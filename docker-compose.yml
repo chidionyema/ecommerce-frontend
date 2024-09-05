@@ -1,0 +1,38 @@
+services:
+  setup_https:
+    build:
+      context: .
+      dockerfile: Dockerfile.setup_https
+    command: bash /setup-https.sh
+    volumes:
+      - .:/app
+    networks:
+      - internal_network
+    restart: "no"
+
+  qtrader:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Ensure you have a Dockerfile for qtrader in the QTrader project
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://api.local.ritualworks.com
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    networks:
+      - internal_network
+      - external_network
+    depends_on:
+      - setup_https
+
+networks:
+  internal_network:
+    external: true
+    name: internal_network
+
+  external_network:
+    external: true
+    name: external_network

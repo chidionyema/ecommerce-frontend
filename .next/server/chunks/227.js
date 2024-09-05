@@ -1,0 +1,1 @@
+"use strict";exports.id=227,exports.ids=[227],exports.modules={61227:(t,e,s)=>{s.d(e,{E:()=>i}),s(20997);var o=s(16689);let d=(0,o.createContext)({state:{items:[]},dispatch:()=>void 0}),i=()=>(0,o.useContext)(d)}};
