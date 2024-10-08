@@ -21,7 +21,8 @@ import {
     Link,
     Slider,
     Tooltip,
-    SelectChangeEvent
+    SelectChangeEvent,
+    Grid,
 } from '@mui/material';
 import { Alert } from '@mui/lab';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -36,7 +37,7 @@ import { useBasket } from '../context/BasketContext';
 import { useProduct } from '../context/ProductContext';
 import ProductList from '../components/ProductList';
 import PaginationControls from '../components/PaginationControls';
-import bannerConfig from '../config/bannerConfig'; // Adjust the path as needed
+import bannerConfig from '../config/bannerConfig';
 import { Product, BasketItem } from '../types/types';
 
 const PAGE_SIZE = 6;
@@ -102,15 +103,6 @@ function reducer(state: typeof initialState, action: { type: string; payload?: a
     }
 }
 
-interface Banner {
-    id: string;
-    message: string;
-    active: boolean;
-    condition: () => boolean;
-    imageUrl: string;
-    gradient: string;
-}
-
 const Shop: React.FC = () => {
     const { state: productState } = useProduct();
     const { state: basketState, dispatch: basketDispatch } = useBasket();
@@ -149,13 +141,8 @@ const Shop: React.FC = () => {
         dispatch({ type: SET_SEARCH_QUERY, payload: event.target.value });
     }, []);
 
-    const handleCheckout = () => {
-        router.push('/checkout/shippingandpayment');
-    };
-
-    const handleGuestCheckout = () => {
-        router.push('/checkout/guest');
-    };
+    const handleCheckout = () => router.push('/checkout/shippingandpayment');
+    const handleGuestCheckout = () => router.push('/checkout/guest');
 
     const filteredProducts = useMemo(() => {
         return productState.products.filter((product: Product) => {
@@ -191,7 +178,7 @@ const Shop: React.FC = () => {
     }, [basketDispatch]);
 
     const removeAllQuantities = useCallback((id: string) => {
-        basketDispatch({ type: 'REMOVE_ALL_QUANTITY', id });
+        basketDispatch({ type: 'REMOVE_FROM_BASKET', id });
     }, [basketDispatch]);
 
     const totalPrice = useMemo(() => {
@@ -203,28 +190,28 @@ const Shop: React.FC = () => {
     }, [filteredProducts.length]);
 
     const activeBanners = useMemo(() => {
-        return bannerConfig.filter((banner: Banner) => banner.active && banner.condition());
+        return bannerConfig.filter((banner) => banner.active && banner.condition());
     }, []);
 
     return (
-        <Box sx={{ padding: { xs: '1rem', sm: '2rem' } }}>
+        <Box sx={{ padding: { xs: '1rem', sm: '2rem' }, backgroundColor: '#f8f9fa' }}>
             <Head>
-                <title>Shop</title>
+                <title>Shop - Explore Our Products</title>
                 <meta name="description" content="Shop the best products online" />
                 <meta name="keywords" content="shop, ecommerce, products, online store" />
             </Head>
             <CssBaseline />
             <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
-                <Link color="inherit" href="/">
+                <Link color="inherit" href="/" underline="hover">
                     Home
                 </Link>
                 <Typography color="textPrimary">Shop</Typography>
             </Breadcrumbs>
             <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} mb={3}>
                 <Typography variant="h4" gutterBottom>
-                    Shop
+                    Explore Our Products
                 </Typography>
-                <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} alignItems="center">
+                <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} alignItems="center" gap={2}>
                     <TextField
                         variant="outlined"
                         placeholder="Search..."
@@ -239,7 +226,7 @@ const Shop: React.FC = () => {
                         }}
                         sx={{ minWidth: 200, mr: 2 }}
                     />
-                    <FormControl variant="outlined" sx={{ minWidth: 120, mr: 2, mt: { xs: 2, sm: 0 } }}>
+                    <FormControl variant="outlined" sx={{ minWidth: 120, mr: 2 }}>
                         <InputLabel>Filter</InputLabel>
                         <Select value={state.filter} onChange={handleFilterChange} label="Filter">
                             <MenuItem value="all">All</MenuItem>
@@ -247,66 +234,29 @@ const Shop: React.FC = () => {
                             <MenuItem value="digital">Digital</MenuItem>
                         </Select>
                     </FormControl>
-                    <FormControl variant="outlined" sx={{ minWidth: 120, mr: 2, mt: { xs: 2, sm: 0 } }}>
-                        <InputLabel>Category</InputLabel>
-                        <Select value={state.category} onChange={handleCategoryChange} label="Category">
-                            <MenuItem value="all">All</MenuItem>
-                            <MenuItem value="electronics">Electronics</MenuItem>
-                            <MenuItem value="apparel">Apparel</MenuItem>
-                            <MenuItem value="home">Home</MenuItem>
-                            {/* Add more categories as needed */}
-                        </Select>
-                    </FormControl>
-                    <FormControl variant="outlined" sx={{ minWidth: 120, mr: 2, mt: { xs: 2, sm: 0 } }}>
-                        <InputLabel>Brand</InputLabel>
-                        <Select value={state.brand} onChange={handleBrandChange} label="Brand">
-                            <MenuItem value="all">All</MenuItem>
-                            <MenuItem value="brandA">Brand A</MenuItem>
-                            <MenuItem value="brandB">Brand B</MenuItem>
-                            {/* Add more brands as needed */}
-                        </Select>
-                    </FormControl>
-                    <Box sx={{ minWidth: 200, mr: 2, mt: { xs: 2, sm: 0 } }}>
-                        <Typography gutterBottom>Price Range</Typography>
-                        <Slider
-                            value={state.priceRange}
-                            onChange={handlePriceRangeChange}
-                            valueLabelDisplay="auto"
-                            min={0}
-                            max={1000}
-                            aria-labelledby="price-range-slider"
-                        />
-                    </Box>
-                    <FormControl variant="outlined" sx={{ minWidth: 120, mr: 2, mt: { xs: 2, sm: 0 } }}>
-                        <InputLabel>Sort</InputLabel>
-                        <Select value={state.sort} onChange={handleSortChange} label="Sort">
-                            <MenuItem value="priceAsc">Price: Low to High</MenuItem>
-                            <MenuItem value="priceDesc">Price: High to Low</MenuItem>
-                            <MenuItem value="rating">Rating</MenuItem>
-                        </Select>
-                    </FormControl>
                     <Tooltip title="Open shopping basket">
                         <IconButton onClick={toggleBasket} aria-label="Open shopping basket">
-                            <Badge badgeContent={basketState.items.reduce((total: number, item: BasketItem) => total + item.quantity, 0)} color="secondary">
+                            <Badge badgeContent={basketState.items.reduce((total, item) => total + item.quantity, 0)} color="secondary">
                                 <ShoppingCartIcon fontSize="large" />
                             </Badge>
                         </IconButton>
                     </Tooltip>
                 </Box>
             </Box>
-            {activeBanners.map((banner: Banner) => (
+            {activeBanners.map((banner) => (
                 <Box
                     key={banner.id}
                     sx={{
                         mb: 2,
-                        p: 2,
-                        borderRadius: 1,
+                        p: 3,
+                        borderRadius: 2,
                         backgroundImage: `url(${banner.imageUrl})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         position: 'relative',
                         color: '#fff',
                         textAlign: 'center',
+                        boxShadow: 3,
                     }}
                 >
                     <Box
@@ -317,10 +267,11 @@ const Shop: React.FC = () => {
                             width: '100%',
                             height: '100%',
                             background: banner.gradient,
-                            borderRadius: 1,
+                            borderRadius: 2,
+                            zIndex: 1,
                         }}
                     />
-                    <Typography variant="h5" sx={{ position: 'relative', zIndex: 1 }}>
+                    <Typography variant="h5" sx={{ position: 'relative', zIndex: 2 }}>
                         {banner.message}
                     </Typography>
                 </Box>
@@ -338,22 +289,14 @@ const Shop: React.FC = () => {
                                 <Typography variant="body1" color="text.secondary">
                                     Your basket is empty
                                 </Typography>
-                                <Image
-                                    src="/empty-basket.png"
-                                    alt="Empty basket"
-                                    width={150}
-                                    height={150}
-                                />
+                                <Image src="/empty-basket.png" alt="Empty basket" width={150} height={150} />
                             </Box>
                         ) : (
-                            basketState.items.map((item: BasketItem) => (
+                            basketState.items.map((item) => (
                                 <ListItem key={item.id} sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Box
-                                        component="div"
-                                        sx={{ width: '100px', height: '100px', marginRight: '1rem', position: 'relative' }}
-                                    >
+                                    <Box component="div" sx={{ width: '100px', height: '100px', marginRight: '1rem', position: 'relative' }}>
                                         <Image
-                                            src={item.images[0]}
+                                            src={item.images?.[0] || '/placeholder.png'}
                                             alt={item.name}
                                             layout="fill"
                                             objectFit="cover"
@@ -362,55 +305,35 @@ const Shop: React.FC = () => {
                                             aria-hidden="true"
                                         />
                                     </Box>
-                                    <ListItemText
-                                        primary={item.name}
-                                        secondary={
-                                            <Box display="flex" alignItems="center" justifyContent="space-between">
-                                                <Typography variant="body2">Price: ${item.price.toFixed(2)}</Typography>
-                                                <Typography variant="body2">Total: ${(item.price * item.quantity).toFixed(2)}</Typography>
-                                            </Box>
-                                        }
-                                    />
-                                    <Box display="flex" alignItems="center">
-                                        <IconButton onClick={() => updateBasketQuantity(item.id, item.quantity - 1)} aria-label="Decrease quantity">
+                                    <ListItemText primary={item.name} secondary={`Price: £${item.price} | Quantity: ${item.quantity}`} />
+                                    <Box>
+                                        <IconButton aria-label="decrease quantity" onClick={() => updateBasketQuantity(item.id, item.quantity - 1)}>
                                             <RemoveIcon />
                                         </IconButton>
-                                        <Typography variant="body1" sx={{ mx: 1 }}>{item.quantity}</Typography>
-                                        <IconButton onClick={() => updateBasketQuantity(item.id, item.quantity + 1)} aria-label="Increase quantity">
+                                        <IconButton aria-label="increase quantity" onClick={() => updateBasketQuantity(item.id, item.quantity + 1)}>
                                             <AddIcon />
                                         </IconButton>
-                                    </Box>
-                                    <Tooltip title="Remove all quantities">
-                                        <IconButton edge="end" aria-label="Remove from basket" onClick={() => removeAllQuantities(item.id)}>
+                                        <IconButton aria-label="remove item" onClick={() => removeAllQuantities(item.id)}>
                                             <DeleteIcon />
                                         </IconButton>
-                                    </Tooltip>
+                                    </Box>
                                 </ListItem>
                             ))
                         )}
                     </List>
-                    <Divider />
-                    <Box sx={{ padding: '1rem' }}>
-                        <Typography variant="h6">Total: ${totalPrice.toFixed(2)}</Typography>
-                        {basketState.items.length > 0 && (
-                            <Box display="flex" flexDirection="column" gap={1}>
-                                <Button variant="contained" color="primary" onClick={handleCheckout}>
-                                    Proceed to Checkout
-                                </Button>
-                                <Button variant="outlined" color="primary" onClick={handleGuestCheckout}>
-                                    Guest Checkout
-                                </Button>
-                            </Box>
-                        )}
-                    </Box>
+                    <Divider sx={{ my: 2 }} />
+                    <Typography variant="h6" gutterBottom>
+                        Total Price: £{totalPrice}
+                    </Typography>
+                    <Button variant="contained" color="primary" fullWidth onClick={handleCheckout}>
+                        Checkout
+                    </Button>
+                    <Button variant="outlined" color="secondary" fullWidth sx={{ mt: 2 }} onClick={handleGuestCheckout}>
+                        Guest Checkout
+                    </Button>
                 </Box>
             </Drawer>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                open={state.snackbarOpen}
-                autoHideDuration={3000}
-                onClose={handleSnackbarClose}
-            >
+            <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} open={state.snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
                 <Alert onClose={handleSnackbarClose} severity={state.snackbarSeverity}>
                     {state.snackbarMessage}
                 </Alert>

@@ -26,6 +26,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Image from 'next/image';
 import { styled } from '@mui/system';
 import { BasketItem, BasketState } from '../types/types';
+
 const stripePromise = loadStripe('your-publishable-key-here');
 
 const cardElementOptions = {
@@ -52,7 +53,7 @@ const CustomCardElement = styled(CardElement)({
 });
 
 const CheckoutForm: React.FC = () => {
-  const { state: basketState, dispatch: basketDispatch } = useBasket() as { state: BasketState, dispatch: React.Dispatch<any> };
+  const { state: basketState, dispatch: basketDispatch } = useBasket() as { state: BasketState; dispatch: React.Dispatch<any> };
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
@@ -212,15 +213,28 @@ const CheckoutForm: React.FC = () => {
                       component="div"
                       sx={{ width: '100px', height: '100px', marginRight: '1rem', position: 'relative' }}
                     >
-                      <Image
-                        src={item.images[0]} // Correct reference to the first image in the images array
-                        alt={item.name}
-                        layout="fill"
-                        objectFit="cover"
-                        sizes="(max-width: 600px) 100px, (max-width: 960px) 100px, 100px"
-                        loading="lazy"
-                        aria-hidden="true"
-                      />
+                      {/* Ensure the item.images array is defined and has at least one element */}
+                      {item.images && item.images.length > 0 ? (
+                        <Image
+                          src={item.images[0]} // Safe access to the first image
+                          alt={item.name}
+                          layout="fill"
+                          objectFit="cover"
+                          sizes="(max-width: 600px) 100px, (max-width: 960px) 100px, 100px"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <Image
+                          src="/placeholder.png" // Fallback image if item.images is undefined or empty
+                          alt="Placeholder"
+                          layout="fill"
+                          objectFit="cover"
+                          sizes="(max-width: 600px) 100px, (max-width: 960px) 100px, 100px"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                      )}
                     </Box>
                     <ListItemText
                       primary={item.name}

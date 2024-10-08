@@ -10,14 +10,14 @@ import {
   CircularProgress,
   Divider,
   FormControlLabel,
-  Checkbox
+  Checkbox,
 } from '@mui/material';
 import { Alert } from '@mui/material';
 import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
 const LoginPage: NextPage = () => {
   const [message, setMessage] = useState('');
-  const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [notRobotChecked, setNotRobotChecked] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -31,13 +31,14 @@ const LoginPage: NextPage = () => {
   const handleCustomLogin = async (e: FormEvent) => {
     e.preventDefault();
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(credentials.email)) {
-      setMessage('Invalid email format!');
+    // Validate username (basic check to ensure username is not empty)
+    if (credentials.username.trim() === '') {
+      setMessage('Username is required!');
       setSnackbarOpen(true);
       return;
     }
 
+    // Validate password length
     if (credentials.password.length < 8) {
       setMessage('Password should be at least 8 characters!');
       setSnackbarOpen(true);
@@ -53,15 +54,25 @@ const LoginPage: NextPage = () => {
     setLoading(true);
 
     try {
-      await login(credentials.email, credentials.password);
+      await login(credentials.username, credentials.password);
       setMessage('Login successful! Redirecting to the home page in 3 seconds...');
       setSnackbarOpen(true);
       setTimeout(() => {
         router.push('/');
       }, 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error during login:', error);
-      setMessage('Login failed. Please try again.');
+
+      let errorMessage = 'Login failed. Please try again.';
+
+      // Check if error is an instance of Error
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
+
+      setMessage(errorMessage);
       setSnackbarOpen(true);
     } finally {
       setLoading(false);
@@ -77,13 +88,13 @@ const LoginPage: NextPage = () => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        minHeight: '100vh', // Ensure it takes at least the full height of the viewport
-        justifyContent: 'center',
+        paddingTop: '30px',
+        minHeight: '100vh',
       }}
     >
       <Box
         sx={{
-          width: { xs: '100%', sm: '80%', md: '50%', lg: '40%' }, // More precise control over widths
+          width: { xs: '100%', sm: '80%', md: '50%', lg: '40%' },
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -104,20 +115,19 @@ const LoginPage: NextPage = () => {
             padding: '20px',
             borderRadius: '8px',
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            maxHeight: '90vh', // Ensure it doesn't exceed the viewport height
-            overflowY: 'auto', // Allow scrolling if needed
+            marginTop: '20px',
           }}
         >
           <TextField
-            type="email"
+            type="text"
             required
-            placeholder="Email Address"
-            value={credentials.email}
-            onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
+            placeholder="Username"
+            value={credentials.username}
+            onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
             variant="outlined"
             fullWidth
             margin="normal"
-            aria-label="Email Address"
+            aria-label="Username"
           />
           <TextField
             type="password"

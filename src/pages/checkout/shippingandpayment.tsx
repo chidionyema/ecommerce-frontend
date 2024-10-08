@@ -45,7 +45,7 @@ const cardElementOptions = {
       color: '#9e2146',
     },
   },
-  hidePostalCode: true, // Disable postal code field
+  hidePostalCode: true,
 };
 
 const ShippingAndPaymentForm: React.FC = () => {
@@ -288,17 +288,6 @@ const ShippingAndPaymentForm: React.FC = () => {
                 }}
               >
                 <CardElement options={cardElementOptions} />
-                <TextField
-                  required
-                  fullWidth
-                  label="Postal Code"
-                  name="postalCode"
-                  value={billingInfo.zip}
-                  onChange={handleInputChange}
-                  error={errors.zip}
-                  helperText={errors.zip && 'Postal Code is required'}
-                  sx={{ mt: 2 }}
-                />
               </Box>
               <Button
                 variant="contained"
@@ -335,15 +324,28 @@ const ShippingAndPaymentForm: React.FC = () => {
                       component="div"
                       sx={{ width: '100px', height: '100px', marginRight: '1rem', position: 'relative' }}
                     >
-                      <Image
-                        src={item.images[0]} // Use the first image from the images array
-                        alt={item.name}
-                        layout="fill"
-                        objectFit="cover"
-                        sizes="(max-width: 600px) 100px, (max-width: 960px) 100px, 100px"
-                        loading="lazy"
-                        aria-hidden="true"
-                      />
+                      {/* Ensure item.images is defined and has at least one element */}
+                      {item.images && item.images.length > 0 ? (
+                        <Image
+                          src={item.images[0]} // Safely access the first image if available
+                          alt={item.name}
+                          layout="fill"
+                          objectFit="cover"
+                          sizes="(max-width: 600px) 100px, (max-width: 960px) 100px, 100px"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <Image
+                          src="/placeholder.png" // Fallback image if item.images is undefined or empty
+                          alt="Placeholder"
+                          layout="fill"
+                          objectFit="cover"
+                          sizes="(max-width: 600px) 100px, (max-width: 960px) 100px, 100px"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                      )}
                     </Box>
                     <ListItemText
                       primary={item.name}

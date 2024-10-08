@@ -45,7 +45,7 @@ export interface Product {
   description: string;
   price: number;
   stock: number;
-  category: string;
+  categoryId: string;
   images: string[];
   assets: any[];
   rating: number;
