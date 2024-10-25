@@ -1,3 +1,5 @@
+// src/context/ProductContext.tsx
+
 import React, { createContext, useReducer, useContext, ReactNode, useEffect } from 'react';
 import { Product, ProductState } from '../types/types';
 import axios from 'axios';
@@ -8,7 +10,7 @@ type Action =
   | { type: 'ADD_PRODUCT'; product: Product }
   | { type: 'UPDATE_PRODUCT'; product: Product }
   | { type: 'DELETE_PRODUCT'; id: string }
-  | { type: 'SET_SINGLE_PRODUCT'; product: Product }; // New action for setting a single product
+  | { type: 'SET_SINGLE_PRODUCT'; product: Product };
 
 // Initial state for the product context
 const initialState: ProductState = {
@@ -21,8 +23,8 @@ const ProductContext = createContext<{
   state: ProductState;
   dispatch: React.Dispatch<Action>;
   fetchProducts: () => Promise<void>;
-  addProduct: (product: Product) => Promise<void>;
-  updateProduct: (product: Product) => Promise<void>;
+  addProduct: (formData: FormData) => Promise<void>;
+  updateProduct: (productId: string, formData: FormData) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
 }>({
   state: initialState,
@@ -67,7 +69,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
   // Fetch products from the backend API
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('/api/products'); // Replace with your API endpoint
+      const response = await axios.get<Product[]>('https://api.local.ritualworks.com/api/products');
       dispatch({ type: 'SET_PRODUCTS', products: response.data, totalProducts: response.data.length });
     } catch (error) {
       console.error('Failed to fetch products:', error);
@@ -75,29 +77,43 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   // Add a product to the backend and update context
-  const addProduct = async (product: Product) => {
+  const addProduct = async (formData: FormData) => {
     try {
-      const response = await axios.post('/api/products', product); // Replace with your API endpoint
+      const response = await axios.post<Product>('https://api.local.ritualworks.com/api/products', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       dispatch({ type: 'ADD_PRODUCT', product: response.data });
     } catch (error) {
       console.error('Failed to add product:', error);
+      throw error;
     }
   };
 
   // Update a product in the backend and update context
-  const updateProduct = async (product: Product) => {
+  const updateProduct = async (productId: string, formData: FormData) => {
     try {
-      await axios.put(`/api/products/${product.id}`, product); // Replace with your API endpoint
-      dispatch({ type: 'UPDATE_PRODUCT', product });
+      const response = await axios.put<Product>(
+        `https://api.local.ritualworks.com/api/products/${productId}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      dispatch({ type: 'UPDATE_PRODUCT', product: response.data });
     } catch (error) {
       console.error('Failed to update product:', error);
+      throw error;
     }
   };
 
   // Delete a product from the backend and update context
   const deleteProduct = async (id: string) => {
     try {
-      await axios.delete(`/api/products/${id}`); // Replace with your API endpoint
+      await axios.delete(`https://api.local.ritualworks.com/api/products/${id}`);
       dispatch({ type: 'DELETE_PRODUCT', id });
     } catch (error) {
       console.error('Failed to delete product:', error);

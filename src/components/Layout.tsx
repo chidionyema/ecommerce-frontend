@@ -2,7 +2,6 @@ import React from 'react';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 import Footer from './Footer';
 import { Box, Container, Typography, Paper, Button, Grid, Card, CardContent, CardActions, Divider } from '@mui/material';
-import BreadcrumbNavigation from './BreadcrumbNavigation';
 import { styled } from '@mui/system';
 
 // Custom Styled Components
@@ -74,22 +73,22 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             {/* Hero Section */}
             <HeroSection>
                 <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2, fontSize: { xs: '2.5rem', sm: '3rem', md: '4rem' } }}>
-                    Empowering Your Journey with Rituals and Community
+                    Exclusive Deals on Top Products
                 </Typography>
                 <Typography variant="h6" sx={{ mb: 3, maxWidth: '600px' }}>
-                    Discover new rituals, join like-minded communities, and enhance your spiritual journey with Ritual Works.
+                    Discover the latest arrivals and save big on premium products.
                 </Typography>
-                <StyledButton endIcon={<ArrowRightAlt />} href="/get-started">
-                    Get Started
+                <StyledButton endIcon={<ArrowRightAlt />} href="/shop">
+                    Shop Now
                 </StyledButton>
             </HeroSection>
 
             {/* Main Content */}
             <Container maxWidth="lg" component="main" sx={{ my: 5 }}>
-                {/* Breadcrumb Navigation */}
-                <BreadcrumbNavigation />
+                {/* Optional Breadcrumb Navigation */}
+                {/* <BreadcrumbNavigation /> */}
 
-                {/* Main Content */}
+                {/* Featured Sections */}
                 <Box sx={{ mb: 5 }}>
                     {children}
                 </Box>
@@ -99,13 +98,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     <Grid item xs={12} md={6}>
                         <InfoCard>
                             <InfoCardContent>
-                                <Typography variant="h6" gutterBottom>Did You Know?</Typography>
+                                <Typography variant="h6" gutterBottom>Free Shipping</Typography>
                                 <Typography>
-                                    Interesting facts about spiritual practices and rituals to inspire and educate.
+                                    Enjoy free shipping on all orders over $50.
                                 </Typography>
                             </InfoCardContent>
                             <InfoCardActions>
-                                <Button variant="outlined" href="/learn-more">
+                                <Button variant="outlined" href="/shipping-info">
                                     Learn More
                                 </Button>
                             </InfoCardActions>
@@ -114,38 +113,43 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     <Grid item xs={12} md={6}>
                         <InfoCard>
                             <InfoCardContent>
-                                <Typography variant="h6" gutterBottom>Latest Updates</Typography>
+                                <Typography variant="h6" gutterBottom>New Arrivals</Typography>
                                 <Typography>
-                                    Stay updated with the latest news and insights in the world of spirituality and rituals.
+                                    Check out the latest trends and additions to our collection.
                                 </Typography>
                             </InfoCardContent>
                             <InfoCardActions>
-                                <Button variant="outlined" href="/updates">
-                                    See Updates
+                                <Button variant="outlined" href="/new-arrivals">
+                                    Shop Now
                                 </Button>
                             </InfoCardActions>
                         </InfoCard>
                     </Grid>
                 </Grid>
 
-                {/* News and Testimonial Section */}
+                {/* Featured Product & Testimonial Section */}
                 <Box sx={{ mt: 5 }}>
                     <Grid container spacing={4}>
                         <Grid item xs={12} md={6}>
                             <InfoCard>
                                 <InfoCardContent>
-                                    <Typography variant="h6" gutterBottom>Latest Spiritual News</Typography>
+                                    <Typography variant="h6" gutterBottom>Featured Product</Typography>
                                     <Typography>
-                                        Get the latest articles, research, and discussions around spiritual practices and their impact.
+                                        Discover our top-selling product of the month, crafted for ultimate quality.
                                     </Typography>
                                 </InfoCardContent>
+                                <InfoCardActions>
+                                    <Button variant="outlined" href="/featured-product">
+                                        View Product
+                                    </Button>
+                                </InfoCardActions>
                             </InfoCard>
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <InfoCard>
                                 <InfoCardContent>
-                                    <Typography variant="h6" gutterBottom>User Testimonial</Typography>
-                                    <Typography>"Ritual Works has brought so much clarity and guidance to my life!" - Satisfied User</Typography>
+                                    <Typography variant="h6" gutterBottom>Customer Testimonial</Typography>
+                                    <Typography>"The products are amazing, and the customer service is top-notch!" - Happy Customer</Typography>
                                 </InfoCardContent>
                             </InfoCard>
                         </Grid>
@@ -155,11 +159,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 {/* Call to Action Section */}
                 <Box sx={{ mt: 5, textAlign: 'center' }}>
                     <Divider sx={{ mb: 3 }} />
-                    <Typography variant="h5" sx={{ mb: 2 }}>Ready to Take the Next Step?</Typography>
+                    <Typography variant="h5" sx={{ mb: 2 }}>Ready to Start Shopping?</Typography>
                     <Button
                         variant="contained"
                         color="primary"
-                        href="/get-started"
+                        href="/shop"
                         sx={{
                             padding: '12px 32px',
                             fontSize: '1.1rem',
@@ -168,7 +172,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                             '&:hover': { backgroundColor: '#155b9f' },
                         }}
                     >
-                        Join the Community
+                        Explore Products
                     </Button>
                 </Box>
             </Container>

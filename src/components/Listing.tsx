@@ -1,4 +1,5 @@
 // src/components/AddListing.tsx
+
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import {
   Box,
@@ -32,11 +33,11 @@ import { SelectChangeEvent } from '@mui/material/Select';
 import { useDropzone } from 'react-dropzone';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Image from 'next/image';
-import axios from 'axios';
 import { Product } from '../types/types';
 import { useAuth } from '../context/AuthContext';
 import { useProduct } from '../context/ProductContext';
 import { useRouter } from 'next/router';
+import axios from 'axios'; // Only used for fetching categories
 
 interface Category {
   id: string;
@@ -56,11 +57,11 @@ const initialProductState: Product = {
   price: 0,
   stock: 0,
   categoryId: '',
-  images: [], // This will hold the image files
-  assets: [], // This will hold the asset files
+  images: [], // This will hold the image URLs or files
+  assets: [], // This will hold the asset URLs or files
   rating: 0,
   new: true,
-  brand: '',
+  brand: 'test',
   type: 'physical',
   inStock: true,
   reviews: [],
@@ -68,8 +69,8 @@ const initialProductState: Product = {
 
 const AddListing: React.FC<AddListingProps> = ({ productId }) => {
   const [product, setProduct] = useState<Product>(initialProductState);
-  const [imageFiles, setImageFiles] = useState<File[]>([]); // New state to hold image files
-  const [assetFiles, setAssetFiles] = useState<File[]>([]); // New state to hold asset files
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [assetFiles, setAssetFiles] = useState<File[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -129,10 +130,10 @@ const AddListing: React.FC<AddListingProps> = ({ productId }) => {
       }));
     } else {
       setAssetFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
-      const previewUrls = acceptedFiles.map((file) => file.name); // For assets, we can use the file name
+      const fileNames = acceptedFiles.map((file) => file.name);
       setProduct((prevProduct) => ({
         ...prevProduct,
-        assets: [...(prevProduct.assets || []), ...previewUrls],
+        assets: [...(prevProduct.assets || []), ...fileNames],
       }));
     }
   };
@@ -182,7 +183,7 @@ const AddListing: React.FC<AddListingProps> = ({ productId }) => {
       formData.append('price', product.price.toString());
       formData.append('stock', product.stock.toString());
       formData.append('categoryId', product.categoryId);
-      formData.append('brand', product.brand);
+      formData.append('brand', 'test');
       formData.append('type', product.type);
       formData.append('inStock', product.inStock.toString());
       formData.append('isNew', product.new.toString());
@@ -198,20 +199,12 @@ const AddListing: React.FC<AddListingProps> = ({ productId }) => {
       });
 
       if (productId) {
-        // Update existing product
-        await axios.put(`/api/products/${productId}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        // Update existing product using context
+        await updateProduct(productId, formData);
         setSuccessMessage('Product updated successfully!');
       } else {
-        // Create new product
-        await axios.post('/api/products', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        // Add new product using context
+        await addProduct(formData);
         setSuccessMessage('Product created successfully!');
       }
       setSnackbarOpen(true);

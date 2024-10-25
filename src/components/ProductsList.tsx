@@ -40,7 +40,7 @@ const ProductsList: React.FC = () => {
   };
 
   const handleDelete = (productId: string) => {
-    if (!isAuthenticated || !user?.isAdmin) {
+    if (!isAuthenticated) {
       alert('You do not have permission to delete products.');
       return;
     }

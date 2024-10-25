@@ -13,7 +13,7 @@ import {
   Checkbox,
 } from '@mui/material';
 import { Alert } from '@mui/material';
-import { AuthContext } from '../context/AuthContext'; // Import AuthContext
+import { AuthContext } from '../context/AuthContext';
 
 const LoginPage: NextPage = () => {
   const [message, setMessage] = useState('');
@@ -22,7 +22,7 @@ const LoginPage: NextPage = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { login } = useContext(AuthContext); // Access login from AuthContext
+  const { login } = useContext(AuthContext);
 
   const handleGoogleLogin = () => {
     window.location.href = 'https://api.dev.io:5000/auth/login/google';
@@ -31,14 +31,12 @@ const LoginPage: NextPage = () => {
   const handleCustomLogin = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Validate username (basic check to ensure username is not empty)
     if (credentials.username.trim() === '') {
       setMessage('Username is required!');
       setSnackbarOpen(true);
       return;
     }
 
-    // Validate password length
     if (credentials.password.length < 8) {
       setMessage('Password should be at least 8 characters!');
       setSnackbarOpen(true);
@@ -62,17 +60,7 @@ const LoginPage: NextPage = () => {
       }, 3000);
     } catch (error: any) {
       console.error('Error during login:', error);
-
-      let errorMessage = 'Login failed. Please try again.';
-
-      // Check if error is an instance of Error
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (error.response && error.response.data && error.response.data.message) {
-        errorMessage = error.response.data.message;
-      }
-
-      setMessage(errorMessage);
+      setMessage(error.message || 'Login failed. Please try again.');
       setSnackbarOpen(true);
     } finally {
       setLoading(false);

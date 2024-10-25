@@ -1,187 +1,204 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {
-  useMediaQuery, AppBar, Toolbar, Button, Drawer, List, ListItem, IconButton, Typography, Box, Menu, MenuItem, Divider, Tooltip, Container,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Button,
+  Menu,
+  MenuItem,
+  Drawer,
+  List,
+  ListItem,
+  Divider,
+  Box,
+  Tooltip,
+  useMediaQuery,
+  Container,
 } from '@mui/material';
-import { Brightness4 as Brightness4Icon, Brightness7 as Brightness7Icon, AccountCircle, Menu as MenuIcon, ShoppingCart } from '@mui/icons-material';
+import {
+  Menu as MenuIcon,
+  Brightness4 as Brightness4Icon,
+  Brightness7 as Brightness7Icon,
+  AccountCircle,
+} from '@mui/icons-material';
+import { styled, useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
 import { AuthContext } from '../context/AuthContext';
 
-// Custom Styled Components for dynamic styles
-const StyledButton = (props) => (
-  <Button
-    sx={{
-      textTransform: 'uppercase',
-      fontWeight: 'bold',
-      transition: 'color 0.3s, background 0.3s',
-      '&:hover': {
-        color: '#ffffff',
-        backgroundColor: '#1976d2',
-      },
-    }}
-    {...props}
-  />
-);
-
-const NavBar: React.FC = () => {
+const NavBar = () => {
   const router = useRouter();
-  const { isAuthenticated, logout } = useContext(AuthContext);
-  const [darkMode, setDarkMode] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const isMobile = useMediaQuery('(max-width:600px)');
+  const { isAuthenticated, user, logout } = useContext(AuthContext);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const navItems = [
-    { path: '/', label: 'Home' },
-    { path: '/shop', label: 'Shop' },
-    { path: '/rituals', label: 'Rituals' },
-    { path: '/add-listing', label: 'List Products' },
-    { path: '/community', label: 'Community' },
-    { path: '/about', label: 'About Us' },
-    { path: '/contact', label: 'Contact' },
-  ];
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
-  // Set username when authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      setUsername('chid'); // Replace with actual logic to fetch username
-    }
-  }, [isAuthenticated]);
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
 
-  // Themes for light and dark mode
-  const lightTheme = createTheme({
-    palette: {
-      mode: 'light',
-      primary: { main: '#1976d2' },
-      secondary: { main: '#000' },
-      background: { default: '#f5f5f5', paper: '#ffffff' },
-      text: { primary: '#000000', secondary: '#1976d2' },
-    },
-    typography: { fontFamily: 'Roboto, sans-serif' },
-  });
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
 
-  const darkTheme = createTheme({
-    palette: {
-      mode: 'dark',
-      primary: { main: '#bb86fc' },
-      secondary: { main: '#03dac6' },
-      background: { default: '#121212', paper: '#1e1e1e' },
-      text: { primary: '#ffffff', secondary: '#bb86fc' },
-    },
-    typography: { fontFamily: 'Roboto, sans-serif' },
-  });
+  const handleThemeToggle = () => {
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  };
 
-  // Toggle light/dark theme
-  const handleThemeToggle = () => setDarkMode((prev) => !prev);
-
-  // Logout functionality
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success('Logged out successfully!');
       router.push('/');
-    } catch {
-      toast.error('Logout failed. Please try again.');
+    } catch (error) {
+      console.error('Logout failed:', error);
     }
   };
 
-  // Open/close user menu
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
-  const handleMenuClose = () => setAnchorEl(null);
+  const navItems = [
+    { label: 'Home', path: '/' },
+    { label: 'Shop', path: '/shop' },
+    { label: 'List Products', path: '/add-listing' },
+    { label: 'Community', path: '/community' },
+    { label: 'About Us', path: '/about' },
+    { label: 'Contact', path: '/contact' },
+  ];
+
+  const DrawerContent = (
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
+      <Typography variant="h6" sx={{ my: 2 }}>
+        Ritual Works
+      </Typography>
+      <Divider />
+      <List>
+        {navItems.map(({ label, path }) => (
+          <Link href={path} key={label} passHref>
+            <ListItem button component="a">
+              <Typography textAlign="center">{label}</Typography>
+            </ListItem>
+          </Link>
+        ))}
+        <Divider />
+        <ListItem>
+          <IconButton onClick={handleThemeToggle} color="inherit">
+            {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
+          <Typography variant="body1">
+            {mode === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          </Typography>
+        </ListItem>
+      </List>
+    </Box>
+  );
+
+  const customTheme = createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: '#673ab7',
+      },
+      secondary: {
+        main: '#ff5722',
+      },
+    },
+  });
 
   return (
-    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-        <AppBar position="static" color="inherit">
-          <Container maxWidth="lg">
-            <Toolbar disableGutters>
-              {/* Logo or App Name */}
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ flexGrow: 1, cursor: 'pointer', color: darkMode ? darkTheme.palette.text.primary : lightTheme.palette.text.primary }}
-                onClick={() => router.push('/')}
-              >
-                Ritual Works
-              </Typography>
+    <ThemeProvider theme={customTheme}>
+      <AppBar position="static" color="primary">
+        <Container maxWidth="lg">
+          <Toolbar disableGutters>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1, cursor: 'pointer' }}
+              onClick={() => router.push('/')}
+            >
+              Ritual Works
+            </Typography>
 
-              {/* Navigation Links for Desktop */}
-              {!isMobile && (
-                <Box sx={{ display: 'flex', gap: 3 }}>
-                  {navItems.map(({ path, label }) => (
-                    <Link href={path} key={path} passHref>
-                      <StyledButton color="inherit">{label}</StyledButton>
-                    </Link>
-                  ))}
-                </Box>
-              )}
-
-              {/* Right side controls */}
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                {/* Theme Toggle Button */}
-                <Tooltip title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>
-                  <IconButton onClick={handleThemeToggle} sx={{ color: darkMode ? darkTheme.palette.text.primary : lightTheme.palette.text.primary }}>
-                    {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+            {isMobile ? (
+              <>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={{ ml: 1 }}
+                >
+                  <MenuIcon />
+                </IconButton>
+              </>
+            ) : (
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                {navItems.map(({ label, path }) => (
+                  <Button
+                    key={label}
+                    color="inherit"
+                    onClick={() => router.push(path)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+                <Tooltip title="Toggle light/dark mode">
+                  <IconButton onClick={handleThemeToggle} color="inherit">
+                    {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                   </IconButton>
                 </Tooltip>
-
-                {/* Show Login/Profile Button based on auth state */}
-                {isAuthenticated ? (
+                {isAuthenticated && user ? (
                   <>
-                    <Typography variant="body1" sx={{ mr: 1, color: darkMode ? darkTheme.palette.text.primary : lightTheme.palette.text.primary }}>
-                      Welcome, {username}
-                    </Typography>
-                    <IconButton onClick={handleMenuOpen} color="inherit">
-                      <AccountCircle sx={{ color: darkMode ? darkTheme.palette.text.primary : lightTheme.palette.text.primary }} />
-                    </IconButton>
-                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+                    <Tooltip title="Open settings">
+                      <IconButton onClick={handleOpenUserMenu} color="inherit">
+                        <AccountCircle />
+                      </IconButton>
+                    </Tooltip>
+                    <Menu
+                      anchorEl={anchorElUser}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      keepMounted
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      open={Boolean(anchorElUser)}
+                      onClose={handleCloseUserMenu}
+                    >
                       <MenuItem onClick={() => router.push('/profile')}>Profile</MenuItem>
                       <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>
                   </>
                 ) : (
-                  <Link href="/login" passHref>
-                    <StyledButton startIcon={<AccountCircle />}>Login</StyledButton>
-                  </Link>
+                  <Button
+                    color="inherit"
+                    startIcon={<AccountCircle />}
+                    onClick={() => router.push('/login')}
+                  >
+                    Login
+                  </Button>
                 )}
-
-                {/* Mobile Navigation Menu */}
-                <IconButton onClick={() => setMobileNavOpen(true)} sx={{ display: { xs: 'block', sm: 'none' }, color: darkMode ? darkTheme.palette.text.primary : lightTheme.palette.text.primary }}>
-                  <MenuIcon />
-                </IconButton>
               </Box>
-            </Toolbar>
-          </Container>
+            )}
+          </Toolbar>
+        </Container>
+      </AppBar>
 
-          {/* Mobile Drawer */}
-          <Drawer anchor="right" open={mobileNavOpen} onClose={() => setMobileNavOpen(false)}>
-            <Box
-              sx={{
-                width: 250,
-                backgroundColor: darkMode ? darkTheme.palette.background.paper : lightTheme.palette.background.paper,
-                height: '100%',
-              }}
-              onClick={() => setMobileNavOpen(false)}
-            >
-              <List>
-                {navItems.map(({ path, label }) => (
-                  <Link href={path} key={path} passHref>
-                    <ListItem button>
-                      <Typography variant="body1" sx={{ color: darkMode ? darkTheme.palette.text.primary : lightTheme.palette.text.primary }}>{label}</Typography>
-                    </ListItem>
-                  </Link>
-                ))}
-              </List>
-            </Box>
-          </Drawer>
-        </AppBar>
-        <ToastContainer />
-      </motion.div>
+      <Drawer
+        anchor="left"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{ keepMounted: true }}
+      >
+        {DrawerContent}
+      </Drawer>
     </ThemeProvider>
   );
 };
