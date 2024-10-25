@@ -12,7 +12,7 @@ interface User {
 // Extend AuthContextProps to include user information
 interface AuthContextProps {
   isAuthenticated: boolean;
-  user: User | null; // Add user property to the context
+  user: User | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   refreshToken: () => Promise<void>;
@@ -22,7 +22,7 @@ interface AuthContextProps {
 
 const defaultAuthContext: AuthContextProps = {
   isAuthenticated: false,
-  user: null, // Default value for user is null
+  user: null,
   login: async () => {},
   logout: () => {},
   refreshToken: async () => {},
@@ -34,125 +34,140 @@ export const AuthContext = createContext<AuthContextProps>(defaultAuthContext);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null); // Manage user state
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null); // Store the JWT token
   const router = useRouter();
   const apiUrl = 'https://api.local.ritualworks.com';
 
   const logError = (message: string, error: any) => {
     console.error(`${message}:`, error);
-    if (error.response) {
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+    }
+    if (axios.isAxiosError(error) && error.response) {
       console.error('Response data:', error.response.data);
       console.error('Response status:', error.response.status);
       console.error('Response headers:', error.response.headers);
     } else if (error.request) {
       console.error('Request data:', error.request);
-    } else {
-      console.error('General error message:', error.message);
     }
+  };
+
+  // Store the token in localStorage and set in axios headers
+  const storeToken = (token: string) => {
+    localStorage.setItem('jwt_token', token);
+    setToken(token);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  };
+
+  // Remove the token from localStorage and axios headers
+  const removeToken = () => {
+    localStorage.removeItem('jwt_token');
+    delete axios.defaults.headers.common['Authorization'];
+    setToken(null);
   };
 
   const verifyToken = async () => {
     try {
-      console.log(`Verifying token at: ${apiUrl}/api/authentication/verify-token`);
-      const response = await axios.get(`${apiUrl}/api/authentication/verify-token`, { withCredentials: true });
-      setIsAuthenticated(true);
-      setUser(response.data.user); // Set the user data from response
-    } catch (error) {
+      // Check if a token is already present in local storage
+      const savedToken = localStorage.getItem('jwt_token');
+      if (savedToken) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+        const response = await axios.get(`${apiUrl}/api/authentication/verify-token`);
+        
+        // If token is valid, set user and isAuthenticated states
+        setIsAuthenticated(true);
+        setUser({ id: response.data.userId, username: response.data.userName, email: '' }); // Adjust based on response structure
+      } else {
+        throw new Error('No token found');
+      }
+    } catch (error: any) {
       logError('Token verification failed', error);
       setIsAuthenticated(false);
-      setUser(null); // Clear user state on failure
-      throw new Error('Token verification failed');
+      setUser(null);
+      removeToken(); // Remove the token on failure
     }
   };
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        await verifyToken();
-      } catch {
-        setIsAuthenticated(false);
-        setUser(null); // Reset user if verification fails
-      }
-    };
-    checkAuth();
+    // Check authentication status on app load
+    verifyToken();
   }, []);
 
   const login = async (username: string, password: string) => {
     try {
-      console.log(`Attempting login at: ${apiUrl}/api/authentication/login`);
       const response = await axios.post(
         `${apiUrl}/api/authentication/login`,
-        { username, password },
-        { withCredentials: true }
+        { username, password }
       );
-  
-      // Extract user from response data
-      const user = response.data.user;
-  
+
+      // Extract the token and user data from the response
+      if (response.status !== 200 || !response.data.token) {
+        throw new Error('Invalid username or password.');
+      }
+
+      const { token, user } = response.data;
+
       setIsAuthenticated(true);
       setUser(user); // Store user data after successful login
+      storeToken(token); // Store the token and set in headers
       router.push('/');
-    } catch (error) {
+    } catch (error: any) {
       logError('Login failed', error);
       setIsAuthenticated(false);
       setUser(null); // Reset user on login failure
+      throw new Error(error.response?.data?.message || 'Login failed. Please try again.');
     }
   };
-  
+
   const logout = async () => {
     try {
-      console.log(`Logging out at: ${apiUrl}/api/authentication/logout`);
-      await axios.post(`${apiUrl}/api/authentication/logout`, {}, { withCredentials: true });
+      await axios.post(`${apiUrl}/api/authentication/logout`);
       setIsAuthenticated(false);
       setUser(null); // Reset user state on logout
+      removeToken(); // Remove the token from storage
       router.push('/login');
-    } catch (error) {
+    } catch (error: any) {
       logError('Logout failed', error);
     }
   };
 
   const refreshToken = async () => {
     try {
-      console.log(`Refreshing token at: ${apiUrl}/api/authentication/refresh-token`);
-      const response = await axios.post(`${apiUrl}/api/authentication/refresh-token`, {}, { withCredentials: true });
+      const response = await axios.post(`${apiUrl}/api/authentication/refresh-token`);
+      const { token } = response.data;
+      
       setIsAuthenticated(true);
-      setUser(response.data.user); // Update user data if necessary
-    } catch (error) {
+      storeToken(token); // Store the new token
+    } catch (error: any) {
       logError('Refresh token failed', error);
       setIsAuthenticated(false);
       setUser(null); // Reset user state on failure
+      removeToken(); // Remove the token from storage on failure
     }
   };
 
   const register = async (email: string, password: string, username: string) => {
     try {
-      console.log(`Registering at: ${apiUrl}/api/authentication/register`);
       const response = await axios.post(
         `${apiUrl}/api/authentication/register`,
-        { email, password, username },
-        { withCredentials: true }
+        { email, password, username }
       );
+
       if (response.data.message === 'User registered successfully') {
         setIsAuthenticated(true);
-        setUser(response.data.user); // Store user data after successful registration
+        const { token, userId } = response.data;
+        setUser({ id: userId, username, email });
+        storeToken(token); // Store the token
         router.push('/');
       } else {
-        console.error('Registration failed:', response.data);
         throw new Error(response.data.message || 'Unexpected registration response.');
       }
     } catch (error: any) {
       logError('Registration failed', error);
       setIsAuthenticated(false);
       setUser(null); // Reset user state on failure
-
-      let errorMessage = 'Registration failed. Please try again.';
-      if (error.response && error.response.data && error.response.data.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-
-      throw new Error(errorMessage);
+      throw new Error(error.response?.data?.message || 'Registration failed. Please try again.');
     }
   };
 
