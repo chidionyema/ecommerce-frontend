@@ -1,16 +1,20 @@
-require('dotenv').config();
+import fs from 'fs';
+import path from 'path';
 
-/** @type {import('next').NextConfig} */
+const certsDir = path.join(process.cwd(), 'certs');
+const keyPath = path.join(certsDir, 'key.pem');
+const certPath = path.join(certsDir, 'cert.pem');
+
+const useHttps = fs.existsSync(keyPath) && fs.existsSync(certPath);
+
+console.log('useHttps:', useHttps);
+console.log('keyPath:', keyPath);
+console.log('certPath:', certPath);
+console.log('key exists:', fs.existsSync(keyPath));
+console.log('cert exists:', fs.existsSync(certPath));
+
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true, // Enable SWC minifier for faster builds
-  images: {
-    domains: ['via.placeholder.com'],
-  },
-  env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-  },
-  // Any other custom Next.js configurations can be added here
 };
 
-module.exports = nextConfig;
+export default nextConfig;

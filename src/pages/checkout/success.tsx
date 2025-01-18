@@ -1,35 +1,70 @@
-import React, { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, CircularProgress, Button } from '@mui/material';
+import axios from 'axios';
 
-const Success: React.FC = () => {
-    const router = useRouter();
+const SuccessPage = () => {
+  const router = useRouter();
+  const { orderId } = router.query; // Get orderId from query params
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [orderDetails, setOrderDetails] = useState<any>(null);
 
-    useEffect(() => {
-        const { session_id } = router.query;
-        if (session_id) {
-            // Optionally fetch the session details or confirm order processing
-            console.log(`Payment succeeded for session ID: ${session_id}`);
-        }
-    }, [router.query]);
+  useEffect(() => {
+    if (!orderId) {
+      setError('Invalid or missing order information.');
+      setLoading(false);
+      return;
+    }
 
-    const handleBackToHome = () => {
-        router.push('/');
+    const fetchOrderDetails = async () => {
+      try {
+        const response = await axios.get(`https://api.local.ritualworks.com/api/orders/${orderId}`);
+        setOrderDetails(response.data);
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Failed to load order details.');
+      } finally {
+        setLoading(false);
+      }
     };
 
+    fetchOrderDetails();
+  }, [orderId]);
+
+  if (loading) {
     return (
-        <Box sx={{ padding: '2rem' }}>
-            <Typography variant="h4" gutterBottom>
-                Payment Successful
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-                Thank you for your purchase!
-            </Typography>
-            <Button variant="contained" color="primary" onClick={handleBackToHome}>
-                Back to Home
-            </Button>
-        </Box>
+      <Box textAlign="center" mt={5}>
+        <CircularProgress />
+        <Typography mt={2}>Loading your order details...</Typography>
+      </Box>
     );
+  }
+
+  if (error) {
+    return (
+      <Box textAlign="center" mt={5}>
+        <Typography color="error">{error}</Typography>
+        <Button variant="contained" onClick={() => router.push('/')}>
+          Go to Home
+        </Button>
+      </Box>
+    );
+  }
+
+  return (
+    <Box textAlign="center" mt={5}>
+      <Typography variant="h4">Payment Successful!</Typography>
+      <Typography mt={2}>Thank you for your order. Here are your details:</Typography>
+      <Box mt={3}>
+        <Typography>Order ID: {orderDetails?.id}</Typography>
+        <Typography>Total Amount: ${orderDetails?.totalAmount.toFixed(2)}</Typography>
+        <Typography>Status: {orderDetails?.status}</Typography>
+      </Box>
+      <Button variant="contained" color="primary" onClick={() => router.push('/')}>
+        Continue Shopping
+      </Button>
+    </Box>
+  );
 };
 
-export default Success;
+export default SuccessPage;

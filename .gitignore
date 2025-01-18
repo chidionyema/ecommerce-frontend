@@ -1,0 +1,21 @@
+cloudflare.ini
+# Dependency directories
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# Build files
+dist/
+build/
+
+# IDE/Editor files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db

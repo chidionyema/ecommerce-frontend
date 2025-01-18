@@ -1,42 +1,44 @@
-# Base stage for building the application
+# Stage 1: Builder
 FROM node:18 AS builder
 
-# Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy only package files for better caching
 COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm ci
 
-# Copy the rest of the application source code
+# Copy rest of the application
 COPY . .
 
 # Build the application
 RUN npm run build
 
-# List the contents of the .next directory
-RUN ls -la /app/.next
+# Stage 2: Production
+FROM node:18-alpine
 
-# Production stage
-FROM node:18-alpine AS production
-
-# Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Install OpenSSL and other required tools
+RUN apk add --no-cache openssl
+
+# Copy package files
 COPY package.json package-lock.json ./
 
-# Install only production dependencies
+# Install production dependencies
 RUN npm ci --only=production
 
-# Copy over the built application and public assets from the builder stage
+# Copy built files and necessary files from builder
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
-# Expose the port the app runs on
-EXPOSE 3000
+# Copy server.js
+COPY server.js ./server.js
 
-# Start the application
+# Create certs directory
+RUN mkdir -p /app/certs
+
+EXPOSE 3001
+
 CMD ["npm", "start"]

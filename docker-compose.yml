@@ -1,19 +1,36 @@
+version: '3.8'
+
 services:
   setup_https:
     build:
       context: .
-      dockerfile: Dockerfile.setup_https
-    command: bash /setup-https.sh
+      dockerfile: Dockerfile.certbot
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    entrypoint: >
+      /bin/sh -c "certbot certonly \
+      --authenticator dns-cloudflare \
+      --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini \
+      --dns-cloudflare-propagation-seconds 60 \
+      --agree-tos \
+      --email chidi@gmail.com \
+      --no-eff-email \
+      --non-interactive \
+      -d local.glustack.com && \
+      mkdir -p /etc/letsencrypt && \
+      cp /etc/letsencrypt/live/local.glustack.com/privkey.pem /etc/letsencrypt/key.pem && \
+      cp /etc/letsencrypt/live/local.glustack.com/fullchain.pem /etc/letsencrypt/cert.pem"
     volumes:
-      - .:/app
-    networks:
-      - internal_network
+      - ./certs:/etc/letsencrypt
+      - ./cloudflare.ini:/etc/letsencrypt/cloudflare.ini
     restart: "no"
+    container_name: ecommerce-frontend-setup_https
 
   qtrader:
     build:
       context: .
-      dockerfile: Dockerfile  # Ensure you have a Dockerfile for qtrader in the QTrader project
+      dockerfile: Dockerfile
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=https://api.local.ritualworks.com
@@ -21,18 +38,7 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - .:/app
-    networks:
-      - internal_network
-      - external_network
+      - ./certs:/app/certs:ro
     depends_on:
       - setup_https
-
-networks:
-  internal_network:
-    external: true
-    name: internal_network
-
-  external_network:
-    external: true
-    name: external_network
+    container_name: ecommerce-frontend-qtrader

@@ -1,76 +1,65 @@
-export interface Post {
-    id: string;
-    title: string;
-    content: string;
-    createdAt: string;
-    updatedAt: string;
-  }
-  
-  export interface Comment {
-    id: string;
-    postId: string;
-    content: string;
-    createdAt: string;
-    updatedAt: string;
-  }
-
-export interface CartItem {
+export interface Content {
   id: string;
-  name: string;
-  quantity: number;
+  entityId: string;
+  entityType: string; // e.g., "Product"
+  contentType: 'Image' | 'Asset'; // Match backend `ContentType` enum
+  url: string;
+  blobName: string;
+  createdAt: string;
 }
 
-
-export interface ProductImage {
-  id: string;
-  imageUrl: string;
-  productId: string;
-  product?: Product;
-}
-
-export interface ProductAsset {
-  id: string;
-  imageUrl: string;
-  productId: string;
-  product?: Product;
-}
-export interface Category {
-  id: string;
-  name: string;
-}
 
 export interface Product {
   id: string;
   name: string;
+  headline: string;
+  title: string;
+  shortDescription: string;
   description: string;
-  price: number;
+  authorAvatarUrl: string;
+  authorName: string;
+  unitPrice: number;
   stock: number;
   categoryId: string;
-  images: string[];
-  assets: any[];
+  contents: Content[]; // Use generic Content for both images and assets
   rating: number;
   new: boolean;
   brand: string;
   type: 'physical' | 'digital';
   inStock: boolean;
-  reviews?: { user: string; comment: string; rating: number }[]; // Add this line
+  reviews?: { user: string; comment: string; rating: number }[];
+  metadata?: ProductMetadata[]; 
 }
 
-export interface Review {
-  user: string;
-  comment: string;
-  rating: number;
+export interface ProductMetadata {
+  //id: string;
+  keyName: string;
+  keyValue: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
 }
 
 export interface BasketItem extends Product {
   quantity: number;
+}
 
+
+export interface CartItem {
+  productid: string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
 }
 
 export interface BasketState {
   items: BasketItem[];
 }
+
 export interface ProductState {
   products: Product[];
   totalProducts: number;
+  error: string;
 }

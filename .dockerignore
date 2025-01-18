@@ -2,11 +2,13 @@ node_modules
 npm-debug.log
 DS_Store
 Check
-Dockerfile
-Dockerfile.setup_https
-docker-compose.yml
-.dockerignore
+
 .git
 .gitignore
 README.md
 .env
+.next
+out
+.git
+.DS_Store
+*.log

@@ -1,468 +1,798 @@
-// src/components/AddListing.tsx
-
-import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+// All imports at the top
+import React, { useState, FormEvent, useEffect } from 'react';
 import {
-  Box,
-  Button,
   Container,
   TextField,
   Typography,
   Grid,
   IconButton,
-  CircularProgress,
+  LinearProgress,
+  Snackbar,
+  Alert,
   MenuItem,
   Select,
   FormControl,
   InputLabel,
-  Stepper,
-  Step,
-  StepLabel,
-  Paper,
-  Snackbar,
-  Alert,
+  Button,
+  Box,
+  Divider,
   Tooltip,
-  LinearProgress,
-  Card,
-  CardContent,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from '@mui/material';
-import { SelectChangeEvent } from '@mui/material/Select';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'; // Import alternative icon
+import AddIcon from '@mui/icons-material/Add';
+import InfoIcon from '@mui/icons-material/Info'; // Info icon for tooltips
+import { SelectChangeEvent } from '@mui/material';
 import { useDropzone } from 'react-dropzone';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Image from 'next/image';
-import { Product } from '../types/types';
-import { useAuth } from '../context/AuthContext';
+
+// Hooks and Helpers
 import { useProduct } from '../context/ProductContext';
-import { useRouter } from 'next/router';
-import axios from 'axios'; // Only used for fetching categories
+import { useCategory } from '../context/CategoryContext';
+import { uploadSingleRequest, uploadChunked } from '../helpers/fileUpload';
 
-interface Category {
-  id: string;
+// =============================
+// Constants for chunking logic
+// =============================
+const CHUNK_THRESHOLD = 100 * 1024 * 1024; // 100 MB
+const CHUNK_SIZE = 5 * 1024 * 1024;       // 5 MB
+
+// Representation of a single lesson for course curriculum
+interface Lesson {
+  title: string;
+  duration: string;
+  description: string;
+}
+
+// Validation errors shape
+interface ValidationErrors {
+  name?: string;
+  headline?: string;
+  title?: string;
+  shortDescription?: string;
+  description?: string;
+  unitPrice?: string;
+  stock?: string;
+  categoryId?: string;
+  courseInfo?: string;
+  courseCurriculum?: Record<number, string>;
+  authorInfoName?: string;
+  authorInfoBio?: string;
+  // Add other specific fields as needed
+}
+
+// We can represent the author info as an object:
+interface AuthorInfo {
   name: string;
+  avatar: string;
+  bio: string;
+  website: string;
 }
 
-interface AddListingProps {
-  productId?: string;
-}
+const AddListing: React.FC = () => {
+  // ============================
+  // State for product fields
+  // ============================
+  const [product, setProduct] = useState({
+    // Fields from ProductCreateDto
+    name: '',
+    headline: '',
+    title: '',
+    shortDescription: '',
+    description: '',
+    unitPrice: '',
+    stock: '',
+    rating: '',
+    isNew: true,
+    inStock: true,
+    brand: '',
+    type: 'physical' as 'physical' | 'digital',
+    categoryId: '',
 
-const steps = ['Basic Information', 'Category Selection', 'Upload Images', 'Upload Assets', 'Review and Submit'];
+    // Additional fields not in base product but we store as metadata:
+    courseInfo: '',
+    courseCurriculum: [] as Lesson[],
 
-const initialProductState: Product = {
-  id: '',
-  name: '',
-  description: '',
-  price: 0,
-  stock: 0,
-  categoryId: '',
-  images: [], // This will hold the image URLs or files
-  assets: [], // This will hold the asset URLs or files
-  rating: 0,
-  new: true,
-  brand: 'test',
-  type: 'physical',
-  inStock: true,
-  reviews: [],
-};
-
-const AddListing: React.FC<AddListingProps> = ({ productId }) => {
-  const [product, setProduct] = useState<Product>(initialProductState);
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [assetFiles, setAssetFiles] = useState<File[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [activeStep, setActiveStep] = useState<number>(0);
-  const [error, setError] = useState<string | null>(null);
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  const [successMessage, setSuccessMessage] = useState<string>('');
-  const [confirmationDialogOpen, setConfirmationDialogOpen] = useState<boolean>(false);
-
-  const { user, isAuthenticated } = useAuth();
-  const { state: productState, addProduct, updateProduct } = useProduct();
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get<Category[]>('https://api.local.ritualworks.com/api/Products/categories');
-        setCategories(response.data);
-      } catch (error) {
-        setError('Failed to fetch categories. Please try again.');
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    if (productId) {
-      const existingProduct = productState.products.find((p) => p.id === productId);
-      if (existingProduct) {
-        setProduct(existingProduct);
-      } else {
-        setError('Product not found.');
-      }
-    }
-  }, [productId, productState.products]);
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setProduct({ ...product, [name]: value });
-  };
-
-  const handleCategoryChange = (e: SelectChangeEvent) => {
-    const value = e.target.value as string;
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      categoryId: value,
-    }));
-  };
-
-  const onDrop = (acceptedFiles: File[], type: 'image' | 'asset') => {
-    if (type === 'image') {
-      setImageFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
-      const previewUrls = acceptedFiles.map((file) => URL.createObjectURL(file));
-      setProduct((prevProduct) => ({
-        ...prevProduct,
-        images: [...(prevProduct.images || []), ...previewUrls],
-      }));
-    } else {
-      setAssetFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
-      const fileNames = acceptedFiles.map((file) => file.name);
-      setProduct((prevProduct) => ({
-        ...prevProduct,
-        assets: [...(prevProduct.assets || []), ...fileNames],
-      }));
-    }
-  };
-
-  const { getRootProps: getImageRootProps, getInputProps: getImageInputProps } = useDropzone({
-    onDrop: (files) => onDrop(files, 'image'),
-    accept: { 'image/*': [] },
+    // =========== NEW: Author Info ===========
+    authorInfo: {
+      name: '',
+      avatar: '/avatar-placeholder.png', // default or empty
+      bio: '',
+      website: '',
+    } as AuthorInfo,
   });
 
-  const { getRootProps: getAssetRootProps, getInputProps: getAssetInputProps } = useDropzone({
-    onDrop: (files) => onDrop(files, 'asset'),
+  // Files (images or assets) to be uploaded
+  const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
+
+  // UI states for feedback
+  const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  // Validation error map
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+
+  // Hooks from context
+  const { addProduct } = useProduct();
+  const {
+    state: { categories = [] },
+    fetchCategories,
+  } = useCategory();
+
+  // ============================
+  // Dropzone for file upload
+  // ============================
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: (acceptedFiles) =>
+      setFilesToUpload((prev) => [...prev, ...acceptedFiles]),
     accept: {
+      'image/*': [],
       'application/pdf': [],
-      'application/msword': [],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [],
       'application/zip': [],
-      'application/x-rar-compressed': [],
+      // any other asset MIME types
     },
   });
 
-  const handleRemoveImage = (index: number) => {
-    const updatedImages = (product.images || []).filter((_, i) => i !== index);
-    const updatedImageFiles = imageFiles.filter((_, i) => i !== index);
-    setProduct({ ...product, images: updatedImages });
-    setImageFiles(updatedImageFiles);
+  const removeFile = (file: File) => {
+    setFilesToUpload((prev) => prev.filter((f) => f !== file));
   };
 
-  const handleRemoveAsset = (index: number) => {
-    const updatedAssets = (product.assets || []).filter((_, i) => i !== index);
-    const updatedAssetFiles = assetFiles.filter((_, i) => i !== index);
-    setProduct({ ...product, assets: updatedAssets });
-    setAssetFiles(updatedAssetFiles);
+  // Fetch categories on mount
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  // ============================
+  // Input Handlers
+  // ============================
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+
+    // If updating top-level fields
+    if (name in product) {
+      setProduct((prev) => ({ ...prev, [name]: value }));
+      setValidationErrors((prev) => ({ ...prev, [name]: '' }));
+      return;
+    }
+
+    // If updating authorInfo sub-fields
+    if (name.startsWith('authorInfo.')) {
+      const fieldName = name.replace('authorInfo.', '') as keyof AuthorInfo;
+      setProduct((prev) => ({
+        ...prev,
+        authorInfo: {
+          ...prev.authorInfo,
+          [fieldName]: value,
+        },
+      }));
+      return;
+    }
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setConfirmationDialogOpen(true);
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    const { value } = e.target;
+    setProduct((prev) => ({ ...prev, categoryId: value }));
+    setValidationErrors((prev) => ({ ...prev, categoryId: '' }));
   };
 
-  const confirmSubmit = async () => {
-    setLoading(true);
-    setConfirmationDialogOpen(false);
-    try {
-      const formData = new FormData();
-      formData.append('name', product.name);
-      formData.append('description', product.description);
-      formData.append('price', product.price.toString());
-      formData.append('stock', product.stock.toString());
-      formData.append('categoryId', product.categoryId);
-      formData.append('brand', 'test');
-      formData.append('type', product.type);
-      formData.append('inStock', product.inStock.toString());
-      formData.append('isNew', product.new.toString());
+  const handleTypeChange = (e: SelectChangeEvent<string>) => {
+    setProduct((prev) => ({
+      ...prev,
+      type: e.target.value as 'physical' | 'digital',
+    }));
+  };
 
-      // Append image files
-      imageFiles.forEach((file) => {
-        formData.append('images', file);
-      });
+  // ============================
+  // Curriculum / Lessons
+  // ============================
+  const addLesson = () => {
+    setProduct((prev) => ({
+      ...prev,
+      courseCurriculum: [
+        ...prev.courseCurriculum,
+        { title: '', duration: '', description: '' },
+      ],
+    }));
+  };
 
-      // Append asset files
-      assetFiles.forEach((file) => {
-        formData.append('assets', file);
-      });
+  const changeLesson = (index: number, field: keyof Lesson, value: string) => {
+    const updated = [...product.courseCurriculum];
+    updated[index][field] = value;
+    setProduct((prev) => ({ ...prev, courseCurriculum: updated }));
 
-      if (productId) {
-        // Update existing product using context
-        await updateProduct(productId, formData);
-        setSuccessMessage('Product updated successfully!');
-      } else {
-        // Add new product using context
-        await addProduct(formData);
-        setSuccessMessage('Product created successfully!');
+    // Clear any error on that lesson
+    setValidationErrors((prev) => {
+      const newVal = { ...prev };
+      if (newVal.courseCurriculum && typeof newVal.courseCurriculum === 'object') {
+        (newVal.courseCurriculum as Record<number, string>)[index] = '';
       }
+      return newVal;
+    });
+  };
+
+  const removeLesson = (index: number) => {
+    setProduct((prev) => ({
+      ...prev,
+      courseCurriculum: prev.courseCurriculum.filter((_, i) => i !== index),
+    }));
+  };
+
+  // ============================
+  // Validation
+  // ============================
+  const validateForm = (): ValidationErrors => {
+    const errs: ValidationErrors = {};
+
+    // Required fields
+    if (!product.name) errs.name = 'Product Name is required.';
+    if (!product.headline) errs.headline = 'Please provide a concise, eye-catching headline.';
+    if (!product.title) errs.title = 'Please provide a descriptive title.';
+    if (!product.shortDescription) errs.shortDescription = 'Short Description is required.';
+    if (!product.description) errs.description = 'Full product description is required.';
+
+    // Numeric fields
+    if (!product.unitPrice || isNaN(Number(product.unitPrice))) {
+      errs.unitPrice = 'Price must be a valid number.';
+    }
+    if (!product.stock || isNaN(Number(product.stock))) {
+      errs.stock = 'Stock must be a valid number.';
+    }
+
+    // Category
+    if (!product.categoryId) {
+      errs.categoryId = 'Select a category that best fits your product/course.';
+    }
+
+    // Additional fields
+    if (!product.courseInfo) {
+      errs.courseInfo = 'Provide an overview for CourseInfo.';
+    }
+
+    // Curriculum
+    if (product.courseCurriculum.length === 0) {
+      errs.courseCurriculum = { 0: 'Add at least one lesson.' };
+    } else {
+      const cErrors: Record<number, string> = {};
+      product.courseCurriculum.forEach((l, idx) => {
+        if (!l.title) cErrors[idx] = 'Lesson title is required.';
+        else if (!l.duration) cErrors[idx] = 'Use format like "2:44" for lesson duration.';
+      });
+      if (Object.keys(cErrors).length) errs.courseCurriculum = cErrors;
+    }
+
+    // Author Info
+    if (!product.authorInfo.name) {
+      errs.authorInfoName = 'Author name is required.';
+    }
+    if (!product.authorInfo.bio) {
+      errs.authorInfoBio = 'Author bio is required.';
+    }
+    // Additional checks for avatar, website, etc. if needed
+
+    return errs;
+  };
+
+  // ============================
+  // Form Submit
+  // ============================
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    console.log('Form Submitted');
+    setLoading(true);
+    setUploadProgress(0);
+    setError(null);
+
+    // Validate
+    const errs = validateForm();
+    if (Object.keys(errs).length) {
+      setValidationErrors(errs);
+      setLoading(false);
+      return;
+    }
+
+    // Build metadata from fields not in basic Product but stored as metadata
+    // Note how we store "authorInfo" as JSON:
+    const metadata = [
+      { keyName: 'CourseInfo', keyValue: product.courseInfo },
+      {
+        keyName: 'CourseCurriculum',
+        keyValue: JSON.stringify(product.courseCurriculum),
+      },
+      {
+        keyName: 'AuthorInfo',
+        keyValue: JSON.stringify(product.authorInfo),
+      },
+    ];
+
+    try {
+      // 1) Add product to DB
+      const created = await addProduct({
+        name: product.name,
+        headline: product.headline,
+        title: product.title,
+        shortDescription: product.shortDescription,
+        description: product.description,
+        unitPrice: parseFloat(product.unitPrice),
+        stock: parseInt(product.stock, 10),
+        rating: parseFloat(product.rating) || 0, // default 0 if blank
+        inStock: product.inStock,
+        type: product.type,
+        categoryId: product.categoryId,
+        // crucial: pass the three metadata objects
+        metadata,
+      });
+
+      // Log the response to ensure 'created' contains valid data
+      console.log('Created product:', created);
+
+      // Check if 'created' is valid and contains an 'id'
+      if (created && created.id) {
+        // Upload files if available
+        if (filesToUpload.length > 0) {
+          await uploadFiles(created.id, filesToUpload);
+        }
+      }
+
+      // Show success
+      setSuccessMessage('Product created and files uploaded successfully!');
       setSnackbarOpen(true);
-      setActiveStep(steps.length);
-      router.push('/products');
-    } catch (error) {
-      setError('Failed to submit the product. Please try again.');
+
+      // (Optional) Reset the form or do something else
+      // setProduct(...);
+      // setFilesToUpload([]);
+    } catch (ex) {
+      console.error(ex);
+      setError('Failed to create product or upload files');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  // ============================
+  // Upload helper
+  // ============================
+  const uploadFiles = async (productId: string, incomingFiles: File[]) => {
+    if (!incomingFiles.length) return;
 
-  const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    const bigFiles: File[] = [];
+    const smallFormData = new FormData();
 
-  const handleSnackbarClose = () => setSnackbarOpen(false);
+    for (const file of incomingFiles) {
+      if (file.size >= CHUNK_THRESHOLD) {
+        bigFiles.push(file);
+      } else {
+        smallFormData.append('content', file);
+      }
+    }
 
-  const handleConfirmationDialogClose = () => setConfirmationDialogOpen(false);
+    // Single request for smaller
+    if (smallFormData.getAll('content').length) {
+      await uploadSingleRequest(productId, smallFormData, (pct: number) =>
+        setUploadProgress(pct),
+      );
+    }
 
-  const PreviewSection = () => (
-    <Card variant="outlined" sx={{ mt: 2, mb: 2, p: 2 }}>
-      <CardContent>
-        <Typography variant="h5" gutterBottom>
-          Product Preview
-        </Typography>
-        <Typography>
-          <strong>Name:</strong> {product.name}
-        </Typography>
-        <Typography>
-          <strong>Description:</strong> {product.description}
-        </Typography>
-        <Typography>
-          <strong>Price:</strong> ${product.price}
-        </Typography>
-        <Typography>
-          <strong>Stock:</strong> {product.stock}
-        </Typography>
-        <Typography>
-          <strong>Category:</strong> {categories.find((c) => c.id === product.categoryId)?.name}
-        </Typography>
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          Images:
-        </Typography>
-        <Grid container spacing={2}>
-          {(product.images || []).map((image, index) => (
-            <Grid item key={index} xs={12} sm={4}>
-              <Image src={image} alt={`Preview image ${index}`} width={300} height={300} />
-            </Grid>
-          ))}
-        </Grid>
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          Assets:
-        </Typography>
-        <Grid container spacing={2}>
-          {(product.assets || []).map((asset, index) => (
-            <Grid item key={index} xs={12} sm={4}>
-              <Typography>{asset}</Typography>
-            </Grid>
-          ))}
-        </Grid>
-      </CardContent>
-    </Card>
-  );
-
-  const StepContent = () => {
-    switch (activeStep) {
-      case 0:
-        return (
-          <Box>
-            <TextField
-              fullWidth
-              label="Product Name"
-              name="name"
-              value={product.name}
-              onChange={handleInputChange}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              multiline
-              minRows={3}
-              label="Description"
-              name="description"
-              value={product.description}
-              onChange={handleInputChange}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              type="number"
-              label="Price"
-              name="price"
-              value={product.price}
-              onChange={handleInputChange}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              type="number"
-              label="Stock"
-              name="stock"
-              value={product.stock}
-              onChange={handleInputChange}
-              sx={{ mb: 2 }}
-            />
-          </Box>
-        );
-      case 1:
-        return (
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="category-label">Category</InputLabel>
-            <Select
-              labelId="category-label"
-              id="category"
-              name="categoryId"
-              value={product.categoryId}
-              onChange={handleCategoryChange}
-              label="Category"
-            >
-              {categories.map((category) => (
-                <MenuItem key={category.id} value={category.id}>
-                  {category.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        );
-      case 2:
-        return (
-          <Box>
-            <Paper
-              variant="outlined"
-              {...getImageRootProps()}
-              sx={{ p: 2, borderColor: 'primary.main', textAlign: 'center', cursor: 'pointer', mb: 2 }}
-            >
-              <input {...getImageInputProps()} />
-              <Typography>Drag & drop images here, or click to select files</Typography>
-            </Paper>
-            <Grid container spacing={2}>
-              {(product.images || []).map((image, index) => (
-                <Grid item key={index} xs={12} sm={6}>
-                  <Box sx={{ position: 'relative' }}>
-                    <Image src={image} alt={`Product image ${index + 1}`} width={500} height={500} />
-                    <Tooltip title="Remove Image">
-                      <IconButton
-                        sx={{ position: 'absolute', top: 0, right: 0 }}
-                        onClick={() => handleRemoveImage(index)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-            {loading && <LinearProgress sx={{ mt: 2 }} />}
-          </Box>
-        );
-      case 3:
-        return (
-          <Box>
-            <Paper
-              variant="outlined"
-              {...getAssetRootProps()}
-              sx={{ p: 2, borderColor: 'primary.main', textAlign: 'center', cursor: 'pointer', mb: 2 }}
-            >
-              <input {...getAssetInputProps()} />
-              <Typography>Drag & drop assets here, or click to select files</Typography>
-            </Paper>
-            <Grid container spacing={2}>
-              {(product.assets || []).map((asset, index) => (
-                <Grid item key={index} xs={12} sm={6}>
-                  <Box sx={{ position: 'relative' }}>
-                    <Typography>{asset}</Typography>
-                    <Tooltip title="Remove Asset">
-                      <IconButton
-                        sx={{ position: 'absolute', top: 0, right: 0 }}
-                        onClick={() => handleRemoveAsset(index)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-            {loading && <LinearProgress sx={{ mt: 2 }} />}
-          </Box>
-        );
-      case 4:
-        return <PreviewSection />;
-      default:
-        return null;
+    // Chunked for bigger
+    for (const bf of bigFiles) {
+      await uploadChunked(productId, bf, CHUNK_SIZE, (pct: number) => {
+        setUploadProgress(pct);
+      });
     }
   };
 
+  // ============================
+  // Render
+  // ============================
   return (
-    <Container maxWidth="md">
-      <Box sx={{ mt: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          {productId ? 'Edit Product' : 'Add New Product'}
-        </Typography>
-        <Stepper activeStep={activeStep} alternativeLabel>
-          {steps.map((label, index) => (
-            <Step key={label} completed={activeStep > index}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          {StepContent()}
-          {error && (
-            <Typography color="error" sx={{ mt: 2 }}>
-              {error}
+    <Container sx={{ py: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        Add Product Listing
+      </Typography>
+
+      {loading && (
+        <Box sx={{ mb: 2 }}>
+          <Typography>Uploading... {uploadProgress}%</Typography>
+          <LinearProgress variant="determinate" value={uploadProgress} />
+        </Box>
+      )}
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert severity="success" onClose={() => setSnackbarOpen(false)}>
+          {successMessage}
+        </Alert>
+      </Snackbar>
+
+      <form onSubmit={handleSubmit}>
+        {/* ========== Basic Fields ========== */}
+        {/* Product Name */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <TextField
+            label="Product Name"
+            name="name"
+            placeholder="e.g. Intro to React"
+            fullWidth
+            value={product.name}
+            onChange={handleInputChange}
+            error={!!validationErrors.name}
+          />
+          <Tooltip title="Give your product a clear, recognizable name.">
+            <IconButton>
+              <InfoIcon color={validationErrors.name ? 'error' : 'action'} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        {validationErrors.name && (
+          <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+            {validationErrors.name}
+          </Typography>
+        )}
+
+        {/* Headline */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <TextField
+            label="Headline"
+            name="headline"
+            placeholder="A short, eye-catching phrase"
+            fullWidth
+            value={product.headline}
+            onChange={handleInputChange}
+            error={!!validationErrors.headline}
+          />
+          <Tooltip title="Keep it short and punchy to grab attention.">
+            <IconButton>
+              <InfoIcon color={validationErrors.headline ? 'error' : 'action'} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        {validationErrors.headline && (
+          <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+            {validationErrors.headline}
+          </Typography>
+        )}
+
+        {/* Title */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <TextField
+            label="Title"
+            name="title"
+            placeholder="A descriptive or somewhat longer title"
+            fullWidth
+            value={product.title}
+            onChange={handleInputChange}
+            error={!!validationErrors.title}
+          />
+          <Tooltip title="Provide a clear, descriptive title for your product or course.">
+            <IconButton>
+              <InfoIcon color={validationErrors.title ? 'error' : 'action'} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        {validationErrors.title && (
+          <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+            {validationErrors.title}
+          </Typography>
+        )}
+
+        {/* Short Description */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <TextField
+            label="Short Description"
+            name="shortDescription"
+            multiline
+            rows={2}
+            placeholder="A quick 1-2 sentence overview"
+            fullWidth
+            value={product.shortDescription}
+            onChange={handleInputChange}
+            error={!!validationErrors.shortDescription}
+          />
+          <Tooltip title="Give a concise overview or highlight.">
+            <IconButton>
+              <InfoIcon
+                color={validationErrors.shortDescription ? 'error' : 'action'}
+              />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        {validationErrors.shortDescription && (
+          <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+            {validationErrors.shortDescription}
+          </Typography>
+        )}
+
+        {/* Full Description */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <TextField
+            label="Full Description"
+            name="description"
+            multiline
+            rows={3}
+            placeholder="Detailed info, features, benefits..."
+            fullWidth
+            value={product.description}
+            onChange={handleInputChange}
+            error={!!validationErrors.description}
+          />
+          <Tooltip title="Add comprehensive details about your product or course.">
+            <IconButton>
+              <InfoIcon color={validationErrors.description ? 'error' : 'action'} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        {validationErrors.description && (
+          <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+            {validationErrors.description}
+          </Typography>
+        )}
+
+        {/* Unit Price */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <TextField
+            label="Unit Price"
+            name="unitPrice"
+            type="number"
+            placeholder="e.g., 49.99"
+            fullWidth
+            value={product.unitPrice}
+            onChange={handleInputChange}
+            error={!!validationErrors.unitPrice}
+          />
+          <Tooltip title="Set a price that reflects the product’s value.">
+            <IconButton>
+              <InfoIcon color={validationErrors.unitPrice ? 'error' : 'action'} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        {validationErrors.unitPrice && (
+          <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+            {validationErrors.unitPrice}
+          </Typography>
+        )}
+
+        {/* Stock */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <TextField
+            label="Stock"
+            name="stock"
+            type="number"
+            placeholder="e.g., 100"
+            fullWidth
+            value={product.stock}
+            onChange={handleInputChange}
+            error={!!validationErrors.stock}
+          />
+          <Tooltip title="How many units available? For digital, pick a large number.">
+            <IconButton>
+              <InfoIcon color={validationErrors.stock ? 'error' : 'action'} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        {validationErrors.stock && (
+          <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+            {validationErrors.stock}
+          </Typography>
+        )}
+
+        {/* Category */}
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel>Category</InputLabel>
+          <Select
+            name="categoryId"
+            value={product.categoryId}
+            onChange={handleSelectChange}
+            error={!!validationErrors.categoryId}
+          >
+            {categories.length > 0 ? (
+              categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.id}>
+                  {cat.name}
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem disabled>No categories available</MenuItem>
+            )}
+          </Select>
+        </FormControl>
+        {validationErrors.categoryId && (
+          <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+            {validationErrors.categoryId}
+          </Typography>
+        )}
+
+        {/* Course Info */}
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            label="Course Info"
+            name="courseInfo"
+            placeholder="Prerequisites, skill level, overview..."
+            multiline
+            rows={2}
+            fullWidth
+            value={product.courseInfo}
+            onChange={handleInputChange}
+            error={!!validationErrors.courseInfo}
+          />
+          {validationErrors.courseInfo && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              {validationErrors.courseInfo}
             </Typography>
           )}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-            <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 2 }}>
-              Back
-            </Button>
-            {activeStep === steps.length - 1 ? (
-              <Button variant="contained" color="primary" type="submit" disabled={loading}>
-                {loading ? <CircularProgress size={24} /> : 'Submit'}
-              </Button>
-            ) : (
-              <Button variant="contained" color="primary" onClick={handleNext} disabled={loading}>
-                {loading ? <CircularProgress size={24} /> : 'Next'}
-              </Button>
-            )}
-          </Box>
         </Box>
-        <Snackbar
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          open={snackbarOpen}
-          autoHideDuration={3000}
-          onClose={handleSnackbarClose}
-        >
-          <Alert onClose={handleSnackbarClose} severity="success">
-            {successMessage}
-          </Alert>
-        </Snackbar>
 
-        <Dialog open={confirmationDialogOpen} onClose={handleConfirmationDialogClose}>
-          <DialogTitle>Confirm Submission</DialogTitle>
-          <DialogContent>
-            <Typography>Are you sure you want to finalize and submit this product?</Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleConfirmationDialogClose} color="secondary">
-              Cancel
-            </Button>
-            <Button onClick={confirmSubmit} color="primary">
-              Confirm
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
+        {/* ========== Curriculum ========== */}
+        <Typography variant="h6" sx={{ mt: 3 }}>
+          Course Curriculum
+        </Typography>
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Outline each lesson or module. For &ldquo;Duration&rdquo;, use
+          &ldquo;2:44&rdquo; or &ldquo;1:05:30&rdquo;.
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+        {product.courseCurriculum.map((lesson, idx) => (
+          <Box key={idx} sx={{ mb: 2, borderBottom: '1px solid #ddd', pb: 2 }}>
+            <TextField
+              label="Lesson Title"
+              fullWidth
+              sx={{ mb: 1 }}
+              value={lesson.title}
+              onChange={(e) => changeLesson(idx, 'title', e.target.value)}
+              error={
+                !!(
+                  validationErrors.courseCurriculum &&
+                  validationErrors.courseCurriculum[idx]
+                )
+              }
+            />
+            <TextField
+              label="Duration"
+              placeholder='e.g. "2:44"'
+              fullWidth
+              sx={{ mb: 1 }}
+              value={lesson.duration}
+              onChange={(e) => changeLesson(idx, 'duration', e.target.value)}
+            />
+            <TextField
+              label="Lesson Description"
+              fullWidth
+              multiline
+              rows={2}
+              placeholder="Briefly summarize this lesson's content."
+              value={lesson.description}
+              onChange={(e) => changeLesson(idx, 'description', e.target.value)}
+            />
+            {validationErrors.courseCurriculum &&
+              typeof validationErrors.courseCurriculum === 'object' &&
+              validationErrors.courseCurriculum[idx] && (
+                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                  {validationErrors.courseCurriculum[idx]}
+                </Typography>
+              )}
+            <IconButton color="error" onClick={() => removeLesson(idx)}>
+              <RemoveCircleOutlineIcon />
+            </IconButton>
+          </Box>
+        ))}
+        <Button
+          variant="outlined"
+          startIcon={<AddIcon />}
+          onClick={addLesson}
+          sx={{ mb: 2 }}
+        >
+          Add Lesson
+        </Button>
+
+        {/* ========== Author Info ========== */}
+        <Typography variant="h6" sx={{ mt: 3 }}>
+          Author Info
+        </Typography>
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Provide details about the course author or product creator.
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+
+        <TextField
+          label="Author Name"
+          name="authorInfo.name"
+          fullWidth
+          sx={{ mb: 2 }}
+          value={product.authorInfo.name}
+          onChange={handleInputChange}
+          error={!!validationErrors.authorInfoName}
+        />
+        {validationErrors.authorInfoName && (
+          <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+            {validationErrors.authorInfoName}
+          </Typography>
+        )}
+
+        <TextField
+          label="Author Avatar URL"
+          name="authorInfo.avatar"
+          fullWidth
+          sx={{ mb: 2 }}
+          value={product.authorInfo.avatar}
+          onChange={handleInputChange}
+        />
+
+        <TextField
+          label="Author Bio"
+          name="authorInfo.bio"
+          fullWidth
+          multiline
+          rows={2}
+          sx={{ mb: 2 }}
+          value={product.authorInfo.bio}
+          onChange={handleInputChange}
+          error={!!validationErrors.authorInfoBio}
+        />
+        {validationErrors.authorInfoBio && (
+          <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+            {validationErrors.authorInfoBio}
+          </Typography>
+        )}
+
+        <TextField
+          label="Author Website"
+          name="authorInfo.website"
+          fullWidth
+          sx={{ mb: 2 }}
+          value={product.authorInfo.website}
+          onChange={handleInputChange}
+        />
+
+        {/* ============================
+            Files (images/assets)
+           ============================ */}
+        <Typography variant="body1" sx={{ mb: 2 }}>
+          <strong>Optional:</strong> Add images or other supporting files below.
+          Large files ({'>'}100 MB) will automatically upload in chunks.
+        </Typography>
+        {/* Alternatively, using HTML entities:
+        Large files (&gt;100 MB) will automatically upload in chunks.
+        */}
+        <Box
+          {...getRootProps()}
+          sx={{
+            border: '2px dashed #ccc',
+            p: 2,
+            mb: 2,
+            textAlign: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <input {...getInputProps()} />
+          <Typography variant="body2">
+            Drag & drop files here, or click to select
+          </Typography>
+        </Box>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          {filesToUpload.map((file, idx) => (
+            <Grid item key={idx}>
+              <Typography variant="body2">{file.name}</Typography>
+              <IconButton onClick={() => removeFile(file)}>
+                <RemoveCircleOutlineIcon />
+              </IconButton>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Submit Button */}
+        <Button type="submit" variant="contained" disabled={loading}>
+          Create Product
+        </Button>
+      </form>
     </Container>
   );
 };

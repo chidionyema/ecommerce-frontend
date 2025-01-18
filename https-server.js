@@ -1,30 +1,28 @@
-const https = require('https');
-const fs = require('fs');
-const httpProxy = require('http-proxy');
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
 
-// Correct paths to your localhost certificates
-const privateKey = fs.readFileSync('./certs/key.pem', 'utf8');
-const certificate = fs.readFileSync('./certs/cert.pem', 'utf8');
+const certsDir = path.join(process.cwd(), 'certs');
+const keyPath = path.join(certsDir, 'key.pem');
+const certPath = path.join(certsDir, 'cert.pem');
 
-const credentials = { key: privateKey, cert: certificate };
+const useHttps = fs.existsSync(keyPath) && fs.existsSync(certPath);
 
-// Create an HTTPS service that proxies to the original Next.js dev server
-const proxyServer = httpProxy.createProxyServer({
-    target: 'http://localhost:3001',
-    secure: true // This ensures that the proxy will accept the self-signed certificate
+if (!useHttps) {
+  console.error('Certificate files not found. Exiting...');
+  process.exit(1);
+}
+
+const options = {
+  key: fs.readFileSync(keyPath),
+  cert: fs.readFileSync(certPath),
+};
+
+const server = https.createServer(options, (req, res) => {
+  res.writeHead(200);
+  res.end('Hello, HTTPS!');
 });
 
-// Error handling for the proxy
-proxyServer.on('error', (err, req, res) => {
-    console.error('Proxy error:', err);
-    res.writeHead(500, {
-        'Content-Type': 'text/plain'
-    });
-    res.end('Proxy encountered an error.');
-});
-
-https.createServer(credentials, (req, res) => {
-    proxyServer.web(req, res);
-}).listen(3000, () => {
-    console.log('> Proxying https://localhost:3000 to http://localhost:3001');
+server.listen(3002, () => {
+  console.log('HTTPS server running on https://localhost:3002');
 });

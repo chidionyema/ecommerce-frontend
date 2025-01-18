@@ -1,350 +1,323 @@
-import React from 'react';
-import Link from 'next/link';
-import {
-  Button,
-  Typography,
-  Box,
-  Grid,
-  Paper,
-  Container,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+
+// Importing individual components directly
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import Link from '@mui/material/Link';
+import IconButton from '@mui/material/IconButton';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
+import Slide from '@mui/material/Slide';
+
+// Importing styled utility
 import { styled } from '@mui/material/styles';
-import Carousel from 'react-material-ui-carousel';
-import { motion } from 'framer-motion';
+
+// Importing icons
+import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+
+// Importing Framer Motion
+import { motion, useAnimation } from 'framer-motion';
+
+// Importing Next.js components
+import NextLink from 'next/link';
+
+// Importing specific types
+import { ButtonProps } from '@mui/material/Button';
+import { PaperProps } from '@mui/material/Paper';
+
+// Importing react-icons
+import { FaAws, FaDocker, FaJava, FaMicrosoft, FaBrain, FaLinux } from 'react-icons/fa';
 
 // Styled Components
+
+// Correctly typed StyledButton
+const StyledButton = styled(Button)<ButtonProps>(({ theme }) => ({
+  fontSize: '1.1rem',
+  padding: theme.spacing(2, 4),
+  borderRadius: '50px',
+  background: '#4A47A3',
+  color: theme.palette.common.white,
+  textTransform: 'uppercase',
+  fontWeight: 700,
+  boxShadow: '0 6px 15px rgba(0, 0, 0, 0.3)',
+  transition: 'transform 0.2s, box-shadow 0.2s',
+  '&:hover': {
+    backgroundColor: '#393685',
+    transform: 'translateY(-4px)',
+    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.4)',
+  },
+  '&:focus': {
+    outline: '2px solid #fff',
+    outlineOffset: '2px',
+  },
+}));
+
+// Correctly typed FeatureCard
+const FeatureCard = styled(Paper)<PaperProps>(({ theme }) => ({
+  padding: theme.spacing(4),
+  textAlign: 'center',
+  borderRadius: '15px',
+  boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
+  transition: 'transform 0.2s, box-shadow 0.2s',
+  '&:hover': {
+    transform: 'translateY(-8px)',
+    boxShadow: '0 16px 30px rgba(0, 0, 0, 0.15)',
+  },
+}));
+
 const HeroSection = styled(Box)(({ theme }) => ({
   position: 'relative',
-  color: '#fff',
-  textAlign: 'center',
-  height: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  minHeight: '50vh', // Reduced minHeight
+  padding: theme.spacing(6, 2),
+  background: `linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)`, // New gradient
+  color: theme.palette.common.white,
   overflow: 'hidden',
-  [theme.breakpoints.down('md')]: {
-    height: '80vh',
+  [theme.breakpoints.down('sm')]: {
+    minHeight: '40vh', // Reduced minHeight for mobile
   },
 }));
 
-const HeroContent = styled(Box)(({ theme }) => ({
-  position: 'relative',
-  zIndex: 2,
-  padding: theme.spacing(0, 2),
-  top: '50%',
-  transform: 'translateY(-50%)',
-}));
-
-const BackgroundVideo = styled('video')({
-  position: 'absolute',
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  top: 0,
-  left: 0,
-  zIndex: 1,
-  filter: 'brightness(0.7)',
-});
-
-const CTAButton = styled(Button)(({ theme }) => ({
-  fontSize: '1.2rem',
-  padding: theme.spacing(1.5, 4),
-  borderRadius: '30px',
-  background: '#ff4081',
-  color: '#fff',
-  marginTop: theme.spacing(3),
-  textTransform: 'uppercase',
-  boxShadow: '0 8px 20px rgba(255, 64, 129, 0.4)',
-  transition: 'all 0.3s ease-in-out',
-  '&:hover': {
-    backgroundColor: '#ff79a7',
-    transform: 'translateY(-5px)',
-  },
-}));
-
-const ProductCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(2),
-  textAlign: 'center',
+const SectionContainer = styled(Box)(({ theme }) => ({
+  backgroundColor: '#f8f9fc',
+  padding: theme.spacing(10, 2),
   borderRadius: '15px',
-  boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
-  transition: 'transform 0.3s ease-in-out',
-  cursor: 'pointer',
-  '&:hover': {
-    transform: 'translateY(-10px)',
-    boxShadow: '0 16px 40px rgba(0, 0, 0, 0.15)',
+  marginBottom: theme.spacing(6),
+  background: `linear-gradient(to bottom, #f8f9fc, #f0f2f5)`, // Subtle gradient
+}));
+
+const techIcons = [
+  {
+    title: 'DevOps',
+    description:
+      'Streamline your development lifecycle with automated CI/CD pipelines, reducing time to market and improving software quality.',
+    icon: <FaDocker size={60} />, // Example icon for DevOps
   },
-}));
+  {
+    title: 'Cloud Infrastructure',
+    description:
+      'Scale your applications seamlessly with robust and reliable cloud solutions, ensuring high availability and performance.',
+    icon: <FaAws size={60} />, // Example icon for Cloud Infrastructure
+  },
+  {
+    title: 'Java',
+    description:
+      'Develop robust and scalable backend solutions with our deep Java expertise, creating high-performance and maintainable applications.',
+    icon: <FaJava size={60} />,
+  },
+  {
+    title: '.NET',
+    description:
+      'Build enterprise-grade .NET applications tailored to your specific business needs, leveraging the power of the Microsoft ecosystem.',
+    icon: <FaMicrosoft size={60} />, // Example for .NET
+  },
+  {
+    title: 'AI & ML',
+    description:
+      'Harness the power of AI and ML to drive innovation and gain a competitive edge with intelligent solutions.',
+    icon: <FaBrain size={60} />, // Example for AI & ML
+  },
+  {
+    title: 'Linux',
+    description:
+      'Leverage efficient and scalable Linux server management for optimal performance, security, and cost-effectiveness.',
+    icon: <FaLinux size={60} />,
+  },
+];
 
-const TestimonialCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  borderRadius: '15px',
-  textAlign: 'center',
-  boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
-  margin: theme.spacing(0, 2),
-}));
+// Function for smooth scrolling
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
 
-const HomePage: React.FC = () => {
+const HomePage = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const controls = useAnimation();
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
+
+  // Trigger for scroll to top button
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 100,
+  });
+
+  // Show/hide scroll to top button
+  useEffect(() => {
+    window.addEventListener('scroll', () => {
+      setShowScrollToTop(window.scrollY > 100);
+    });
+  }, []);
+
+  // Animate feature cards on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const cards = document.querySelectorAll('.feature-card');
+      cards.forEach((card) => {
+        if (isElementInViewport(card)) {
+          controls.start('visible');
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [controls]);
+
+  // Helper function to check if an element is in the viewport
+  const isElementInViewport = (el: Element) => {
+    const rect = el.getBoundingClientRect();
+    return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  };
 
   return (
-    <Box sx={{ backgroundColor: '#f4f4f4', color: '#333' }}>
+    <Box component="main">
       {/* Hero Section */}
-      <HeroSection>
-        <BackgroundVideo autoPlay loop muted playsInline>
-          <source src="/videos/hero-video.mp4" type="video/mp4" />
-        </BackgroundVideo>
-        <HeroContent>
-          <motion.div
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1 }}
-          >
-            <Typography
-              variant="h2"
-              sx={{
-                fontWeight: 'bold',
-                fontSize: isMobile ? '2.5rem' : '4rem',
-                lineHeight: 1.2,
-                textShadow: '2px 2px 15px rgba(0, 0, 0, 0.5)',
-              }}
+      <HeroSection component="section">
+        <Container maxWidth="md">
+          <Box sx={{ py: 6 }}>
+            <motion.div
+              initial={{ opacity: 0, y: -40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, ease: 'easeInOut' }}
             >
-              Unleash the Magic Within
-            </Typography>
-          </motion.div>
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-          >
-            <Typography
-              variant="h6"
-              sx={{
-                fontSize: isMobile ? '1rem' : '1.25rem',
-                maxWidth: '700px',
-                margin: '20px auto',
-                opacity: 0.9,
-              }}
+              <Typography
+                variant="h1"
+                component="h1"
+                sx={{
+                  fontWeight: 'bold',
+                  fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
+                  mb: 4,
+                  textShadow: '0 6px 15px rgba(0, 0, 0, 0.5)',
+                  lineHeight: 1.2,
+                }}
+              >
+                Speed Up Your Journey to Tech Mastery
+              </Typography>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, delay: 0.4, ease: 'easeInOut' }}
             >
-              Discover enchanting products that elevate your spiritual journey.
-            </Typography>
-            <Link href="/shop" passHref>
-              <CTAButton variant="contained">Explore Now</CTAButton>
-            </Link>
-          </motion.div>
-        </HeroContent>
-      </HeroSection>
-
-      {/* Featured Products Carousel */}
-      <Container sx={{ mt: 10 }}>
-        <Typography
-          variant="h4"
-          align="center"
-          sx={{ mb: 4, fontWeight: 'bold', position: 'relative' }}
-        >
-          Best Sellers
-        </Typography>
-        <Carousel
-          indicators={false}
-          navButtonsAlwaysVisible
-          animation="slide"
-          autoPlay
-          interval={5000}
-        >
-          {[1, 2].map((slide) => (
-            <Grid container spacing={4} key={slide}>
-              {[
-                {
-                  title: 'Mystic Candle Set',
-                  price: '$30.00',
-                  image: '/images/mystic-candle.jpg',
-                  description: 'Set of 3 handmade candles for meditation and rituals.',
-                },
-                {
-                  title: 'Herbal Incense',
-                  price: '$15.00',
-                  image: '/images/herbal-incense.jpg',
-                  description: 'Natural incense sticks with calming properties.',
-                },
-                {
-                  title: 'Crystal Healing Kit',
-                  price: '$50.00',
-                  image: '/images/crystal-healing.jpg',
-                  description: 'Includes crystals, instructions, and a guidebook.',
-                },
-              ].map((product, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <ProductCard elevation={3}>
-                    <motion.div whileHover={{ scale: 1.05 }}>
-                      <Box
-                        component="img"
-                        src={product.image}
-                        alt={product.title}
-                        sx={{ width: '100%', borderRadius: '10px' }}
-                      />
-                    </motion.div>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>
-                      {product.title}
-                    </Typography>
-                    <Typography variant="subtitle1" sx={{ color: '#ff4081', mb: 1 }}>
-                      {product.price}
-                    </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
-                      {product.description}
-                    </Typography>
-                    <Button variant="contained" color="primary" href="/shop" sx={{ mt: 2 }}>
-                      Add to Cart
-                    </Button>
-                  </ProductCard>
-                </Grid>
-              ))}
-            </Grid>
-          ))}
-        </Carousel>
-      </Container>
-
-      {/* Newsletter Signup Section */}
-      <Box sx={{ backgroundColor: '#ff4081', py: 8, mt: 8, color: '#fff', textAlign: 'center' }}>
-        <Container>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
-            Join Our Community
-          </Typography>
-          <Typography variant="body1" sx={{ maxWidth: '600px', margin: '0 auto', mb: 4 }}>
-            Subscribe to our newsletter and get exclusive updates on new products and special offers.
-          </Typography>
-          <Box
-            component="form"
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              flexDirection: isMobile ? 'column' : 'row',
-              gap: 2,
-            }}
-          >
-            <input
-              type="email"
-              placeholder="Enter your email"
-              style={{
-                padding: '12px 20px',
-                borderRadius: '30px',
-                border: 'none',
-                width: isMobile ? '100%' : '300px',
-                fontSize: '1rem',
-              }}
-            />
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: '#fff',
-                color: '#ff4081',
-                padding: '12px 30px',
-                borderRadius: '30px',
-                fontSize: '1rem',
-                '&:hover': {
-                  backgroundColor: '#f5f5f5',
-                },
-              }}
+              <Typography
+                variant="h5"
+                component="p"
+                sx={{
+                  fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.75rem' },
+                  color: '#eee',
+                  maxWidth: '800px',
+                  mx: 'auto',
+                  mb: 6,
+                  lineHeight: 1.6,
+                }}
+              >
+                Empowering tech professionals with expert-led solutions for seamless integrations, streamlined configurations, and efficient setups.
+              </Typography>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: 0.8, type: 'spring', stiffness: 100 }}
             >
-              Subscribe
-            </Button>
+              {/* If using Next.js Link */}
+              <NextLink href="/solutions" passHref>
+                <StyledButton endIcon={<ArrowRightAlt />}>
+                  Explore Solutions
+                </StyledButton>
+              </NextLink>
+            </motion.div>
           </Box>
         </Container>
-      </Box>
+      </HeroSection>
 
-      {/* Customer Testimonials */}
-      <Container sx={{ py: 10, mt: 8 }}>
-        <Typography variant="h4" align="center" sx={{ mb: 4, fontWeight: 'bold' }}>
-          What Our Customers Say
-        </Typography>
-        <Carousel
-          indicators={false}
-          navButtonsAlwaysVisible
-          animation="slide"
-          autoPlay
-          interval={6000}
-        >
-          {[1, 2].map((slide) => (
-            <Grid container justifyContent="center" key={slide}>
-              {[
-                {
-                  name: 'John Doe',
-                  feedback: '"Amazing quality and fast delivery. The candles have such a calming scent."',
-                  image: '/images/customer1.jpg',
-                },
-                {
-                  name: 'Jane Smith',
-                  feedback: '"I absolutely love the crystal healing kit. It’s become a part of my daily routine!"',
-                  image: '/images/customer2.jpg',
-                },
-              ].map((testimonial, index) => (
-                <Grid item xs={12} md={6} key={index}>
-                  <TestimonialCard elevation={3}>
-                    <Box
-                      component="img"
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      sx={{
-                        width: '80px',
-                        height: '80px',
-                        borderRadius: '50%',
-                        mb: 2,
-                        objectFit: 'cover',
-                      }}
-                    />
-                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                      {testimonial.name}
-                    </Typography>
-                    <Typography variant="body1" sx={{ fontStyle: 'italic', mt: 1 }}>
-                      {testimonial.feedback}
-                    </Typography>
-                  </TestimonialCard>
-                </Grid>
-              ))}
-            </Grid>
-          ))}
-        </Carousel>
-      </Container>
-
-      {/* Instagram Feed Section */}
-      <Box sx={{ py: 8, backgroundColor: '#fafafa' }}>
-        <Container>
-          <Typography variant="h4" align="center" sx={{ mb: 4, fontWeight: 'bold' }}>
-            Follow Us on Instagram
+      {/* Technologies Section */}
+      <SectionContainer component="section">
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            align="center"
+            component="h2"
+            sx={{
+              mb: 8,
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              color: '#333',
+              fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+            }}
+          >
+            Technologies We Support
           </Typography>
-          {/* Placeholder for Instagram images */}
-          <Grid container spacing={2}>
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-              <Grid item xs={4} sm={2} key={item}>
-                <Box
-                  component="img"
-                  src={`/images/instagram${item}.jpg`} // Replace with actual images
-                  alt={`Instagram ${item}`}
-                  sx={{
-                    width: '100%',
-                    height: '100px',
-                    objectFit: 'cover',
-                    borderRadius: '10px',
+          <Grid container spacing={isMobile ? 4 : 6} justifyContent="center">
+            {techIcons.map((tech, index) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                <motion.div
+                  className="feature-card"
+                  initial="hidden"
+                  animate={controls}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0, transition: { duration: 0.8, delay: index * 0.2 } },
                   }}
-                />
+                  whileHover={{ scale: 1.08, y: -10 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 150, damping: 10 }}
+                >
+                  <FeatureCard component="article">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                      {tech.icon}
+                    </Box>
+                    <Typography variant="h6" component="h3" sx={{ fontWeight: 700, mb: 2, color: '#212121' }}>
+                      {tech.title}
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: '#555', fontSize: '1rem' }}>
+                      {tech.description}
+                    </Typography>
+                  </FeatureCard>
+                </motion.div>
               </Grid>
             ))}
           </Grid>
         </Container>
-      </Box>
+      </SectionContainer>
 
-      {/* Call to Action */}
-      <Box sx={{ textAlign: 'center', py: 10, background: '#333', color: '#fff' }}>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
-          Ready to Discover More?
-        </Typography>
-        <Typography variant="body1" sx={{ maxWidth: '700px', margin: '0 auto 20px' }}>
-          Dive into our collection and find the perfect items that resonate with your soul.
-        </Typography>
-        <Link href="/shop" passHref>
-          <CTAButton variant="contained" sx={{ backgroundColor: '#ff4081', color: '#fff' }}>
-            Shop Now
-          </CTAButton>
-        </Link>
-      </Box>
+      {/* Scroll to Top Button */}
+      {showScrollToTop && (
+        <IconButton
+          onClick={scrollToTop}
+          sx={{
+            position: 'fixed',
+            bottom: 16,
+            right: 16,
+            backgroundColor: '#4A47A3',
+            color: '#fff',
+            borderRadius: '50%',
+            padding: '12px',
+            boxShadow: '0 6px 15px rgba(0, 0, 0, 0.2)',
+            '&:hover': {
+              backgroundColor: '#393685',
+              boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)',
+            },
+          }}
+        >
+          <KeyboardArrowUpIcon />
+        </IconButton>
+      )}
     </Box>
   );
 };
