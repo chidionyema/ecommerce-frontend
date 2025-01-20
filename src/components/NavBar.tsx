@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Image from 'next/image'; 
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import {
@@ -15,12 +14,9 @@ import {
   List,
   ListItem,
   Divider,
-  Badge,
-  Tooltip,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  ShoppingCart,
   Close as CloseIcon,
   Delete as DeleteIcon,
   ArrowForward,
@@ -30,7 +26,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { removeItem, clearCart } from '../store/cartSlice';
 import { loadStripe, Stripe } from '@stripe/stripe-js';
-import type { CartItem as CartItemType } from '../types/types'; 
 
 // --- Styled Components ---
 const StyledAppBar = styled(AppBar)(({ theme }: { theme: Theme }) => ({
@@ -43,7 +38,7 @@ const StyledToolbar = styled(Toolbar)(({ theme }: { theme: Theme }) => ({
   minHeight: 90,
   padding: theme.spacing(0, 3),
   display: 'flex',
-  justifyContent: 'space-between',
+  justifyContent: 'flex-start',
   alignItems: 'center',
 }));
 
@@ -52,6 +47,7 @@ const LogoContainer = styled(Box)(({ theme }: { theme: Theme }) => ({
   alignItems: 'center',
   cursor: 'pointer',
   marginRight: theme.spacing(4),
+  marginLeft: theme.spacing(18), // Keep the logo position unchanged
   '& img': {
     height: '50px',
     marginRight: theme.spacing(1),
@@ -66,8 +62,9 @@ const LogoContainer = styled(Box)(({ theme }: { theme: Theme }) => ({
 
 const DesktopNav = styled(Box)(({ theme }: { theme: Theme }) => ({
   display: 'flex',
-  gap: theme.spacing(4),
+  gap: theme.spacing(4), // Space between menu items
   alignItems: 'center',
+  marginLeft: theme.spacing(18), // Increased margin to shift menu items to the right
 }));
 
 const StyledNavButton = styled(Button)(({ theme }: { theme: Theme }) => ({
@@ -137,7 +134,7 @@ const NavBar: React.FC = () => {
 
   const navItems = [
     { label: 'Home', path: '/' },
-    { label: 'Solutions', path: '/shop' },
+    { label: 'Solutions', path: '/solutions' },
     { label: 'Resources', path: '/resources' },
     { label: 'Pricing', path: '/pricing' },
     { label: 'Contact', path: '/contact' },
@@ -263,13 +260,11 @@ const NavBar: React.FC = () => {
     >
       <StyledAppBar position="sticky">
         <StyledBanner>
-        Get expert insights and a personalized strategy with a free consultation. No obligation, just valuable advice. Book your free session now!
-
+          Get expert insights and a personalized strategy with a free consultation. No obligation, just valuable advice. Book your free session now!
         </StyledBanner>
         <Container maxWidth="xl">
           <StyledToolbar>
             <LogoContainer onClick={() => router.push('/')}>
-             
               <Typography variant="h4" className="logo-text">
                 GluStack
               </Typography>
@@ -281,13 +276,6 @@ const NavBar: React.FC = () => {
                     {label}
                   </StyledNavButton>
                 ))}
-                <Tooltip title="Open Cart">
-                  <IconButton onClick={handleCartDrawerToggle} color="inherit">
-                    <Badge badgeContent={cartItemsCount} color="secondary">
-                      <ShoppingCart />
-                    </Badge>
-                  </IconButton>
-                </Tooltip>
               </DesktopNav>
             ) : (
               <IconButton onClick={handleDrawerToggle} color="inherit">

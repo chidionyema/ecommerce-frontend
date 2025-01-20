@@ -8,8 +8,8 @@ const Footer: React.FC = () => {
                 &copy; {new Date().getFullYear()} GluStack. All rights reserved.
             </Typography>
             <Box sx={{ mt: 2 }}>
-                <Link href="/privacy" color="inherit" sx={{ mx: 1 }}>Privacy Policy</Link>
-                <Link href="/terms" color="inherit" sx={{ mx: 1 }}>Terms of Service</Link>
+                <Link href="/privacy-policy" color="inherit" sx={{ mx: 1 }}>Privacy Policy</Link>
+                <Link href="/terms-of-service" color="inherit" sx={{ mx: 1 }}>Terms of Service</Link>
             </Box>
         </Box>
     );

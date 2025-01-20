@@ -1,43 +1,17 @@
 import React, { useState, useEffect } from 'react';
-
-// Importing individual components directly
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import Link from '@mui/material/Link';
-import IconButton from '@mui/material/IconButton';
-import useScrollTrigger from '@mui/material/useScrollTrigger';
-import Slide from '@mui/material/Slide';
-
-// Importing styled utility
-import { styled } from '@mui/material/styles';
-
-// Importing icons
+import { Box, Container, Typography, Button, Grid, Paper, useTheme, useMediaQuery, Link, IconButton, Modal, styled } from '@mui/material';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-
-// Importing Framer Motion
 import { motion, useAnimation } from 'framer-motion';
-
-// Importing Next.js components
 import NextLink from 'next/link';
-
-// Importing specific types
-import { ButtonProps } from '@mui/material/Button';
-import { PaperProps } from '@mui/material/Paper';
-
-// Importing react-icons
-import { FaAws, FaDocker, FaJava, FaMicrosoft, FaBrain, FaLinux } from 'react-icons/fa';
+import { FaPython, FaReact, FaNodeJs, FaAws, FaDocker, FaJava, FaMicrosoft, FaBrain, FaLinux } from 'react-icons/fa';
+import { SiRust, SiGoland } from 'react-icons/si';
+import TextField from '@mui/material/TextField';
+import FormControl from '@mui/material/FormControl';
+import Head from 'next/head';
 
 // Styled Components
-
-// Correctly typed StyledButton
-const StyledButton = styled(Button)<ButtonProps>(({ theme }) => ({
+const StyledButton = styled(Button)(({ theme }) => ({
   fontSize: '1.1rem',
   padding: theme.spacing(2, 4),
   borderRadius: '50px',
@@ -58,8 +32,7 @@ const StyledButton = styled(Button)<ButtonProps>(({ theme }) => ({
   },
 }));
 
-// Correctly typed FeatureCard
-const FeatureCard = styled(Paper)<PaperProps>(({ theme }) => ({
+const FeatureCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   textAlign: 'center',
   borderRadius: '15px',
@@ -75,13 +48,13 @@ const HeroSection = styled(Box)(({ theme }) => ({
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
-  minHeight: '50vh', // Reduced minHeight
+  minHeight: '50vh',
   padding: theme.spacing(6, 2),
-  background: `linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)`, // New gradient
+  background: `linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)`,
   color: theme.palette.common.white,
   overflow: 'hidden',
   [theme.breakpoints.down('sm')]: {
-    minHeight: '40vh', // Reduced minHeight for mobile
+    minHeight: '40vh',
   },
 }));
 
@@ -90,21 +63,39 @@ const SectionContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(10, 2),
   borderRadius: '15px',
   marginBottom: theme.spacing(6),
-  background: `linear-gradient(to bottom, #f8f9fc, #f0f2f5)`, // Subtle gradient
+  background: `linear-gradient(to bottom, #f8f9fc, #f0f2f5)`,
 }));
 
 const techIcons = [
   {
+    title: 'Python',
+    description:
+      'Build scalable and efficient applications with Python, leveraging its versatility for web development, data analysis, and automation.',
+    icon: <FaPython size={60} />,
+  },
+  {
+    title: 'React Native',
+    description:
+      'Develop cross-platform mobile applications with React Native, ensuring a seamless user experience on both iOS and Android.',
+    icon: <FaReact size={60} />,
+  },
+  {
+    title: 'Node.js',
+    description:
+      'Build fast and scalable server-side applications with Node.js, leveraging its event-driven architecture for high performance.',
+    icon: <FaNodeJs size={60} />,
+  },
+  {
     title: 'DevOps',
     description:
       'Streamline your development lifecycle with automated CI/CD pipelines, reducing time to market and improving software quality.',
-    icon: <FaDocker size={60} />, // Example icon for DevOps
+    icon: <FaDocker size={60} />,
   },
   {
     title: 'Cloud Infrastructure',
     description:
       'Scale your applications seamlessly with robust and reliable cloud solutions, ensuring high availability and performance.',
-    icon: <FaAws size={60} />, // Example icon for Cloud Infrastructure
+    icon: <FaAws size={60} />,
   },
   {
     title: 'Java',
@@ -116,19 +107,37 @@ const techIcons = [
     title: '.NET',
     description:
       'Build enterprise-grade .NET applications tailored to your specific business needs, leveraging the power of the Microsoft ecosystem.',
-    icon: <FaMicrosoft size={60} />, // Example for .NET
+    icon: <FaMicrosoft size={60} />,
   },
   {
     title: 'AI & ML',
     description:
       'Harness the power of AI and ML to drive innovation and gain a competitive edge with intelligent solutions.',
-    icon: <FaBrain size={60} />, // Example for AI & ML
+    icon: <FaBrain size={60} />,
   },
   {
     title: 'Linux',
     description:
       'Leverage efficient and scalable Linux server management for optimal performance, security, and cost-effectiveness.',
     icon: <FaLinux size={60} />,
+  },
+  {
+    title: 'Rust',
+    description:
+      'Build high-performance, memory-safe, and concurrent applications with Rust, a modern systems programming language.',
+    icon: <SiRust size={60} />,
+  },
+  {
+    title: 'Go (Golang)',
+    description:
+      'Develop fast, efficient, and scalable backend services with Go, leveraging its simplicity and concurrency model.',
+    icon: <SiGoland size={60} />,
+  },
+  {
+    title: 'React',
+    description:
+      'Create dynamic and responsive user interfaces with React, a powerful JavaScript library for building modern web applications.',
+    icon: <FaReact size={60} />,
   },
 ];
 
@@ -140,26 +149,253 @@ const scrollToTop = () => {
   });
 };
 
+// Booking Modal Component
+interface BookingModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+}
+
+interface FormErrors {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  general: string;
+}
+
+const BookingModal: React.FC<BookingModalProps> = ({ open, onClose }) => {
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+  });
+  const [errors, setErrors] = useState<FormErrors>({
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+    general: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: '' });
+  };
+
+  const validateForm = () => {
+    let valid = true;
+    const newErrors: FormErrors = {
+      name: '',
+      email: '',
+      phone: '',
+      message: '',
+      general: '',
+    };
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+      valid = false;
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+      valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Invalid email address';
+      valid = false;
+    }
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+      valid = false;
+    } else if (!/^\d{8}$/.test(formData.phone)) {
+      newErrors.phone = 'Invalid phone number (10 digits required)';
+      valid = false;
+    }
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      setIsSubmitting(true);
+      try {
+        const response = await fetch('/api/booking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+        if (!response.ok) throw new Error('Submission failed');
+        console.log('Form submitted:', formData);
+        onClose();
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          general: 'Submission failed. Please try again.',
+        }));
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  return (
+    <Modal open={open} onClose={onClose} aria-labelledby="booking-modal-title">
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90%',
+          maxWidth: '800px',
+          backgroundColor: 'background.paper',
+          boxShadow: 24,
+          borderRadius: '12px',
+          p: 6,
+          outline: 'none',
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Typography
+            id="booking-modal-title"
+            variant="h4"
+            component="h2"
+            sx={{ mb: 4, fontWeight: 700, color: '#4A47A3', textAlign: 'center' }}
+          >
+            Book a Consultation
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <FormControl fullWidth sx={{ mb: 4 }}>
+              <TextField
+                label="Your Name"
+                variant="outlined"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                error={!!errors.name}
+                helperText={errors.name}
+                aria-required="true"
+                fullWidth
+              />
+            </FormControl>
+            <FormControl fullWidth sx={{ mb: 4 }}>
+              <TextField
+                label="Your Email"
+                variant="outlined"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                error={!!errors.email}
+                helperText={errors.email}
+                aria-required="true"
+                fullWidth
+              />
+            </FormControl>
+            <FormControl fullWidth sx={{ mb: 4 }}>
+              <TextField
+                label="Your Phone Number"
+                variant="outlined"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                error={!!errors.phone}
+                helperText={errors.phone}
+                aria-required="true"
+                fullWidth
+              />
+            </FormControl>
+            <FormControl fullWidth sx={{ mb: 4 }}>
+              <TextField
+                label="Your Message"
+                variant="outlined"
+                name="message"
+                value={formData.message}
+                onChange={handleInputChange}
+                error={!!errors.message}
+                helperText={errors.message}
+                multiline
+                rows={6}
+                aria-required="true"
+                fullWidth
+              />
+            </FormControl>
+            {errors.general && (
+              <Typography color="error" sx={{ mb: 2, textAlign: 'center' }}>
+                {errors.general}
+              </Typography>
+            )}
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={isSubmitting}
+                sx={{
+                  width: '50%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  backgroundColor: '#4A47A3',
+                  color: 'white',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  '&:hover': {
+                    backgroundColor: '#393685',
+                  },
+                }}
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit'}
+              </Button>
+            </Box>
+          </form>
+        </motion.div>
+      </Box>
+    </Modal>
+  );
+};
+
 const HomePage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const controls = useAnimation();
   const [showScrollToTop, setShowScrollToTop] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
-  // Trigger for scroll to top button
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 100,
-  });
+  const handleOpenBookingModal = () => {
+    setIsBookingModalOpen(true);
+  };
 
-  // Show/hide scroll to top button
+  const handleCloseBookingModal = () => {
+    setIsBookingModalOpen(false);
+  };
+
   useEffect(() => {
-    window.addEventListener('scroll', () => {
+    const handleScroll = () => {
       setShowScrollToTop(window.scrollY > 100);
-    });
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Animate feature cards on scroll
   useEffect(() => {
     const handleScroll = () => {
       const cards = document.querySelectorAll('.feature-card');
@@ -174,8 +410,7 @@ const HomePage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [controls]);
 
-  // Helper function to check if an element is in the viewport
-  const isElementInViewport = (el: Element) => {
+  const isElementInViewport = (el: HTMLElement) => {
     const rect = el.getBoundingClientRect();
     return (
       rect.top >= 0 &&
@@ -187,6 +422,13 @@ const HomePage = () => {
 
   return (
     <Box component="main">
+      <Head>
+        <title>Tech Mastery - Expert-Led Solutions</title>
+        <meta name="description" content="Empowering tech professionals with expert-led solutions for seamless integrations, streamlined configurations, and efficient setups." />
+        <meta name="keywords" content="tech, programming, consultation, development, AI, cloud, DevOps" />
+        <meta name="author" content="Your Company" />
+      </Head>
+
       {/* Hero Section */}
       <HeroSection component="section">
         <Container maxWidth="md">
@@ -201,7 +443,7 @@ const HomePage = () => {
                 component="h1"
                 sx={{
                   fontWeight: 'bold',
-                  fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
+                  fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem', lg: '5rem' },
                   mb: 4,
                   textShadow: '0 6px 15px rgba(0, 0, 0, 0.5)',
                   lineHeight: 1.2,
@@ -235,16 +477,23 @@ const HomePage = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.8, type: 'spring', stiffness: 100 }}
             >
-              {/* If using Next.js Link */}
-              <NextLink href="/solutions" passHref>
-                <StyledButton endIcon={<ArrowRightAlt />}>
-                  Explore Solutions
-                </StyledButton>
-              </NextLink>
+              <StyledButton endIcon={<ArrowRightAlt />} onClick={handleOpenBookingModal} aria-label="Book a Consultation">
+                Book a Consultation
+              </StyledButton>
+              <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+                <NextLink href="/consultation" passHref legacyBehavior>
+                  <Link sx={{ color: '#fff', textDecoration: 'underline' }} aria-label="Learn more about our consultation process">
+                    Learn more about our consultation process
+                  </Link>
+                </NextLink>
+              </Typography>
             </motion.div>
           </Box>
         </Container>
       </HeroSection>
+
+      {/* Booking Modal */}
+      <BookingModal open={isBookingModalOpen} onClose={handleCloseBookingModal} />
 
       {/* Technologies Section */}
       <SectionContainer component="section">
@@ -314,6 +563,7 @@ const HomePage = () => {
               boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)',
             },
           }}
+          aria-label="Scroll to top"
         >
           <KeyboardArrowUpIcon />
         </IconButton>

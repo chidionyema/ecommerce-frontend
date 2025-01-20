@@ -96,8 +96,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps, router }) => {
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <BasketProvider>
-          <CategoryProvider>
+   
             <ErrorBoundary>
               <Head>
                 <meta charSet="utf-8" />
@@ -121,8 +120,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps, router }) => {
               </Layout>
               <ToastContainer />
             </ErrorBoundary>
-          </CategoryProvider>
-        </BasketProvider>
+        
       </ThemeProvider>
     </Provider>
   );
