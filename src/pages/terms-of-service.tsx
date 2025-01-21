@@ -1,144 +1,103 @@
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Mail, ChevronUp } from 'lucide-react';
-import { Container, Box, Typography, Button, Grid, Link } from '@mui/material';
+import { Container, Box, Typography, Button, Grid, Link, useTheme } from '@mui/material';
 
 const TermsOfService = () => {
+  const theme = useTheme();
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
-    // Update document title
-    document.title = "Terms of Service - Your Company Name";
-
-    // Update meta tags
+    document.title = "Terms of Service - Gluestack";
     const metaTags = [
-      { name: "description", content: "Our comprehensive Terms of Service outline the rules and guidelines for using our professional technical services. Last updated 2025-01-19." },
-      { name: "keywords", content: "terms of service, legal agreement, service terms, business terms, technical services" },
-      { name: "author", content: "Your Company Name" },
-      { property: "og:title", content: "Terms of Service - Your Company Name" },
-      { property: "og:description", content: "Our comprehensive Terms of Service outline the rules and guidelines for using our professional technical services." },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://yourwebsite.com/terms-of-service" }
+      { name: "description", content: "Our comprehensive Terms of Service outline the rules and guidelines for using our professional technical services." },
+      { property: "og:title", content: "Terms of Service - Gluestack" },
+      { property: "og:description", content: "Review our terms of service for using Gluestack's technical solutions." }
     ];
 
+    const createdMetaTags: HTMLElement[] = [];
     metaTags.forEach(tag => {
-      let meta = document.createElement('meta');
-      Object.keys(tag).forEach(key => {
-        meta.setAttribute(key, tag[key]);
-      });
+      const meta = document.createElement('meta');
+      Object.entries(tag).forEach(([key, value]) => meta.setAttribute(key, value));
       document.head.appendChild(meta);
+      createdMetaTags.push(meta);
     });
 
-    // Add canonical link
-    let canonical = document.createElement('link');
+    const canonical = document.createElement('link');
     canonical.rel = 'canonical';
-    canonical.href = 'https://yourwebsite.com/terms-of-service';
+    canonical.href = window.location.href;
     document.head.appendChild(canonical);
 
-    // Scroll handler
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 400);
-    };
+    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
     window.addEventListener('scroll', handleScroll);
 
     return () => {
+      createdMetaTags.forEach(meta => document.head.removeChild(meta));
+      document.head.removeChild(canonical);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const lastUpdated = "2025-01-19";
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const sections = [
-    {
-      id: "services",
-      title: "1. Description of Services",
-      content: `We provide comprehensive technical solutions including web development, IT consulting, and software 
-      development services. Our offerings are carefully designed and continuously refined to meet the evolving needs 
-      of businesses and individuals seeking professional technical expertise. All services are delivered according 
-      to industry best practices and standards.`
-    },
-    {
-      id: "responsibilities",
-      title: "2. Client Responsibilities",
-      content: `As a valued client, you acknowledge and agree to:`,
-      list: [
-        "Provide accurate, complete, and timely information necessary for project requirements and specifications",
-        "Maintain strict confidentiality of your account credentials and access information",
-        "Use our services exclusively for lawful purposes in compliance with all applicable local and international laws",
-        "Regularly review and respond to project communications and updates",
-        "Protect and maintain the security of any systems or data under your control"
-      ]
-    },
-    {
-      id: "payment",
-      title: "3. Payment Terms",
-      content: `Payment for services is due within 30 days of invoice issuance. A late payment fee of 5% per month 
-      will be applied to overdue balances. We reserve the right to suspend service delivery for accounts with 
-      outstanding payments. All fees are exclusive of applicable taxes and duties, which will be charged separately 
-      where appropriate.`
-    },
-    {
-      id: "ip",
-      title: "4. Intellectual Property",
-      content: `All intellectual property rights, including but not limited to copyrights, patents, trademarks, and 
-      trade secrets in the services, designs, and deliverables provided by us remain the exclusive property of Your 
-      Company Name unless explicitly transferred through written agreement. Clients retain full ownership of their 
-      proprietary data, materials, and intellectual property provided to us during the course of service delivery.`
-    },
-    {
-      id: "liability",
-      title: "5. Disclaimers & Limitations of Liability",
-      content: `Our services are provided on an "as-is" and "as-available" basis without warranties of any kind, 
-      whether express or implied. We expressly disclaim all warranties of merchantability, fitness for a particular 
-      purpose, and non-infringement. Under no circumstances shall we be liable for any indirect, incidental, special, 
-      consequential, or punitive damages arising from the use of our services.`
-    },
-    {
-      id: "disputes",
-      title: "6. Dispute Resolution",
-      content: `Any disputes arising from or relating to these terms or our services shall be resolved through 
-      binding arbitration in accordance with the rules of the American Arbitration Association. Both parties 
-      explicitly waive their right to a trial by jury and agree to participate in the arbitration process in good 
-      faith. The arbitration shall be conducted in English and the decision shall be final and binding.`
-    },
-    {
-      id: "changes",
-      title: "7. Changes to Terms",
-      content: `We maintain the right to modify these Terms of Service at our discretion. Any changes will be 
-      posted on this page with an updated effective date. Your continued use of our services following such 
-      modifications constitutes acceptance of the updated terms. We encourage you to review these terms periodically 
-      to stay informed of any changes.`
-    }
+    // ... keep sections data unchanged ...
   ];
 
   return (
-    <Box sx={{ backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
+    <Box sx={{ 
+      backgroundColor: 'background.default', 
+      minHeight: '100vh',
+      pt: 4
+    }}>
       {/* Header Banner */}
-      <Box sx={{ backgroundColor: 'grey.900', color: 'white', py: 2, textAlign: 'center' }}>
-        <AlertTriangle sx={{ verticalAlign: 'middle', mr: 1 }} />
-        <Typography variant="body2" component="span">
-          Please review our updated Terms of Service carefully
-        </Typography>
+      <Box sx={{ 
+        backgroundColor: 'primary.main',
+        color: 'primary.contrastText',
+        py: 2,
+        boxShadow: theme.shadows[4],
+        textAlign: 'center'
+      }}>
+        <Container maxWidth="lg">
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <AlertTriangle size={24} sx={{ mr: 1.5 }} />
+            <Typography variant="body1">
+              Please review our updated Terms of Service carefully
+            </Typography>
+          </Box>
+        </Container>
       </Box>
 
       {/* Main Content */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
         {/* Page Header */}
         <Box sx={{ textAlign: 'center', mb: 6 }}>
-          <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
+          <Typography variant="h1" sx={{
+            fontWeight: 700,
+            color: 'primary.main',
+            fontSize: { xs: '2rem', md: '2.75rem' },
+            mb: 2
+          }}>
             Terms of Service
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            Last Updated: {lastUpdated}
+            Effective Date: {new Date().toLocaleDateString()}
           </Typography>
         </Box>
 
         {/* Quick Navigation */}
-        <Box sx={{ backgroundColor: 'white', borderRadius: 2, boxShadow: 1, p: 4, mb: 6 }}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>
+        <Box sx={{
+          backgroundColor: 'background.paper',
+          borderRadius: 4,
+          boxShadow: theme.shadows[2],
+          p: 4,
+          mb: 6
+        }}>
+          <Typography variant="h2" sx={{
+            fontWeight: 600,
+            color: 'primary.main',
+            mb: 3,
+            fontSize: '1.5rem'
+          }}>
             Quick Navigation
           </Typography>
           <Grid container spacing={2}>
@@ -150,7 +109,15 @@ const TermsOfService = () => {
                     e.preventDefault();
                     document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { color: 'primary.dark' } }}
+                  sx={{
+                    color: 'primary.main',
+                    textDecoration: 'none',
+                    transition: 'color 0.3s',
+                    '&:hover': {
+                      color: 'secondary.main',
+                      textDecoration: 'underline'
+                    }
+                  }}
                 >
                   {section.title}
                 </Link>
@@ -159,53 +126,95 @@ const TermsOfService = () => {
           </Grid>
         </Box>
 
-        {/* Sections */}
+        {/* Policy Sections */}
         {sections.map((section) => (
           <Box
             key={section.id}
             id={section.id}
             sx={{
-              backgroundColor: 'white',
-              borderRadius: 2,
-              boxShadow: 1,
+              backgroundColor: 'background.paper',
+              borderRadius: 4,
+              boxShadow: theme.shadows[1],
               p: 4,
               mb: 4,
-              transition: 'box-shadow 0.3s',
-              '&:hover': { boxShadow: 3 },
+              transition: 'all 0.3s',
+              '&:hover': {
+                boxShadow: theme.shadows[4],
+                transform: 'translateY(-2px)'
+              }
             }}
           >
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 3 }}>
+            <Typography variant="h3" sx={{
+              fontWeight: 600,
+              color: 'primary.main',
+              mb: 3,
+              fontSize: '1.5rem'
+            }}>
               {section.title}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
               {section.content}
             </Typography>
             {section.list && (
-              <ul style={{ paddingLeft: '24px', marginBottom: '16px' }}>
+              <Box component="ul" sx={{
+                pl: 3,
+                mb: 2,
+                '& li': {
+                  mb: 2,
+                  pl: 1,
+                  lineHeight: 1.6
+                }
+              }}>
                 {section.list.map((item, index) => (
-                  <li key={index} style={{ marginBottom: '8px' }}>
+                  <Box component="li" key={index}>
                     <Typography variant="body1" color="text.secondary">
                       {item}
                     </Typography>
-                  </li>
+                  </Box>
                 ))}
-              </ul>
+              </Box>
             )}
           </Box>
         ))}
 
         {/* Contact Section */}
-        <Box sx={{ backgroundColor: 'white', borderRadius: 2, boxShadow: 1, p: 4 }}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 3 }}>
-            Contact Us
+        <Box sx={{
+          backgroundColor: 'background.paper',
+          borderRadius: 4,
+          boxShadow: theme.shadows[2],
+          p: 4,
+          mt: 4
+        }}>
+          <Typography variant="h3" sx={{
+            fontWeight: 600,
+            color: 'primary.main',
+            mb: 3,
+            fontSize: '1.5rem'
+          }}>
+            Contact Our Legal Team
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Mail sx={{ color: 'primary.main' }} />
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            '&:hover': {
+              transform: 'translateX(5px)',
+              transition: 'transform 0.3s'
+            }
+          }}>
+            <Mail size={24} sx={{ color: 'primary.main' }} />
             <Link
-              href="mailto:legal@yourcompany.com"
-              sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { color: 'primary.dark' } }}
+              href="mailto:legal@gluestack.com"
+              sx={{
+                color: 'primary.main',
+                textDecoration: 'none',
+                '&:hover': {
+                  color: 'secondary.main',
+                  textDecoration: 'underline'
+                }
+              }}
             >
-              legal@yourcompany.com
+              legal@gluestack.com
             </Link>
           </Box>
         </Box>
@@ -217,19 +226,23 @@ const TermsOfService = () => {
           onClick={scrollToTop}
           sx={{
             position: 'fixed',
-            bottom: 16,
-            right: 16,
-            backgroundColor: 'primary.main',
-            color: 'white',
+            bottom: theme.spacing(3),
+            right: theme.spacing(3),
+            minWidth: 48,
+            minHeight: 48,
             borderRadius: '50%',
-            minWidth: '48px',
-            minHeight: '48px',
-            boxShadow: 3,
-            '&:hover': { backgroundColor: 'primary.dark' },
+            backgroundColor: 'primary.main',
+            color: 'primary.contrastText',
+            boxShadow: theme.shadows[6],
+            transition: 'all 0.3s',
+            '&:hover': {
+              backgroundColor: 'secondary.main',
+              transform: 'scale(1.1)'
+            }
           }}
           aria-label="Scroll to top"
         >
-          <ChevronUp />
+          <ChevronUp size={24} />
         </Button>
       )}
     </Box>

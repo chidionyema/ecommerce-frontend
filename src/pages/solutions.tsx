@@ -1,35 +1,45 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   AppBar,
   Toolbar,
   Box,
   Typography,
-  IconButton,
   Grid,
-  CssBaseline,
   TextField,
   InputAdornment,
   Container,
   Chip,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
   Snackbar,
   Alert,
   CircularProgress,
   Skeleton,
   useTheme,
   useMediaQuery,
+  styled,
+  Button,
 } from '@mui/material';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { motion } from 'framer-motion';
-import Carousel from 'react-material-ui-carousel';
 import { useRouter } from 'next/router';
-import { CVProject, cvProjects } from '../data/cvProjects'; // Import CVProject and cvProjects
+import { CVProject, cvProjects } from '../data/cvProjects';
 
 const PAGE_SIZE = 9;
+
+const GradientButton = styled(Button)(({ theme }) => ({
+  background: theme.gradients.primary,
+  color: theme.palette.common.white,
+  borderRadius: '50px',
+  padding: theme.spacing(1.5, 4),
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  transition: 'transform 0.2s, box-shadow 0.2s',
+  '&:hover': {
+    background: theme.gradients.secondary,
+    transform: 'translateY(-2px)',
+    boxShadow: theme.shadows[4],
+  },
+}));
 
 const Solutions: React.FC = () => {
   const [displayedProjects, setDisplayedProjects] = useState<CVProject[]>([]);
@@ -37,43 +47,37 @@ const Solutions: React.FC = () => {
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [quickViewOpen, setQuickViewOpen] = useState(false);
-  const [quickViewProduct, setQuickViewProduct] = useState<CVProject | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const loaderRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Filter projects based on search query
-  const filteredProjects = cvProjects.filter((project) =>
-    project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    project.technologies.some((tech) => tech.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  // Simulate fetching CV projects
+  const filteredProjects = useMemo(() => {
+    return cvProjects.filter((project) =>
+      project.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+      project.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+      project.technologies.some((tech) => tech.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
+    );
+  }, [debouncedSearchQuery]);
+
   useEffect(() => {
     const fetchProjects = async () => {
       setIsLoading(true);
       try {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
         const startIndex = (page - 1) * PAGE_SIZE;
         const endIndex = startIndex + PAGE_SIZE;
         const newProjects = filteredProjects.slice(startIndex, endIndex);
 
-        // Append new projects to the existing list
         setDisplayedProjects((prev) => {
-          // Avoid duplicates by checking if the project already exists in the list
           const uniqueProjects = newProjects.filter(
             (newProject) => !prev.some((prevProject) => prevProject.id === newProject.id)
           );
           return [...prev, ...uniqueProjects];
         });
 
-        // Check if there are more projects to load
         if (newProjects.length < PAGE_SIZE) setHasMore(false);
       } catch (error) {
         setErrorMessage('Failed to load projects. Please try again later.');
@@ -83,9 +87,8 @@ const Solutions: React.FC = () => {
     };
 
     fetchProjects();
-  }, [page, searchQuery]); // Re-fetch when page or searchQuery changes
+  }, [page, filteredProjects]);
 
-  // Infinite scroll setup
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -103,125 +106,177 @@ const Solutions: React.FC = () => {
     };
   }, [loaderRef, hasMore, isLoading]);
 
-  // Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    setPage(1); // Reset page when search query changes
-    setDisplayedProjects([]); // Clear displayed projects
-    setHasMore(true); // Reset hasMore flag
+    setPage(1);
+    setDisplayedProjects([]);
+    setHasMore(true);
   };
-
-  const handleQuickViewOpen = (project: CVProject) => {
-    setQuickViewProduct(project);
-    setQuickViewOpen(true);
-  };
-
-  const handleQuickViewClose = () => setQuickViewOpen(false);
 
   const handleViewDetails = (projectId: string) => {
     router.push(`/projects/${projectId}`);
   };
 
   return (
-    <Box sx={{ backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
-      <CssBaseline />
-
-      {/* AppBar & Search */}
-      <AppBar position="sticky" color="inherit" elevation={1}>
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-            Showcase Projects
+    <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
+      <AppBar 
+        position="sticky" 
+        sx={{ 
+          background: theme.gradients.secondary,
+          backdropFilter: 'blur(8px)',
+          color: 'common.white',
+          boxShadow: theme.shadows[4],
+        }}
+      >
+        <Toolbar sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          py: 2,
+          gap: 2,
+          flexDirection: { xs: 'column', sm: 'row' }
+        }}>
+          <Typography variant="h6" sx={{ 
+            fontWeight: 'bold', 
+            fontSize: isMobile ? '1.25rem' : '1.5rem',
+            whiteSpace: 'nowrap'
+          }}>
+            Tech Solutions Portfolio
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <TextField
-              variant="outlined"
-              placeholder="Search projects..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              size="small"
-              disabled={isLoading}
-              sx={{ width: { xs: '100%', sm: '400px' }, backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: 1 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchOutlinedIcon />
-                  </InputAdornment>
-                ),
-              }}
-              aria-label="Search projects"
-            />
-          </Box>
+          <TextField
+            variant="outlined"
+            placeholder="Search projects..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            size="small"
+            disabled={isLoading}
+            sx={{ 
+              width: { xs: '100%', sm: '300px', md: '400px' }, 
+              backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+              borderRadius: '8px',
+              '& .MuiOutlinedInput-root': {
+                color: 'common.white',
+                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                '&.Mui-focused fieldset': { borderColor: 'common.white' },
+              }
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start" sx={{ color: 'common.white' }}>
+                  <SearchOutlinedIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
         </Toolbar>
       </AppBar>
 
-      {/* Main Container */}
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Product Grid */}
-        <Grid container spacing={3}>
+        <Grid container spacing={isMobile ? 2 : 3}>
           {isLoading && !displayedProjects.length
             ? Array.from({ length: PAGE_SIZE }).map((_, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Skeleton variant="rectangular" height={300} animation="wave" />
+                  <Skeleton 
+                    variant="rectangular" 
+                    height={300} 
+                    animation="wave" 
+                    sx={{ borderRadius: '15px' }}
+                  />
                   <Skeleton variant="text" height={30} animation="wave" />
                   <Skeleton variant="text" height={20} animation="wave" />
                 </Grid>
               ))
             : displayedProjects.map((project) => (
                 <Grid item xs={12} sm={6} md={4} key={project.id}>
-                  <motion.div whileHover={{ translateY: -3 }} style={{ height: '100%' }}>
+                  <motion.div 
+                    whileHover={{ translateY: -8 }} 
+                    style={{ height: '100%' }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     <Box
                       sx={{
                         display: 'flex',
                         flexDirection: 'column',
                         height: '100%',
-                        backgroundColor: '#fff',
+                        backgroundColor: 'background.paper',
                         borderRadius: '15px',
-                        boxShadow: '0 2px 12px rgba(173, 80, 180, 0.1)',
+                        boxShadow: 3,
                         transition: 'transform 0.3s, box-shadow 0.3s',
-                        '&:hover': { boxShadow: '0 4px 16px rgba(173, 80, 180, 0.15)' },
-                        position: 'relative',
+                        '&:hover': { 
+                          boxShadow: 6,
+                          transform: 'translateY(-4px)'
+                        },
                         overflow: 'hidden',
                       }}
                     >
-                      {/* Banner */}
                       <Box
                         sx={{
-                          background: 'linear-gradient(90deg, #AB47BC, #F06292)',
-                          color: '#fff',
+                          background: theme.gradients.primary,
+                          color: 'common.white',
                           py: 2,
+                          px: 3,
                           textAlign: 'center',
+                          position: 'relative',
+                          '&:before': {
+                            content: '""',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            background: 'url(/grid-pattern.svg) repeat',
+                            opacity: 0.1,
+                          }
                         }}
                       >
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                           {project.bannerText}
                         </Typography>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            mt: 1,
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderRadius: '4px',
+                            px: 1.5,
+                            py: 0.5,
+                            display: 'inline-block',
+                            fontSize: '0.8rem',
+                          }}
+                        >
+                          {project.clientName}
+                        </Typography>
                       </Box>
 
-                      {/* Image Section */}
                       <Box
                         sx={{
                           height: 140,
                           backgroundImage: `url(${project.imageUrl || '/placeholder.png'})`,
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
+                          position: 'relative',
+                          '&:after': {
+                            content: '""',
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '40%',
+                            background: 'linear-gradient(to top, rgba(0,0,0,0.3), transparent)',
+                          }
                         }}
-                        role="img"
-                        aria-label={`Image for ${project.name}`}
                       />
 
-                      {/* Content Section */}
-                      <Box
-                        sx={{
-                          p: 3,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          height: '100%',
-                          gap: 2,
-                        }}
-                      >
-                        {/* Title and Description */}
-                        <Box>
-                          <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                      <Box sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                        <Box sx={{ mb: 2 }}>
+                          <Typography variant="h6" sx={{ 
+                            fontWeight: 'bold', 
+                            mb: 1,
+                            color: 'primary.main'
+                          }}>
                             {project.name}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
@@ -229,46 +284,36 @@ const Solutions: React.FC = () => {
                           </Typography>
                         </Box>
 
-                        {/* Technologies */}
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                        <Box sx={{ 
+                          display: 'flex', 
+                          flexWrap: 'wrap', 
+                          gap: 1,
+                          mt: 'auto',
+                          pt: 2
+                        }}>
                           {project.technologies.map((tech, index) => (
                             <Chip
                               key={index}
                               label={tech}
                               size="small"
-                              aria-label={`Technology: ${tech}`}
+                              sx={{
+                                backgroundColor: 'action.hover',
+                                color: 'primary.main',
+                                fontWeight: 600,
+                                '&:hover': { backgroundColor: 'action.selected' }
+                              }}
                             />
                           ))}
                         </Box>
 
-                        {/* Actions */}
-                        <Box 
-                          sx={{ 
-                            display: 'flex', 
-                            justifyContent: 'space-between', 
-                            width: '100%',
-                            mt: 'auto'
-                          }}
-                        >
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            sx={{ textTransform: 'none', fontWeight: 600 }}
-                            onClick={() => handleQuickViewOpen(project)}
-                            aria-label={`Quick view ${project.name}`}
-                          >
-                            Quick View
-                          </Button>
-                          <IconButton
+                        <Box sx={{ mt: 2 }}>
+                          <GradientButton
                             onClick={() => handleViewDetails(project.id)}
-                            sx={{ 
-                              border: '1px solid rgba(0,0,0,0.2)', 
-                              '&:hover': { backgroundColor: 'rgba(0,0,0,0.05)' } 
-                            }}
-                            aria-label={`View details of ${project.name}`}
+                            endIcon={<ArrowForwardIcon />}
+                            fullWidth
                           >
-                            <ArrowForwardIcon />
-                          </IconButton>
+                            View Case Study
+                          </GradientButton>
                         </Box>
                       </Box>
                     </Box>
@@ -277,60 +322,64 @@ const Solutions: React.FC = () => {
               ))}
         </Grid>
 
-        {/* Loader */}
-        <Box ref={loaderRef} sx={{ height: '50px', textAlign: 'center', mt: 2 }}>
+        <Box ref={loaderRef} sx={{ 
+          height: '50px', 
+          textAlign: 'center', 
+          mt: 4,
+          color: 'primary.main'
+        }}>
           {isLoading && hasMore ? (
-            <CircularProgress aria-label="Loading more projects" />
+            <CircularProgress color="inherit" />
           ) : hasMore ? (
-            <Typography variant="body2" color="text.secondary">
-              Scroll down to load more...
+            <Typography variant="body2">
+              Scroll to explore more solutions...
             </Typography>
           ) : (
-            <Typography variant="body2" color="text.secondary">
-              No more projects to show.
+            <Typography variant="body2">
+              All solutions loaded 🎉
             </Typography>
           )}
         </Box>
       </Container>
 
-      {/* Quick View Dialog */}
-      {quickViewProduct && (
-        <Dialog
-          open={quickViewOpen}
-          onClose={handleQuickViewClose}
-          maxWidth="md"
-          fullWidth
-          aria-labelledby="quick-view-dialog-title"
-        >
-          <DialogTitle id="quick-view-dialog-title">{quickViewProduct.name}</DialogTitle>
-          <DialogContent>
-            <Carousel aria-label="Project images">
-              <img
-                src={quickViewProduct.imageUrl || '/placeholder.png'}
-                alt={quickViewProduct.name}
-                style={{ width: '100%', maxHeight: '400px', objectFit: 'cover' }}
-              />
-            </Carousel>
-            <Typography variant="body2" sx={{ mt: 2 }}>
-              {quickViewProduct.description}
-            </Typography>
-          </DialogContent>
-        </Dialog>
-      )}
-
-      {/* Error Snackbar */}
       <Snackbar
         open={!!errorMessage}
         autoHideDuration={5000}
         onClose={() => setErrorMessage('')}
-        aria-live="assertive"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="error" onClose={() => setErrorMessage('')} sx={{ width: '100%' }}>
+        <Alert 
+          severity="error" 
+          onClose={() => setErrorMessage('')}
+          sx={{ 
+            background: 'secondary.dark',
+            color: 'common.white',
+            borderRadius: '8px',
+            backdropFilter: 'blur(4px)',
+            '& .MuiAlert-icon': { color: 'common.white' }
+          }}
+        >
           {errorMessage}
         </Alert>
       </Snackbar>
     </Box>
   );
 };
+
+function useDebounce(value: string, delay: number) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 export default Solutions;

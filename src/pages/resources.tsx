@@ -1,8 +1,20 @@
+// Resources.tsx
 import React from 'react';
-import BlogCard from '../components/BlogCard';
-import { Container, Grid, Typography, useTheme, useMediaQuery, Box } from '@mui/material';
+import { 
+  Container, 
+  Grid, 
+  Typography, 
+  useTheme, 
+  useMediaQuery, 
+  Box, 
+  Button, 
+  styled 
+} from '@mui/material';
+import { motion } from 'framer-motion';
 import SEO from '../components/SEO';
 import { Cloud, VpnKey, Code } from '@mui/icons-material';
+import BlogCard from '../components/BlogCard';
+import NextLink from 'next/link';
 
 const Resources: React.FC = () => {
   const theme = useTheme();
@@ -11,92 +23,122 @@ const Resources: React.FC = () => {
   const resources = [
     {
       id: 1,
-      title: 'Understanding the Basics of Cloud Computing',
-      summary: 'A beginner-friendly guide to understanding cloud computing and its various models.',
+      title: 'Mastering Cloud Computing',
+      summary: 'Comprehensive guide to cloud infrastructure and deployment strategies',
       path: '/resources/cloud-computing',
-      icon: <Cloud fontSize="large" />,
+      icon: <Cloud />,
     },
     {
       id: 2,
-      title: 'Integrating Vault with .NET',
-      summary: 'Learn how to securely integrate HashiCorp Vault with your .NET application for secrets management.',
+      title: 'Secrets Management with Vault',
+      summary: 'Enterprise-grade secrets management in .NET using HashiCorp Vault',
       path: '/resources/integrating-vault-dotnet',
-      icon: <VpnKey fontSize="large" />,
+      icon: <VpnKey />,
     },
     {
       id: 3,
-      title: 'Exploring Serverless Architectures',
-      summary: 'An overview of serverless computing and how it can simplify the deployment of applications.',
+      title: 'Serverless Architecture Guide',
+      summary: 'Optimize cloud costs with serverless implementation best practices',
       path: '/resources/serverless',
-      icon: <Code fontSize="large" />,
+      icon: <Code />,
     },
   ];
 
   return (
     <Box
       sx={{
-        backgroundColor: '#f4f6f8',
-        padding: isMobile ? '32px 0' : '64px 0',
+        backgroundColor: 'background.default',
         minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
+        py: 8,
+        position: 'relative',
+        overflow: 'hidden',
+        '&:before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'url(/grid-pattern.svg) repeat',
+          opacity: 0.1,
+        },
       }}
     >
       <SEO
-        title="Resources - Technology Insights"
-        description="Explore expert insights on cloud computing, CI/CD, serverless architectures, and other tech trends."
+        title="Technical Resources - Expert Insights"
+        description="Cutting-edge technical resources on cloud architecture, DevOps, and modern software development"
       />
-      <Container
-        maxWidth="lg"
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          padding: isMobile ? '0 16px' : '0 24px',
-        }}
-      >
-        <Typography
-          variant="h2"
-          gutterBottom
-          align="center"
-          sx={{
-            fontFamily: "'Roboto', sans-serif",
-            fontWeight: 700,
-            fontSize: isMobile ? '28px' : '42px', // Increased font size
-            color: '#2c3e50',
-            marginBottom: isMobile ? '24px' : '48px', // Increased margin
-            lineHeight: 1.2,
-            textDecoration: 'none',
-          }}
+      
+      <Container maxWidth="lg" sx={{ position: 'relative' }}>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          Explore Our Tech Resources
-        </Typography>
-        <Grid
-          container
-          spacing={isMobile ? 2 : 4}
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-          }}
-        >
-          {resources.map((post) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              key={post.id}
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            >
-              <BlogCard {...post} />
+          <Typography
+            variant="h2"
+            sx={{
+              fontWeight: 800,
+              fontSize: isMobile ? '2rem' : '3rem',
+              textAlign: 'center',
+              mb: 6,
+              background: theme.gradients.primary,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              lineHeight: 1.2,
+              '&:after': {
+                content: '"📚"',
+                display: 'inline-block',
+                ml: 2,
+              }
+            }}
+          >
+            Expert Technical Resources
+          </Typography>
+        </motion.div>
+
+        <Grid container spacing={isMobile ? 2 : 4}>
+          {resources.map((resource, index) => (
+            <Grid item xs={12} sm={6} md={4} key={resource.id}>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <BlogCard {...resource} />
+              </motion.div>
             </Grid>
           ))}
         </Grid>
+
+        <Box sx={{ textAlign: 'center', mt: 8 }}>
+          <Typography variant="h5" sx={{ 
+            mb: 4, 
+            fontWeight: 600, 
+            color: 'primary.main'
+          }}>
+            Need Custom Technical Guidance?
+          </Typography>
+          <NextLink href="/consultation" passHref>
+            <Button
+              variant="contained"
+              sx={{
+                background: theme.gradients.primary,
+                borderRadius: '50px',
+                px: 6,
+                py: 2,
+                fontWeight: 700,
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: theme.shadows[6],
+                }
+              }}
+            >
+              Schedule Consultation
+            </Button>
+          </NextLink>
+        </Box>
       </Container>
     </Box>
   );

@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Typography, Button, Grid, Paper, useTheme, useMediaQuery, Link, IconButton, Modal, styled } from '@mui/material';
+import { 
+  Box, Container, Typography, Button, Grid, Paper, useTheme, useMediaQuery, Link, 
+  IconButton, Modal, styled 
+} from '@mui/material';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import { motion, useAnimation } from 'framer-motion';
 import NextLink from 'next/link';
-import { FaPython, FaReact, FaNodeJs, FaAws, FaDocker, FaJava, FaMicrosoft, FaBrain, FaLinux } from 'react-icons/fa';
+import { 
+  FaPython, FaReact, FaNodeJs, FaAws, FaDocker, FaJava, FaMicrosoft, FaBrain, FaLinux 
+} from 'react-icons/fa';
 import { SiRust, SiGoland } from 'react-icons/si';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
@@ -15,14 +21,14 @@ const StyledButton = styled(Button)(({ theme }) => ({
   fontSize: '1.1rem',
   padding: theme.spacing(2, 4),
   borderRadius: '50px',
-  background: '#4A47A3',
+  background: 'linear-gradient(45deg, #1a237e 0%, #0d47a1 100%)',
   color: theme.palette.common.white,
   textTransform: 'uppercase',
   fontWeight: 700,
   boxShadow: '0 6px 15px rgba(0, 0, 0, 0.3)',
   transition: 'transform 0.2s, box-shadow 0.2s',
   '&:hover': {
-    backgroundColor: '#393685',
+    background: 'linear-gradient(45deg, #0d47a1 0%, #1a237e 100%)',
     transform: 'translateY(-4px)',
     boxShadow: '0 10px 20px rgba(0, 0, 0, 0.4)',
   },
@@ -38,9 +44,25 @@ const FeatureCard = styled(Paper)(({ theme }) => ({
   borderRadius: '15px',
   boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
   transition: 'transform 0.2s, box-shadow 0.2s',
+  position: 'relative',
+  overflow: 'hidden',
   '&:hover': {
     transform: 'translateY(-8px)',
     boxShadow: '0 16px 30px rgba(0, 0, 0, 0.15)',
+  },
+  '&:after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(45deg, #1a237e 0%, #0d47a1 100%)',
+    opacity: 0,
+    transition: 'opacity 0.3s',
+  },
+  '&:hover:after': {
+    opacity: 0.1,
   },
 }));
 
@@ -50,11 +72,22 @@ const HeroSection = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   minHeight: '50vh',
   padding: theme.spacing(6, 2),
-  background: `linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)`,
+  background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)',
   color: theme.palette.common.white,
   overflow: 'hidden',
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: 'url(/grid-pattern.svg) repeat',
+    opacity: 0.1,
+  },
   [theme.breakpoints.down('sm')]: {
-    minHeight: '40vh',
+    minHeight: '60vh',
+    padding: theme.spacing(4, 2),
   },
 }));
 
@@ -63,144 +96,56 @@ const SectionContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(10, 2),
   borderRadius: '15px',
   marginBottom: theme.spacing(6),
-  background: `linear-gradient(to bottom, #f8f9fc, #f0f2f5)`,
+  background: 'linear-gradient(to bottom, #f8f9fc, #f0f2f5)',
+  color: '#333',
 }));
 
 const techIcons = [
-  {
-    title: 'Python',
-    description:
-      'Build scalable and efficient applications with Python, leveraging its versatility for web development, data analysis, and automation.',
-    icon: <FaPython size={60} />,
-  },
-  {
-    title: 'React Native',
-    description:
-      'Develop cross-platform mobile applications with React Native, ensuring a seamless user experience on both iOS and Android.',
-    icon: <FaReact size={60} />,
-  },
-  {
-    title: 'Node.js',
-    description:
-      'Build fast and scalable server-side applications with Node.js, leveraging its event-driven architecture for high performance.',
-    icon: <FaNodeJs size={60} />,
-  },
-  {
-    title: 'DevOps',
-    description:
-      'Streamline your development lifecycle with automated CI/CD pipelines, reducing time to market and improving software quality.',
-    icon: <FaDocker size={60} />,
-  },
-  {
-    title: 'Cloud Infrastructure',
-    description:
-      'Scale your applications seamlessly with robust and reliable cloud solutions, ensuring high availability and performance.',
-    icon: <FaAws size={60} />,
-  },
-  {
-    title: 'Java',
-    description:
-      'Develop robust and scalable backend solutions with our deep Java expertise, creating high-performance and maintainable applications.',
-    icon: <FaJava size={60} />,
-  },
-  {
-    title: '.NET',
-    description:
-      'Build enterprise-grade .NET applications tailored to your specific business needs, leveraging the power of the Microsoft ecosystem.',
-    icon: <FaMicrosoft size={60} />,
-  },
-  {
-    title: 'AI & ML',
-    description:
-      'Harness the power of AI and ML to drive innovation and gain a competitive edge with intelligent solutions.',
-    icon: <FaBrain size={60} />,
-  },
-  {
-    title: 'Linux',
-    description:
-      'Leverage efficient and scalable Linux server management for optimal performance, security, and cost-effectiveness.',
-    icon: <FaLinux size={60} />,
-  },
-  {
-    title: 'Rust',
-    description:
-      'Build high-performance, memory-safe, and concurrent applications with Rust, a modern systems programming language.',
-    icon: <SiRust size={60} />,
-  },
-  {
-    title: 'Go (Golang)',
-    description:
-      'Develop fast, efficient, and scalable backend services with Go, leveraging its simplicity and concurrency model.',
-    icon: <SiGoland size={60} />,
-  },
-  {
-    title: 'React',
-    description:
-      'Create dynamic and responsive user interfaces with React, a powerful JavaScript library for building modern web applications.',
-    icon: <FaReact size={60} />,
-  },
-];
+  { title: 'Python', icon: <FaPython size={60} />, color: '#3776AB' },
+  { title: 'React Native', icon: <FaReact size={60} />, color: '#61DAFB' },
+  { title: 'Node.js', icon: <FaNodeJs size={60} />, color: '#68A063' },
+  { title: 'DevOps', icon: <FaDocker size={60} />, color: '#2496ED' },
+  { title: 'Cloud Infrastructure', icon: <FaAws size={60} />, color: '#FF9900' },
+  { title: 'Java', icon: <FaJava size={60} />, color: '#007396' },
+  { title: '.NET', icon: <FaMicrosoft size={60} />, color: '#512BD4' },
+  { title: 'AI & ML', icon: <FaBrain size={60} />, color: '#FF6F00' },
+  { title: 'Linux', icon: <FaLinux size={60} />, color: '#FCC624' },
+  { title: 'Rust', icon: <SiRust size={60} />, color: '#000000' },
+  { title: 'Go (Golang)', icon: <SiGoland size={60} />, color: '#00ADD8' },
+  { title: 'React', icon: <FaReact size={60} />, color: '#61DAFB' },
+].map((tech, index) => ({
+  ...tech,
+  description: [
+    'Build scalable and efficient applications with Python',
+    'Develop cross-platform mobile applications with React Native',
+    'Build fast and scalable server-side applications with Node.js',
+    'Streamline your development lifecycle with automated CI/CD',
+    'Scale applications with robust cloud solutions',
+    'Develop robust backend solutions with Java',
+    'Build enterprise-grade .NET applications',
+    'Harness the power of AI and ML for innovation',
+    'Leverage efficient Linux server management',
+    'Build high-performance applications with Rust',
+    'Develop fast backend services with Go',
+    'Create dynamic UIs with React',
+  ][index],
+}));
 
-// Function for smooth scrolling
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth',
-  });
-};
-
-// Booking Modal Component
-interface BookingModalProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-interface FormData {
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-}
-
-interface FormErrors {
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-  general: string;
-}
-
-const BookingModal: React.FC<BookingModalProps> = ({ open, onClose }) => {
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-  });
-  const [errors, setErrors] = useState<FormErrors>({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-    general: '',
-  });
+const BookingModal: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
+  const [errors, setErrors] = useState({ name: '', email: '', phone: '', message: '', general: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: '' });
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
   const validateForm = () => {
     let valid = true;
-    const newErrors: FormErrors = {
-      name: '',
-      email: '',
-      phone: '',
-      message: '',
-      general: '',
-    };
+    const newErrors = { name: '', email: '', phone: '', message: '', general: '' };
 
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
@@ -216,7 +161,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ open, onClose }) => {
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
       valid = false;
-    } else if (!/^\d{8}$/.test(formData.phone)) {
+    } else if (!/^\d{10}$/.test(formData.phone)) {
       newErrors.phone = 'Invalid phone number (10 digits required)';
       valid = false;
     }
@@ -240,14 +185,10 @@ const BookingModal: React.FC<BookingModalProps> = ({ open, onClose }) => {
           body: JSON.stringify(formData),
         });
         if (!response.ok) throw new Error('Submission failed');
-        console.log('Form submitted:', formData);
-        onClose();
+        setIsSuccess(true);
+        setTimeout(() => onClose(), 2000);
       } catch (error) {
-        console.error('Error submitting form:', error);
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          general: 'Submission failed. Please try again.',
-        }));
+        setErrors(prev => ({ ...prev, general: 'Submission failed. Please try again.' }));
       } finally {
         setIsSubmitting(false);
       }
@@ -255,118 +196,101 @@ const BookingModal: React.FC<BookingModalProps> = ({ open, onClose }) => {
   };
 
   return (
-    <Modal open={open} onClose={onClose} aria-labelledby="booking-modal-title">
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '90%',
-          maxWidth: '800px',
-          backgroundColor: 'background.paper',
-          boxShadow: 24,
-          borderRadius: '12px',
-          p: 6,
-          outline: 'none',
-        }}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Typography
-            id="booking-modal-title"
-            variant="h4"
-            component="h2"
-            sx={{ mb: 4, fontWeight: 700, color: '#4A47A3', textAlign: 'center' }}
-          >
-            Book a Consultation
-          </Typography>
-          <form onSubmit={handleSubmit}>
-            <FormControl fullWidth sx={{ mb: 4 }}>
-              <TextField
-                label="Your Name"
-                variant="outlined"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                error={!!errors.name}
-                helperText={errors.name}
-                aria-required="true"
-                fullWidth
-              />
-            </FormControl>
-            <FormControl fullWidth sx={{ mb: 4 }}>
-              <TextField
-                label="Your Email"
-                variant="outlined"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                error={!!errors.email}
-                helperText={errors.email}
-                aria-required="true"
-                fullWidth
-              />
-            </FormControl>
-            <FormControl fullWidth sx={{ mb: 4 }}>
-              <TextField
-                label="Your Phone Number"
-                variant="outlined"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                error={!!errors.phone}
-                helperText={errors.phone}
-                aria-required="true"
-                fullWidth
-              />
-            </FormControl>
-            <FormControl fullWidth sx={{ mb: 4 }}>
-              <TextField
-                label="Your Message"
-                variant="outlined"
-                name="message"
-                value={formData.message}
-                onChange={handleInputChange}
-                error={!!errors.message}
-                helperText={errors.message}
-                multiline
-                rows={6}
-                aria-required="true"
-                fullWidth
-              />
-            </FormControl>
-            {errors.general && (
-              <Typography color="error" sx={{ mb: 2, textAlign: 'center' }}>
-                {errors.general}
-              </Typography>
-            )}
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={isSubmitting}
-                sx={{
-                  width: '50%',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  backgroundColor: '#4A47A3',
-                  color: 'white',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  '&:hover': {
-                    backgroundColor: '#393685',
-                  },
-                }}
-              >
-                {isSubmitting ? 'Submitting...' : 'Submit'}
-              </Button>
-            </Box>
-          </form>
-        </motion.div>
+    <Modal open={open} onClose={onClose}>
+      <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '90%',
+        maxWidth: '800px',
+        bgcolor: 'background.paper',
+        boxShadow: 24,
+        borderRadius: '12px',
+        p: 6,
+      }}>
+        {isSuccess ? (
+          <Box sx={{ textAlign: 'center', py: 6 }}>
+            <CheckCircleOutline sx={{ fontSize: 80, color: '#4CAF50', mb: 2 }} />
+            <Typography variant="h5" sx={{ mb: 2 }}>
+              Consultation Booked!
+            </Typography>
+            <Typography>
+              Our expert will contact you within 2 business hours
+            </Typography>
+          </Box>
+        ) : (
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+            <Typography variant="h4" component="h2" sx={{ mb: 4, textAlign: 'center', fontWeight: 700 }}>
+              Book a Consultation
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <TextField
+                  label="Your Name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  error={!!errors.name}
+                  helperText={errors.name}
+                />
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <TextField
+                  label="Your Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  error={!!errors.email}
+                  helperText={errors.email}
+                />
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <TextField
+                  label="Your Phone Number"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  error={!!errors.phone}
+                  helperText={errors.phone}
+                />
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <TextField
+                  label="Your Message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  error={!!errors.message}
+                  helperText={errors.message}
+                  multiline
+                  rows={6}
+                />
+              </FormControl>
+              {errors.general && (
+                <Typography color="error" sx={{ mb: 2, textAlign: 'center' }}>
+                  {errors.general}
+                </Typography>
+              )}
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={isSubmitting}
+                  sx={{
+                    width: '50%',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    background: 'linear-gradient(45deg, #1a237e 0%, #0d47a1 100%)',
+                    '&:hover': { background: 'linear-gradient(45deg, #0d47a1 0%, #1a237e 100%)' },
+                  }}
+                >
+                  {isSubmitting ? 'Submitting...' : 'Get Expert Help Now →'}
+                </Button>
+              </Box>
+            </form>
+          </motion.div>
+        )}
       </Box>
     </Modal>
   );
@@ -379,162 +303,116 @@ const HomePage = () => {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
-  const handleOpenBookingModal = () => {
-    setIsBookingModalOpen(true);
-  };
-
-  const handleCloseBookingModal = () => {
-    setIsBookingModalOpen(false);
-  };
-
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollToTop(window.scrollY > 100);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const cards = document.querySelectorAll('.feature-card');
-      cards.forEach((card) => {
-        if (isElementInViewport(card)) {
+      document.querySelectorAll('.feature-card').forEach(card => {
+        if (card.getBoundingClientRect().top <= window.innerHeight * 0.75) {
           controls.start('visible');
         }
       });
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [controls]);
 
-  const isElementInViewport = (el: HTMLElement) => {
-    const rect = el.getBoundingClientRect();
-    return (
-      rect.top >= 0 &&
-      rect.left >= 0 &&
-      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-  };
-
   return (
     <Box component="main">
       <Head>
-        <title>Tech Mastery - Expert-Led Solutions</title>
-        <meta name="description" content="Empowering tech professionals with expert-led solutions for seamless integrations, streamlined configurations, and efficient setups." />
-        <meta name="keywords" content="tech, programming, consultation, development, AI, cloud, DevOps" />
-        <meta name="author" content="Your Company" />
+        <title>TechMastery - Expert Technology Solutions</title>
+        <meta name="description" content="Professional tech consultancy with proven results" />
       </Head>
 
-      {/* Hero Section */}
       <HeroSection component="section">
         <Container maxWidth="md">
           <Box sx={{ py: 6 }}>
-            <motion.div
-              initial={{ opacity: 0, y: -40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, ease: 'easeInOut' }}
-            >
+            <motion.div initial={{ opacity: 0, y: -40 }} animate={{ opacity: 1, y: 0 }}>
               <Typography
                 variant="h1"
                 component="h1"
                 sx={{
-                  fontWeight: 'bold',
-                  fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem', lg: '5rem' },
+                  fontWeight: 800,
+                  fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem' },
                   mb: 4,
-                  textShadow: '0 6px 15px rgba(0, 0, 0, 0.5)',
+                  textAlign: 'center',
                   lineHeight: 1.2,
+                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
+                  '&:after': { content: '"🚀"', ml: 2 }
                 }}
               >
-                Speed Up Your Journey to Tech Mastery
+                Accelerate Your Tech Success
               </Typography>
             </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.4, ease: 'easeInOut' }}
-            >
+
+            <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}>
               <Typography
                 variant="h5"
                 component="p"
                 sx={{
-                  fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.75rem' },
-                  color: '#eee',
-                  maxWidth: '800px',
-                  mx: 'auto',
+                  fontSize: { xs: '1.2rem', sm: '1.5rem' },
+                  textAlign: 'center',
                   mb: 6,
-                  lineHeight: 1.6,
+                  px: 2,
                 }}
               >
-                Empowering tech professionals with expert-led solutions for seamless integrations, streamlined configurations, and efficient setups.
+                Enterprise-grade solutions with startup agility
               </Typography>
             </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.7 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.8, type: 'spring', stiffness: 100 }}
-            >
-              <StyledButton endIcon={<ArrowRightAlt />} onClick={handleOpenBookingModal} aria-label="Book a Consultation">
-                Book a Consultation
-              </StyledButton>
-              <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
-                <NextLink href="/consultation" passHref legacyBehavior>
-                  <Link sx={{ color: '#fff', textDecoration: 'underline' }} aria-label="Learn more about our consultation process">
-                    Learn more about our consultation process
-                  </Link>
-                </NextLink>
-              </Typography>
+
+            <motion.div initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }}>
+              <Box sx={{ textAlign: 'center' }}>
+                <StyledButton
+                  endIcon={<ArrowRightAlt />}
+                  onClick={() => setIsBookingModalOpen(true)}
+                  aria-label="Book Consultation"
+                >
+                  Start Your Project
+                </StyledButton>
+              </Box>
             </motion.div>
           </Box>
         </Container>
       </HeroSection>
 
-      {/* Booking Modal */}
-      <BookingModal open={isBookingModalOpen} onClose={handleCloseBookingModal} />
-
-      {/* Technologies Section */}
       <SectionContainer component="section">
         <Container maxWidth="lg">
           <Typography
             variant="h2"
-            align="center"
             component="h2"
             sx={{
               mb: 8,
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-              color: '#333',
-              fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+              fontWeight: 700,
+              textAlign: 'center',
+              fontSize: { xs: '2rem', sm: '2.5rem' },
+              color: theme.palette.text.primary
             }}
           >
-            Technologies We Support
+            Core Technologies
           </Typography>
-          <Grid container spacing={isMobile ? 4 : 6} justifyContent="center">
+          <Grid container spacing={isMobile ? 3 : 6} justifyContent="center">
             {techIcons.map((tech, index) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                 <motion.div
                   className="feature-card"
-                  initial="hidden"
+                  initial={{ opacity: 0, y: 20 }}
                   animate={controls}
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0, transition: { duration: 0.8, delay: index * 0.2 } },
-                  }}
-                  whileHover={{ scale: 1.08, y: -10 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: 'spring', stiffness: 150, damping: 10 }}
+                  variants={{ visible: { opacity: 1, y: 0 } }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05 }}
                 >
-                  <FeatureCard component="article">
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                  <FeatureCard>
+                    <Box sx={{ 
+                      mb: 2,
+                      color: tech.color,
+                      transition: 'transform 0.3s',
+                      '&:hover': { transform: 'rotate(15deg) scale(1.2)' }
+                    }}>
                       {tech.icon}
                     </Box>
-                    <Typography variant="h6" component="h3" sx={{ fontWeight: 700, mb: 2, color: '#212121' }}>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
                       {tech.title}
                     </Typography>
-                    <Typography variant="body1" sx={{ color: '#555', fontSize: '1rem' }}>
+                    <Typography variant="body1" sx={{ color: '#555' }}>
                       {tech.description}
                     </Typography>
                   </FeatureCard>
@@ -545,25 +423,78 @@ const HomePage = () => {
         </Container>
       </SectionContainer>
 
-      {/* Scroll to Top Button */}
+      <SectionContainer component="section" sx={{ backgroundColor: '#fff' }}>
+        <Container maxWidth="lg">
+          <Typography variant="h2" sx={{ mb: 6, textAlign: 'center', fontWeight: 700 }}>
+            Trusted by Innovators
+          </Typography>
+          <Grid container spacing={4} justifyContent="center">
+            {[
+              { quote: "Cut deployment time by 40% with their cloud expertise", author: "CTO, FinTech Startup" },
+              { quote: "Revolutionized our mobile app performance in 2 weeks", author: "Lead Engineer, HealthTech" },
+              { quote: "Essential partner in our AI migration journey", author: "Director, Enterprise SaaS" }
+            ].map((testimonial, index) => (
+              <Grid item xs={12} md={4} key={index}>
+                <motion.div whileHover={{ scale: 1.02 }}>
+                  <Paper sx={{ p: 4, borderRadius: 4, height: '100%' }}>
+                    <Typography variant="body1" sx={{ mb: 2, fontStyle: 'italic' }}>
+                      "{testimonial.quote}"
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: '#1a237e' }}>
+                      {testimonial.author}
+                    </Typography>
+                  </Paper>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </SectionContainer>
+
+      <SectionContainer component="section">
+        <Container maxWidth="md">
+          <Grid container spacing={6} justifyContent="center">
+            {[
+              { number: '300+', label: 'Projects Delivered' },
+              { number: '98%', label: 'Client Satisfaction' },
+              { number: '24/7', label: 'Expert Support' }
+            ].map((metric, index) => (
+              <Grid item xs={12} sm={4} key={index}>
+                <motion.div whileHover={{ scale: 1.05 }}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h2" sx={{ 
+                      fontWeight: 800,
+                      background: 'linear-gradient(45deg, #1a237e, #0d47a1)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      mb: 1
+                    }}>
+                      {metric.number}
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {metric.label}
+                    </Typography>
+                  </Box>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </SectionContainer>
+
+      <BookingModal open={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
+
       {showScrollToTop && (
         <IconButton
-          onClick={scrollToTop}
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           sx={{
             position: 'fixed',
-            bottom: 16,
-            right: 16,
-            backgroundColor: '#4A47A3',
-            color: '#fff',
-            borderRadius: '50%',
-            padding: '12px',
-            boxShadow: '0 6px 15px rgba(0, 0, 0, 0.2)',
-            '&:hover': {
-              backgroundColor: '#393685',
-              boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)',
-            },
+            bottom: 32,
+            right: 32,
+            bgcolor: '#1a237e',
+            color: 'white',
+            '&:hover': { bgcolor: '#0d47a1' }
           }}
-          aria-label="Scroll to top"
         >
           <KeyboardArrowUpIcon />
         </IconButton>

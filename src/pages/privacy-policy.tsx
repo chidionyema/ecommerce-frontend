@@ -1,165 +1,121 @@
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, Mail, ChevronUp, Shield } from 'lucide-react';
-import { Container, Box, Typography, Button, Grid, Link } from '@mui/material';
+import { Shield, Mail, ChevronUp } from 'lucide-react';
+import { Container, Box, Typography, Button, Grid, Link, useTheme } from '@mui/material';
 
 const PrivacyPolicy = () => {
+  const theme = useTheme();
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
-    // Update document title
-    document.title = "Privacy Policy - Your Company Name";
-
-    // Update meta tags
-    const metaTags = [
-      { name: "description", content: "Read our Privacy Policy to understand how we collect, use, and protect your personal information. Effective as of 2025-01-19." },
-      { name: "keywords", content: "privacy policy, data protection, cookies, personal information" },
-      { name: "author", content: "Your Company Name" },
-      { property: "og:title", content: "Privacy Policy - Your Company Name" },
-      { property: "og:description", content: "Read our Privacy Policy to understand how we collect, use, and protect your personal information." },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://yourwebsite.com/privacy-policy" }
-    ];
-
-    metaTags.forEach(tag => {
-      let meta = document.createElement('meta');
-      Object.keys(tag).forEach(key => {
-        meta.setAttribute(key, tag[key]);
-      });
-      document.head.appendChild(meta);
-    });
-
-    // Add canonical link
-    let canonical = document.createElement('link');
-    canonical.rel = 'canonical';
-    canonical.href = 'https://yourwebsite.com/privacy-policy';
-    document.head.appendChild(canonical);
+    // Meta tags management
+    document.title = "Privacy Policy - Gluestack";
+    const metaDescription = document.createElement('meta');
+    metaDescription.name = "description";
+    metaDescription.content = "Read our comprehensive Privacy Policy to understand how Gluestack collects, uses, and protects your information.";
+    document.head.appendChild(metaDescription);
 
     // Scroll handler
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 400);
-    };
+    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
     window.addEventListener('scroll', handleScroll);
-
+    
     return () => {
+      document.head.removeChild(metaDescription);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const lastUpdated = "2025-01-19";
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const sections = [
     {
       id: "information-collection",
       title: "1. Information We Collect",
-      content: "We collect the following types of information to provide and improve our services:",
+      content: "We collect various types of information to provide and improve our services:",
       list: [
         {
           title: "Personal Information",
-          content: "Names, email addresses, phone numbers, billing information, and other contact details provided by you"
+          content: "Name, email address, contact details, and payment information"
         },
         {
-          title: "Technical Data",
-          content: "IP addresses, browser types, device information, and operating system details"
-        },
-        {
-          title: "Usage Information",
-          content: "Pages visited, features used, interaction patterns, and other analytics data"
-        },
-        {
-          title: "Communication Data",
-          content: "Your preferences, feedback, survey responses, and correspondence with us"
+          title: "Usage Data",
+          content: "IP address, browser type, pages visited, and service usage patterns"
         }
       ]
     },
     {
-      id: "information-use",
-      title: "2. How We Use Your Information",
-      content: "We use your information for the following purposes:",
+      id: "data-usage",
+      title: "2. Use of Your Information",
+      content: "Your information helps us to:",
       list: [
-        "To provide and maintain our services effectively",
-        "To communicate important updates and service-related notices",
-        "To respond to your inquiries and support requests",
-        "To detect and prevent fraudulent or unauthorized system access",
-        "To analyze usage patterns and improve our service quality",
-        "To comply with legal obligations and enforce our terms"
+        "Provide and maintain our services",
+        "Improve user experience",
+        "Develop new features",
+        "Ensure service security"
       ]
     },
     {
       id: "data-protection",
-      title: "3. Data Storage & Protection",
-      content: `We implement robust security measures to protect your personal information. This includes:
-      encryption of data in transit and at rest, regular security assessments, access controls, and 
-      secure data centers. We maintain strict internal protocols and train our staff in data protection 
-      practices. Your data is stored in secure facilities with redundant backup systems.`
-    },
-    {
-      id: "data-sharing",
-      title: "4. Data Sharing",
-      content: `We maintain strict controls over your personal information and share it only under specific 
-      circumstances: with your explicit consent, with service providers bound by confidentiality agreements, 
-      or when required by law. We regularly review our data sharing practices and require our partners to 
-      maintain appropriate security standards.`
-    },
-    {
-      id: "cookies",
-      title: "5. Cookie Policy",
-      content: `We use cookies and similar tracking technologies to enhance your browsing experience and 
-      analyze website usage. These include: essential cookies for basic functionality, analytical cookies 
-      to understand usage patterns, and preference cookies to remember your settings. You can manage cookie 
-      preferences through your browser settings.`
-    },
-    {
-      id: "your-rights",
-      title: "6. Your Rights",
-      content: `You have significant rights regarding your personal information:`,
-      list: [
-        "Right to access your personal data",
-        "Right to correct inaccurate information",
-        "Right to request deletion of your data",
-        "Right to restrict or object to processing",
-        "Right to data portability",
-        "Right to withdraw consent at any time"
-      ]
-    },
-    {
-      id: "policy-changes",
-      title: "7. Changes to This Policy",
-      content: `We may update this Privacy Policy periodically to reflect changes in our practices or legal 
-      requirements. We will notify you of any material changes through our website or email. Continued use 
-      of our services after such modifications constitutes acceptance of the updated policy.`
+      title: "3. Data Protection",
+      content: "We implement industry-standard security measures including encryption and regular security audits."
     }
   ];
 
   return (
-    <Box sx={{ backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
-      {/* Header Banner */}
-      <Box sx={{ backgroundColor: 'grey.900', color: 'white', py: 2, textAlign: 'center' }}>
-        <Shield sx={{ verticalAlign: 'middle', mr: 1 }} />
-        <Typography variant="body2" component="span">
-          Your privacy is our priority. Please review our updated Privacy Policy
-        </Typography>
+    <Box sx={{ 
+      backgroundColor: 'background.default', 
+      minHeight: '100vh',
+      pt: 4
+    }}>
+      {/* Privacy Header Banner */}
+      <Box sx={{
+        backgroundColor: 'primary.main',
+        color: 'primary.contrastText',
+        py: 2,
+        boxShadow: theme.shadows[4],
+        textAlign: 'center'
+      }}>
+        <Container maxWidth="lg">
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Shield size={24} sx={{ mr: 1.5 }} />
+            <Typography variant="body1">
+              Your privacy matters. Review our updated policy.
+            </Typography>
+          </Box>
+        </Container>
       </Box>
 
-      {/* Main Content */}
+      {/* Main Content Container */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
         {/* Page Header */}
         <Box sx={{ textAlign: 'center', mb: 6 }}>
-          <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
+          <Typography variant="h1" sx={{
+            fontWeight: 700,
+            color: 'primary.main',
+            fontSize: { xs: '2rem', md: '2.75rem' },
+            mb: 2
+          }}>
             Privacy Policy
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            Last Updated: {lastUpdated}
+            Effective Date: {new Date().toLocaleDateString()}
           </Typography>
         </Box>
 
         {/* Quick Navigation */}
-        <Box sx={{ backgroundColor: 'white', borderRadius: 2, boxShadow: 1, p: 4, mb: 6 }}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>
-            Quick Navigation
+        <Box sx={{
+          backgroundColor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: theme.shadows[2],
+          p: 4,
+          mb: 6
+        }}>
+          <Typography variant="h2" sx={{
+            fontWeight: 600,
+            color: 'primary.main',
+            mb: 3,
+            fontSize: '1.5rem'
+          }}>
+            Quick Links
           </Typography>
           <Grid container spacing={2}>
             {sections.map((section) => (
@@ -170,7 +126,15 @@ const PrivacyPolicy = () => {
                     e.preventDefault();
                     document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { color: 'primary.dark' } }}
+                  sx={{
+                    color: 'primary.main',
+                    textDecoration: 'none',
+                    transition: 'color 0.3s',
+                    '&:hover': {
+                      color: 'secondary.main',
+                      textDecoration: 'underline'
+                    }
+                  }}
                 >
                   {section.title}
                 </Link>
@@ -179,38 +143,54 @@ const PrivacyPolicy = () => {
           </Grid>
         </Box>
 
-        {/* Sections */}
+        {/* Policy Sections */}
         {sections.map((section) => (
           <Box
             key={section.id}
             id={section.id}
             sx={{
-              backgroundColor: 'white',
+              backgroundColor: 'background.paper',
               borderRadius: 2,
-              boxShadow: 1,
+              boxShadow: theme.shadows[1],
               p: 4,
               mb: 4,
-              transition: 'box-shadow 0.3s',
-              '&:hover': { boxShadow: 3 },
+              transition: 'all 0.3s',
+              '&:hover': {
+                boxShadow: theme.shadows[4],
+                transform: 'translateY(-2px)'
+              }
             }}
           >
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 3 }}>
+            <Typography variant="h3" sx={{
+              fontWeight: 600,
+              color: 'primary.main',
+              mb: 3,
+              fontSize: '1.5rem'
+            }}>
               {section.title}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
               {section.content}
             </Typography>
             {section.list && (
-              <ul style={{ paddingLeft: '24px', marginBottom: '16px' }}>
+              <Box component="ul" sx={{
+                pl: 3,
+                mb: 2,
+                '& li': {
+                  mb: 2,
+                  pl: 1,
+                  lineHeight: 1.6
+                }
+              }}>
                 {section.list.map((item, index) => (
-                  <li key={index} style={{ marginBottom: '8px' }}>
+                  <Box component="li" key={index}>
                     {typeof item === 'string' ? (
                       <Typography variant="body1" color="text.secondary">
                         {item}
                       </Typography>
                     ) : (
                       <>
-                        <Typography variant="body1" component="strong" sx={{ fontWeight: 'bold' }}>
+                        <Typography component="strong" sx={{ fontWeight: 600 }}>
                           {item.title}:
                         </Typography>{' '}
                         <Typography variant="body1" color="text.secondary" component="span">
@@ -218,25 +198,51 @@ const PrivacyPolicy = () => {
                         </Typography>
                       </>
                     )}
-                  </li>
+                  </Box>
                 ))}
-              </ul>
+              </Box>
             )}
           </Box>
         ))}
 
         {/* Contact Section */}
-        <Box sx={{ backgroundColor: 'white', borderRadius: 2, boxShadow: 1, p: 4 }}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 3 }}>
-            Contact Us
+        <Box sx={{
+          backgroundColor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: theme.shadows[2],
+          p: 4,
+          mt: 4
+        }}>
+          <Typography variant="h3" sx={{
+            fontWeight: 600,
+            color: 'primary.main',
+            mb: 3,
+            fontSize: '1.5rem'
+          }}>
+            Contact Our Privacy Team
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Mail sx={{ color: 'primary.main' }} />
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            '&:hover': {
+              transform: 'translateX(5px)',
+              transition: 'transform 0.3s'
+            }
+          }}>
+            <Mail size={24} sx={{ color: 'primary.main' }} />
             <Link
-              href="mailto:privacy@yourcompany.com"
-              sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { color: 'primary.dark' } }}
+              href="mailto:privacy@gluestack.com"
+              sx={{
+                color: 'primary.main',
+                textDecoration: 'none',
+                '&:hover': {
+                  color: 'secondary.main',
+                  textDecoration: 'underline'
+                }
+              }}
             >
-              privacy@yourcompany.com
+              privacy@gluestack.com
             </Link>
           </Box>
         </Box>
@@ -248,19 +254,23 @@ const PrivacyPolicy = () => {
           onClick={scrollToTop}
           sx={{
             position: 'fixed',
-            bottom: 16,
-            right: 16,
-            backgroundColor: 'primary.main',
-            color: 'white',
+            bottom: theme.spacing(3),
+            right: theme.spacing(3),
+            minWidth: 48,
+            minHeight: 48,
             borderRadius: '50%',
-            minWidth: '48px',
-            minHeight: '48px',
-            boxShadow: 3,
-            '&:hover': { backgroundColor: 'primary.dark' },
+            backgroundColor: 'primary.main',
+            color: 'primary.contrastText',
+            boxShadow: theme.shadows[6],
+            transition: 'all 0.3s',
+            '&:hover': {
+              backgroundColor: 'secondary.main',
+              transform: 'scale(1.1)'
+            }
           }}
           aria-label="Scroll to top"
         >
-          <ChevronUp />
+          <ChevronUp size={24} />
         </Button>
       )}
     </Box>

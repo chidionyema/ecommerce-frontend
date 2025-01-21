@@ -1,21 +1,3 @@
-interface CVProject {
-  id: string;
-  name: string;
-  description: string;
-  technologies: string[];
-  role: string;
-  bannerText: string;
-  imageUrl: string;
-  rating: number;
-  challenges: string;
-  impact: string;
-  teamSize: number;
-  stakeholders: string[];
-  lessonsLearned: string;
-  timeline: string;
-  achievements: string[];
-}
-
 export const cvProjects: CVProject[] = [
   {
     id: '1',
@@ -26,7 +8,7 @@ export const cvProjects: CVProject[] = [
     role: 'Senior Full Stack Engineer',
     bannerText: 'Enhanced Security at Airports',
     imageUrl: '/security.jpg',
-    rating: 4.5,
+    clientName: 'OSL Technologies', // Replaced rating with clientName
     challenges:
       'The project required real-time processing of large volumes of data from multiple sources, which posed significant performance challenges. Additionally, integrating with legacy systems was complex.',
     impact:
@@ -50,7 +32,7 @@ export const cvProjects: CVProject[] = [
     role: 'Technical Lead',
     bannerText: 'Government Digital Service',
     imageUrl: '/government.jpg',
-    rating: 4.7,
+    clientName: 'HM Courts & Tribunals Service', // Replaced rating with clientName
     challenges:
       'Ensuring compliance with strict GDS standards while delivering a seamless user experience was a major challenge. The project also required integration with multiple government systems.',
     impact:
@@ -74,7 +56,7 @@ export const cvProjects: CVProject[] = [
     role: 'Senior .NET Developer',
     bannerText: 'Optimized Interest Rates',
     imageUrl: '/finance.jpg',
-    rating: 4.6,
+    clientName: 'Flagstone', // Replaced rating with clientName
     challenges:
       'The platform needed to handle high transaction volumes while ensuring data accuracy and security. Integrating with third-party financial APIs was also challenging.',
     impact:
@@ -98,7 +80,7 @@ export const cvProjects: CVProject[] = [
     role: 'Senior Full Stack Engineer',
     bannerText: 'Cloud Banking Solutions',
     imageUrl: '/banking.jpg',
-    rating: 4.8,
+    clientName: 'Omnio', // Replaced rating with clientName
     challenges:
       'Ensuring compliance with financial regulations while delivering a scalable and secure platform was a major challenge. The project also required seamless integration with multiple third-party APIs.',
     impact:
@@ -122,7 +104,7 @@ export const cvProjects: CVProject[] = [
     role: 'Full Stack/Platform Engineer',
     bannerText: 'Cloud Transformation',
     imageUrl: '/cloud.jpg',
-    rating: 4.4,
+    clientName: 'StepStone UK', // Replaced rating with clientName
     challenges:
       'Migrating legacy systems to the cloud while ensuring minimal downtime and data integrity was a significant challenge. The project also required training the team on new cloud technologies.',
     impact:
@@ -146,7 +128,7 @@ export const cvProjects: CVProject[] = [
     role: 'Lead .NET Software Engineer',
     bannerText: 'Scalable Microservices Architecture',
     imageUrl: '/microservices.jpg',
-    rating: 4.6,
+    clientName: 'Philip Morris International', // Replaced rating with clientName
     challenges:
       'Designing a highly available and scalable microservices architecture while ensuring seamless integration with existing systems was a major challenge. The project also required optimizing resource utilization.',
     impact:
@@ -170,7 +152,7 @@ export const cvProjects: CVProject[] = [
     role: 'Software Engineer',
     bannerText: 'Modernised Asset Management',
     imageUrl: '/digital-asset.jpg',
-    rating: 4.3,
+    clientName: 'ASOS', // Replaced rating with clientName
     challenges:
       'Transitioning from a monolithic architecture to microservices while ensuring minimal disruption to ongoing operations was a significant challenge. The project also required extensive testing to ensure data integrity.',
     impact:
@@ -194,7 +176,7 @@ export const cvProjects: CVProject[] = [
     role: 'Senior Developer',
     bannerText: 'Private Cloud Solutions',
     imageUrl: '/private-cloud.jpg',
-    rating: 4.2,
+    clientName: 'Tesco PLC', // Replaced rating with clientName
     challenges:
       'Ensuring high availability and scalability while reducing infrastructure provisioning times was a major challenge. The project also required integration with multiple virtualization technologies.',
     impact:
@@ -218,7 +200,7 @@ export const cvProjects: CVProject[] = [
     role: 'Contract Software Engineer',
     bannerText: 'Automated Media Workflows',
     imageUrl: '/media-automation.jpg',
-    rating: 4.1,
+    clientName: 'BBC', // Replaced rating with clientName
     challenges:
       'Automating complex media processing workflows while ensuring data accuracy and system reliability was a significant challenge. The project also required integration with multiple third-party tools.',
     impact:
@@ -242,7 +224,7 @@ export const cvProjects: CVProject[] = [
     role: 'Lead Consultant',
     bannerText: 'Seamless SaaS Integration',
     imageUrl: '/saas-integration.jpg',
-    rating: 4.0,
+    clientName: 'Total Jobs Group', // Replaced rating with clientName
     challenges:
       'Ensuring seamless integration between the SaaS platform and internal systems while maintaining data integrity and security was a major challenge. The project also required optimizing Salesforce workflows.',
     impact:
@@ -266,7 +248,7 @@ export const cvProjects: CVProject[] = [
     role: 'Senior Full Stack Engineer',
     bannerText: 'Cloud Banking Solutions',
     imageUrl: '/banking.jpg',
-    rating: 4.8,
+    clientName: 'Omnio', // Replaced rating with clientName
     challenges:
       'Ensuring compliance with financial regulations while delivering a scalable and secure platform was a major challenge. The project also required seamless integration with multiple third-party APIs.',
     impact:
@@ -290,7 +272,7 @@ export const cvProjects: CVProject[] = [
     role: 'Full Stack/Platform Engineer',
     bannerText: 'Secure Secrets Management',
     imageUrl: '/secrets-management.jpg',
-    rating: 4.5,
+    clientName: 'StepStone UK', // Replaced rating with clientName
     challenges:
       'Ensuring secure storage and access control for sensitive credentials across multiple environments was a significant challenge. The project also required integration with existing CI/CD pipelines.',
     impact:
@@ -314,7 +296,7 @@ export const cvProjects: CVProject[] = [
     role: 'Full Stack/Platform Engineer',
     bannerText: 'Self-Service Cloud Portal',
     imageUrl: '/self-service.jpg',
-    rating: 4.4,
+    clientName: 'StepStone UK', // Replaced rating with clientName
     challenges:
       'Creating a user-friendly interface for developers while ensuring secure and compliant resource provisioning was a major challenge. The project also required integration with multiple cloud services.',
     impact:
@@ -338,7 +320,7 @@ export const cvProjects: CVProject[] = [
     role: 'Contract Software Engineer',
     bannerText: 'Automated Media Workflows',
     imageUrl: '/media-automation.jpg',
-    rating: 4.1,
+    clientName: 'BBC', // Replaced rating with clientName
     challenges:
       'Automating complex media processing workflows while ensuring data accuracy and system reliability was a significant challenge. The project also required integration with multiple third-party tools.',
     impact:
@@ -362,7 +344,7 @@ export const cvProjects: CVProject[] = [
     role: 'Lead Consultant',
     bannerText: 'Automated Email Campaigns',
     imageUrl: '/email-campaigns.jpg',
-    rating: 4.0,
+    clientName: 'Total Jobs Group', // Replaced rating with clientName
     challenges:
       'Ensuring seamless integration between Salesforce Marketing Cloud and internal systems while maintaining data integrity and security was a major challenge. The project also required optimizing email campaign workflows.',
     impact:
