@@ -22,6 +22,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import { CVProject, cvProjects } from '../data/cvProjects';
 
 const PAGE_SIZE = 9;
@@ -39,6 +40,10 @@ const GradientButton = styled(Button)(({ theme }) => ({
     transform: 'translateY(-2px)',
     boxShadow: theme.shadows[4],
   },
+  '&.Mui-disabled': {
+    background: theme.palette.action.disabledBackground,
+    color: theme.palette.text.disabled,
+  },
 }));
 
 const Solutions: React.FC = () => {
@@ -48,6 +53,8 @@ const Solutions: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [navigatingProjectId, setNavigatingProjectId] = useState<string | null>(null);
+  const [isOnline, setIsOnline] = useState(true);
   const loaderRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const theme = useTheme();
@@ -90,6 +97,19 @@ const Solutions: React.FC = () => {
   }, [page, filteredProjects]);
 
   useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !isLoading) {
@@ -113,8 +133,20 @@ const Solutions: React.FC = () => {
     setHasMore(true);
   };
 
-  const handleViewDetails = (projectId: string) => {
-    router.push(`/projects/${projectId}`);
+  const handleViewDetails = async (projectId: string) => {
+    if (!isOnline) {
+      setErrorMessage('No internet connection. Please check your network.');
+      return;
+    }
+
+    setNavigatingProjectId(projectId);
+    try {
+      await router.push(`/projects/${projectId}`);
+    } catch (error) {
+      setErrorMessage('Failed to load project details. Please try again.');
+    } finally {
+      setNavigatingProjectId(null);
+    }
   };
 
   return (
@@ -141,7 +173,7 @@ const Solutions: React.FC = () => {
             fontSize: isMobile ? '1.25rem' : '1.5rem',
             whiteSpace: 'nowrap'
           }}>
-            Tech Solutions Portfolio
+             Solutions Portfolio
           </Typography>
           <TextField
             variant="outlined"
@@ -195,6 +227,7 @@ const Solutions: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
+                    onHoverStart={() => router.prefetch(`/projects/${project.id}`)}
                   >
                     <Box
                       sx={{
@@ -254,9 +287,6 @@ const Solutions: React.FC = () => {
                       <Box
                         sx={{
                           height: 140,
-                          backgroundImage: `url(${project.imageUrl || '/placeholder.png'})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
                           position: 'relative',
                           '&:after': {
                             content: '""',
@@ -268,7 +298,17 @@ const Solutions: React.FC = () => {
                             background: 'linear-gradient(to top, rgba(0,0,0,0.3), transparent)',
                           }
                         }}
-                      />
+                      >
+                        <Image
+                          src={project.imageUrl || '/placeholder.png'}
+                          alt={project.name}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          style={{ objectFit: 'cover' }}
+                          placeholder="blur"
+                          blurDataURL="/placeholder-blur.jpg"
+                        />
+                      </Box>
 
                       <Box sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                         <Box sx={{ mb: 2 }}>
@@ -309,10 +349,17 @@ const Solutions: React.FC = () => {
                         <Box sx={{ mt: 2 }}>
                           <GradientButton
                             onClick={() => handleViewDetails(project.id)}
-                            endIcon={<ArrowForwardIcon />}
+                            endIcon={
+                              navigatingProjectId === project.id ? (
+                                <CircularProgress size={20} sx={{ color: 'inherit', ml: 1 }} />
+                              ) : (
+                                <ArrowForwardIcon />
+                              )
+                            }
+                            disabled={!isOnline || navigatingProjectId === project.id}
                             fullWidth
                           >
-                            View Case Study
+                            {navigatingProjectId === project.id ? 'Loading...' : 'View Case Study'}
                           </GradientButton>
                         </Box>
                       </Box>

@@ -9,7 +9,8 @@ import {
   useTheme,
   styled,
   useMediaQuery,
-  Grid
+  Grid,
+  Chip
 } from '@mui/material';
 import { motion } from 'framer-motion';
 
@@ -60,6 +61,15 @@ const Contact: React.FC = () => {
     message: '',
   });
 
+  // Plan selection logic
+  const { plan } = router.query;
+  const planTitles: { [key: string]: string } = {
+    hourly: 'Hourly Consulting',
+    project: 'Project-Based',
+    retainer: 'Retainer Model',
+    consultation: 'General Consultation'
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -67,7 +77,11 @@ const Contact: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form Data Submitted:', formData);
+    const submissionData = {
+      ...formData,
+      selectedPlan: planTitles[plan as string] || 'Custom Inquiry'
+    };
+    console.log('Form Data Submitted:', submissionData);
     router.push('/thank-you');
   };
 
@@ -91,8 +105,25 @@ const Contact: React.FC = () => {
             mb: 2
           }}
         >
-          Book a Consultation
+          {plan ? 'Start Your Project' : 'Contact Us'}
         </Typography>
+
+        {plan && (
+          <Box sx={{ textAlign: 'center', mb: 3 }}>
+            <Chip
+              label={`Selected Plan: ${planTitles[plan as string] || 'Custom Inquiry'}`}
+              color="primary"
+              sx={{
+                fontSize: '1rem',
+                py: 1,
+                px: 2,
+                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                color: theme.palette.common.white,
+                '& .MuiChip-label': { padding: '0 16px' }
+              }}
+            />
+          </Box>
+        )}
 
         <Typography
           variant="body1"
@@ -101,10 +132,14 @@ const Contact: React.FC = () => {
             mb: 6,
             color: 'text.secondary',
             maxWidth: '600px',
-            mx: 'auto'
+            mx: 'auto',
+            fontSize: isMobile ? '1rem' : '1.1rem'
           }}
         >
-          Let's discuss your project needs and find the perfect solution together.
+          {plan ? 
+            "Let's finalize your project details and get started:" : 
+            "Have questions or want to discuss a custom solution? We're here to help."
+          }
         </Typography>
 
         <FormContainer component="form" onSubmit={handleSubmit}>
@@ -117,6 +152,7 @@ const Contact: React.FC = () => {
                 onChange={handleChange}
                 required
                 fullWidth
+                variant="outlined"
               />
             </Grid>
             
@@ -129,6 +165,7 @@ const Contact: React.FC = () => {
                 onChange={handleChange}
                 required
                 fullWidth
+                variant="outlined"
               />
             </Grid>
 
@@ -140,28 +177,35 @@ const Contact: React.FC = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 fullWidth
+                variant="outlined"
               />
             </Grid>
 
             <Grid item xs={12}>
               <StyledTextField
-                label="Project Details"
+                label={plan ? "Project Requirements" : "How Can We Help?"}
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
                 multiline
                 rows={4}
                 fullWidth
+                variant="outlined"
+                required
               />
             </Grid>
 
-            <Grid item xs={12} sx={{ textAlign: 'center' }}>
+            <Grid item xs={12} sx={{ textAlign: 'center', mt: 2 }}>
               <SubmitButton
                 type="submit"
                 size="large"
-                sx={{ width: isMobile ? '100%' : 'auto' }}
+                sx={{ 
+                  width: isMobile ? '100%' : 'auto',
+                  px: 6,
+                  fontSize: '1.1rem'
+                }}
               >
-                Schedule Consultation
+                {plan ? 'Start Project Now' : 'Send Message'}
               </SubmitButton>
             </Grid>
           </Grid>
@@ -169,13 +213,14 @@ const Contact: React.FC = () => {
 
         <Box sx={{ mt: 4, textAlign: 'center' }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Prefer email? Contact us at{' '}
+            Prefer direct contact? Reach us at{' '}
             <Box 
               component="a" 
               href="mailto:support@gluestack.com"
               sx={{ 
                 color: 'primary.main',
                 textDecoration: 'none',
+                fontWeight: 600,
                 '&:hover': {
                   textDecoration: 'underline'
                 }

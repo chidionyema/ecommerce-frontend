@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   Box, 
   Typography, 
@@ -7,11 +7,10 @@ import {
   Container, 
   useTheme, 
   styled,
-  useMediaQuery,
-  Modal 
+  useMediaQuery
 } from '@mui/material';
 import { Info, Award, Clock, Users, Mail, Calendar, Briefcase } from 'lucide-react';
-import { InlineWidget } from "react-calendly";
+import { useRouter } from 'next/router';
 
 const PricingCard = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -28,47 +27,11 @@ const PricingCard = styled(Box)(({ theme }) => ({
 const PricingPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [calendlyOpen, setCalendlyOpen] = useState(false);
+  const router = useRouter();
 
-  const handleCalendlyOpen = () => setCalendlyOpen(true);
-  const handleCalendlyClose = () => setCalendlyOpen(false);
-
-  const CalendlyModal = () => (
-    <Modal
-      open={calendlyOpen}
-      onClose={handleCalendlyClose}
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backdropFilter: 'blur(3px)'
-      }}
-    >
-      <Box sx={{
-        backgroundColor: 'background.paper',
-        borderRadius: 4,
-        p: 2,
-        width: '95%',
-        maxWidth: 800,
-        height: '80vh',
-        overflow: 'hidden'
-      }}>
-        <InlineWidget
-          url="https://calendly.com/your-username/your-event-type"
-          styles={{
-            height: '100%',
-            width: '100%'
-          }}
-          pageSettings={{
-            backgroundColor: theme.palette.background.default,
-            hideEventTypeDetails: false,
-            primaryColor: theme.palette.primary.main,
-            textColor: theme.palette.text.primary
-          }}
-        />
-      </Box>
-    </Modal>
-  );
+  const handlePlanSelection = (planType: string) => {
+    router.push(`/contact?plan=${encodeURIComponent(planType)}`);
+  };
 
   return (
     <Container maxWidth="lg" sx={{ py: 8 }}>
@@ -116,7 +79,7 @@ const PricingPage = () => {
               variant="contained" 
               fullWidth 
               sx={{ mt: 3 }}
-              onClick={handleCalendlyOpen}
+              onClick={() => handlePlanSelection('hourly')}
               startIcon={<Mail size={20} />}
             >
               Discuss Your Needs
@@ -151,7 +114,7 @@ const PricingPage = () => {
               variant="contained" 
               fullWidth 
               sx={{ mt: 3 }}
-              onClick={handleCalendlyOpen}
+              onClick={() => handlePlanSelection('project')}
               startIcon={<Mail size={20} />}
             >
               Start Your Project
@@ -186,7 +149,7 @@ const PricingPage = () => {
               variant="contained" 
               fullWidth 
               sx={{ mt: 3 }}
-              onClick={handleCalendlyOpen}
+              onClick={() => handlePlanSelection('retainer')}
               startIcon={<Mail size={20} />}
             >
               Build a Partnership
@@ -194,143 +157,6 @@ const PricingPage = () => {
           </PricingCard>
         </Grid>
       </Grid>
-
-      {/* Value Comparison Section */}
-      <Box sx={{ 
-        backgroundColor: 'background.default', 
-        borderRadius: 4,
-        p: 4,
-        mb: 8
-      }}>
-        <Typography variant="h4" sx={{ 
-          fontWeight: 700, 
-          color: 'primary.main',
-          mb: 4,
-          textAlign: 'center'
-        }}>
-          What's Included in Every Engagement
-        </Typography>
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <Users size={32} style={{ marginRight: 16 }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Dedicated Team</Typography>
-                <Typography color="text.secondary">
-                  Direct access to senior consultants and technical experts
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <Award size={32} style={{ marginRight: 16 }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Quality Assurance</Typography>
-                <Typography color="text.secondary">
-                  Rigorous quality control and performance monitoring
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <Info size={32} style={{ marginRight: 16 }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Transparent Reporting</Typography>
-                <Typography color="text.secondary">
-                  Regular progress updates and performance metrics
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <Calendar size={32} style={{ marginRight: 16 }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Flexible Scheduling</Typography>
-                <Typography color="text.secondary">
-                  Adaptable timelines to meet your business needs
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-        </Grid>
-      </Box>
-
-      {/* FAQ Section */}
-      <Box sx={{ mb: 8 }}>
-        <Typography variant="h4" sx={{ 
-          fontWeight: 700, 
-          color: 'primary.main',
-          mb: 4,
-          textAlign: 'center'
-        }}>
-          Common Questions
-        </Typography>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ 
-              backgroundColor: 'background.paper', 
-              borderRadius: 2,
-              p: 3
-            }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                How do you determine pricing?
-              </Typography>
-              <Typography color="text.secondary">
-                We create custom proposals based on your specific requirements, 
-                project complexity, and desired outcomes.
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ 
-              backgroundColor: 'background.paper', 
-              borderRadius: 2,
-              p: 3
-            }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                What's included in the initial consultation?
-              </Typography>
-              <Typography color="text.secondary">
-                Our free consultation includes a needs assessment, scope discussion, 
-                and high-level recommendations.
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ 
-              backgroundColor: 'background.paper', 
-              borderRadius: 2,
-              p: 3
-            }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                Can we adjust engagement terms mid-project?
-              </Typography>
-              <Typography color="text.secondary">
-                Yes, we maintain flexible agreements that can evolve with your 
-                changing business needs.
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ 
-              backgroundColor: 'background.paper', 
-              borderRadius: 2,
-              p: 3
-            }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                What payment methods do you accept?
-              </Typography>
-              <Typography color="text.secondary">
-                We accept all major credit cards, bank transfers, and offer 
-                flexible payment terms for enterprise clients.
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
-      </Box>
 
       {/* CTA Section */}
       <Box sx={{ 
@@ -355,13 +181,11 @@ const PricingPage = () => {
           color="secondary"
           size="large"
           sx={{ px: 6, py: 2 }}
-          onClick={handleCalendlyOpen}
+          onClick={() => handlePlanSelection('consultation')}
         >
           Start Your Consultation
         </Button>
       </Box>
-
-      <CalendlyModal />
     </Container>
   );
 };

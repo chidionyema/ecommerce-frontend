@@ -38,6 +38,16 @@
       "static/chunks/main.js",
       "static/chunks/pages/contact.js"
     ],
+    "/pricing": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/pricing.js"
+    ],
+    "/projects/[id]": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/projects/[id].js"
+    ],
     "/resources": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",

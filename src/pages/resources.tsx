@@ -120,7 +120,7 @@ const Resources: React.FC = () => {
           }}>
             Need Custom Technical Guidance?
           </Typography>
-          <NextLink href="/consultation" passHref>
+          <NextLink href="/contact" passHref>
             <Button
               variant="contained"
               sx={{

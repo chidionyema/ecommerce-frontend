@@ -1,9 +1,9 @@
 import React from 'react';
 import { AppProps } from 'next/app';
+import { useRouter } from 'next/router';
 import NavBar from '../components/NavBar';
 import Layout from '../components/Layout';
 import Head from 'next/head';
-
 import { ThemeProvider, CssBaseline, createTheme, responsiveFontSizes } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,18 +13,21 @@ import '@fontsource/poppins/300.css';
 import '@fontsource/poppins/400.css';
 import '@fontsource/poppins/500.css';
 import '@fontsource/poppins/700.css';
-import theme from '../theme/theme'; // Import the custom theme
+import theme from '../theme/theme';
+import dynamic from 'next/dynamic';
 
-const MyAppInner: React.FC<AppProps> = ({ Component, pageProps, router }) => {
-  return (
-    <>
-      <Component {...pageProps} router={router} />
-    </>
-  );
+// Dynamically load AnalyticsProvider to prevent SSR issues
+const AnalyticsProvider = dynamic(
+  () => import('../components/AnalyticsProvider'),
+  { ssr: false }
+);
+
+const MyAppInner: React.FC<AppProps> = ({ Component, pageProps }) => {
+  return <Component {...pageProps} />;
 };
 
-const MyApp: React.FC<AppProps> = ({ Component, pageProps, router }) => {
-  // Create theme without mode-specific overrides
+const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
+  const router = useRouter();
   const currentTheme = responsiveFontSizes(
     createTheme({
       ...theme,
@@ -36,32 +39,34 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps, router }) => {
   );
 
   return (
-    <ThemeProvider theme={currentTheme}>
-      <CssBaseline />
-      <ErrorBoundary>
-        <Head>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap"
-            rel="stylesheet"
-          />
-          <title>Glu Stack</title>
-          <meta
-            name="description"
-            content="Ritualworks - Explore magical products and services to enrich your rituals and spiritual practices."
-          />
-          <meta name="theme-color" content={currentTheme.palette.primary.main} />
-        </Head>
-        <NavBar />
-        <Layout>
-          <MyAppInner Component={Component} pageProps={pageProps} router={router} />
-        </Layout>
-        <ToastContainer />
-      </ErrorBoundary>
-    </ThemeProvider>
+    <AnalyticsProvider>
+      <ThemeProvider theme={currentTheme}>
+        <CssBaseline />
+        <ErrorBoundary>
+          <Head>
+            <meta charSet="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+            <link
+              href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap"
+              rel="stylesheet"
+            />
+            <title>Glu Stack</title>
+            <meta
+              name="description"
+              content="Glu Stack | Cloud Technology Partners - AWS/GCP/Azure solutions, Kubernetes orchestration, and infrastructure optimization. Modernize your tech stack with expert guidance."
+            />
+            <meta name="theme-color" content={currentTheme.palette.primary.main} />
+          </Head>
+          <NavBar />
+          <Layout>
+            <MyAppInner Component={Component} pageProps={pageProps} />
+          </Layout>
+          <ToastContainer />
+        </ErrorBoundary>
+      </ThemeProvider>
+    </AnalyticsProvider>
   );
 };
 

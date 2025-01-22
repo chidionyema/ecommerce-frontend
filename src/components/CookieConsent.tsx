@@ -1,52 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Button, Typography, Link } from '@mui/material';
-import { styled } from '@mui/material/styles';
+// components/CookieConsent.tsx
+import { useState, useEffect } from 'react'
+import { Button, Snackbar, Alert, Box } from '@mui/material'
 
-const CookieBanner = styled(Box)(({ theme }) => ({
-  position: 'fixed', // Keeps the banner at the bottom
-  bottom: 0,         // Anchors it to the bottom of the viewport
-  left: 0,
-  width: '100%',     // Full width of the page
-  
-  backgroundColor: theme.palette.background.paper,
-  color: theme.palette.text.primary,
-  padding: theme.spacing(2),
-  boxShadow: '0px -2px 10px rgba(0, 0, 0, 0.1)',
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-}));
-
-const CookieConsent: React.FC = () => {
-  const [isVisible, setIsVisible] = useState<boolean>(false);
+const CookieConsent = () => {
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    const consent = localStorage.getItem('cookie-consent');
-    if (!consent) {
-      setIsVisible(true);
+    if (!localStorage.getItem('cookieConsent')) {
+      setOpen(true)
     }
-  }, []);
+  }, [])
 
   const handleAccept = () => {
-    localStorage.setItem('cookie-consent', 'true');
-    setIsVisible(false);
-  };
+    localStorage.setItem('cookieConsent', 'accepted')
+    setOpen(false)
+    window.location.reload() // Re-initialize analytics
+  }
+
+  const handleDecline = () => {
+    localStorage.setItem('cookieConsent', 'declined')
+    setOpen(false)
+  }
 
   return (
-    isVisible && (
-      <CookieBanner>
-        <Typography variant="body2">
-          This website uses cookies to ensure you get the best experience on our website.{' '}
-          <Link href="/privacy-policy" color="primary" underline="hover">
-            Learn more
-          </Link>
-        </Typography>
-        <Button variant="contained" color="primary" onClick={handleAccept}>
-          Accept
-        </Button>
-      </CookieBanner>
-    )
-  );
-};
-
-export default CookieConsent;
+    <Snackbar
+      open={open}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+    >
+      <Alert severity="info" sx={{ width: '100%' }}>
+        We use cookies to analyze traffic and improve your experience.
+        <Box mt={1} display="flex" gap={1}>
+          <Button variant="contained" size="small" onClick={handleAccept}>
+            Accept
+          </Button>
+          <Button variant="outlined" size="small" onClick={handleDecline}>
+            Decline
+          </Button>
+        </Box>
+      </Alert>
+    </Snackbar>
+  )
+}

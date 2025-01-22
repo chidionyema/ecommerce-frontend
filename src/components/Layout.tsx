@@ -133,22 +133,22 @@ const Layout: React.FC<LayoutProps> = ({ children, showHeroSection = false }) =>
     {
       title: 'Strategic Consulting',
       content: 'Tailored strategies to help your business achieve its goals',
-      link: '/strategic-consulting'
+      link: '/solutions'
     },
     {
       title: 'Expert Guidance',
       content: 'Leverage our deep expertise for informed decisions',
-      link: '/expert-guidance'
+      link: '/solutions'
     },
     {
       title: 'Custom Solutions',
       content: 'Bespoke solutions for unique business needs',
-      link: '/custom-solutions'
+      link: '/solutions'
     },
     {
       title: 'Industry Insights',
       content: 'Actionable insights to stay ahead in your industry',
-      link: '/industry-insights'
+      link: '/solutions'
     },
   ];
 
@@ -256,7 +256,7 @@ const Layout: React.FC<LayoutProps> = ({ children, showHeroSection = false }) =>
           <Typography variant="h4" sx={{ fontWeight: 800, mb: 4 }}>
             Ready to Accelerate Growth?
           </Typography>
-          <StyledButton href="/consultation" size="large">
+          <StyledButton href="/contact" size="large">
             Schedule Free Consultation
           </StyledButton>
         </Box>

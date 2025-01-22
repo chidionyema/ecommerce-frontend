@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Box, Container, Typography, Button, Grid, Paper, useTheme, useMediaQuery, Link, 
-  IconButton, Modal, styled 
+  Box, Container, Typography, Button, Grid, Paper, useTheme, useMediaQuery, 
+  IconButton, styled 
 } from '@mui/material';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import { motion, useAnimation } from 'framer-motion';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
 import { 
   FaPython, FaReact, FaNodeJs, FaAws, FaDocker, FaJava, FaMicrosoft, FaBrain, FaLinux 
 } from 'react-icons/fa';
 import { SiRust, SiGoland } from 'react-icons/si';
-import TextField from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';
 import Head from 'next/head';
 
 // Styled Components
@@ -131,177 +129,12 @@ const techIcons = [
   ][index],
 }));
 
-const BookingModal: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
-  const [errors, setErrors] = useState({ name: '', email: '', phone: '', message: '', general: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setErrors(prev => ({ ...prev, [name]: '' }));
-  };
-
-  const validateForm = () => {
-    let valid = true;
-    const newErrors = { name: '', email: '', phone: '', message: '', general: '' };
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-      valid = false;
-    }
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-      valid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Invalid email address';
-      valid = false;
-    }
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-      valid = false;
-    } else if (!/^\d{10}$/.test(formData.phone)) {
-      newErrors.phone = 'Invalid phone number (10 digits required)';
-      valid = false;
-    }
-    if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
-      setIsSubmitting(true);
-      try {
-        const response = await fetch('/api/booking', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        });
-        if (!response.ok) throw new Error('Submission failed');
-        setIsSuccess(true);
-        setTimeout(() => onClose(), 2000);
-      } catch (error) {
-        setErrors(prev => ({ ...prev, general: 'Submission failed. Please try again.' }));
-      } finally {
-        setIsSubmitting(false);
-      }
-    }
-  };
-
-  return (
-    <Modal open={open} onClose={onClose}>
-      <Box sx={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '90%',
-        maxWidth: '800px',
-        bgcolor: 'background.paper',
-        boxShadow: 24,
-        borderRadius: '12px',
-        p: 6,
-      }}>
-        {isSuccess ? (
-          <Box sx={{ textAlign: 'center', py: 6 }}>
-            <CheckCircleOutline sx={{ fontSize: 80, color: '#4CAF50', mb: 2 }} />
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              Consultation Booked!
-            </Typography>
-            <Typography>
-              Our expert will contact you within 2 business hours
-            </Typography>
-          </Box>
-        ) : (
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-            <Typography variant="h4" component="h2" sx={{ mb: 4, textAlign: 'center', fontWeight: 700 }}>
-              Book a Consultation
-            </Typography>
-            <form onSubmit={handleSubmit}>
-              <FormControl fullWidth sx={{ mb: 4 }}>
-                <TextField
-                  label="Your Name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  error={!!errors.name}
-                  helperText={errors.name}
-                />
-              </FormControl>
-              <FormControl fullWidth sx={{ mb: 4 }}>
-                <TextField
-                  label="Your Email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  error={!!errors.email}
-                  helperText={errors.email}
-                />
-              </FormControl>
-              <FormControl fullWidth sx={{ mb: 4 }}>
-                <TextField
-                  label="Your Phone Number"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  error={!!errors.phone}
-                  helperText={errors.phone}
-                />
-              </FormControl>
-              <FormControl fullWidth sx={{ mb: 4 }}>
-                <TextField
-                  label="Your Message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  error={!!errors.message}
-                  helperText={errors.message}
-                  multiline
-                  rows={6}
-                />
-              </FormControl>
-              {errors.general && (
-                <Typography color="error" sx={{ mb: 2, textAlign: 'center' }}>
-                  {errors.general}
-                </Typography>
-              )}
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={isSubmitting}
-                  sx={{
-                    width: '50%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    background: 'linear-gradient(45deg, #1a237e 0%, #0d47a1 100%)',
-                    '&:hover': { background: 'linear-gradient(45deg, #0d47a1 0%, #1a237e 100%)' },
-                  }}
-                >
-                  {isSubmitting ? 'Submitting...' : 'Get Expert Help Now →'}
-                </Button>
-              </Box>
-            </form>
-          </motion.div>
-        )}
-      </Box>
-    </Modal>
-  );
-};
-
 const HomePage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const controls = useAnimation();
   const [showScrollToTop, setShowScrollToTop] = useState(false);
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -363,8 +196,8 @@ const HomePage = () => {
               <Box sx={{ textAlign: 'center' }}>
                 <StyledButton
                   endIcon={<ArrowRightAlt />}
-                  onClick={() => setIsBookingModalOpen(true)}
-                  aria-label="Book Consultation"
+                  onClick={() => router.push('/contact')}
+                  aria-label="Start Project"
                 >
                   Start Your Project
                 </StyledButton>
@@ -481,8 +314,6 @@ const HomePage = () => {
           </Grid>
         </Container>
       </SectionContainer>
-
-      <BookingModal open={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
 
       {showScrollToTop && (
         <IconButton

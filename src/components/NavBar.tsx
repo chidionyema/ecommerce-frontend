@@ -15,78 +15,87 @@ import {
   ListItem,
   Divider,
   CircularProgress,
+  ButtonProps
 } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
-import { createTheme, ThemeProvider, useTheme, styled, Theme } from '@mui/material/styles';
+import {
+  Menu as MenuIcon,
+  Home as HomeIcon,
+  Code as CodeIcon,
+  Book as BookIcon,
+  LocalAtm as LocalAtmIcon,
+  ContactMail as ContactMailIcon
+} from '@mui/icons-material';
+import { createTheme, ThemeProvider, useTheme, styled } from '@mui/material/styles';
+
+// Color Constants
+const PRIMARY_MAIN = '#0d1b3a';
+const PRIMARY_LIGHT = '#1e88e5';
+const ACCENT_COLOR = '#ff758c';
 
 // --- Styled Components ---
-const StyledAppBar = styled(AppBar)(({ theme }: { theme: Theme }) => ({
-  background: `linear-gradient(90deg, ${theme.palette.primary.main}80, ${theme.palette.primary.main}40)`,
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  background: `linear-gradient(90deg, ${PRIMARY_MAIN}, ${PRIMARY_MAIN}dd)`,
   color: theme.palette.text.primary,
-  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
+  transition: 'all 0.3s ease',
 }));
 
-const StyledToolbar = styled(Toolbar)(({ theme }: { theme: Theme }) => ({
-  minHeight: 80,
-  padding: theme.spacing(0, 2),
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-}));
-
-const LogoContainer = styled(Box)(({ theme }: { theme: Theme }) => ({
+const LogoContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   cursor: 'pointer',
-  flexShrink: 0,
-  '& img': {
-    height: '40px',
-    marginRight: theme.spacing(1),
+  padding: theme.spacing(1),
+  borderRadius: '8px',
+  background: 'rgba(255, 255, 255, 0.1)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    background: 'rgba(255, 255, 255, 0.15)',
+    transform: 'scale(1.05)',
   },
   '& .logo-text': {
-    fontWeight: 700,
-    fontSize: '1.5rem',
-    color: theme.palette.text.primary,
-    textShadow: '1px 1px 5px rgba(0, 0, 0, 0.5)',
+    fontWeight: 900,
+    fontSize: '1.8rem',
+    background: `linear-gradient(45deg, ${ACCENT_COLOR}, #fff)`,
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+    letterSpacing: '-0.5px',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '1.5rem',
+    },
   },
 }));
 
-const DesktopNav = styled(Box)(({ theme }: { theme: Theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(3),
-  alignItems: 'center',
-  margin: '0 auto',
-}));
-
-const StyledNavButton = styled(Button, {
-  shouldForwardProp: (prop) => prop !== 'active',
-})<{ active?: boolean }>(({ theme, active }) => ({
-  color: theme.palette.text.primary,
-  fontSize: '0.9rem',
-  fontWeight: 600,
-  textTransform: 'uppercase',
-  transition: 'all 0.3s ease',
-  borderBottom: active ? `2px solid ${theme.palette.secondary.main}` : 'none',
-  padding: theme.spacing(1),
-  '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-}));
-
-const StyledBanner = styled(Box)(({ theme }: { theme: Theme }) => ({
-  background: `linear-gradient(90deg, ${theme.palette.secondary.main}80, ${theme.palette.secondary.main}40)`,
-  color: theme.palette.text.primary,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  fontSize: '0.85rem',
-  fontWeight: 500,
-  borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-  [theme.breakpoints.down('sm')]: {
-    fontSize: '0.75rem',
-    padding: theme.spacing(0.5),
-    whiteSpace: 'normal',
-  },
-}));
+const StyledNavButton = styled(Button)<ButtonProps & { active?: boolean }>(
+  ({ theme, active }) => ({
+    color: '#ffffffdd !important',
+    fontSize: '0.95rem',
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    transition: 'all 0.3s ease',
+    position: 'relative',
+    '& .MuiButton-startIcon': {
+      marginRight: theme.spacing(1),
+    },
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      bottom: '-2px',
+      left: 0,
+      width: active ? '100%' : '0',
+      height: '2px',
+      background: ACCENT_COLOR,
+      transition: 'width 0.3s ease',
+    },
+    '&:hover': {
+      color: '#fff !important',
+      '&::after': {
+        width: '100%',
+      },
+    },
+  })
+);
 
 const NavBar: React.FC = () => {
   const router = useRouter();
@@ -95,122 +104,101 @@ const NavBar: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  useEffect(() => {
-    const handleRouteChangeComplete = () => {
-      setIsNavigating(false);
-    };
-
-    const handleRouteChangeError = () => {
-      setIsNavigating(false);
-    };
-
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    router.events.on('routeChangeError', handleRouteChangeError);
-
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      router.events.off('routeChangeError', handleRouteChangeError);
-    };
-  }, [router]);
-
   const navItems = [
-    { label: 'Home', path: '/' },
-    { label: 'Solutions', path: '/solutions' },
-    { label: 'Resources', path: '/resources' },
-    { label: 'Pricing', path: '/pricing' },
-    { label: 'Contact Us', path: '/contact' },
+    { label: 'Home', path: '/', icon: <HomeIcon sx={{ color: 'inherit' }} /> },
+    { label: 'Solutions', path: '/solutions', icon: <CodeIcon sx={{ color: 'inherit' }} /> },
+    { label: 'Resources', path: '/resources', icon: <BookIcon sx={{ color: 'inherit' }} /> },
+    { label: 'Pricing', path: '/pricing', icon: <LocalAtmIcon sx={{ color: 'inherit' }} /> },
+    { label: 'Contact', path: '/contact', icon: <ContactMailIcon sx={{ color: 'inherit' }} /> },
   ];
 
   return (
     <ThemeProvider
       theme={createTheme({
         palette: {
-          mode: 'light',
-          primary: { main: '#6a11cb' },
-          secondary: { main: '#ff758c' },
-          text: { primary: '#fff', secondary: '#000' },
+          primary: { main: PRIMARY_MAIN },
+          secondary: { main: PRIMARY_LIGHT },
         },
-        typography: { 
+        typography: {
           fontFamily: 'Poppins, Arial, sans-serif',
-          allVariants: {
-            color: '#fff'
-          }
+          allVariants: { color: '#fff' },
         },
       })}
     >
       <StyledAppBar position="sticky">
-        <StyledBanner>
-          Get expert insights and personalized strategy with a free consultation.
-        </StyledBanner>
         <Container maxWidth="xl" disableGutters={isMobile}>
-          <StyledToolbar>
+          <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
             <LogoContainer onClick={() => router.push('/')}>
               <Typography variant="h4" className="logo-text">
-                Gluestack
+                GluStack
               </Typography>
             </LogoContainer>
-            
+
             {!isMobile ? (
-              <DesktopNav>
-                {navItems.map(({ label, path }) => (
+              <Box display="flex" gap={4} alignItems="center">
+                {navItems.map(({ label, path, icon }) => (
                   <Link href={path} key={label} passHref legacyBehavior>
                     <StyledNavButton
                       component="a"
                       active={router.pathname === path}
-                      onClick={() => setIsNavigating(true)}
-                      disabled={isNavigating}
+                      startIcon={icon}
                     >
                       {label}
                     </StyledNavButton>
                   </Link>
                 ))}
-              </DesktopNav>
-            ) : (
-              <Box display="flex" alignItems="center">
-                <IconButton onClick={handleDrawerToggle} color="inherit">
-                  <MenuIcon />
-                </IconButton>
               </Box>
+            ) : (
+              <IconButton onClick={() => setMobileOpen(true)} color="inherit">
+                <MenuIcon sx={{ fontSize: '2rem' }} />
+              </IconButton>
             )}
-          </StyledToolbar>
+          </Toolbar>
         </Container>
       </StyledAppBar>
 
       <Drawer
-        anchor="left"
+        anchor="right"
         open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{ keepMounted: true }}
+        onClose={() => setMobileOpen(false)}
         sx={{
           '& .MuiDrawer-paper': {
-            width: 240,
-            background: theme.palette.background.default,
-            color: theme.palette.text.primary,
+            width: 280,
+            background: PRIMARY_MAIN,
+            color: '#fff',
           },
         }}
       >
-        <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', p: 2 }}>
-          <Typography variant="h6" sx={{ my: 2 }}>
-            Gluestack
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <List sx={{ py: 0 }}>
-            {navItems.map(({ label, path }) => (
+        <Box sx={{ p: 2 }}>
+          <LogoContainer onClick={() => {
+            router.push('/');
+            setMobileOpen(false);
+          }}>
+            <Typography className="logo-text" sx={{ fontSize: '1.5rem' }}>
+              GluStack
+            </Typography>
+          </LogoContainer>
+          
+          <Divider sx={{ my: 2, borderColor: '#ffffff33' }} />
+          
+          <List>
+            {navItems.map(({ label, path, icon }) => (
               <Link href={path} key={label} passHref legacyBehavior>
                 <ListItem
                   button
                   component="a"
                   sx={{
-                    py: 1.5,
-                    justifyContent: 'center',
-                    borderLeft: router.pathname === path ? `4px solid ${theme.palette.secondary.main}` : 'none',
+                    py: 2,
+                    borderRadius: '8px',
+                    '&:hover': {
+                      background: '#ffffff11',
+                    },
                   }}
                 >
-                  <Typography variant="body2">{label}</Typography>
+                  <Box display="flex" alignItems="center" gap={2}>
+                    {icon}
+                    <Typography variant="body1">{label}</Typography>
+                  </Box>
                 </ListItem>
               </Link>
             ))}
@@ -219,15 +207,8 @@ const NavBar: React.FC = () => {
       </Drawer>
 
       {isNavigating && (
-        <Box
-          sx={{
-            position: 'fixed',
-            top: theme.spacing(2),
-            right: theme.spacing(2),
-            zIndex: 9999,
-          }}
-        >
-          <CircularProgress color="secondary" size={40} />
+        <Box sx={{ position: 'fixed', top: 20, right: 20, zIndex: 9999 }}>
+          <CircularProgress sx={{ color: ACCENT_COLOR }} size={40} />
         </Box>
       )}
     </ThemeProvider>

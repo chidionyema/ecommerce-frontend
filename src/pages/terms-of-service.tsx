@@ -40,7 +40,95 @@ const TermsOfService = () => {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const sections = [
-    // ... keep sections data unchanged ...
+    {
+      id: "introduction",
+      title: "1. Introduction",
+      content: "Welcome to Gluestack Technical Consultancy Limited ('Company', 'we', 'our'). These Terms of Service govern your access to and use of our professional services, including technical consulting, system integration, and cloud solutions.",
+      list: [
+        "By engaging our services, you agree to be bound by these Terms",
+        "These Terms comply with UK Consumer Rights Act 2015",
+        "We reserve the right to modify these Terms with 30 days' notice"
+      ]
+    },
+    {
+      id: "services",
+      title: "2. Professional Services",
+      content: "Our consultancy services include but are not limited to:",
+      list: [
+        "Technical architecture design and implementation",
+        "Cloud infrastructure optimization (AWS/Azure/GCP)",
+        "Legacy system modernization",
+        "DevOps pipeline configuration",
+        "Compliance auditing (GDPR, ISO 27001)"
+      ]
+    },
+    {
+      id: "obligations",
+      title: "3. Client Obligations",
+      content: "As our client, you agree to:",
+      list: [
+        "Provide accurate technical specifications and requirements",
+        "Grant necessary system access with appropriate privileges",
+        "Maintain adequate cyber insurance coverage",
+        "Notify us of any compliance requirements (e.g., UK DPA 2018)",
+        "Appoint a technical liaison for project coordination"
+      ]
+    },
+    {
+      id: "ip",
+      title: "4. Intellectual Property",
+      content: "Ownership of developed assets:",
+      list: [
+        "Pre-existing IP remains property of original owner",
+        "Custom-developed solutions are licensed (not sold)",
+        "Documentation and reports remain our property",
+        "Open-source components under respective licenses"
+      ]
+    },
+    {
+      id: "liability",
+      title: "5. Liability & Warranty",
+      content: "Our professional services include:",
+      list: [
+        "Services provided with reasonable skill and care (UK Supply of Goods and Services Act 1982)",
+        "Maximum liability limited to 125% of fees paid",
+        "Exclusion of indirect/consequential damages",
+        "30-day defect rectification period"
+      ]
+    },
+    {
+      id: "confidentiality",
+      title: "6. Confidentiality",
+      content: "Both parties agree to:",
+      list: [
+        "Maintain confidentiality of sensitive information",
+        "NDA terms survive termination for 5 years",
+        "Exclusions for publicly available information",
+        "Comply with UK Official Secrets Act 1989 where applicable"
+      ]
+    },
+    {
+      id: "termination",
+      title: "7. Termination",
+      content: "Either party may terminate engagements:",
+      list: [
+        "30 days written notice for convenience",
+        "Immediate termination for material breach",
+        "Post-termination transition assistance",
+        "Survival of key clauses (confidentiality, liability)"
+      ]
+    },
+    {
+      id: "disputes",
+      title: "8. Dispute Resolution",
+      content: "In case of disagreements:",
+      list: [
+        "Mediation through CEDR (Centre for Effective Dispute Resolution)",
+        "Litigation in English courts (England & Wales jurisdiction)",
+        "Time bar of 12 months from cause of action",
+        "Costs follow event principle applies"
+      ]
+    }
   ];
 
   return (

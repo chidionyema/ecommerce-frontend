@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST="{\"pages/_app.tsx -> ../components/AnalyticsProvider\":{\"id\":\"pages/_app.tsx -> ../components/AnalyticsProvider\",\"files\":[\"static/chunks/src_components_AnalyticsProvider_tsx.js\"]}}"
