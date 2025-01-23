@@ -1,18 +1,13 @@
 import React from 'react';
 import { AppProps } from 'next/app';
-import { useRouter } from 'next/router';
+import { Router } from 'next/router';
 import NavBar from '../components/NavBar';
 import Layout from '../components/Layout';
 import Head from 'next/head';
 import { ThemeProvider, CssBaseline, createTheme, responsiveFontSizes } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../../fontawesome';
 import ErrorBoundary from '../components/ErrorBoundary';
-import '@fontsource/poppins/300.css';
-import '@fontsource/poppins/400.css';
-import '@fontsource/poppins/500.css';
-import '@fontsource/poppins/700.css';
 import theme from '../theme/theme';
 import dynamic from 'next/dynamic';
 
@@ -22,12 +17,15 @@ const AnalyticsProvider = dynamic(
   { ssr: false }
 );
 
-const MyAppInner: React.FC<AppProps> = ({ Component, pageProps }) => {
-  return <Component {...pageProps} />;
+interface MyAppInnerProps extends AppProps {
+  router: Router;
+}
+
+const MyAppInner: React.FC<MyAppInnerProps> = ({ Component, pageProps, router }) => {
+  return <Component {...pageProps} router={router} />;
 };
 
-const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
-  const router = useRouter();
+const MyApp: React.FC<AppProps & { router: Router }> = ({ Component, pageProps, router }) => {
   const currentTheme = responsiveFontSizes(
     createTheme({
       ...theme,
@@ -61,7 +59,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
           </Head>
           <NavBar />
           <Layout>
-            <MyAppInner Component={Component} pageProps={pageProps} />
+            <MyAppInner Component={Component} pageProps={pageProps} router={router} />
           </Layout>
           <ToastContainer />
         </ErrorBoundary>

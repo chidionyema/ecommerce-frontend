@@ -1,7 +1,23 @@
-import { createTheme } from '@mui/material/styles';
-import { styled } from '@mui/material/styles';
+// src/theme.ts
+import { createTheme, styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
+
+// Type augmentation for custom palette properties
+declare module '@mui/material/styles' {
+  interface Palette {
+    gradients: {
+      primary: string;
+      secondary: string;
+    };
+  }
+  interface PaletteOptions {
+    gradients?: {
+      primary?: string;
+      secondary?: string;
+    };
+  }
+}
 
 const theme = createTheme({
   palette: {

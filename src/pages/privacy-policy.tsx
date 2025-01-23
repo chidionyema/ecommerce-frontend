@@ -7,14 +7,12 @@ const PrivacyPolicy = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
-    // Meta tags management
     document.title = "Privacy Policy - Gluestack";
     const metaDescription = document.createElement('meta');
     metaDescription.name = "description";
     metaDescription.content = "Read our comprehensive Privacy Policy to understand how Gluestack collects, uses, and protects your information.";
     document.head.appendChild(metaDescription);
 
-    // Scroll handler
     const handleScroll = () => setShowScrollTop(window.scrollY > 400);
     window.addEventListener('scroll', handleScroll);
     
@@ -76,7 +74,9 @@ const PrivacyPolicy = () => {
       }}>
         <Container maxWidth="lg">
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Shield size={24} sx={{ mr: 1.5 }} />
+            <Box sx={{ mr: 1.5 }}>
+              <Shield size={24} />
+            </Box>
             <Typography variant="body1">
               Your privacy matters. Review our updated policy.
             </Typography>
@@ -230,7 +230,9 @@ const PrivacyPolicy = () => {
               transition: 'transform 0.3s'
             }
           }}>
-            <Mail size={24} sx={{ color: 'primary.main' }} />
+            <Box sx={{ color: 'primary.main' }}>
+              <Mail size={24} />
+            </Box>
             <Link
               href="mailto:privacy@gluestack.com"
               sx={{

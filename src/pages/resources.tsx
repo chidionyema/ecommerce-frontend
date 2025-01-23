@@ -1,4 +1,3 @@
-// Resources.tsx
 import React from 'react';
 import { 
   Container, 
@@ -18,9 +17,7 @@ import NextLink from 'next/link';
 const Resources: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  // Use the gradient from the theme
-  const primaryGradient = theme.palette.gradients.corporate;
+  const primaryGradient = theme.palette.gradients.primary;
 
   const resources = [
     {
@@ -77,27 +74,21 @@ const Resources: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Typography
-            variant="h2"
-            sx={{
-              fontWeight: 800,
-              fontSize: isMobile ? '2rem' : '3rem',
-              textAlign: 'center',
-              mb: 6,
-              background: primaryGradient,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              color: theme.palette.primary.main, // Fallback color
-              lineHeight: 1.2,
-              '&:after': {
-                content: '"📚"',
-                display: 'inline-block',
-                ml: 2,
-              }
-            }}
-          >
-            Expert Technical Resources
-          </Typography>
+          <Box sx={{ textAlign: 'center', mb: 8 }}>
+            <Typography 
+              variant="h2" 
+              sx={{ 
+                fontWeight: 800,
+                background: primaryGradient,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 3,
+                fontSize: isMobile ? '2rem' : '2.75rem'
+              }}
+            >
+              Expert Technical Resources
+            </Typography>
+          </Box>
         </motion.div>
 
         <Grid container spacing={isMobile ? 2 : 4}>
@@ -116,11 +107,14 @@ const Resources: React.FC = () => {
         </Grid>
 
         <Box sx={{ textAlign: 'center', mt: 8 }}>
-          <Typography variant="h5" sx={{ 
-            mb: 4, 
-            fontWeight: 600, 
-            color: 'text.primary'
-          }}>
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              mb: 4, 
+              fontWeight: 600, 
+              color: 'text.primary'
+            }}
+          >
             Need Custom Technical Guidance?
           </Typography>
           <NextLink href="/contact" passHref>

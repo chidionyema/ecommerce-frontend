@@ -152,7 +152,7 @@ const HomePage = () => {
   return (
     <Box component="main">
       <Head>
-        <title>TechMastery - Expert Technology Solutions</title>
+        <title>Expert Technology Solutions</title>
         <meta name="description" content="Professional tech consultancy with proven results" />
       </Head>
 

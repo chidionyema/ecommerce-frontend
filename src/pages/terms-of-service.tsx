@@ -6,6 +6,13 @@ const TermsOfService = () => {
   const theme = useTheme();
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   useEffect(() => {
     document.title = "Terms of Service - Gluestack";
     const metaTags = [
@@ -36,8 +43,6 @@ const TermsOfService = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const sections = [
     {
@@ -147,7 +152,9 @@ const TermsOfService = () => {
       }}>
         <Container maxWidth="lg">
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <AlertTriangle size={24} sx={{ mr: 1.5 }} />
+            <Box sx={{ mr: 1.5 }}>
+              <AlertTriangle size={24} />
+            </Box>
             <Typography variant="body1">
               Please review our updated Terms of Service carefully
             </Typography>
@@ -290,7 +297,9 @@ const TermsOfService = () => {
               transition: 'transform 0.3s'
             }
           }}>
-            <Mail size={24} sx={{ color: 'primary.main' }} />
+            <Box sx={{ color: 'primary.main' }}>
+              <Mail size={24} />
+            </Box>
             <Link
               href="mailto:legal@gluestack.com"
               sx={{

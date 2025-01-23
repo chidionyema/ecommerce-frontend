@@ -49,7 +49,14 @@ const LogoContainer = styled(Box)(({ theme }) => ({
   },
 }));
 
-const StyledNavButton = styled(Button)<{ active?: boolean }>(({ theme, active }) => ({
+interface StyledNavButtonProps {
+  active?: boolean;
+  component?: React.ElementType;
+}
+
+const StyledNavButton = styled(Button, {
+  shouldForwardProp: (prop) => !['active'].includes(prop as string),
+})<StyledNavButtonProps>(({ theme, active }) => ({
   color: WHITE,
   fontSize: '0.95rem',
   fontWeight: 500,

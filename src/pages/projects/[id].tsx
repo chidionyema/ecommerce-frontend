@@ -31,7 +31,7 @@ import TimelineDot from '@mui/lab/TimelineDot';
 import { motion } from 'framer-motion';
 
 const CaseStudyHeader = styled(Box)(({ theme }) => ({
-  background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)',
+  background: theme.palette.gradients?.primary || 'linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)',
   color: theme.palette.common.white,
   padding: theme.spacing(8),
   textAlign: 'center',
@@ -107,7 +107,6 @@ const ProjectDetails: React.FC = () => {
       </CaseStudyHeader>
 
       <Container maxWidth="lg" sx={{ py: 6, position: 'relative' }}>
-        {/* Key Metrics */}
         <Grid container spacing={4} sx={{ mb: 8 }}>
           <Grid item xs={12} md={4}>
             <ImpactMetric>
@@ -135,7 +134,6 @@ const ProjectDetails: React.FC = () => {
           </Grid>
         </Grid>
 
-        {/* Project Details */}
         <Grid container spacing={6}>
           <Grid item xs={12} md={8}>
             <Section title="The Challenge" defaultOpen>
@@ -199,7 +197,6 @@ const ProjectDetails: React.FC = () => {
 
         <Divider sx={{ my: 8 }} />
 
-        {/* Results Section */}
         <Section title="Measurable Outcomes" defaultOpen>
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
@@ -229,12 +226,12 @@ const ProjectDetails: React.FC = () => {
   );
 };
 
-const Section: React.FC<{ title: string; toggleable?: boolean; defaultOpen?: boolean }> = ({
-  title,
-  children,
-  toggleable = false,
-  defaultOpen = false
-}) => {
+const Section: React.FC<{
+  title: string;
+  toggleable?: boolean;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}> = ({ title, children, toggleable = false, defaultOpen = false }) => {
   const [open, setOpen] = useState(defaultOpen);
   
   return (
