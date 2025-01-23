@@ -1,40 +1,128 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next.js + Cloudflare Pages Deployment Guide
 
-## Getting Started
-download latest version of Nodejs
-nvm install node # "node" is an alias for the latest version
+This document outlines the development workflow, build process, and deployment configuration for a Next.js application to Cloudflare Pages.
 
-First, run the development server:
-rm -rf node_modules
-rm package-lock.json
-npm install
+## Prerequisites
+- Node.js v20+
+- npm v9+
+- Cloudflare account
+- Wrangler CLI installed globally (`npm install -g wrangler`)
+
+## Installation
 ```bash
+# Install project dependencies
+npm install
+
+# Install development tools
+npm install --save-dev serve cross-env concurrently
+
+Environment Setup
+1. Local Development Environment
+Create .env.local file:
+
+NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_ID=local_dev
+# Add other environment variables here
+
+2. Cloudflare Production Environment
+Go to Cloudflare Dashboard → Pages → Settings → Environment Variables
+https://dash.cloudflare.com/4912457480997df81450b3ea614ccf3c/workers-and-pages/create/pages
+Add production values matching your local environment variables
+
+Development Workflow
+Local Development Server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Cloudflare Edge Runtime Testing
+npm run dev:cf
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Fullstack Local Development
+npm run dev:fullstack
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Build & Preview
+Production Build
+npm run build
 
-## Learn More
+Local Production Preview
 
-To learn more about Next.js, take a look at the following resources:
+npm run preview
+# Visits http://localhost:3000
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Deployment
+One-Time Deployment
+npm run deploy:ci
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Update Existing Deployment
+npm run deploy
 
-## Deploy on Vercel
+Configuration Files
+wrangler.toml
+name = "gluestack"
+compatibility_date = "2024-02-01"
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+.gitignore
+# Build directories
+.out/
+.next/
+
+# Environment files
+.env*.local
+
+# Dependencies
+node_modules/
+
+Recommended Workflow
+Daily Development
+
+npm run dev
+
+Test Cloudflare Features
+
+npm run build
+npm run dev:cf
+
+
+Production Deployment
+npm run deploy:ci
+
+Key Features
+🔥 Local dev server with hot reloading
+
+☁️ Cloudflare edge runtime simulation
+
+🚀 One-command CI/CD deployment
+
+🔒 Separate environment configurations
+
+📦 Automatic build cleanup
+
+📊 Bundle analysis tools
+
+Troubleshooting
+Missing Environment Variables
+
+Verify .env.local exists for local development
+
+Check Cloudflare Dashboard environment variables
+
+Deployment Failures
+
+Ensure wrangler login has been completed
+
+Verify Node.js version >= 20
+
+Preview Issues
+
+Run npm run build before preview
+
+Check for build errors in console
+
+Maintenance
+Update compatibility_date in wrangler.toml quarterly
+
+Review Cloudflare Pages settings after major Next.js updates
+
+Rotate API keys/credentials every 90 days
+
+
+This README provides a complete reference for both new developers and deployment pipelines. Keep it updated as your deployment process evolves.
