@@ -12,23 +12,25 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
-  Skeleton,
   useTheme,
   useMediaQuery,
   styled,
   Button,
+  Avatar,
+  Badge
 } from '@mui/material';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { motion } from 'framer-motion';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CodeIcon from '@mui/icons-material/Code';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import { CVProject, cvProjects } from '../data/cvProjects';
 
 const PAGE_SIZE = 9;
 
 const GradientButton = styled(Button)(({ theme }) => ({
-  background: theme.gradients.primary,
+  background: theme.palette.gradients.secondary,
   color: theme.palette.common.white,
   borderRadius: '50px',
   padding: theme.spacing(1.5, 4),
@@ -36,7 +38,7 @@ const GradientButton = styled(Button)(({ theme }) => ({
   textTransform: 'uppercase',
   transition: 'transform 0.2s, box-shadow 0.2s',
   '&:hover': {
-    background: theme.gradients.secondary,
+    background: theme.palette.secondary.dark,
     transform: 'translateY(-2px)',
     boxShadow: theme.shadows[4],
   },
@@ -54,96 +56,82 @@ const Solutions: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [navigatingProjectId, setNavigatingProjectId] = useState<string | null>(null);
-  const [isOnline, setIsOnline] = useState(true);
   const loaderRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const shouldReduceMotion = useReducedMotion();
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   const filteredProjects = useMemo(() => {
-    return cvProjects.filter((project) =>
+    return cvProjects.filter(project => 
       project.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
       project.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-      project.technologies.some((tech) => tech.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
+      project.technologies.some(tech => tech.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
     );
   }, [debouncedSearchQuery]);
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      setIsLoading(true);
-      try {
-        const startIndex = (page - 1) * PAGE_SIZE;
-        const endIndex = startIndex + PAGE_SIZE;
-        const newProjects = filteredProjects.slice(startIndex, endIndex);
-
-        setDisplayedProjects((prev) => {
-          const uniqueProjects = newProjects.filter(
-            (newProject) => !prev.some((prevProject) => prevProject.id === newProject.id)
-          );
-          return [...prev, ...uniqueProjects];
-        });
-
-        if (newProjects.length < PAGE_SIZE) setHasMore(false);
-      } catch (error) {
-        setErrorMessage('Failed to load projects. Please try again later.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, [page, filteredProjects]);
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          setPage((prev) => prev + 1);
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    if (loaderRef.current) observer.observe(loaderRef.current);
-
-    return () => {
-      if (loaderRef.current) observer.unobserve(loaderRef.current);
-    };
-  }, [loaderRef, hasMore, isLoading]);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
     setPage(1);
     setDisplayedProjects([]);
     setHasMore(true);
+  }, [filteredProjects]);
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    const loadProjects = () => {
+      if (!isCurrent || isLoading) return;
+
+      setIsLoading(true);
+      const startIndex = (page - 1) * PAGE_SIZE;
+      const endIndex = startIndex + PAGE_SIZE;
+      const newProjects = filteredProjects.slice(startIndex, endIndex);
+
+      setDisplayedProjects(prev => [
+        ...(page === 1 ? [] : prev),
+        ...newProjects
+      ]);
+      setHasMore(endIndex < filteredProjects.length);
+      setIsLoading(false);
+    };
+
+    loadProjects();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [page, filteredProjects, isLoading]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          setPage(prev => prev + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentLoader = loaderRef.current;
+    if (currentLoader) observer.observe(currentLoader);
+
+    return () => {
+      if (currentLoader) observer.unobserve(currentLoader);
+    };
+  }, [hasMore, isLoading]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   const handleViewDetails = async (projectId: string) => {
-    if (!isOnline) {
-      setErrorMessage('No internet connection. Please check your network.');
-      return;
-    }
-
     setNavigatingProjectId(projectId);
     try {
       await router.push(`/projects/${projectId}`);
     } catch (error) {
-      setErrorMessage('Failed to load project details. Please try again.');
+      setErrorMessage('Failed to navigate to project details');
     } finally {
       setNavigatingProjectId(null);
     }
@@ -151,261 +139,196 @@ const Solutions: React.FC = () => {
 
   return (
     <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
-      <AppBar 
-        position="sticky" 
-        sx={{ 
-          background: theme.gradients.secondary,
-          backdropFilter: 'blur(8px)',
-          color: 'common.white',
-          boxShadow: theme.shadows[4],
-        }}
-      >
+      <AppBar position="sticky" sx={{ 
+        background: theme.palette.primary.main,
+        boxShadow: theme.shadows[4],
+      }}>
         <Toolbar sx={{ 
           display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          py: 2,
-          gap: 2,
-          flexDirection: { xs: 'column', sm: 'row' }
+          flexDirection: 'column', 
+          py: 3,
+          gap: 2
         }}>
-          <Typography variant="h6" sx={{ 
+          <Typography variant="h4" component="h1" sx={{ 
             fontWeight: 'bold', 
-            fontSize: isMobile ? '1.25rem' : '1.5rem',
-            whiteSpace: 'nowrap'
+            color: 'common.white',
+            textAlign: 'center',
+            fontSize: isMobile ? '1.5rem' : '2.125rem'
           }}>
-             Solutions Portfolio
+            Technical Portfolio
           </Typography>
+          
           <TextField
             variant="outlined"
             placeholder="Search projects..."
             value={searchQuery}
             onChange={handleSearchChange}
-            size="small"
-            disabled={isLoading}
+            size="medium"
             sx={{ 
-              width: { xs: '100%', sm: '300px', md: '400px' }, 
-              backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+              width: '100%', 
+              maxWidth: 600,
+              backgroundColor: 'background.default',
               borderRadius: '8px',
               '& .MuiOutlinedInput-root': {
-                color: 'common.white',
-                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
-                '&.Mui-focused fieldset': { borderColor: 'common.white' },
+                color: 'text.primary',
+                '& fieldset': { borderColor: theme.palette.secondary.main },
+                '&:hover fieldset': { borderColor: theme.palette.secondary.dark },
+                '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main },
               }
             }}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start" sx={{ color: 'common.white' }}>
-                  <SearchOutlinedIcon />
+                <InputAdornment position="start" sx={{ color: 'text.primary' }}>
+                  <SearchOutlinedIcon fontSize="medium" />
                 </InputAdornment>
               ),
+              'aria-label': 'Search projects',
             }}
           />
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Grid container spacing={isMobile ? 2 : 3}>
-          {isLoading && !displayedProjects.length
-            ? Array.from({ length: PAGE_SIZE }).map((_, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Skeleton 
-                    variant="rectangular" 
-                    height={300} 
-                    animation="wave" 
-                    sx={{ borderRadius: '15px' }}
-                  />
-                  <Skeleton variant="text" height={30} animation="wave" />
-                  <Skeleton variant="text" height={20} animation="wave" />
-                </Grid>
-              ))
-            : displayedProjects.map((project) => (
-                <Grid item xs={12} sm={6} md={4} key={project.id}>
-                  <motion.div 
-                    whileHover={{ translateY: -8 }} 
-                    style={{ height: '100%' }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    onHoverStart={() => router.prefetch(`/projects/${project.id}`)}
-                  >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        height: '100%',
-                        backgroundColor: 'background.paper',
-                        borderRadius: '15px',
-                        boxShadow: 3,
-                        transition: 'transform 0.3s, box-shadow 0.3s',
-                        '&:hover': { 
-                          boxShadow: 6,
-                          transform: 'translateY(-4px)'
-                        },
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          background: theme.gradients.primary,
-                          color: 'common.white',
-                          py: 2,
-                          px: 3,
-                          textAlign: 'center',
-                          position: 'relative',
-                          '&:before': {
-                            content: '""',
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            background: 'url(/grid-pattern.svg) repeat',
-                            opacity: 0.1,
-                          }
-                        }}
-                      >
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                          {project.bannerText}
-                        </Typography>
-                        <Typography
-                          variant="subtitle2"
-                          sx={{
-                            mt: 1,
-                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                            borderRadius: '4px',
-                            px: 1.5,
-                            py: 0.5,
-                            display: 'inline-block',
-                            fontSize: '0.8rem',
-                          }}
-                        >
+      <Container maxWidth="xl" sx={{ py: 6 }}>
+        <Grid container spacing={4} component="main">
+          {displayedProjects.map((project) => (
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3} key={project.id}>
+              <motion.div 
+                whileHover={!shouldReduceMotion ? { translateY: -8 } : undefined}
+                style={{ height: '100%' }}
+                initial={!shouldReduceMotion ? { opacity: 0, y: 20 } : undefined}
+                animate={!shouldReduceMotion ? { opacity: 1, y: 0 } : undefined}
+                transition={{ duration: 0.3 }}
+              >
+                <Box sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  backgroundColor: 'background.default',
+                  borderRadius: '16px',
+                  boxShadow: 3,
+                  overflow: 'hidden',
+                  transition: 'all 0.3s',
+                  '&:hover': {
+                    boxShadow: 6,
+                  }
+                }}>
+                  <Box sx={{
+                    backgroundColor: theme.palette.primary.main,
+                    color: 'common.white',
+                    p: 3,
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                      <Avatar sx={{ 
+                        backgroundColor: theme.palette.secondary.main, 
+                        width: 48, 
+                        height: 48
+                      }}>
+                        {project.icon ? (
+                          React.createElement(project.icon, { className: project.iconColor })
+                        ) : (
+                          <CodeIcon />
+                        )}
+                      </Avatar>
+                      <Box>
+                        <Typography variant="subtitle2" component="h2" fontWeight="bold">
                           {project.clientName}
                         </Typography>
+                        <Typography variant="caption" component="time" sx={{
+                          color: 'common.white',
+                          backgroundColor: 'primary.dark',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          display: 'inline-block'
+                        }}>
+                          {project.timeline}
+                        </Typography>
                       </Box>
+                    </Box>
+                    <Typography variant="h6" component="h3" fontWeight="bold">
+                      {project.name}
+                    </Typography>
+                  </Box>
 
-                      <Box
+                  <Box sx={{ p: 3, flexGrow: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      {project.description}
+                    </Typography>
+
+                    <Box sx={{ mb: 3 }}>
+                      <Typography variant="caption" fontWeight="bold" color="text.secondary">
+                        KEY TECHNOLOGIES
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                        {project.technologies.slice(0, 4).map((tech, index) => (
+                          <Chip
+                            key={index}
+                            label={tech}
+                            size="small"
+                            sx={{
+                              backgroundColor: theme.palette.secondary.light,
+                              color: 'common.white',
+                              fontWeight: 600,
+                              fontSize: '0.75rem'
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
+                      <Badge
+                        badgeContent={project.teamSize}
                         sx={{
-                          height: 140,
-                          position: 'relative',
-                          '&:after': {
-                            content: '""',
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '40%',
-                            background: 'linear-gradient(to top, rgba(0,0,0,0.3), transparent)',
+                          '& .MuiBadge-badge': {
+                            right: -8,
+                            top: 13,
+                            backgroundColor: theme.palette.secondary.main,
+                            fontSize: '0.75rem'
                           }
                         }}
                       >
-                        <Image
-                          src={project.imageUrl || '/placeholder.png'}
-                          alt={project.name}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                          style={{ objectFit: 'cover' }}
-                          placeholder="blur"
-                          blurDataURL="/placeholder-blur.jpg"
-                        />
-                      </Box>
-
-                      <Box sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                        <Box sx={{ mb: 2 }}>
-                          <Typography variant="h6" sx={{ 
-                            fontWeight: 'bold', 
-                            mb: 1,
-                            color: 'primary.main'
-                          }}>
-                            {project.name}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {project.description}
-                          </Typography>
-                        </Box>
-
-                        <Box sx={{ 
-                          display: 'flex', 
-                          flexWrap: 'wrap', 
-                          gap: 1,
-                          mt: 'auto',
-                          pt: 2
-                        }}>
-                          {project.technologies.map((tech, index) => (
-                            <Chip
-                              key={index}
-                              label={tech}
-                              size="small"
-                              sx={{
-                                backgroundColor: 'action.hover',
-                                color: 'primary.main',
-                                fontWeight: 600,
-                                '&:hover': { backgroundColor: 'action.selected' }
-                              }}
-                            />
-                          ))}
-                        </Box>
-
-                        <Box sx={{ mt: 2 }}>
-                          <GradientButton
-                            onClick={() => handleViewDetails(project.id)}
-                            endIcon={
-                              navigatingProjectId === project.id ? (
-                                <CircularProgress size={20} sx={{ color: 'inherit', ml: 1 }} />
-                              ) : (
-                                <ArrowForwardIcon />
-                              )
-                            }
-                            disabled={!isOnline || navigatingProjectId === project.id}
-                            fullWidth
-                          >
-                            {navigatingProjectId === project.id ? 'Loading...' : 'View Case Study'}
-                          </GradientButton>
-                        </Box>
-                      </Box>
+                        <Typography variant="caption">Team Size</Typography>
+                      </Badge>
+                      
+                      <GradientButton
+                        onClick={() => handleViewDetails(project.id)}
+                        endIcon={navigatingProjectId === project.id ? <CircularProgress size={20} /> : <ArrowForwardIcon />}
+                        disabled={navigatingProjectId === project.id}
+                      >
+                        Details
+                      </GradientButton>
                     </Box>
-                  </motion.div>
-                </Grid>
-              ))}
+                  </Box>
+                </Box>
+              </motion.div>
+            </Grid>
+          ))}
         </Grid>
 
-        <Box ref={loaderRef} sx={{ 
-          height: '50px', 
-          textAlign: 'center', 
-          mt: 4,
-          color: 'primary.main'
-        }}>
-          {isLoading && hasMore ? (
-            <CircularProgress color="inherit" />
+        <Box ref={loaderRef} sx={{ py: 6, textAlign: 'center' }}>
+          {isLoading ? (
+            <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
           ) : hasMore ? (
-            <Typography variant="body2">
-              Scroll to explore more solutions...
+            <Typography variant="body2" color="text.secondary">
+              Scroll to load more projects
             </Typography>
+          ) : displayedProjects.length > 0 ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <CheckCircleOutlineIcon color="success" />
+              <Typography variant="body2" color="text.secondary">
+                Showing {displayedProjects.length} of {filteredProjects.length} projects
+              </Typography>
+            </Box>
           ) : (
-            <Typography variant="body2">
-              All solutions loaded 🎉
+            <Typography variant="body2" color="text.secondary">
+              No projects found matching your search
             </Typography>
           )}
         </Box>
       </Container>
 
-      <Snackbar
-        open={!!errorMessage}
-        autoHideDuration={5000}
-        onClose={() => setErrorMessage('')}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          severity="error" 
-          onClose={() => setErrorMessage('')}
-          sx={{ 
-            background: 'secondary.dark',
-            color: 'common.white',
-            borderRadius: '8px',
-            backdropFilter: 'blur(4px)',
-            '& .MuiAlert-icon': { color: 'common.white' }
-          }}
-        >
+      <Snackbar open={!!errorMessage} autoHideDuration={6000} onClose={() => setErrorMessage('')}>
+        <Alert severity="error" sx={{ width: '100%' }}>
           {errorMessage}
         </Alert>
       </Snackbar>
@@ -413,7 +336,7 @@ const Solutions: React.FC = () => {
   );
 };
 
-function useDebounce(value: string, delay: number) {
+function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {

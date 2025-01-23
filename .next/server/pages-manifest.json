@@ -3,10 +3,10 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
-  "/pricing": "pages/pricing.js",
-  "/contact": "pages/contact.js",
   "/resources": "pages/resources.js",
-  "/projects/[id]": "pages/projects/[id].js",
   "/solutions": "pages/solutions.js",
-  "/404": "pages/404.js"
+  "/contact": "pages/contact.js",
+  "/projects/[id]": "pages/projects/[id].js",
+  "/404": "pages/404.js",
+  "/pricing": "pages/pricing.js"
 }

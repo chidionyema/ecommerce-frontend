@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import {
@@ -13,9 +13,7 @@ import {
   Drawer,
   List,
   ListItem,
-  Divider,
-  CircularProgress,
-  ButtonProps
+  Divider
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -23,139 +21,118 @@ import {
   Code as CodeIcon,
   Book as BookIcon,
   LocalAtm as LocalAtmIcon,
-  ContactMail as ContactMailIcon
+  ContactMail as ContactMailIcon,
+  RocketLaunch as RocketIcon
 } from '@mui/icons-material';
-import { createTheme, ThemeProvider, useTheme, styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 
 // Color Constants
-const PRIMARY_MAIN = '#0d1b3a';
-const PRIMARY_LIGHT = '#1e88e5';
-const ACCENT_COLOR = '#ff758c';
+const NAVY_BLUE = '#003366';
+const GOLD_ACCENT = '#b58900';
+const WHITE = '#ffffff';
 
-// --- Styled Components ---
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  background: `linear-gradient(90deg, ${PRIMARY_MAIN}, ${PRIMARY_MAIN}dd)`,
-  color: theme.palette.text.primary,
-  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
+const StyledAppBar = styled(AppBar)({
+  backgroundColor: NAVY_BLUE,
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   transition: 'all 0.3s ease',
-}));
+});
 
 const LogoContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
+  gap: theme.spacing(1),
   cursor: 'pointer',
   padding: theme.spacing(1),
-  borderRadius: '8px',
-  background: 'rgba(255, 255, 255, 0.1)',
   transition: 'all 0.3s ease',
   '&:hover': {
-    background: 'rgba(255, 255, 255, 0.15)',
-    transform: 'scale(1.05)',
-  },
-  '& .logo-text': {
-    fontWeight: 900,
-    fontSize: '1.8rem',
-    background: `linear-gradient(45deg, ${ACCENT_COLOR}, #fff)`,
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
-    letterSpacing: '-0.5px',
-    [theme.breakpoints.down('sm')]: {
-      fontSize: '1.5rem',
-    },
+    opacity: 0.9,
   },
 }));
 
-const StyledNavButton = styled(Button)<ButtonProps & { active?: boolean }>(
-  ({ theme, active }) => ({
-    color: '#ffffffdd !important',
-    fontSize: '0.95rem',
-    fontWeight: 600,
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    transition: 'all 0.3s ease',
-    position: 'relative',
-    '& .MuiButton-startIcon': {
-      marginRight: theme.spacing(1),
-    },
+const StyledNavButton = styled(Button)<{ active?: boolean }>(({ theme, active }) => ({
+  color: WHITE,
+  fontSize: '0.95rem',
+  fontWeight: 500,
+  letterSpacing: '0.3px',
+  transition: 'all 0.2s ease',
+  position: 'relative',
+  '& .MuiButton-startIcon': {
+    color: active ? GOLD_ACCENT : WHITE,
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: active ? '100%' : '0',
+    height: '2px',
+    background: GOLD_ACCENT,
+    transition: 'width 0.3s ease',
+  },
+  '&:hover': {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     '&::after': {
-      content: '""',
-      position: 'absolute',
-      bottom: '-2px',
-      left: 0,
-      width: active ? '100%' : '0',
-      height: '2px',
-      background: ACCENT_COLOR,
-      transition: 'width 0.3s ease',
+      width: '100%',
     },
-    '&:hover': {
-      color: '#fff !important',
-      '&::after': {
-        width: '100%',
-      },
-    },
-  })
-);
+    '& .MuiButton-startIcon': {
+      color: GOLD_ACCENT,
+    }
+  },
+}));
 
 const NavBar: React.FC = () => {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isNavigating, setIsNavigating] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const navItems = [
-    { label: 'Home', path: '/', icon: <HomeIcon sx={{ color: 'inherit' }} /> },
-    { label: 'Solutions', path: '/solutions', icon: <CodeIcon sx={{ color: 'inherit' }} /> },
-    { label: 'Resources', path: '/resources', icon: <BookIcon sx={{ color: 'inherit' }} /> },
-    { label: 'Pricing', path: '/pricing', icon: <LocalAtmIcon sx={{ color: 'inherit' }} /> },
-    { label: 'Contact', path: '/contact', icon: <ContactMailIcon sx={{ color: 'inherit' }} /> },
+    { label: 'Home', path: '/', icon: <HomeIcon /> },
+    { label: 'Solutions', path: '/solutions', icon: <CodeIcon /> },
+    { label: 'Resources', path: '/resources', icon: <BookIcon /> },
+    { label: 'Pricing', path: '/pricing', icon: <LocalAtmIcon /> },
+    { label: 'Contact', path: '/contact', icon: <ContactMailIcon /> },
   ];
 
   return (
-    <ThemeProvider
-      theme={createTheme({
-        palette: {
-          primary: { main: PRIMARY_MAIN },
-          secondary: { main: PRIMARY_LIGHT },
-        },
-        typography: {
-          fontFamily: 'Poppins, Arial, sans-serif',
-          allVariants: { color: '#fff' },
-        },
-      })}
-    >
-      <StyledAppBar position="sticky">
-        <Container maxWidth="xl" disableGutters={isMobile}>
-          <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
-            <LogoContainer onClick={() => router.push('/')}>
-              <Typography variant="h4" className="logo-text">
-                GluStack
-              </Typography>
-            </LogoContainer>
+    <StyledAppBar position="sticky">
+      <Container maxWidth="xl">
+        <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
+          <LogoContainer onClick={() => router.push('/')}>
+            <RocketIcon sx={{ color: GOLD_ACCENT, fontSize: '2rem' }} />
+            <Typography variant="h5" sx={{ 
+              fontWeight: 700,
+              color: WHITE,
+              letterSpacing: '-0.5px'
+            }}>
+              GluStack
+            </Typography>
+          </LogoContainer>
 
-            {!isMobile ? (
-              <Box display="flex" gap={4} alignItems="center">
-                {navItems.map(({ label, path, icon }) => (
-                  <Link href={path} key={label} passHref legacyBehavior>
-                    <StyledNavButton
-                      component="a"
-                      active={router.pathname === path}
-                      startIcon={icon}
-                    >
-                      {label}
-                    </StyledNavButton>
-                  </Link>
-                ))}
-              </Box>
-            ) : (
-              <IconButton onClick={() => setMobileOpen(true)} color="inherit">
-                <MenuIcon sx={{ fontSize: '2rem' }} />
-              </IconButton>
-            )}
-          </Toolbar>
-        </Container>
-      </StyledAppBar>
+          {!isMobile ? (
+            <Box display="flex" gap={2}>
+              {navItems.map(({ label, path, icon }) => (
+                <Link href={path} key={label} passHref legacyBehavior>
+                  <StyledNavButton
+                    component="a"
+                    active={router.pathname === path}
+                    startIcon={icon}
+                  >
+                    {label}
+                  </StyledNavButton>
+                </Link>
+              ))}
+            </Box>
+          ) : (
+            <IconButton 
+              onClick={() => setMobileOpen(true)}
+              sx={{ color: WHITE }}
+            >
+              <MenuIcon sx={{ fontSize: '2rem' }} />
+            </IconButton>
+          )}
+        </Toolbar>
+      </Container>
 
       <Drawer
         anchor="right"
@@ -164,8 +141,8 @@ const NavBar: React.FC = () => {
         sx={{
           '& .MuiDrawer-paper': {
             width: 280,
-            background: PRIMARY_MAIN,
-            color: '#fff',
+            backgroundColor: NAVY_BLUE,
+            color: WHITE,
           },
         }}
       >
@@ -174,12 +151,13 @@ const NavBar: React.FC = () => {
             router.push('/');
             setMobileOpen(false);
           }}>
-            <Typography className="logo-text" sx={{ fontSize: '1.5rem' }}>
+            <RocketIcon sx={{ color: GOLD_ACCENT, fontSize: '1.8rem' }} />
+            <Typography variant="h6" sx={{ color: WHITE }}>
               GluStack
             </Typography>
           </LogoContainer>
           
-          <Divider sx={{ my: 2, borderColor: '#ffffff33' }} />
+          <Divider sx={{ my: 2, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
           
           <List>
             {navItems.map(({ label, path, icon }) => (
@@ -189,14 +167,17 @@ const NavBar: React.FC = () => {
                   component="a"
                   sx={{
                     py: 2,
-                    borderRadius: '8px',
+                    borderRadius: '4px',
+                    color: router.pathname === path ? GOLD_ACCENT : WHITE,
                     '&:hover': {
-                      background: '#ffffff11',
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
                     },
                   }}
                 >
                   <Box display="flex" alignItems="center" gap={2}>
-                    {icon}
+                    {React.cloneElement(icon, { 
+                      sx: { color: router.pathname === path ? GOLD_ACCENT : WHITE } 
+                    })}
                     <Typography variant="body1">{label}</Typography>
                   </Box>
                 </ListItem>
@@ -205,13 +186,7 @@ const NavBar: React.FC = () => {
           </List>
         </Box>
       </Drawer>
-
-      {isNavigating && (
-        <Box sx={{ position: 'fixed', top: 20, right: 20, zIndex: 9999 }}>
-          <CircularProgress sx={{ color: ACCENT_COLOR }} size={40} />
-        </Box>
-      )}
-    </ThemeProvider>
+    </StyledAppBar>
   );
 };
 

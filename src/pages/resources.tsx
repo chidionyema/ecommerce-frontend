@@ -7,8 +7,7 @@ import {
   useTheme, 
   useMediaQuery, 
   Box, 
-  Button, 
-  styled 
+  Button 
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import SEO from '../components/SEO';
@@ -19,6 +18,9 @@ import NextLink from 'next/link';
 const Resources: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // Use the gradient from the theme
+  const primaryGradient = theme.palette.gradients.corporate;
 
   const resources = [
     {
@@ -82,9 +84,10 @@ const Resources: React.FC = () => {
               fontSize: isMobile ? '2rem' : '3rem',
               textAlign: 'center',
               mb: 6,
-              background: theme.gradients.primary,
+              background: primaryGradient,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
+              color: theme.palette.primary.main, // Fallback color
               lineHeight: 1.2,
               '&:after': {
                 content: '"📚"',
@@ -116,7 +119,7 @@ const Resources: React.FC = () => {
           <Typography variant="h5" sx={{ 
             mb: 4, 
             fontWeight: 600, 
-            color: 'primary.main'
+            color: 'text.primary'
           }}>
             Need Custom Technical Guidance?
           </Typography>
@@ -124,11 +127,12 @@ const Resources: React.FC = () => {
             <Button
               variant="contained"
               sx={{
-                background: theme.gradients.primary,
+                background: primaryGradient,
                 borderRadius: '50px',
                 px: 6,
                 py: 2,
                 fontWeight: 700,
+                color: 'common.white',
                 '&:hover': {
                   transform: 'translateY(-2px)',
                   boxShadow: theme.shadows[6],
