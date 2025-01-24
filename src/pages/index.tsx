@@ -233,8 +233,8 @@ const HomePage = () => {
               const ref = React.useRef<HTMLDivElement>(null);
               const isInView = useInView(ref, {
                 once: true,
-                margin: "0px 0px -50px 0px",
-                amount: 0.2
+                margin: "0px 0px -100px 0px",  // Increased detection area
+                amount: 0.1                    // Trigger with 10% visibility
               });
 
               return (
@@ -248,9 +248,9 @@ const HomePage = () => {
                         scale: 1,
                         transition: {
                           type: "spring",
-                          stiffness: 120,
-                          damping: 18,
-                          delay: index * 0.03
+                          stiffness: 100,  // Smoother animation
+                          damping: 15,
+                          delay: index * 0.02  // Faster stagger
                         }
                       } : {}}
                       whileHover={{
