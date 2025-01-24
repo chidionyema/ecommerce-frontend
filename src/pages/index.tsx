@@ -5,8 +5,7 @@ import {
 } from '@mui/material';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { motion, useAnimation } from 'framer-motion';
-import NextLink from 'next/link';
+import { motion, useInView } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { 
   FaPython, FaReact, FaNodeJs, FaAws, FaDocker, FaJava, FaMicrosoft, FaBrain, FaLinux 
@@ -30,10 +29,6 @@ const StyledButton = styled(Button)(({ theme }) => ({
     transform: 'translateY(-4px)',
     boxShadow: '0 10px 20px rgba(0, 0, 0, 0.4)',
   },
-  '&:focus': {
-    outline: '2px solid #fff',
-    outlineOffset: '2px',
-  },
 }));
 
 const FeatureCard = styled(Paper)(({ theme }) => ({
@@ -48,20 +43,6 @@ const FeatureCard = styled(Paper)(({ theme }) => ({
     transform: 'translateY(-8px)',
     boxShadow: '0 16px 30px rgba(0, 0, 0, 0.15)',
   },
-  '&:after': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    background: 'linear-gradient(45deg, #1a237e 0%, #0d47a1 100%)',
-    opacity: 0,
-    transition: 'opacity 0.3s',
-  },
-  '&:hover:after': {
-    opacity: 0.1,
-  },
 }));
 
 const HeroSection = styled(Box)(({ theme }) => ({
@@ -73,16 +54,6 @@ const HeroSection = styled(Box)(({ theme }) => ({
   background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)',
   color: theme.palette.common.white,
   overflow: 'hidden',
-  '&:before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    background: 'url(/grid-pattern.svg) repeat',
-    opacity: 0.1,
-  },
   [theme.breakpoints.down('sm')]: {
     minHeight: '60vh',
     padding: theme.spacing(4, 2),
@@ -92,10 +63,7 @@ const HeroSection = styled(Box)(({ theme }) => ({
 const SectionContainer = styled(Box)(({ theme }) => ({
   backgroundColor: '#f8f9fc',
   padding: theme.spacing(10, 2),
-  borderRadius: '15px',
   marginBottom: theme.spacing(6),
-  background: 'linear-gradient(to bottom, #f8f9fc, #f0f2f5)',
-  color: '#333',
 }));
 
 const techIcons = [
@@ -132,22 +100,17 @@ const techIcons = [
 const HomePage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const controls = useAnimation();
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollToTop(window.scrollY > 100);
-      document.querySelectorAll('.feature-card').forEach(card => {
-        if (card.getBoundingClientRect().top <= window.innerHeight * 0.75) {
-          controls.start('visible');
-        }
-      });
     };
-    window.addEventListener('scroll', handleScroll);
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [controls]);
+  }, []);
 
   return (
     <Box component="main">
@@ -159,25 +122,32 @@ const HomePage = () => {
       <HeroSection component="section">
         <Container maxWidth="md">
           <Box sx={{ py: 6 }}>
-            <motion.div initial={{ opacity: 0, y: -40 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div 
+              initial={{ opacity: 0, y: -40 }} 
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
               <Typography
                 variant="h1"
                 component="h1"
                 sx={{
                   fontWeight: 800,
-                  fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem' },
+                  fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem' },
                   mb: 4,
                   textAlign: 'center',
                   lineHeight: 1.2,
                   textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
-                  '&:after': { content: '"🚀"', ml: 2 }
                 }}
               >
-                Accelerate Your Tech Success
+                Accelerate Your Digital Transformation
               </Typography>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
               <Typography
                 variant="h5"
                 component="p"
@@ -192,7 +162,11 @@ const HomePage = () => {
               </Typography>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }}>
+            <motion.div
+              initial={{ scale: 0.7 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
               <Box sx={{ textAlign: 'center' }}>
                 <StyledButton
                   endIcon={<ArrowRightAlt />}
@@ -223,35 +197,33 @@ const HomePage = () => {
             Core Technologies
           </Typography>
           <Grid container spacing={isMobile ? 3 : 6} justifyContent="center">
-            {techIcons.map((tech, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                <motion.div
-                  className="feature-card"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={controls}
-                  variants={{ visible: { opacity: 1, y: 0 } }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <FeatureCard>
-                    <Box sx={{ 
-                      mb: 2,
-                      color: tech.color,
-                      transition: 'transform 0.3s',
-                      '&:hover': { transform: 'rotate(15deg) scale(1.2)' }
-                    }}>
-                      {tech.icon}
-                    </Box>
-                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
-                      {tech.title}
-                    </Typography>
-                    <Typography variant="body1" sx={{ color: '#555' }}>
-                      {tech.description}
-                    </Typography>
-                  </FeatureCard>
-                </motion.div>
-              </Grid>
-            ))}
+            {techIcons.map((tech, index) => {
+              const ref = React.useRef(null);
+              const isInView = useInView(ref, { once: true, margin: "0px 0px -100px 0px" });
+
+              return (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={index} ref={ref}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <FeatureCard>
+                      <Box sx={{ mb: 2, color: tech.color }}>
+                        {tech.icon}
+                      </Box>
+                      <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+                        {tech.title}
+                      </Typography>
+                      <Typography variant="body1" sx={{ color: '#555' }}>
+                        {tech.description}
+                      </Typography>
+                    </FeatureCard>
+                  </motion.div>
+                </Grid>
+              );
+            })}
           </Grid>
         </Container>
       </SectionContainer>
@@ -259,27 +231,46 @@ const HomePage = () => {
       <SectionContainer component="section" sx={{ backgroundColor: '#fff' }}>
         <Container maxWidth="lg">
           <Typography variant="h2" sx={{ mb: 6, textAlign: 'center', fontWeight: 700 }}>
-            Trusted by Innovators
+            Trusted by Industry Leaders
           </Typography>
           <Grid container spacing={4} justifyContent="center">
             {[
-              { quote: "Cut deployment time by 40% with their cloud expertise", author: "CTO, FinTech Startup" },
-              { quote: "Revolutionized our mobile app performance in 2 weeks", author: "Lead Engineer, HealthTech" },
-              { quote: "Essential partner in our AI migration journey", author: "Director, Enterprise SaaS" }
-            ].map((testimonial, index) => (
-              <Grid item xs={12} md={4} key={index}>
-                <motion.div whileHover={{ scale: 1.02 }}>
-                  <Paper sx={{ p: 4, borderRadius: 4, height: '100%' }}>
-                    <Typography variant="body1" sx={{ mb: 2, fontStyle: 'italic' }}>
-                      "{testimonial.quote}"
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600, color: '#1a237e' }}>
-                      {testimonial.author}
-                    </Typography>
-                  </Paper>
-                </motion.div>
-              </Grid>
-            ))}
+              { 
+                quote: "Reduced our deployment time by 40% through optimized cloud infrastructure", 
+                author: "CTO, FinTech Startup" 
+              },
+              { 
+                quote: "Revolutionized our mobile app performance in just 2 weeks", 
+                author: "Lead Engineer, HealthTech" 
+              },
+              { 
+                quote: "Essential partner in our AI/ML migration journey", 
+                author: "Director, Enterprise SaaS" 
+              }
+            ].map((testimonial, index) => {
+              const ref = React.useRef(null);
+              const isInView = useInView(ref, { once: true });
+
+              return (
+                <Grid item xs={12} md={4} key={index} ref={ref}>
+                  <motion.div
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : {}}
+                    transition={{ duration: 0.5, delay: index * 0.2 }}
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <Paper sx={{ p: 4, borderRadius: 4, height: '100%' }}>
+                      <Typography variant="body1" sx={{ mb: 2, fontStyle: 'italic' }}>
+                        "{testimonial.quote}"
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#1a237e' }}>
+                        {testimonial.author}
+                      </Typography>
+                    </Paper>
+                  </motion.div>
+                </Grid>
+              );
+            })}
           </Grid>
         </Container>
       </SectionContainer>
@@ -291,26 +282,36 @@ const HomePage = () => {
               { number: '300+', label: 'Projects Delivered' },
               { number: '98%', label: 'Client Satisfaction' },
               { number: '24/7', label: 'Expert Support' }
-            ].map((metric, index) => (
-              <Grid item xs={12} sm={4} key={index}>
-                <motion.div whileHover={{ scale: 1.05 }}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h2" sx={{ 
-                      fontWeight: 800,
-                      background: 'linear-gradient(45deg, #1a237e, #0d47a1)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      mb: 1
-                    }}>
-                      {metric.number}
-                    </Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {metric.label}
-                    </Typography>
-                  </Box>
-                </motion.div>
-              </Grid>
-            ))}
+            ].map((metric, index) => {
+              const ref = React.useRef(null);
+              const isInView = useInView(ref, { once: true });
+
+              return (
+                <Grid item xs={12} sm={4} key={index} ref={ref}>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography variant="h2" sx={{ 
+                        fontWeight: 800,
+                        background: 'linear-gradient(45deg, #1a237e, #0d47a1)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        mb: 1
+                      }}>
+                        {metric.number}
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {metric.label}
+                      </Typography>
+                    </Box>
+                  </motion.div>
+                </Grid>
+              );
+            })}
           </Grid>
         </Container>
       </SectionContainer>
@@ -324,7 +325,8 @@ const HomePage = () => {
             right: 32,
             bgcolor: '#1a237e',
             color: 'white',
-            '&:hover': { bgcolor: '#0d47a1' }
+            '&:hover': { bgcolor: '#0d47a1' },
+            transition: 'background-color 0.3s',
           }}
         >
           <KeyboardArrowUpIcon />
