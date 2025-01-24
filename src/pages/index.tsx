@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Box, Container, Typography, Button, Grid, Paper, useTheme, useMediaQuery, 
-  IconButton, styled, Skeleton 
+  IconButton, styled 
 } from '@mui/material';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -13,94 +13,93 @@ import {
 import { SiRust, SiGoland } from 'react-icons/si';
 import Head from 'next/head';
 
-// Styled Components
+// Mobile-optimized styled components
 const StyledButton = styled(Button)(({ theme }) => ({
-  fontSize: '1.1rem',
-  padding: theme.spacing(2, 4),
-  borderRadius: '50px',
+  fontSize: '1rem',
+  padding: theme.spacing(1.5, 3),
+  borderRadius: '28px',
   background: 'linear-gradient(45deg, #1a237e 0%, #0d47a1 100%)',
   color: theme.palette.common.white,
   textTransform: 'uppercase',
   fontWeight: 700,
-  boxShadow: '0 6px 15px rgba(0, 0, 0, 0.3)',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
   transition: 'transform 0.2s, box-shadow 0.2s',
   '&:hover': {
-    background: 'linear-gradient(45deg, #0d47a1 0%, #1a237e 100%)',
-    transform: 'translateY(-4px)',
-    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.4)',
+    transform: 'translateY(-2px)',
+    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.3)',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.9rem',
+    padding: theme.spacing(1, 2.5),
   },
 }));
 
 const FeatureCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(4),
+  padding: theme.spacing(3),
   textAlign: 'center',
-  borderRadius: '15px',
-  boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
+  borderRadius: '12px',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
   transition: 'transform 0.2s, box-shadow 0.2s',
-  position: 'relative',
-  overflow: 'hidden',
   height: '100%',
   '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: '0 16px 30px rgba(0, 0, 0, 0.15)',
+    transform: 'translateY(-4px)',
+    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.12)',
+  },
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(2),
   },
 }));
 
 const HeroSection = styled(Box)(({ theme }) => ({
-  position: 'relative',
+  minHeight: '60vh',
   display: 'flex',
   alignItems: 'center',
-  minHeight: '50vh',
-  padding: theme.spacing(6, 2),
+  padding: theme.spacing(4, 2),
   background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)',
   color: theme.palette.common.white,
-  overflow: 'hidden',
   [theme.breakpoints.down('sm')]: {
-    minHeight: '60vh',
-    padding: theme.spacing(4, 2),
+    minHeight: '70vh',
+    padding: theme.spacing(3, 1.5),
   },
 }));
 
 const SectionContainer = styled(Box)(({ theme }) => ({
   backgroundColor: '#f8f9fc',
-  padding: theme.spacing(10, 2),
-  marginBottom: theme.spacing(6),
+  padding: theme.spacing(8, 2),
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(6, 1.5),
+  },
 }));
 
-// Force update hook
-const useForceUpdate = () => {
-  const [, setValue] = useState(0);
-  return () => setValue(value => value + 1);
-};
-
+// Mobile-first tech icons configuration
 const techIcons = [
-  { title: 'Python', icon: <FaPython size={60} />, color: '#3776AB' },
-  { title: 'React Native', icon: <FaReact size={60} />, color: '#61DAFB' },
-  { title: 'Node.js', icon: <FaNodeJs size={60} />, color: '#68A063' },
-  { title: 'DevOps', icon: <FaDocker size={60} />, color: '#2496ED' },
-  { title: 'Cloud Infrastructure', icon: <FaAws size={60} />, color: '#FF9900' },
-  { title: 'Java', icon: <FaJava size={60} />, color: '#007396' },
-  { title: '.NET', icon: <FaMicrosoft size={60} />, color: '#512BD4' },
-  { title: 'AI & ML', icon: <FaBrain size={60} />, color: '#FF6F00' },
-  { title: 'Linux', icon: <FaLinux size={60} />, color: '#FCC624' },
-  { title: 'Rust', icon: <SiRust size={60} />, color: '#000000' },
-  { title: 'Go (Golang)', icon: <SiGoland size={60} />, color: '#00ADD8' },
-  { title: 'React', icon: <FaReact size={60} />, color: '#61DAFB' },
+  { title: 'Python', icon: <FaPython size={48} />, color: '#3776AB' },
+  { title: 'React Native', icon: <FaReact size={48} />, color: '#61DAFB' },
+  { title: 'Node.js', icon: <FaNodeJs size={48} />, color: '#68A063' },
+  { title: 'DevOps', icon: <FaDocker size={48} />, color: '#2496ED' },
+  { title: 'Cloud Infrastructure', icon: <FaAws size={48} />, color: '#FF9900' },
+  { title: 'Java', icon: <FaJava size={48} />, color: '#007396' },
+  { title: '.NET', icon: <FaMicrosoft size={48} />, color: '#512BD4' },
+  { title: 'AI & ML', icon: <FaBrain size={48} />, color: '#FF6F00' },
+  { title: 'Linux', icon: <FaLinux size={48} />, color: '#FCC624' },
+  { title: 'Rust', icon: <SiRust size={48} />, color: '#000000' },
+  { title: 'Go (Golang)', icon: <SiGoland size={48} />, color: '#00ADD8' },
+  { title: 'React', icon: <FaReact size={48} />, color: '#61DAFB' },
 ].map((tech, index) => ({
   ...tech,
   description: [
-    'Build scalable and efficient applications with Python',
-    'Develop cross-platform mobile applications with React Native',
-    'Build fast and scalable server-side applications with Node.js',
-    'Streamline your development lifecycle with automated CI/CD',
-    'Scale applications with robust cloud solutions',
-    'Develop robust backend solutions with Java',
-    'Build enterprise-grade .NET applications',
-    'Harness the power of AI and ML for innovation',
-    'Leverage efficient Linux server management',
-    'Build high-performance applications with Rust',
-    'Develop fast backend services with Go',
-    'Create dynamic UIs with React',
+    'Scalable Python applications',
+    'Cross-platform React Native apps',
+    'High-performance Node.js services',
+    'Automated CI/CD pipelines',
+    'Cloud infrastructure solutions',
+    'Enterprise Java systems',
+    '.NET application development',
+    'AI/ML integration services',
+    'Linux server management',
+    'Rust system programming',
+    'Go backend services',
+    'React UI development',
   ][index],
 }));
 
@@ -109,95 +108,100 @@ const HomePage = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const router = useRouter();
-  const forceUpdate = useForceUpdate();
 
+  // Optimized scroll handler
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollToTop(window.scrollY > 100);
-      document.body.clientWidth;
     };
 
-    const throttledScroll = throttle(handleScroll, 100);
+    const throttledScroll = throttle(handleScroll, 50);
     window.addEventListener('scroll', throttledScroll, { passive: true });
-    window.addEventListener('resize', forceUpdate);
-    
-    return () => {
-      window.removeEventListener('scroll', throttledScroll);
-      window.removeEventListener('resize', forceUpdate);
-    };
-  }, [forceUpdate]);
+    return () => window.removeEventListener('scroll', throttledScroll);
+  }, []);
 
+  // Performance-optimized throttle
   const throttle = (fn: Function, wait: number) => {
-    let time = Date.now();
+    let lastCall = 0;
     return (...args: any[]) => {
-      if (time + wait - Date.now() < 0) {
+      const now = Date.now();
+      if (now - lastCall >= wait) {
         fn(...args);
-        time = Date.now();
+        lastCall = now;
       }
     };
   };
+
+  // Mobile-optimized animation config
+  const mobileAnimation = {
+    stiffness: 80,
+    damping: 12,
+    delayFactor: 0.04,
+    viewMargin: '0px 0px -50px 0px',
+  };
+
+  const desktopAnimation = {
+    stiffness: 100,
+    damping: 15,
+    delayFactor: 0.02,
+    viewMargin: '0px 0px -100px 0px',
+  };
+
+  const animationConfig = isMobile ? mobileAnimation : desktopAnimation;
 
   return (
     <Box component="main">
       <Head>
         <title>Expert Technology Solutions</title>
-        <meta name="description" content="Professional tech consultancy with proven results" />
-        <link 
-          rel="preload" 
-          href="https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2" 
-          as="font" 
-          type="font/woff2" 
-          crossOrigin="anonymous"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
       </Head>
 
       <HeroSection component="section">
         <Container maxWidth="md">
-          <Box sx={{ py: 6 }}>
+          <Box sx={{ py: 4 }}>
             <motion.div 
-              initial={{ opacity: 0, y: -40 }} 
+              initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.6 }}
             >
               <Typography
                 variant="h1"
                 component="h1"
                 sx={{
-                  fontWeight: 800,
-                  fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem' },
-                  mb: 4,
+                  fontWeight: 700,
+                  fontSize: isMobile ? '2rem' : '3rem',
+                  mb: 3,
                   textAlign: 'center',
                   lineHeight: 1.2,
-                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
                 }}
               >
-                Accelerate Your Digital Transformation
+                Accelerate Digital Transformation
               </Typography>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
             >
               <Typography
                 variant="h5"
                 component="p"
                 sx={{
-                  fontSize: { xs: '1.2rem', sm: '1.5rem' },
+                  fontSize: isMobile ? '1.1rem' : '1.3rem',
                   textAlign: 'center',
-                  mb: 6,
+                  mb: 4,
                   px: 2,
                 }}
               >
-                Enterprise-grade solutions with startup agility
+                Enterprise solutions with startup agility
               </Typography>
             </motion.div>
 
             <motion.div
-              initial={{ scale: 0.7 }}
+              initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
             >
               <Box sx={{ textAlign: 'center' }}>
                 <StyledButton
@@ -219,71 +223,61 @@ const HomePage = () => {
             variant="h2"
             component="h2"
             sx={{
-              mb: 8,
+              mb: 6,
               fontWeight: 700,
               textAlign: 'center',
-              fontSize: { xs: '2rem', sm: '2.5rem' },
-              color: theme.palette.text.primary
+              fontSize: isMobile ? '1.75rem' : '2.25rem',
             }}
           >
             Core Technologies
           </Typography>
-          <Grid container spacing={isMobile ? 3 : 6} justifyContent="center">
+          <Grid container spacing={isMobile ? 2 : 4} justifyContent="center">
             {techIcons.map((tech, index) => {
               const ref = React.useRef<HTMLDivElement>(null);
               const isInView = useInView(ref, {
                 once: true,
-                margin: "0px 0px -100px 0px",  // Increased detection area
-                amount: 0.1                    // Trigger with 10% visibility
+                margin: animationConfig.viewMargin,
+                amount: isMobile ? 0.01 : 0.1  // More sensitive on mobile
               });
 
               return (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                  <div ref={ref} style={{ height: '100%', width: '100%' }}>
+                <Grid item xs={6} sm={4} md={3} key={index}>
+                  <div ref={ref} style={{ height: '100%', padding: isMobile ? 8 : 12 }}>
                     <motion.div
-                      initial={{ opacity: 0, y: 30, scale: 0.97 }}
+                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
                       animate={isInView ? {
                         opacity: 1,
                         y: 0,
                         scale: 1,
                         transition: {
                           type: "spring",
-                          stiffness: 100,  // Smoother animation
-                          damping: 15,
-                          delay: index * 0.02  // Faster stagger
+                          stiffness: animationConfig.stiffness,
+                          damping: animationConfig.damping,
+                          delay: index * animationConfig.delayFactor
                         }
                       } : {}}
-                      whileHover={{
-                        scale: 1.03,
-                        transition: { duration: 0.15 }
-                      }}
-                      style={{
-                        transformOrigin: 'center bottom',
-                        height: '100%',
-                        width: '100%'
-                      }}
+                      whileHover={{ scale: 1.02 }}
+                      style={{ height: '100%' }}
                     >
                       <FeatureCard>
                         <Box sx={{ 
-                          mb: 2, 
+                          mb: 1.5,
                           color: tech.color,
-                          transform: 'translateZ(0)',
-                          willChange: 'transform'
+                          fontSize: '3rem',
+                          lineHeight: 1,
                         }}>
                           {tech.icon}
                         </Box>
-                        <Typography variant="h6" sx={{ 
-                          mb: 2, 
+                        <Typography variant="subtitle1" sx={{ 
                           fontWeight: 700,
-                          minHeight: '3em',
-                          transform: 'translateZ(0)'
+                          mb: 1,
+                          minHeight: isMobile ? '2.5em' : '3em',
                         }}>
                           {tech.title}
                         </Typography>
-                        <Typography variant="body1" sx={{ 
-                          color: '#555',
-                          minHeight: '6em',
-                          transform: 'translateZ(0)'
+                        <Typography variant="body2" sx={{ 
+                          color: '#666',
+                          minHeight: isMobile ? '4em' : '5em',
                         }}>
                           {tech.description}
                         </Typography>
@@ -307,12 +301,11 @@ const HomePage = () => {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             sx={{
               position: 'fixed',
-              bottom: 32,
-              right: 32,
-              bgcolor: '#1a237e',
+              bottom: 24,
+              right: 24,
+              bgcolor: 'primary.main',
               color: 'white',
-              '&:hover': { bgcolor: '#0d47a1' },
-              transition: 'background-color 0.3s',
+              '&:hover': { bgcolor: 'primary.dark' },
             }}
           >
             <KeyboardArrowUpIcon />
