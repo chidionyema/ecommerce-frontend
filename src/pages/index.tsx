@@ -13,7 +13,7 @@ import {
 import { SiRust, SiGoland } from 'react-icons/si';
 import Head from 'next/head';
 
-// Mobile-optimized styled components
+// Mobile-first styled components
 const StyledButton = styled(Button)(({ theme }) => ({
   fontSize: '1rem',
   padding: theme.spacing(1.5, 3),
@@ -47,6 +47,7 @@ const FeatureCard = styled(Paper)(({ theme }) => ({
   },
   [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(2),
+    transform: 'translateZ(0)', // Hardware acceleration
   },
 }));
 
@@ -71,7 +72,7 @@ const SectionContainer = styled(Box)(({ theme }) => ({
   },
 }));
 
-// Mobile-first tech icons configuration
+// Optimized tech icons configuration
 const techIcons = [
   { title: 'Python', icon: <FaPython size={48} />, color: '#3776AB' },
   { title: 'React Native', icon: <FaReact size={48} />, color: '#61DAFB' },
@@ -111,16 +112,13 @@ const HomePage = () => {
 
   // Optimized scroll handler
   useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollToTop(window.scrollY > 100);
-    };
-
+    const handleScroll = () => setShowScrollToTop(window.scrollY > 100);
     const throttledScroll = throttle(handleScroll, 50);
     window.addEventListener('scroll', throttledScroll, { passive: true });
     return () => window.removeEventListener('scroll', throttledScroll);
   }, []);
 
-  // Performance-optimized throttle
+  // Efficient throttle function
   const throttle = (fn: Function, wait: number) => {
     let lastCall = 0;
     return (...args: any[]) => {
@@ -131,23 +129,6 @@ const HomePage = () => {
       }
     };
   };
-
-  // Mobile-optimized animation config
-  const mobileAnimation = {
-    stiffness: 80,
-    damping: 12,
-    delayFactor: 0.04,
-    viewMargin: '0px 0px -50px 0px',
-  };
-
-  const desktopAnimation = {
-    stiffness: 100,
-    damping: 15,
-    delayFactor: 0.02,
-    viewMargin: '0px 0px -100px 0px',
-  };
-
-  const animationConfig = isMobile ? mobileAnimation : desktopAnimation;
 
   return (
     <Box component="main">
@@ -236,27 +217,29 @@ const HomePage = () => {
               const ref = React.useRef<HTMLDivElement>(null);
               const isInView = useInView(ref, {
                 once: true,
-                margin: animationConfig.viewMargin,
-                amount: isMobile ? 0.01 : 0.1  // More sensitive on mobile
+                margin: isMobile ? '0px 0px -30% 0px' : '0px 0px -150px 0px',
+                amount: isMobile ? 0.01 : 0.1
               });
 
               return (
                 <Grid item xs={6} sm={4} md={3} key={index}>
-                  <div ref={ref} style={{ height: '100%', padding: isMobile ? 8 : 12 }}>
+                  <div ref={ref} style={{ 
+                    height: '100%', 
+                    padding: isMobile ? 8 : 12,
+                    transform: 'translateZ(0)' // GPU acceleration
+                  }}>
                     <motion.div
-                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 20 }}
                       animate={isInView ? {
                         opacity: 1,
                         y: 0,
-                        scale: 1,
                         transition: {
                           type: "spring",
-                          stiffness: animationConfig.stiffness,
-                          damping: animationConfig.damping,
-                          delay: index * animationConfig.delayFactor
+                          stiffness: isMobile ? 150 : 120,
+                          damping: 15,
+                          delay: isMobile ? 0 : index * 0.02
                         }
                       } : {}}
-                      whileHover={{ scale: 1.02 }}
                       style={{ height: '100%' }}
                     >
                       <FeatureCard>
