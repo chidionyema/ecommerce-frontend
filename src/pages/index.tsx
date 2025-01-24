@@ -67,15 +67,11 @@ const SectionContainer = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(6),
 }));
 
-// Loading Skeleton Component
-const TechSkeleton = () => (
-  <FeatureCard>
-    <Skeleton variant="circular" width={60} height={60} sx={{ mx: 'auto', mb: 2 }} />
-    <Skeleton variant="text" width="60%" sx={{ mx: 'auto', mb: 2, height: 32 }} />
-    <Skeleton variant="text" width="80%" sx={{ mx: 'auto', height: 24 }} />
-    <Skeleton variant="text" width="80%" sx={{ mx: 'auto', height: 24 }} />
-  </FeatureCard>
-);
+// Force update hook
+const useForceUpdate = () => {
+  const [, setValue] = useState(0);
+  return () => setValue(value => value + 1);
+};
 
 const techIcons = [
   { title: 'Python', icon: <FaPython size={60} />, color: '#3776AB' },
@@ -113,8 +109,24 @@ const HomePage = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const router = useRouter();
+  const forceUpdate = useForceUpdate();
 
-  // Optimized scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollToTop(window.scrollY > 100);
+      document.body.clientWidth;
+    };
+
+    const throttledScroll = throttle(handleScroll, 100);
+    window.addEventListener('scroll', throttledScroll, { passive: true });
+    window.addEventListener('resize', forceUpdate);
+    
+    return () => {
+      window.removeEventListener('scroll', throttledScroll);
+      window.removeEventListener('resize', forceUpdate);
+    };
+  }, [forceUpdate]);
+
   const throttle = (fn: Function, wait: number) => {
     let time = Date.now();
     return (...args: any[]) => {
@@ -124,17 +136,6 @@ const HomePage = () => {
       }
     };
   };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollToTop(window.scrollY > 100);
-      document.body.clientWidth; // Force reflow
-    };
-
-    const throttledScroll = throttle(handleScroll, 100);
-    window.addEventListener('scroll', throttledScroll, { passive: true });
-    return () => window.removeEventListener('scroll', throttledScroll);
-  }, []);
 
   return (
     <Box component="main">
@@ -151,7 +152,65 @@ const HomePage = () => {
       </Head>
 
       <HeroSection component="section">
-        {/* Hero content remains same */}
+        <Container maxWidth="md">
+          <Box sx={{ py: 6 }}>
+            <motion.div 
+              initial={{ opacity: 0, y: -40 }} 
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <Typography
+                variant="h1"
+                component="h1"
+                sx={{
+                  fontWeight: 800,
+                  fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem' },
+                  mb: 4,
+                  textAlign: 'center',
+                  lineHeight: 1.2,
+                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                Accelerate Your Digital Transformation
+              </Typography>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <Typography
+                variant="h5"
+                component="p"
+                sx={{
+                  fontSize: { xs: '1.2rem', sm: '1.5rem' },
+                  textAlign: 'center',
+                  mb: 6,
+                  px: 2,
+                }}
+              >
+                Enterprise-grade solutions with startup agility
+              </Typography>
+            </motion.div>
+
+            <motion.div
+              initial={{ scale: 0.7 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Box sx={{ textAlign: 'center' }}>
+                <StyledButton
+                  endIcon={<ArrowRightAlt />}
+                  onClick={() => router.push('/contact')}
+                  aria-label="Start Project"
+                >
+                  Start Your Project
+                </StyledButton>
+              </Box>
+            </motion.div>
+          </Box>
+        </Container>
       </HeroSection>
 
       <SectionContainer component="section">
@@ -171,71 +230,72 @@ const HomePage = () => {
           </Typography>
           <Grid container spacing={isMobile ? 3 : 6} justifyContent="center">
             {techIcons.map((tech, index) => {
-              const ref = React.useRef(null);
-              const isInView = useInView(ref, { 
+              const ref = React.useRef<HTMLDivElement>(null);
+              const isInView = useInView(ref, {
                 once: true,
-                margin: "0px 0px -20% 0px",
-                amount: 0.1
+                margin: "0px 0px -50px 0px",
+                amount: 0.2
               });
 
               return (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={index} ref={ref}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 30, scale: 0.97 }}
-                    animate={isInView ? { 
-                      opacity: 1, 
-                      y: 0,
-                      scale: 1
-                    } : {}}
-                    transition={{ 
-                      type: "spring",
-                      stiffness: 100,
-                      damping: 20,
-                      delay: index * 0.05 
-                    }}
-                    whileHover={{ 
-                      scale: 1.03,
-                      transition: { duration: 0.2 } 
-                    }}
-                    style={{
-                      transformOrigin: 'center bottom',
-                      height: '100%'
-                    }}
-                  >
-                    <FeatureCard>
-                      <Box sx={{ 
-                        mb: 2, 
-                        color: tech.color,
-                        transition: 'transform 0.3s',
-                        '&:hover': {
-                          transform: 'rotate(5deg) scale(1.1)'
+                <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                  <div ref={ref} style={{ height: '100%', width: '100%' }}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 30, scale: 0.97 }}
+                      animate={isInView ? {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        transition: {
+                          type: "spring",
+                          stiffness: 120,
+                          damping: 18,
+                          delay: index * 0.03
                         }
-                      }}>
-                        {tech.icon}
-                      </Box>
-                      <Typography variant="h6" sx={{ 
-                        mb: 2, 
-                        fontWeight: 700,
-                        minHeight: '3em'
-                      }}>
-                        {tech.title}
-                      </Typography>
-                      <Typography variant="body1" sx={{ 
-                        color: '#555',
-                        minHeight: '6em'
-                      }}>
-                        {tech.description}
-                      </Typography>
-                    </FeatureCard>
-                  </motion.div>
+                      } : {}}
+                      whileHover={{
+                        scale: 1.03,
+                        transition: { duration: 0.15 }
+                      }}
+                      style={{
+                        transformOrigin: 'center bottom',
+                        height: '100%',
+                        width: '100%'
+                      }}
+                    >
+                      <FeatureCard>
+                        <Box sx={{ 
+                          mb: 2, 
+                          color: tech.color,
+                          transform: 'translateZ(0)',
+                          willChange: 'transform'
+                        }}>
+                          {tech.icon}
+                        </Box>
+                        <Typography variant="h6" sx={{ 
+                          mb: 2, 
+                          fontWeight: 700,
+                          minHeight: '3em',
+                          transform: 'translateZ(0)'
+                        }}>
+                          {tech.title}
+                        </Typography>
+                        <Typography variant="body1" sx={{ 
+                          color: '#555',
+                          minHeight: '6em',
+                          transform: 'translateZ(0)'
+                        }}>
+                          {tech.description}
+                        </Typography>
+                      </FeatureCard>
+                    </motion.div>
+                  </div>
                 </Grid>
               );
             })}
           </Grid>
         </Container>
       </SectionContainer>
-
-      {/* Other sections remain same */}
 
       {showScrollToTop && (
         <motion.div
