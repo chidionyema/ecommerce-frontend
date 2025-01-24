@@ -2,6 +2,8 @@ cloudflare.ini
 # Dependency directories
 node_modules/
 .next
+.next/
+out/
 # Environment variables
 .env
 

@@ -1,6 +1,0 @@
-# Create public/_routes.json for SPA support
-echo '{
-  "version": 1,
-  "include": ["/*"],
-  "exclude": ["/_next/static/*"]
-}' > public/_routes.json
