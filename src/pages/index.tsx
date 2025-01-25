@@ -133,6 +133,7 @@ const HomePage = () => {
               
               <ProfessionalButton
                 variant="outlined"
+                onClick={() => router.push('/solutions')}
                 sx={{
                   borderColor: 'rgba(255, 255, 255, 0.3)',
                   color: 'white',
