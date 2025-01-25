@@ -13,7 +13,8 @@ import {
   Drawer,
   List,
   ListItem,
-  Divider
+  Divider,
+  alpha
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -26,16 +27,19 @@ import {
 } from '@mui/icons-material';
 import { styled, useTheme } from '@mui/material/styles';
 
-// Color Constants
-const NAVY_BLUE = '#003366';
-const GOLD_ACCENT = '#b58900';
-const WHITE = '#ffffff';
+// Premium Color Scheme
+const NAVY_BLUE = '#0A2342';
+const GOLD_GRADIENT = 'linear-gradient(135deg, #C5A46D 0%, #D4B88E 100%)';
+const GLASS_BACKGROUND = 'rgba(10, 35, 66, 0.85)';
+const BACKDROP_BLUR = 'blur(10px)';
 
-const StyledAppBar = styled(AppBar)({
-  backgroundColor: NAVY_BLUE,
-  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-  transition: 'all 0.3s ease',
-});
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  background: `${GLASS_BACKGROUND} !important`,
+  backdropFilter: BACKDROP_BLUR,
+  borderBottom: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+}));
 
 const LogoContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -45,7 +49,10 @@ const LogoContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
   transition: 'all 0.3s ease',
   '&:hover': {
-    opacity: 0.9,
+    transform: 'scale(1.02)',
+  },
+  '&:active': {
+    transform: 'scale(0.98)',
   },
 }));
 
@@ -57,34 +64,48 @@ interface StyledNavButtonProps {
 const StyledNavButton = styled(Button, {
   shouldForwardProp: (prop) => !['active'].includes(prop as string),
 })<StyledNavButtonProps>(({ theme, active }) => ({
-  color: WHITE,
+  color: theme.palette.common.white,
   fontSize: '0.95rem',
-  fontWeight: 500,
+  fontWeight: 600,
   letterSpacing: '0.3px',
-  transition: 'all 0.2s ease',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   position: 'relative',
+  padding: theme.spacing(1, 2),
+  borderRadius: theme.shape.borderRadius,
+  
   '& .MuiButton-startIcon': {
-    color: active ? GOLD_ACCENT : WHITE,
+    background: GOLD_GRADIENT,
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
   },
-  '&::after': {
+  
+  '&::before': {
     content: '""',
     position: 'absolute',
     bottom: 0,
-    left: 0,
-    width: active ? '100%' : '0',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: active ? '80%' : '0%',
     height: '2px',
-    background: GOLD_ACCENT,
+    background: GOLD_GRADIENT,
     transition: 'width 0.3s ease',
   },
+  
   '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    '&::after': {
+    background: alpha(theme.palette.common.white, 0.05),
+    '&::before': {
       width: '100%',
     },
     '& .MuiButton-startIcon': {
-      color: GOLD_ACCENT,
+      animation: 'iconPulse 1.5s infinite',
     }
   },
+  
+  '@keyframes iconPulse': {
+    '0%': { transform: 'scale(1)' },
+    '50%': { transform: 'scale(1.1)' },
+    '100%': { transform: 'scale(1)' },
+  }
 }));
 
 const NavBar: React.FC = () => {
@@ -106,10 +127,17 @@ const NavBar: React.FC = () => {
       <Container maxWidth="xl">
         <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
           <LogoContainer onClick={() => router.push('/')}>
-            <RocketIcon sx={{ color: GOLD_ACCENT, fontSize: '2rem' }} />
+            <RocketIcon sx={{
+              fontSize: '2rem',
+              background: GOLD_GRADIENT,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }} />
             <Typography variant="h5" sx={{ 
-              fontWeight: 700,
-              color: WHITE,
+              fontWeight: 800,
+              background: GOLD_GRADIENT,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
               letterSpacing: '-0.5px'
             }}>
               GluStack
@@ -117,7 +145,7 @@ const NavBar: React.FC = () => {
           </LogoContainer>
 
           {!isMobile ? (
-            <Box display="flex" gap={2}>
+            <Box display="flex" gap={1}>
               {navItems.map(({ label, path, icon }) => (
                 <Link href={path} key={label} passHref legacyBehavior>
                   <StyledNavButton
@@ -133,7 +161,7 @@ const NavBar: React.FC = () => {
           ) : (
             <IconButton 
               onClick={() => setMobileOpen(true)}
-              sx={{ color: WHITE }}
+              sx={{ color: 'white' }}
             >
               <MenuIcon sx={{ fontSize: '2rem' }} />
             </IconButton>
@@ -147,9 +175,10 @@ const NavBar: React.FC = () => {
         onClose={() => setMobileOpen(false)}
         sx={{
           '& .MuiDrawer-paper': {
-            width: 280,
-            backgroundColor: NAVY_BLUE,
-            color: WHITE,
+            width: 300,
+            background: GLASS_BACKGROUND,
+            backdropFilter: BACKDROP_BLUR,
+            borderLeft: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
           },
         }}
       >
@@ -158,8 +187,17 @@ const NavBar: React.FC = () => {
             router.push('/');
             setMobileOpen(false);
           }}>
-            <RocketIcon sx={{ color: GOLD_ACCENT, fontSize: '1.8rem' }} />
-            <Typography variant="h6" sx={{ color: WHITE }}>
+            <RocketIcon sx={{
+              fontSize: '1.8rem',
+              background: GOLD_GRADIENT,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }} />
+            <Typography variant="h6" sx={{ 
+              background: GOLD_GRADIENT,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
               GluStack
             </Typography>
           </LogoContainer>
@@ -174,18 +212,30 @@ const NavBar: React.FC = () => {
                   component="a"
                   sx={{
                     py: 2,
-                    borderRadius: '4px',
-                    color: router.pathname === path ? GOLD_ACCENT : WHITE,
+                    borderRadius: '8px',
+                    transition: 'all 0.3s ease',
+                    background: router.pathname === path ? 
+                      alpha(theme.palette.common.white, 0.05) : 'transparent',
                     '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      background: alpha(theme.palette.common.white, 0.08),
+                      transform: 'translateX(5px)',
                     },
                   }}
                 >
                   <Box display="flex" alignItems="center" gap={2}>
                     {React.cloneElement(icon, { 
-                      sx: { color: router.pathname === path ? GOLD_ACCENT : WHITE } 
+                      sx: { 
+                        background: GOLD_GRADIENT,
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      } 
                     })}
-                    <Typography variant="body1">{label}</Typography>
+                    <Typography variant="body1" sx={{ 
+                      color: 'white',
+                      fontWeight: 600 
+                    }}>
+                      {label}
+                    </Typography>
                   </Box>
                 </ListItem>
               </Link>

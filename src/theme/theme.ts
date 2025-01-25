@@ -1,9 +1,8 @@
-// src/theme.ts
 import { createTheme, styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 
-// Type augmentation for custom palette properties
 declare module '@mui/material/styles' {
   interface Palette {
     gradients: {
@@ -22,85 +21,81 @@ declare module '@mui/material/styles' {
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#003366',    // Navy Blue
-      light: '#1a4d80',
-      dark: '#00234d',
-      contrastText: '#ffffff'
+      main: '#0A2342',
+      light: '#2D4A6E',
+      dark: '#06172B',
+      contrastText: '#F4FFFD'
     },
     secondary: {
-      main: '#b58900',    // Gold/Bronze
-      light: '#c9a116',
-      dark: '#9e7500',
-      contrastText: '#ffffff'
+      main: '#C5A46D',
+      light: '#D4B88E',
+      dark: '#B08C4A',
+      contrastText: '#0A2342'
     },
     background: {
-      default: '#f2f2f2', // Light Gray
-      paper: '#ffffff'     // White
+      default: '#FAFAFA',
+      paper: '#FFFFFF'    
     },
     text: {
-      primary: '#003366', // Navy Blue
-      secondary: '#5c5c5c', // Dark Gray
-      disabled: '#a0a0a0'
+      primary: '#0A2342',
+      secondary: '#4A5568', 
+      disabled: '#A0AEC0'
     },
     gradients: {
-      primary: 'linear-gradient(135deg, #003366 0%, #1a4d80 100%)',
-      secondary: 'linear-gradient(45deg, #b58900 0%, #c9a116 100%)'
+      primary: 'linear-gradient(135deg, #0A2342 0%, #2D4A6E 100%)',
+      secondary: 'linear-gradient(45deg, #C5A46D 0%, #D4B88E 100%)'
     }
   },
   typography: {
     fontFamily: 'Inter, system-ui, sans-serif',
     h1: {
-      fontSize: '2.5rem',
+      fontSize: '3rem',
       fontWeight: 700,
-      lineHeight: 1.2,
-      color: '#003366'
+      lineHeight: 1.15,
+      letterSpacing: '-0.02em',
     },
     h2: {
-      fontSize: '2rem',
+      fontSize: '2.25rem',
       fontWeight: 600,
-      color: '#003366'
+      lineHeight: 1.2,
+      letterSpacing: '-0.01em'
+    },
+    h3: {
+      fontSize: '1.75rem',
+      fontWeight: 600,
+      lineHeight: 1.3
     },
     body1: {
+      fontSize: '1.125rem',
+      lineHeight: 1.6
+    },
+    body2: {
       fontSize: '1rem',
-      lineHeight: 1.7,
-      color: '#5c5c5c'
+      lineHeight: 1.6
     }
   },
   shape: {
-    borderRadius: 8
+    borderRadius: 12
   },
   components: {
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          backgroundColor: '#003366',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-          color: '#ffffff'
-        }
-      }
-    },
     MuiButton: {
       styleOverrides: {
         root: {
           fontWeight: 600,
-          textTransform: 'none',
-          padding: '12px 28px',
-          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          letterSpacing: '0.02em',
+          padding: '14px 32px',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           '&.MuiButton-contained': {
-            background: 'linear-gradient(45deg, #b58900 0%, #c9a116 100%)',
-            color: '#ffffff',
-            boxShadow: '0 4px 6px rgba(181, 137, 0, 0.2)',
+            boxShadow: '0 4px 6px rgba(10, 35, 66, 0.15)',
             '&:hover': {
               transform: 'translateY(-2px)',
-              boxShadow: '0 6px 8px rgba(181, 137, 0, 0.3)'
+              boxShadow: '0 6px 8px rgba(10, 35, 66, 0.25)'
             }
           },
           '&.MuiButton-outlined': {
             borderWidth: '2px',
-            borderColor: '#b58900',
-            color: '#b58900',
             '&:hover': {
-              backgroundColor: 'rgba(181, 137, 0, 0.05)'
+              backgroundColor: 'rgba(197, 164, 109, 0.08)'
             }
           }
         }
@@ -109,28 +104,23 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundColor: '#ffffff',
-          border: '1px solid #e0e0e0',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #EDF2F7',
+          boxShadow: '0 4px 6px rgba(160, 174, 192, 0.1)',
           transition: 'all 0.3s ease',
           '&:hover': {
             transform: 'translateY(-4px)',
-            boxShadow: '0 8px 12px rgba(0, 0, 0, 0.1)'
+            boxShadow: '0 8px 12px rgba(160, 174, 192, 0.15)'
           }
         }
       }
     },
-    MuiTextField: {
+    MuiLink: {
       styleOverrides: {
         root: {
-          '& .MuiOutlinedInput-root': {
-            borderRadius: '8px',
-            '& fieldset': {
-              borderColor: '#e0e0e0'
-            },
-            '&:hover fieldset': {
-              borderColor: '#b58900'
-            }
+          fontWeight: 600,
+          textDecoration: 'none',
+          '&:hover': {
+            textDecoration: 'underline'
           }
         }
       }
@@ -138,57 +128,44 @@ const theme = createTheme({
   }
 });
 
-// Enhanced Components
 export const ProfessionalButton = styled(Button)(({ theme }) => ({
   fontSize: '1.1rem',
-  padding: theme.spacing(1.75, 4),
   borderRadius: theme.shape.borderRadius,
-  fontWeight: 600,
-  letterSpacing: '0.02em',
   '&.primary': {
     background: theme.palette.gradients.primary,
     color: theme.palette.common.white,
-    boxShadow: '0 4px 6px rgba(0, 51, 102, 0.2)',
     '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: '0 6px 8px rgba(0, 51, 102, 0.3)'
+      transform: 'translateY(-2px)'
     }
   },
   '&.secondary': {
     background: theme.palette.gradients.secondary,
-    color: theme.palette.common.white,
+    color: theme.palette.primary.main,
     '&:hover': {
       transform: 'scale(1.05)'
     }
   }
 }));
 
-export const PortfolioSection = styled('section')(({ theme }) => ({
-  backgroundColor: theme.palette.background.default,
-  padding: theme.spacing(6, 2),
-  '& h2': {
-    color: theme.palette.primary.main,
-    marginBottom: theme.spacing(4)
+export const ValuePropositionItem = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(2),
+  backgroundColor: 'rgba(255, 255, 255, 0.03)',
+  borderRadius: '8px',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)'
   }
 }));
 
-export const ProjectCard = styled(Paper)(({ theme }) => ({
+export const FeatureCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: theme.shape.borderRadius,
-  border: `1px solid ${theme.palette.divider}`,
-  transition: theme.transitions.create(['transform', 'box-shadow']),
+  border: '1px solid rgba(237, 242, 247, 0.8)',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)'
-  },
-  '& h3': {
-    color: theme.palette.primary.main,
-    marginBottom: theme.spacing(2)
-  },
-  '& .technologies': {
-    color: theme.palette.secondary.main,
-    fontWeight: 500
+    borderColor: theme.palette.secondary.light,
+    transform: 'translateY(-4px)'
   }
 }));
 

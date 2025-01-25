@@ -8,7 +8,9 @@ import { ThemeProvider, CssBaseline, createTheme, responsiveFontSizes } from '@m
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ErrorBoundary from '../components/ErrorBoundary';
-import theme from '../theme/theme';
+import theme, { ProfessionalButton, ValuePropositionItem, FeatureCard } from  '../theme/theme';
+
+
 import dynamic from 'next/dynamic';
 import { LazyMotion, domAnimation } from 'framer-motion';
 

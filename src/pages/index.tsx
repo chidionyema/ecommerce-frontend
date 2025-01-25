@@ -1,78 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Box, Container, Typography, Button, Grid, Paper, useTheme, useMediaQuery, 
-  IconButton, styled 
+  Box, Container, Typography, Grid, useTheme, useMediaQuery, 
+  IconButton 
 } from '@mui/material';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import { motion, useInView } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { 
-  FaPython, FaReact, FaNodeJs, FaAws, FaDocker, FaJava, FaMicrosoft, FaBrain, FaLinux 
+  FaPython, FaReact, FaNodeJs, FaAws, FaDocker, FaJava, 
+  FaMicrosoft, FaBrain, FaLinux 
 } from 'react-icons/fa';
 import { SiRust, SiGoland } from 'react-icons/si';
 import Head from 'next/head';
+import { ProfessionalButton, FeatureCard, ValuePropositionItem } from '../theme/theme'; 
 
-// Mobile-first styled components
-const StyledButton = styled(Button)(({ theme }) => ({
-  fontSize: '1rem',
-  padding: theme.spacing(1.5, 3),
-  borderRadius: '28px',
-  background: 'linear-gradient(45deg, #1a237e 0%, #0d47a1 100%)',
-  color: theme.palette.common.white,
-  textTransform: 'uppercase',
-  fontWeight: 700,
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-  transition: 'transform 0.2s, box-shadow 0.2s',
-  '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.3)',
-  },
-  [theme.breakpoints.down('sm')]: {
-    fontSize: '0.9rem',
-    padding: theme.spacing(1, 2.5),
-  },
-}));
 
-const FeatureCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  textAlign: 'center',
-  borderRadius: '12px',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-  transition: 'transform 0.2s, box-shadow 0.2s',
-  height: '100%',
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.12)',
-  },
-  [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(2),
-    transform: 'translateZ(0)', // Hardware acceleration
-  },
-}));
-
-const HeroSection = styled(Box)(({ theme }) => ({
-  minHeight: '60vh',
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(4, 2),
-  background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)',
-  color: theme.palette.common.white,
-  [theme.breakpoints.down('sm')]: {
-    minHeight: '70vh',
-    padding: theme.spacing(3, 1.5),
-  },
-}));
-
-const SectionContainer = styled(Box)(({ theme }) => ({
-  backgroundColor: '#f8f9fc',
-  padding: theme.spacing(8, 2),
-  [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(6, 1.5),
-  },
-}));
-
-// Optimized tech icons configuration
 const techIcons = [
   { title: 'Python', icon: <FaPython size={48} />, color: '#3776AB' },
   { title: 'React Native', icon: <FaReact size={48} />, color: '#61DAFB' },
@@ -110,7 +54,6 @@ const HomePage = () => {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const router = useRouter();
 
-  // Optimized scroll handler
   useEffect(() => {
     const handleScroll = () => setShowScrollToTop(window.scrollY > 100);
     const throttledScroll = throttle(handleScroll, 50);
@@ -118,7 +61,6 @@ const HomePage = () => {
     return () => window.removeEventListener('scroll', throttledScroll);
   }, []);
 
-  // Efficient throttle function
   const throttle = (fn: Function, wait: number) => {
     let lastCall = 0;
     return (...args: any[]) => {
@@ -133,162 +75,223 @@ const HomePage = () => {
   return (
     <Box component="main">
       <Head>
-        <title>Expert Technology Solutions</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <title>Elite Technical Solutions</title>
+        <meta name="description" content="Enterprise-grade technology consultancy with precision engineering" />
       </Head>
 
-      <HeroSection component="section">
+      {/* Hero Section */}
+      <Box component="section" sx={{
+        minHeight: '80vh',
+        display: 'flex',
+        alignItems: 'center',
+        background: theme.palette.gradients.primary,
+        color: 'white',
+        py: 10
+      }}>
         <Container maxWidth="md">
-          <Box sx={{ py: 4 }}>
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <Typography
-                variant="h1"
-                component="h1"
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <Typography variant="h1" component="h1" sx={{
+              maxWidth: '800px',
+              mx: 'auto',
+              mb: 4,
+              textAlign: 'center',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}>
+              Precision Engineering for Digital Excellence
+            </Typography>
+            
+            <Typography variant="body1" sx={{
+              maxWidth: '680px',
+              mx: 'auto',
+              fontSize: '1.25rem',
+              mb: 6,
+              px: 2,
+              textAlign: 'center',
+              opacity: 0.95
+            }}>
+              Strategic technology solutions blending enterprise robustness with agile innovation
+            </Typography>
+
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 3, 
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}>
+              <ProfessionalButton
+                variant="contained"
+                className="primary"
+                endIcon={<ArrowRightAlt />}
+                onClick={() => router.push('/contact')}
+              >
+                Start Enterprise Project
+              </ProfessionalButton>
+              
+              <ProfessionalButton
+                variant="outlined"
                 sx={{
-                  fontWeight: 700,
-                  fontSize: isMobile ? '2rem' : '3rem',
-                  mb: 3,
-                  textAlign: 'center',
-                  lineHeight: 1.2,
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                  color: 'white',
+                  '&:hover': {
+                    borderColor: 'white'
+                  }
                 }}
               >
-                Accelerate Digital Transformation
-              </Typography>
-            </motion.div>
+                View Case Studies
+              </ProfessionalButton>
+            </Box>
+          </motion.div>
+        </Container>
+      </Box>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <Typography
-                variant="h5"
-                component="p"
-                sx={{
-                  fontSize: isMobile ? '1.1rem' : '1.3rem',
-                  textAlign: 'center',
-                  mb: 4,
-                  px: 2,
-                }}
-              >
-                Enterprise solutions with startup agility
-              </Typography>
-            </motion.div>
+      {/* Core Technologies Section */}
+      <Box component="section" sx={{ py: 10, backgroundColor: theme.palette.background.default }}>
+        <Container maxWidth="xl">
+          <Box sx={{ 
+            maxWidth: '1200px', 
+            mx: 'auto', 
+            px: isMobile ? 2 : 4 
+          }}>
+            <Typography variant="h2" component="h2" sx={{
+              textAlign: 'center',
+              mb: 8,
+              position: 'relative',
+              '&:after': {
+                content: '""',
+                display: 'block',
+                width: '60px',
+                height: '3px',
+                backgroundColor: theme.palette.secondary.main,
+                mx: 'auto',
+                mt: 3
+              }
+            }}>
+              Core Technical Expertise
+            </Typography>
 
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.4 }}
-            >
-              <Box sx={{ textAlign: 'center' }}>
-                <StyledButton
-                  endIcon={<ArrowRightAlt />}
-                  onClick={() => router.push('/contact')}
-                  aria-label="Start Project"
-                >
-                  Start Your Project
-                </StyledButton>
-              </Box>
-            </motion.div>
+            <Grid container spacing={isMobile ? 3 : 6}>
+              {techIcons.map((tech, index) => {
+                const ref = React.useRef<HTMLDivElement>(null);
+                const isInView = useInView(ref, {
+                  once: true,
+                  margin: isMobile ? '0px 0px -30% 0px' : '0px 0px -150px 0px',
+                  amount: isMobile ? 0.01 : 0.1
+                });
+
+                return (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                    <div ref={ref}>
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={isInView ? { opacity: 1, y: 0 } : {}}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <FeatureCard elevation={0}>
+                          <Box sx={{
+                            height: 80,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            mb: 3,
+                            color: tech.color
+                          }}>
+                            {tech.icon}
+                          </Box>
+                          <Typography variant="h6" sx={{
+                            fontWeight: 700,
+                            mb: 2,
+                            color: theme.palette.primary.main
+                          }}>
+                            {tech.title}
+                          </Typography>
+                          <Typography variant="body2" sx={{
+                            color: theme.palette.text.secondary,
+                            lineHeight: 1.6
+                          }}>
+                            {tech.description}
+                          </Typography>
+                        </FeatureCard>
+                      </motion.div>
+                    </div>
+                  </Grid>
+                );
+              })}
+            </Grid>
           </Box>
         </Container>
-      </HeroSection>
+      </Box>
 
-      <SectionContainer component="section">
-        <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            component="h2"
-            sx={{
-              mb: 6,
-              fontWeight: 700,
-              textAlign: 'center',
-              fontSize: isMobile ? '1.75rem' : '2.25rem',
-            }}
-          >
-            Core Technologies
-          </Typography>
-          <Grid container spacing={isMobile ? 2 : 4} justifyContent="center">
-            {techIcons.map((tech, index) => {
-              const ref = React.useRef<HTMLDivElement>(null);
-              const isInView = useInView(ref, {
-                once: true,
-                margin: isMobile ? '0px 0px -30% 0px' : '0px 0px -150px 0px',
-                amount: isMobile ? 0.01 : 0.1
-              });
-
-              return (
-                <Grid item xs={6} sm={4} md={3} key={index}>
-                  <div ref={ref} style={{ 
-                    height: '100%', 
-                    padding: isMobile ? 8 : 12,
-                    transform: 'translateZ(0)' // GPU acceleration
-                  }}>
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={isInView ? {
-                        opacity: 1,
-                        y: 0,
-                        transition: {
-                          type: "spring",
-                          stiffness: isMobile ? 150 : 120,
-                          damping: 15,
-                          delay: isMobile ? 0 : index * 0.02
-                        }
-                      } : {}}
-                      style={{ height: '100%' }}
-                    >
-                      <FeatureCard>
-                        <Box sx={{ 
-                          mb: 1.5,
-                          color: tech.color,
-                          fontSize: '3rem',
-                          lineHeight: 1,
-                        }}>
-                          {tech.icon}
-                        </Box>
-                        <Typography variant="subtitle1" sx={{ 
-                          fontWeight: 700,
-                          mb: 1,
-                          minHeight: isMobile ? '2.5em' : '3em',
-                        }}>
-                          {tech.title}
-                        </Typography>
-                        <Typography variant="body2" sx={{ 
-                          color: '#666',
-                          minHeight: isMobile ? '4em' : '5em',
-                        }}>
-                          {tech.description}
-                        </Typography>
-                      </FeatureCard>
-                    </motion.div>
-                  </div>
-                </Grid>
-              );
-            })}
+      {/* Value Proposition Section */}
+      <Box component="section" sx={{ 
+        py: 10,
+        backgroundColor: theme.palette.primary.main,
+        color: 'white'
+      }}>
+        <Container maxWidth="md">
+          <Grid container spacing={6} alignItems="center">
+            <Grid item xs={12} md={6}>
+              <Typography variant="h3" sx={{
+                mb: 3,
+                fontWeight: 600,
+                lineHeight: 1.2
+              }}>
+                Why Partner With Us
+              </Typography>
+              <Typography sx={{
+                opacity: 0.9,
+                lineHeight: 1.7
+              }}>
+                Our methodology combines rigorous enterprise standards with cutting-edge innovation practices.
+              </Typography>
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <Box sx={{
+                p: 4,
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: theme.shape.borderRadius
+              }}>
+                {[
+                  'Enterprise Security First',
+                  'Full-Cycle Development',
+                  '24/7 Production Support',
+                  'Compliance Guarantee'
+                ].map((item, idx) => (
+                  <ValuePropositionItem key={idx} sx={{ mb: 3 }}>
+                    <CheckCircleOutline sx={{ 
+                      mr: 2, 
+                      color: theme.palette.secondary.main 
+                    }}/>
+                    <Typography>{item}</Typography>
+                  </ValuePropositionItem>
+                ))}
+              </Box>
+            </Grid>
           </Grid>
         </Container>
-      </SectionContainer>
+      </Box>
 
+      {/* Scroll to Top */}
       {showScrollToTop && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
           <IconButton
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             sx={{
               position: 'fixed',
-              bottom: 24,
-              right: 24,
-              bgcolor: 'primary.main',
-              color: 'white',
-              '&:hover': { bgcolor: 'primary.dark' },
+              bottom: 40,
+              right: 40,
+              backgroundColor: theme.palette.secondary.main,
+              color: theme.palette.primary.main,
+              '&:hover': {
+                backgroundColor: theme.palette.secondary.dark
+              }
             }}
           >
             <KeyboardArrowUpIcon />
