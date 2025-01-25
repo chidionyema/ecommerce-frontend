@@ -102,7 +102,7 @@ const Solutions: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [navigatingId, setNavigatingId] = useState<string | null>(null);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const primaryGradient = theme.palette.gradients.primary;
+  const primaryGradient = theme.palette.gradients?.primary || 'linear-gradient(135deg, #1976d2 0%, #2196f3 100%)';
 
   const debouncedQuery = useDebounce(searchQuery, 300);
   const filteredProjects = useMemo(() => 
@@ -283,8 +283,8 @@ const ProjectCard = React.memo<ProjectCardProps>(({ project, theme, navigatingId
               label={tech}
               size="small"
               sx={styles.techChip(theme)}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
             />
           ))}
         </Box>
@@ -320,18 +320,18 @@ const styles = {
   } as SxProps<Theme>,
 
   animatedBackground: (y: any) => ({
-    position: 'fixed',
+    position: 'fixed' as const,
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     zIndex: 0,
-    pointerEvents: 'none',
+    pointerEvents: 'none' as const,
     y
   }),
 
   gradientBlob: (index: number, theme: Theme) => ({
-    position: 'absolute',
+    position: 'absolute' as const,
     background: `linear-gradient(45deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
     borderRadius: '50%',
     filter: 'blur(80px)',
@@ -343,10 +343,10 @@ const styles = {
   }),
 
   cursor: (cursor: any, theme: Theme) => ({
-    position: 'fixed',
-    pointerEvents: 'none',
+    position: 'fixed' as const,
+    pointerEvents: 'none' as const,
     zIndex: 9999,
-    mixBlendMode: 'difference',
+    mixBlendMode: 'difference' as const,
     borderRadius: '50%',
     background: theme.palette.common.white,
     width: cursor.variant === 'hover' ? 48 : 24,
@@ -371,7 +371,7 @@ const styles = {
     width: '100%',
     maxWidth: 800,
     margin: '0 auto',
-    textAlign: 'center'
+    textAlign: 'center' as const
   },
 
   searchField: {
@@ -400,29 +400,29 @@ const styles = {
 
   projectsContainer: {
     py: 8,
-    position: 'relative',
+    position: 'relative' as const,
     zIndex: 1
   },
 
   cardContainer: {
     height: '100%',
     borderRadius: '24px',
-    overflow: 'hidden',
+    overflow: 'hidden' as const,
     boxShadow: '0 16px 40px rgba(0, 0, 0, 0.1)',
-    position: 'relative',
+    position: 'relative' as const,
     transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     willChange: 'transform'
   },
 
   cardHeader: {
-    position: 'relative',
+    position: 'relative' as const,
     height: 200,
-    overflow: 'hidden',
+    overflow: 'hidden' as const,
     p: 3
   },
 
   cardBackground: (theme: Theme) => ({
-    position: 'absolute',
+    position: 'absolute' as const,
     top: 0,
     left: 0,
     right: 0,
@@ -432,7 +432,7 @@ const styles = {
   }),
 
   glassOverlay: {
-    position: 'absolute',
+    position: 'absolute' as const,
     top: 0,
     left: 0,
     right: 0,
@@ -443,7 +443,7 @@ const styles = {
   },
 
   cardContent: {
-    position: 'relative',
+    position: 'relative' as const,
     zIndex: 2,
     height: '100%',
     display: 'flex',
@@ -476,7 +476,7 @@ const styles = {
 
   clientName: {
     color: 'common.white',
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
   },
 
@@ -507,7 +507,7 @@ const styles = {
 
   chipContainer: {
     display: 'flex',
-    flexWrap: 'wrap',
+    flexWrap: 'wrap' as const,
     gap: 1,
     mb: 3
   },
@@ -568,15 +568,15 @@ const styles = {
 
   loadingContainer: {
     py: 6,
-    textAlign: 'center'
+    textAlign: 'center' as const
   },
 
   spinner: (theme: Theme) => ({
     color: theme.palette.primary.main,
-    position: 'relative',
+    position: 'relative' as const,
     '&:after': {
       content: '""',
-      position: 'absolute',
+      position: 'absolute' as const,
       top: -8,
       left: -8,
       right: -8,
