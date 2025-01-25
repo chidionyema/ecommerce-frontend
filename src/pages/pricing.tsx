@@ -14,6 +14,11 @@ import { Info, Award, Clock, Users, Calendar, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { motion, useScroll, useTransform, LazyMotion, domAnimation } from 'framer-motion';
 
+interface FeatureItemProps {
+  icon: React.ElementType;
+  text: string;
+}
+
 const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
   position: 'relative',
   backdropFilter: 'blur(24px)',
@@ -58,13 +63,13 @@ const UltraPricingPage = () => {
   const router = useRouter();
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '40%']);
-  const primaryGradient = theme.palette.gradients.primary;
+  const primaryGradient = theme.palette.gradients?.primary || 'linear-gradient(135deg, #1976d2 0%, #2196f3 100%)';
   const handlePlanSelection = useCallback((planType: string) => {
     router.push(`/contact?plan=${encodeURIComponent(planType)}`);
   }, [router]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    const cards = document.querySelectorAll('.luxury-card');
+    const cards = document.querySelectorAll<HTMLElement>('.luxury-card');
     const { left, top } = e.currentTarget.getBoundingClientRect();
     
     cards.forEach(card => {
@@ -123,22 +128,21 @@ const UltraPricingPage = () => {
               borderRadius: '2px'
             }
           }}>
-        <Typography 
-                  variant="h1" 
-                  sx={{ 
-                    fontWeight: 900,
-                    letterSpacing: '-0.03em',
-                    mb: 2,
-                    fontSize: isMobile ? '2.5rem' : '3.5rem',
-                    background: primaryGradient,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
-                  }}
-                >
-                Technology Engagement
-                </Typography>
-
+            <Typography 
+              variant="h1" 
+              sx={{ 
+                fontWeight: 900,
+                letterSpacing: '-0.03em',
+                mb: 2,
+                fontSize: isMobile ? '2.5rem' : '3.5rem',
+                background: primaryGradient,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
+              }}
+            >
+              Technology Engagement
+            </Typography>
 
             <Typography
               variant="subtitle1"
@@ -230,8 +234,8 @@ const UltraPricingPage = () => {
                 </Box>
 
                 <Box component="ul" sx={featureListStyle}>
-                  {getFeatures(planType, theme).map((FeatureComponent, idx) => (
-                    <FeatureComponent key={idx} theme={theme} />
+                  {getFeatures(planType).map((FeatureComponent, idx) => (
+                    <FeatureComponent key={idx} />
                   ))}
                 </Box>
 
@@ -286,16 +290,19 @@ const UltraPricingPage = () => {
   );
 };
 
-const FeatureItem = memo(({ icon: Icon, text, theme }: any) => (
-  <Box component="li" sx={listItemStyle}>
-    <Icon size={24} style={{ color: theme.palette.primary.main, marginRight: 16 }} />
-    <Typography variant="body2" sx={featureTextStyle}>
-      {text}
-    </Typography>
-  </Box>
-));
+const FeatureItem = memo<FeatureItemProps>(({ icon: Icon, text }) => {
+  const theme = useTheme();
+  return (
+    <Box component="li" sx={listItemStyle}>
+      <Icon size={24} style={{ color: theme.palette.primary.main, marginRight: 16 }} />
+      <Typography variant="body2" sx={featureTextStyle}>
+        {text}
+      </Typography>
+    </Box>
+  );
+});
 
-// Style constants remain the same as original
+// Style constants
 const iconStyle = (theme: any) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
   WebkitBackgroundClip: 'text',
@@ -448,7 +455,7 @@ const finalArrowStyle = {
   transition: 'transform 0.3s ease'
 };
 
-const getFeatures = (planType: string, theme: any) => {
+const getFeatures = (planType: string) => {
   const features = {
     hourly: [
       { icon: Clock, text: 'On-demand senior architects' },
@@ -468,7 +475,7 @@ const getFeatures = (planType: string, theme: any) => {
   };
 
   return features[planType as keyof typeof features].map(({ icon, text }) => (
-    () => <FeatureItem icon={icon} text={text} theme={theme} />
+    () => <FeatureItem key={text} icon={icon} text={text} />
   ));
 };
 

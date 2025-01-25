@@ -30,7 +30,7 @@ import { cvProjects, type CVProject } from '../data/cvProjects';
 
 const Tilt = dynamic(() => import('react-parallax-tilt'), { 
   ssr: false,
-  loading: () => <div style={{ height: '100%', width: '100%' }} />
+  loading: () => <div className="tilt-placeholder" />
 });
 
 const PAGE_SIZE = 9;
@@ -162,23 +162,21 @@ const Solutions: React.FC = () => {
       <AppBar position="sticky" sx={styles.appBar(theme)}>
         <Toolbar sx={styles.toolbar}>
           <Box sx={styles.headerContainer}>
-       
-
-              <Typography 
-                          variant="h1" 
-                          sx={{ 
-                            fontWeight: 900,
-                            letterSpacing: '-0.03em',
-                            mb: 2,
-                            fontSize: isMobile ? '2.5rem' : '3.5rem',
-                            background: primaryGradient,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
-                          }}
-                        >
-                       Technical Portfolio
-                        </Typography>
+            <Typography 
+              variant="h1" 
+              sx={{ 
+                fontWeight: 900,
+                letterSpacing: '-0.03em',
+                mb: 2,
+                fontSize: isMobile ? '2.5rem' : '3.5rem',
+                background: primaryGradient,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
+              }}
+            >
+              Technical Portfolio
+            </Typography>
             <TextField
               variant="filled"
               placeholder="Search case studies..."
@@ -239,23 +237,21 @@ const ProjectCard = React.memo<ProjectCardProps>(({ project, theme, navigatingId
     tiltMaxAngleX={5}
     tiltMaxAngleY={5}
     glareEnable={true}
-    glareMaxOpacity={0.1}
+    glareMaxOpacity={0.2}
+    glareBorderRadius="24px"
     transitionSpeed={2000}
     scale={1.03}
+    tiltEnable={!navigatingId}
   >
     <motion.div
-      whileHover={{ y: -8 }}
-      style={{
-        height: '100%',
-        borderRadius: '24px',
-        overflow: 'hidden',
-        boxShadow: theme.shadows[4],
-        position: 'relative'
-      }}
+      initial={{ scale: 1 }}
+      whileHover={{ scale: 1.02, y: -8 }}
+      style={styles.cardContainer}
       onMouseEnter={() => onHover(project.id)}
     >
       <Box sx={styles.cardHeader}>
         <Box sx={styles.cardBackground(theme)} />
+        <Box sx={styles.glassOverlay} />
         <Box sx={styles.cardContent}>
           <Box sx={styles.clientInfo}>
             <Avatar sx={styles.avatar(theme)}>
@@ -287,6 +283,8 @@ const ProjectCard = React.memo<ProjectCardProps>(({ project, theme, navigatingId
               label={tech}
               size="small"
               sx={styles.techChip(theme)}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             />
           ))}
         </Box>
@@ -361,10 +359,10 @@ const styles = {
   }),
 
   appBar: (theme: Theme) => ({
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-    backdropFilter: 'blur(12px)',
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    boxShadow: theme.shadows[4]
+    backgroundColor: alpha(theme.palette.background.paper, 0.8),
+    backdropFilter: 'blur(24px)',
+    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1)'
   }),
 
   toolbar: { py: 4 },
@@ -376,22 +374,16 @@ const styles = {
     textAlign: 'center'
   },
 
-  headerText: (theme: Theme) => ({
-    fontWeight: 800,
-    fontSize: { xs: '2.5rem', md: '3.5rem' },
-    lineHeight: 1.2,
-    mb: 2,
-    background: `linear-gradient(45deg, ${theme.palette.text.primary} 30%, ${theme.palette.primary.main} 100%)`,
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent'
-  }),
-
   searchField: {
     width: '100%',
     '& .MuiFilledInput-root': {
-      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      backgroundColor: alpha('#fff', 0.1),
       borderRadius: '16px',
-      '&:before, &:after': { display: 'none' }
+      '&:before, &:after': { display: 'none' },
+      transition: 'all 0.3s ease',
+      '&:hover': {
+        backgroundColor: alpha('#fff', 0.15)
+      }
     }
   },
 
@@ -412,6 +404,16 @@ const styles = {
     zIndex: 1
   },
 
+  cardContainer: {
+    height: '100%',
+    borderRadius: '24px',
+    overflow: 'hidden',
+    boxShadow: '0 16px 40px rgba(0, 0, 0, 0.1)',
+    position: 'relative',
+    transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    willChange: 'transform'
+  },
+
   cardHeader: {
     position: 'relative',
     height: 200,
@@ -426,8 +428,19 @@ const styles = {
     right: 0,
     bottom: 0,
     background: `linear-gradient(45deg, ${theme.palette.primary.dark} 0%, ${theme.palette.secondary.dark} 100%)`,
-    opacity: 0.8
+    opacity: 0.9
   }),
+
+  glassOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)',
+    backdropFilter: 'blur(8px)',
+    zIndex: 1
+  },
 
   cardContent: {
     position: 'relative',
@@ -449,7 +462,11 @@ const styles = {
     width: 56,
     height: 56,
     background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-    boxShadow: theme.shadows[4]
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
+    transition: 'transform 0.3s ease',
+    '&:hover': {
+      transform: 'scale(1.1)'
+    }
   }),
 
   icon: {
@@ -459,7 +476,8 @@ const styles = {
 
   clientName: {
     color: 'common.white',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
   },
 
   timeline: {
@@ -470,13 +488,14 @@ const styles = {
     color: 'common.white',
     fontWeight: 800,
     lineHeight: 1.3,
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+    textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
   },
 
   cardBody: (theme: Theme) => ({
     p: 3,
-    backgroundColor: 'background.paper',
-    borderTop: `1px solid ${theme.palette.divider}`
+    backgroundColor: alpha(theme.palette.background.paper, 0.95),
+    borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+    backdropFilter: 'blur(12px)'
   }),
 
   description: {
@@ -494,10 +513,16 @@ const styles = {
   },
 
   techChip: (theme: Theme) => ({
-    background: `linear-gradient(45deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
-    color: 'common.white',
+    background: alpha(theme.palette.primary.main, 0.1),
+    color: theme.palette.primary.main,
     fontWeight: 600,
-    borderRadius: '8px'
+    borderRadius: '8px',
+    border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      background: alpha(theme.palette.primary.main, 0.2),
+      transform: 'translateY(-2px)'
+    }
   }),
 
   cardFooter: {
@@ -528,7 +553,7 @@ const styles = {
     transition: 'transform 0.3s, box-shadow 0.3s',
     '&:hover': {
       transform: 'translateY(-2px)',
-      boxShadow: theme.shadows[6]
+      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
     }
   }),
 
