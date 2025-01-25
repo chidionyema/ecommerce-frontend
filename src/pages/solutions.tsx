@@ -51,26 +51,68 @@ const Cursor = styled(Box)(({ theme }) => ({
 }));
 
 const GradientButton = styled(Button)(({ theme }) => ({
-  background: theme.palette.gradients.secondary,
+  background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
   color: theme.palette.common.white,
-  borderRadius: '50px',
+  borderRadius: '16px',
   padding: theme.spacing(1.5, 4),
   fontWeight: 700,
-  textTransform: 'uppercase',
-  transition: 'transform 0.2s, box-shadow 0.2s',
+  position: 'relative',
+  overflow: 'hidden',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: '-100%', // Fixed: Added quotes around the percentage value
+    width: '200%',
+    height: '100%',
+    background: `linear-gradient(
+      120deg,
+      transparent,
+      rgba(255,255,255,0.3),
+      transparent
+    )`,
+    transition: '0.4s',
+  },
   '&:hover': {
-    background: theme.palette.secondary.dark,
     transform: 'translateY(-2px)',
-    boxShadow: theme.shadows[4],
+    boxShadow: theme.shadows[6],
+    '&:before': {
+      left: '100%',
+    },
   },
   '&.Mui-disabled': {
     background: theme.palette.action.disabledBackground,
-    color: theme.palette.text.disabled,
+  },
+}));
+
+const PremiumCard = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  borderRadius: '24px',
+  overflow: 'hidden',
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: '24px',
+    padding: '2px',
+    background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    WebkitMaskComposite: 'xor',
+    maskComposite: 'exclude',
+    opacity: 0,
+    transition: 'opacity 0.3s ease-in-out',
+  },
+  '&:hover:before': {
+    opacity: 0.3,
   },
 }));
 
 const Solutions: React.FC = () => {
-  // State management
   const [displayedProjects, setDisplayedProjects] = useState<CVProject[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -81,7 +123,6 @@ const Solutions: React.FC = () => {
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
   const [cursorVariant, setCursorVariant] = useState('default');
 
-  // Refs and hooks
   const loaderRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -89,14 +130,12 @@ const Solutions: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const shouldReduceMotion = useReducedMotion();
 
-  // Scroll effects
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
-  // Cursor effects
   useEffect(() => {
     const moveCursor = (e: MouseEvent) => {
       setCursorPos({ x: e.clientX, y: e.clientY });
@@ -118,7 +157,6 @@ const Solutions: React.FC = () => {
     };
   }, []);
 
-  // Search and filtering
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const filteredProjects = useMemo(() => {
     return cvProjects.filter(project => 
@@ -128,14 +166,12 @@ const Solutions: React.FC = () => {
     );
   }, [debouncedSearchQuery]);
 
-  // Pagination controls
   useEffect(() => {
     setPage(1);
     setDisplayedProjects([]);
     setHasMore(true);
   }, [filteredProjects]);
 
-  // Project loading
   useEffect(() => {
     let isCurrent = true;
 
@@ -162,7 +198,6 @@ const Solutions: React.FC = () => {
     };
   }, [page, filteredProjects, isLoading]);
 
-  // Infinite scroll observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
@@ -181,7 +216,6 @@ const Solutions: React.FC = () => {
     };
   }, [hasMore, isLoading]);
 
-  // Event handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -198,25 +232,13 @@ const Solutions: React.FC = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }} ref={containerRef}>
-      <style>{`
-        @keyframes ripple {
-          0% { opacity: 1; transform: scale(0.8); }
-          100% { opacity: 0; transform: scale(1.8); }
-        }
-      `}</style>
-
-      <Cursor
-        sx={{
-          width: cursorVariant === 'hover' ? 48 : 24,
-          height: cursorVariant === 'hover' ? 48 : 24,
-          opacity: cursorVariant === 'hover' ? 0.8 : 0.5,
-          left: cursorPos.x,
-          top: cursorPos.y,
-          transform: `translate(-50%, -50%) scale(${cursorVariant === 'hover' ? 1.5 : 1})`
-        }}
-      />
-
+    <Box sx={{ 
+      backgroundColor: 'background.default', 
+      minHeight: '100vh',
+      position: 'relative',
+      overflow: 'hidden',
+    }} ref={containerRef}>
+      
       <motion.div
         style={{
           y,
@@ -229,99 +251,93 @@ const Solutions: React.FC = () => {
           pointerEvents: 'none'
         }}
       >
-        {[...Array(5)].map((_, i) => (
+        {[...Array(7)].map((_, i) => (
           <motion.div
             key={i}
             style={{
               position: 'absolute',
               background: `linear-gradient(45deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
               borderRadius: '50%',
-              filter: 'blur(40px)',
-              opacity: 0.1,
-              width: 200 + i * 100,
-              height: 200 + i * 100,
-              top: i * 20 + '%',
-              left: i * 15 + '%'
+              filter: 'blur(80px)',
+              opacity: 0.08,
+              width: 300 + i * 150,
+              height: 300 + i * 150,
+              top: i * 15 + '%',
+              left: i * 10 + '%'
             }}
             animate={{
               x: [0, 100, 0],
               y: [0, 50, 0],
-              scale: [1, 1.2, 1]
+              rotate: [0, 360],
             }}
             transition={{
-              duration: 10 + i * 2,
+              duration: 20 + i * 5,
               repeat: Infinity,
-              ease: 'easeInOut'
+              ease: 'linear'
             }}
           />
         ))}
       </motion.div>
 
       <AppBar position="sticky" sx={{ 
-        backgroundColor: 'background.paper',
+        backgroundColor: 'rgba(255,255,255,0.01)',
+        backdropFilter: 'blur(12px)',
         borderBottom: `1px solid ${theme.palette.divider}`,
-        backdropFilter: 'blur(8px)',
-        boxShadow: theme.shadows[1],
+        boxShadow: theme.shadows[2],
       }}>
-        <Toolbar sx={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          py: 4,
-          gap: 3
-        }}>
+        <Toolbar sx={{ py: 4 }}>
           <Box sx={{ 
-            textAlign: 'center',
-            mb: 2
+            width: '100%',
+            maxWidth: 800,
+            margin: '0 auto',
+            textAlign: 'center'
           }}>
-            <Typography variant="h2" sx={{
-              fontWeight: 700,
-              color: 'text.primary',
-              fontSize: { xs: '2rem', md: '2.75rem' },
-              mb: 1
+            <Typography variant="h1" sx={{
+              fontWeight: 800,
+              fontSize: { xs: '2.5rem', md: '3.5rem' },
+              lineHeight: 1.2,
+              mb: 2,
+              background: `linear-gradient(45deg, ${theme.palette.text.primary} 30%, ${theme.palette.primary.main} 100%)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
             }}>
-              Portfolio
+              Technical Portfolio
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
-              Explore our technical implementations
-            </Typography>
+            <TextField
+              variant="filled"
+              placeholder="Search case studies..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              sx={{ 
+                width: '100%',
+                '& .MuiFilledInput-root': {
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  borderRadius: '16px',
+                  '&:before, &:after': { display: 'none' },
+                  '& input': {
+                    py: 2,
+                    fontSize: '1.1rem',
+                    color: 'text.primary',
+                  }
+                }
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchOutlinedIcon sx={{ 
+                      color: 'text.secondary',
+                      fontSize: '1.5rem' 
+                    }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
           </Box>
-
-          <TextField
-            variant="outlined"
-            placeholder="Search case studies..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            size="medium"
-            sx={{ 
-              width: '100%', 
-              maxWidth: 600,
-              backgroundColor: 'background.default',
-              borderRadius: '8px',
-              '& .MuiOutlinedInput-root': {
-                color: 'text.primary',
-                fontSize: '1rem',
-                padding: theme.spacing(1.25, 2),
-                '& fieldset': { borderColor: theme.palette.divider },
-                '&:hover fieldset': { borderColor: theme.palette.primary.main },
-                '&.Mui-focused': {
-                  boxShadow: `${theme.palette.primary.main} 0 0 0 2px`,
-                },
-              }
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchOutlinedIcon fontSize="medium" />
-                </InputAdornment>
-              ),
-              'aria-label': 'Search projects',
-            }}
-          />
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="xl" sx={{ py: 6, position: 'relative', zIndex: 1 }}>
-        <Grid container spacing={4} component="main">
+      <Container maxWidth="xl" sx={{ py: 8, position: 'relative', zIndex: 1 }}>
+        <Grid container spacing={4}>
           {displayedProjects.map((project) => (
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3} key={project.id}>
               <Tilt
@@ -329,126 +345,129 @@ const Solutions: React.FC = () => {
                 tiltMaxAngleX={5}
                 tiltMaxAngleY={5}
                 glareEnable={true}
-                glareMaxOpacity={0.1}
+                glareMaxOpacity={0.2}
                 glareColor={theme.palette.common.white}
                 glarePosition="all"
                 glareBorderRadius="24px"
-                transitionSpeed={1500}
-                scale={1.02}
+                transitionSpeed={2000}
+                scale={1.05}
               >
-                <MotionBox 
-                  whileHover={!shouldReduceMotion ? { translateY: -8 } : undefined}
-                  whileTap={{ scale: 0.98 }}
-                  style={{ height: '100%' }}
-                  initial={!shouldReduceMotion ? { opacity: 0, y: 20 } : undefined}
-                  animate={!shouldReduceMotion ? { opacity: 1, y: 0 } : undefined}
-                  transition={{ 
-                    duration: 0.3,
-                    ease: [0.4, 0, 0.2, 1]
-                  }}
-                >
-                  <Box 
+                <PremiumCard>
+                  <MotionBox 
+                    whileHover={!shouldReduceMotion ? { y: -8 } : undefined}
+                    whileTap={{ scale: 0.98 }}
                     sx={{
                       height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
                       backgroundColor: 'background.paper',
                       borderRadius: '24px',
-                      boxShadow: 3,
+                      boxShadow: 4,
                       overflow: 'hidden',
-                      transition: 'all 0.3s',
                       position: 'relative',
-                      '&:hover': {
-                        boxShadow: 6,
-                      },
-                      '&:hover:after': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        borderRadius: '24px',
-                        border: `2px solid ${theme.palette.primary.main}`,
-                        zIndex: 1,
-                        pointerEvents: 'none',
-                      }
                     }}
                     data-cursor-hover
                   >
                     <Box sx={{
-                      backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                      backgroundImage: `linear-gradient(to right, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
-                      backgroundBlendMode: 'multiply',
                       position: 'relative',
                       overflow: 'hidden',
                       p: 3,
-                      '&:before': {
+                      '&:after': {
                         content: '""',
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '40%',
+                        background: `linear-gradient(transparent 0%, ${theme.palette.background.paper} 100%)`,
+                        zIndex: 1,
+                      }
+                    }}>
+                      <Box sx={{ 
                         position: 'absolute',
                         top: 0,
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: `radial-gradient(circle at 100% 0%, ${theme.palette.primary.light} 0%, transparent 40%)`,
-                      }
-                    }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, position: 'relative', zIndex: 1 }}>
-                        <Avatar sx={{ 
-                          backgroundColor: theme.palette.secondary.main, 
-                          width: 48, 
-                          height: 48,
-                          boxShadow: theme.shadows[2]
-                        }}>
-                          {project.icon ? (
-                            React.createElement(project.icon, { className: project.iconColor })
-                          ) : (
-                            <CodeIcon />
-                          )}
-                        </Avatar>
-                        <Box>
-                          <Typography variant="subtitle2" component="h2" fontWeight="bold" color="common.white">
-                            {project.clientName}
-                          </Typography>
-                          <Typography variant="caption" component="time" sx={{
-                            color: 'common.white',
-                            backgroundColor: 'primary.dark',
-                            padding: '2px 8px',
-                            borderRadius: '4px',
-                            display: 'inline-block',
-                            backdropFilter: 'blur(4px)'
+                        background: `linear-gradient(45deg, ${theme.palette.primary.dark} 0%, ${theme.palette.secondary.dark} 100%)`,
+                        opacity: 0.8,
+                        zIndex: 0,
+                      }} />
+
+                      <Box sx={{ position: 'relative', zIndex: 2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                          <Avatar sx={{ 
+                            width: 56,
+                            height: 56,
+                            background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                            boxShadow: theme.shadows[4],
                           }}>
-                            {project.timeline}
-                          </Typography>
+                            {project.icon ? (
+                              React.createElement(project.icon, { 
+                                sx: { 
+                                  fontSize: '1.75rem',
+                                  color: theme.palette.common.white 
+                                } 
+                              })
+                            ) : (
+                              <CodeIcon sx={{ color: 'common.white' }} />
+                            )}
+                          </Avatar>
+                          <Box>
+                            <Typography variant="subtitle1" fontWeight="bold" color="common.white">
+                              {project.clientName}
+                            </Typography>
+                            <Typography variant="caption" color="rgba(255,255,255,0.8)">
+                              {project.timeline}
+                            </Typography>
+                          </Box>
                         </Box>
+
+                        <Typography variant="h5" fontWeight="800" color="common.white" sx={{ 
+                          mb: 2,
+                          lineHeight: 1.3,
+                          textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        }}>
+                          {project.name}
+                        </Typography>
                       </Box>
-                      <Typography variant="h6" component="h3" fontWeight="bold" color="common.white" sx={{ position: 'relative', zIndex: 1 }}>
-                        {project.name}
-                      </Typography>
                     </Box>
 
-                    <Box sx={{ p: 3, flexGrow: 1 }}>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    <Box sx={{ 
+                      p: 3,
+                      position: 'relative',
+                      zIndex: 2,
+                      backgroundColor: 'background.paper'
+                    }}>
+                      <Typography variant="body1" color="text.secondary" sx={{ 
+                        mb: 3,
+                        lineHeight: 1.6,
+                        minHeight: 100
+                      }}>
                         {project.description}
                       </Typography>
 
                       <Box sx={{ mb: 3 }}>
-                        <Typography variant="caption" fontWeight="bold" color="text.secondary">
-                          KEY TECHNOLOGIES
+                        <Typography variant="overline" component="div" sx={{ 
+                          display: 'block',
+                          mb: 1.5,
+                          color: 'text.secondary',
+                          letterSpacing: '0.1em',
+                          fontWeight: 700
+                        }}>
+                          Core Technologies
                         </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                           {project.technologies.slice(0, 4).map((tech, index) => (
                             <Chip
                               key={index}
                               label={tech}
                               size="small"
                               sx={{
-                                border: `1px solid ${theme.palette.divider}`,
-                                background: 'transparent',
-                                color: theme.palette.text.secondary,
+                                background: `linear-gradient(45deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
+                                color: 'common.white',
                                 fontWeight: 600,
+                                borderRadius: '8px',
                                 '&:hover': {
-                                  background: theme.palette.action.hover
+                                  transform: 'translateY(-1px)'
                                 }
                               }}
                             />
@@ -456,51 +475,47 @@ const Solutions: React.FC = () => {
                         </Box>
                       </Box>
 
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderTop: `1px solid ${theme.palette.divider}`,
+                        pt: 2
+                      }}>
                         <Badge
                           badgeContent={project.teamSize}
                           sx={{
                             '& .MuiBadge-badge': {
                               right: -8,
-                              top: 13,
-                              backgroundColor: theme.palette.secondary.main,
-                              fontSize: '0.75rem',
+                              top: 16,
+                              backgroundColor: 'secondary.main',
                               fontWeight: 700
                             }
                           }}
                         >
-                          <Typography variant="caption" color="text.secondary">Team Size</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Team Members
+                          </Typography>
                         </Badge>
-                        
+
                         <GradientButton
                           onClick={() => handleViewDetails(project.id)}
-                          endIcon={navigatingProjectId === project.id ? (
-                            <Box sx={{
-                              position: 'relative',
-                              display: 'inline-block',
-                              '&:after': {
-                                content: '""',
-                                position: 'absolute',
-                                top: -8,
-                                left: -8,
-                                right: -8,
-                                bottom: -8,
-                                border: `3px solid ${theme.palette.primary.main}`,
-                                borderRadius: '50%',
-                                animation: 'ripple 1.2s infinite',
-                              }
-                            }}>
-                              <CircularProgress size={20} />
-                            </Box>
-                          ) : <ArrowForwardIcon />}
+                          endIcon={<ArrowForwardIcon sx={{ transition: 'transform 0.2s' }} />}
                           disabled={navigatingProjectId === project.id}
+                          sx={{
+                            '&:hover': {
+                              '& .MuiSvgIcon-root': {
+                                transform: 'translateX(4px)'
+                              }
+                            }
+                          }}
                         >
-                          Details
+                          Case Study
                         </GradientButton>
                       </Box>
                     </Box>
-                  </Box>
-                </MotionBox>
+                  </MotionBox>
+                </PremiumCard>
               </Tilt>
             </Grid>
           ))}
@@ -550,6 +565,17 @@ const Solutions: React.FC = () => {
           {errorMessage}
         </Alert>
       </Snackbar>
+
+      <Cursor
+        sx={{
+          width: cursorVariant === 'hover' ? 48 : 24,
+          height: cursorVariant === 'hover' ? 48 : 24,
+          opacity: cursorVariant === 'hover' ? 0.8 : 0.5,
+          left: cursorPos.x,
+          top: cursorPos.y,
+          transform: `translate(-50%, -50%) scale(${cursorVariant === 'hover' ? 1.5 : 1})`
+        }}
+      />
     </Box>
   );
 };

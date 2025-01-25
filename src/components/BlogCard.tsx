@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 interface BlogCardProps {
   title: string;
@@ -23,13 +24,40 @@ interface BlogCardProps {
   sx?: SxProps<Theme>;
 }
 
+const PremiumCard = styled(Card)(({ theme }) => ({
+  background: `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${theme.palette.action.hover} 100%)`,
+  position: 'relative',
+  overflow: 'visible',
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: '24px',
+    padding: '2px',
+    background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    WebkitMaskComposite: 'xor',
+    maskComposite: 'exclude',
+    opacity: 0,
+    transition: 'opacity 0.3s ease-in-out',
+  },
+  '&:hover:before': {
+    opacity: 0.15,
+  },
+}));
+
 const StyledChip = styled(Chip)(({ theme }) => ({
-  backgroundColor: theme.palette.secondary.light,
+  background: `linear-gradient(45deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
   color: theme.palette.common.white,
   fontWeight: 600,
-  height: 24,
+  height: 28,
+  borderRadius: '8px',
   '& .MuiChip-label': {
-    padding: theme.spacing(0, 1),
+    padding: theme.spacing(0, 1.5),
   },
 }));
 
@@ -38,110 +66,120 @@ const BlogCard: React.FC<BlogCardProps> = ({
   summary, 
   path, 
   icon,
-  sx = [] // Default empty array for sx prop
+  sx = []
 }) => {
   const theme = useTheme();
 
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.3 }}
+      whileHover={{ y: -8 }}
+      transition={{ type: 'spring', stiffness: 300 }}
       style={{ height: '100%' }}
     >
-      <Card
+      <PremiumCard
         sx={[
           {
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.common.white,
-            borderRadius: '16px',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            borderRadius: '24px',
+            boxShadow: theme.shadows[4],
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
-              boxShadow: theme.shadows[6],
+              boxShadow: theme.shadows[8],
             },
           },
-          // Spread the sx prop array after default styles
           ...(Array.isArray(sx) ? sx : [sx])
         ]}
       >
-        <CardContent sx={{ p: 3 }}>
+        <CardContent sx={{ p: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
             <Avatar
               sx={{
-                bgcolor: theme.palette.secondary.main,
-                width: 48,
-                height: 48,
+                background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                width: 56,
+                height: 56,
                 mr: 2,
+                boxShadow: theme.shadows[4],
               }}
             >
               {icon}
             </Avatar>
             <Typography variant="overline" component="div" sx={{ 
-              opacity: 0.9,
-              letterSpacing: '0.08em',
-              lineHeight: 1.2,
-              color: theme.palette.common.white
+              opacity: 0.8,
+              letterSpacing: '0.1em',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              color: theme.palette.text.secondary
             }}>
-              Technical Resource
+              Expert Insight
             </Typography>
           </Box>
 
           <Typography 
-            variant="h5" 
+            variant="h4" 
             component="h3" 
             sx={{ 
               mb: 2,
-              fontWeight: 700,
-              lineHeight: 1.3,
+              fontWeight: 800,
+              lineHeight: 1.25,
               minHeight: '3.9rem',
-              color: theme.palette.common.white
+              background: `linear-gradient(45deg, ${theme.palette.text.primary} 0%, ${theme.palette.text.secondary} 100%)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
             }}
           >
             {title}
           </Typography>
 
           <Typography 
-            variant="body2"
+            variant="body1"
             sx={{ 
               mb: 3,
               opacity: 0.9,
-              lineHeight: 1.6,
+              lineHeight: 1.7,
               minHeight: '4.5rem',
-              color: theme.palette.common.white
+              color: theme.palette.text.secondary,
+              fontFamily: '"Helvetica Neue", sans-serif',
             }}
           >
             {summary}
           </Typography>
 
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            <StyledChip label="Cloud Computing" size="small" />
-            <StyledChip label="Best Practices" size="small" />
-            <StyledChip label="Architecture" size="small" />
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
+            <StyledChip label="Cloud Architecture" size="medium" />
+            <StyledChip label="Best Practices" size="medium" />
+            <StyledChip label="Scalability" size="medium" />
           </Box>
         </CardContent>
 
-        <Box sx={{ p: 3, pt: 0 }}>
+        <Box sx={{ p: 4, pt: 0 }}>
           <NextLink href={path} passHref>
             <Button
-              variant="outlined"
               fullWidth
+              variant="contained"
+              endIcon={<ArrowForwardIcon sx={{ transition: 'transform 0.2s' }} />}
               sx={{
+                py: 1.5,
+                background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
                 color: theme.palette.common.white,
-                borderColor: theme.palette.secondary.main,
+                borderRadius: '12px',
+                fontSize: '1rem',
+                fontWeight: 700,
                 '&:hover': {
-                  borderColor: theme.palette.common.white,
-                  backgroundColor: theme.palette.secondary.dark
+                  background: `linear-gradient(45deg, ${theme.palette.primary.dark} 0%, ${theme.palette.secondary.dark} 100%)`,
+                  '& .MuiSvgIcon-root': {
+                    transform: 'translateX(4px)',
+                  }
                 },
               }}
             >
-              Read Guide
+              Explore Guide
             </Button>
           </NextLink>
         </Box>
-      </Card>
+      </PremiumCard>
     </motion.div>
   );
 };
