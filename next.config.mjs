@@ -1,11 +1,16 @@
-import postcss from 'postcss';
-
-/** @type {import('next').NextConfig} */
-const config = {
+// next.config.mjs
+const nextConfig = {
+  output: 'export',
+  distDir: 'out',
   experimental: {
-    esmExternals: 'loose', // ⚠ Consider removing this as per the Next.js warning
+    esmExternals: true,
+  },
+  images: {
+    unoptimized: true, // Required for static exports
   },
   webpack: (config) => {
+    // Only modify CSS handling if you have specific needs
+    // Consider removing this entire webpack block if using standard CSS modules
     config.module.rules.push({
       test: /\.css$/,
       use: [
@@ -13,18 +18,12 @@ const config = {
         {
           loader: 'css-loader',
           options: {
-            esModule: false,
             url: {
               filter: (url) => !url.startsWith('/_next/static/media'),
             },
           },
         },
-        {
-          loader: 'postcss-loader',
-          options: {
-            implementation: postcss, // ✅ Use ES module import instead of require
-          },
-        },
+        'postcss-loader',
       ],
     });
 
@@ -32,4 +31,4 @@ const config = {
   },
 };
 
-export default config;
+export default nextConfig;
