@@ -8,7 +8,9 @@ import {
   Box, 
   Avatar, 
   Chip,
-  styled 
+  styled,
+  type SxProps,
+  type Theme
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
@@ -18,6 +20,7 @@ interface BlogCardProps {
   summary: string;
   path: string;
   icon: React.ReactNode;
+  sx?: SxProps<Theme>;
 }
 
 const StyledChip = styled(Chip)(({ theme }) => ({
@@ -30,7 +33,13 @@ const StyledChip = styled(Chip)(({ theme }) => ({
   },
 }));
 
-const BlogCard: React.FC<BlogCardProps> = ({ title, summary, path, icon }) => {
+const BlogCard: React.FC<BlogCardProps> = ({ 
+  title, 
+  summary, 
+  path, 
+  icon,
+  sx = [] // Default empty array for sx prop
+}) => {
   const theme = useTheme();
 
   return (
@@ -40,19 +49,23 @@ const BlogCard: React.FC<BlogCardProps> = ({ title, summary, path, icon }) => {
       style={{ height: '100%' }}
     >
       <Card
-        sx={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          backgroundColor: theme.palette.primary.main,
-          color: theme.palette.common.white,
-          borderRadius: '16px',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:hover': {
-            boxShadow: theme.shadows[6],
+        sx={[
+          {
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.common.white,
+            borderRadius: '16px',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            '&:hover': {
+              boxShadow: theme.shadows[6],
+            },
           },
-        }}
+          // Spread the sx prop array after default styles
+          ...(Array.isArray(sx) ? sx : [sx])
+        ]}
       >
         <CardContent sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>

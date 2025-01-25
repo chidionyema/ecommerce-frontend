@@ -17,7 +17,9 @@ import {
   styled,
   Button,
   Avatar,
-  Badge
+  Badge,
+  type SxProps,
+  type Theme
 } from '@mui/material';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -27,6 +29,13 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion
 import { useRouter } from 'next/router';
 import { CVProject, cvProjects } from '../data/cvProjects';
 import Tilt from 'react-parallax-tilt';
+import type { HTMLMotionProps } from 'framer-motion';
+
+interface MotionDivProps extends HTMLMotionProps<"div"> {
+  sx?: SxProps<Theme>;
+}
+
+const MotionBox = motion(Box);
 
 const PAGE_SIZE = 9;
 
@@ -228,7 +237,11 @@ const Solutions: React.FC = () => {
               background: `linear-gradient(45deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
               borderRadius: '50%',
               filter: 'blur(40px)',
-              opacity: 0.1
+              opacity: 0.1,
+              width: 200 + i * 100,
+              height: 200 + i * 100,
+              top: i * 20 + '%',
+              left: i * 15 + '%'
             }}
             animate={{
               x: [0, 100, 0],
@@ -239,12 +252,6 @@ const Solutions: React.FC = () => {
               duration: 10 + i * 2,
               repeat: Infinity,
               ease: 'easeInOut'
-            }}
-            sx={{
-              width: 200 + i * 100,
-              height: 200 + i * 100,
-              top: i * 20 + '%',
-              left: i * 15 + '%'
             }}
           />
         ))}
@@ -329,7 +336,7 @@ const Solutions: React.FC = () => {
                 transitionSpeed={1500}
                 scale={1.02}
               >
-                <motion.div 
+                <MotionBox 
                   whileHover={!shouldReduceMotion ? { translateY: -8 } : undefined}
                   whileTap={{ scale: 0.98 }}
                   style={{ height: '100%' }}
@@ -493,7 +500,7 @@ const Solutions: React.FC = () => {
                       </Box>
                     </Box>
                   </Box>
-                </motion.div>
+                </MotionBox>
               </Tilt>
             </Grid>
           ))}
