@@ -1,54 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useTheme, Container, Grid, TextField, Button, Typography, useMediaQuery } from '@mui/material';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/router';
-import { 
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Container,
-  useTheme,
-  styled,
-  useMediaQuery,
-  Grid,
-  Chip
-} from '@mui/material';
-import { motion } from 'framer-motion';
-
-const FormContainer = styled(Box)(({ theme }) => ({
-  background: `linear-gradient(145deg, ${theme.palette.background.paper}, ${theme.palette.background.default})`,
-  borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[4],
-  padding: theme.spacing(4),
-  border: `1px solid ${theme.palette.divider}`,
-}));
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '8px',
-    '& fieldset': {
-      borderColor: theme.palette.divider,
-    },
-    '&:hover fieldset': {
-      borderColor: theme.palette.primary.main,
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: theme.palette.secondary.main,
-    },
-  },
-}));
-
-const SubmitButton = styled(Button)(({ theme }) => ({
-  background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-  color: theme.palette.common.white,
-  borderRadius: '50px',
-  padding: theme.spacing(1.5, 4),
-  fontWeight: 700,
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: theme.shadows[4],
-  },
-}));
 
 const Contact: React.FC = () => {
   const theme = useTheme();
@@ -61,6 +14,10 @@ const Contact: React.FC = () => {
     message: '',
   });
 
+  // Scroll animations
+  const { scrollYProgress } = useScroll();
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+
   // Plan selection logic
   const { plan } = router.query;
   const planTitles: { [key: string]: string } = {
@@ -70,6 +27,7 @@ const Contact: React.FC = () => {
     consultation: 'General Consultation'
   };
 
+  // Form handling
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -86,151 +44,243 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ my: 8 }}>
+    <Container maxWidth="lg" sx={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      position: 'relative',
+      overflow: 'hidden',
+      py: 10,
+      background: 'radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 100%)'
+    }}>
+      {/* Animated background elements */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Typography
-          variant="h3"
-          gutterBottom
-          align="center"
-          sx={{
-            fontWeight: 800,
-            fontSize: isMobile ? '2rem' : '2.5rem',
-            background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            mb: 2
-          }}
-        >
-          {plan ? 'Start Your Project' : 'Contact Us'}
-        </Typography>
+        style={{
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          background: `linear-gradient(45deg, 
+            ${theme.palette.primary.main} 0%, 
+            ${theme.palette.secondary.main} 30%,
+            ${theme.palette.primary.main} 70%)`,
+          y,
+          opacity: 0.05,
+          zIndex: -2,
+          rotate: 15
+        }}
+      />
+      
+      {/* Glass-morphism overlay */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          zIndex: -1
+        }}
+      />
 
-        {plan && (
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <Chip
-              label={`Selected Plan: ${planTitles[plan as string] || 'Custom Inquiry'}`}
-              color="primary"
-              sx={{
-                fontSize: '1rem',
-                py: 1,
-                px: 2,
-                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                color: theme.palette.common.white,
-                '& .MuiChip-label': { padding: '0 16px' }
-              }}
-            />
-          </Box>
-        )}
+      <Grid container spacing={6} component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <Grid item xs={12} md={6}>
+          <motion.div
+            initial={{ x: -100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.8, type: 'spring' }}
+          >
+            <Typography variant="h2" sx={{
+              fontWeight: 800,
+              mb: 3,
+              fontSize: isMobile ? '2.5rem' : '3.5rem',
+              lineHeight: 1.2,
+              background: `-webkit-linear-gradient(-45deg, 
+                ${theme.palette.primary.main} 0%, 
+                ${theme.palette.secondary.main} 100%)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              position: 'relative',
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: -8,
+                left: 0,
+                width: '60px',
+                height: '4px',
+                background: theme.palette.primary.main,
+                borderRadius: '2px'
+              }
+            }}>
+              {planTitles[plan as string] || "Let's Talk"}
+            </Typography>
+            <Typography variant="body1" sx={{ 
+              mb: 4, 
+              fontSize: '1.1rem',
+              color: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.8)'
+            }}>
+              {plan ? `Complete the form to get started with your ${planTitles[plan as string]}.` : "Get in touch to discuss your project requirements."}
+            </Typography>
+          </motion.div>
+        </Grid>
 
-        <Typography
-          variant="body1"
-          align="center"
-          sx={{ 
-            mb: 6,
-            color: 'text.secondary',
-            maxWidth: '600px',
-            mx: 'auto',
-            fontSize: isMobile ? '1rem' : '1.1rem'
-          }}
-        >
-          {plan ? 
-            "Let's finalize your project details and get started:" : 
-            "Have questions or want to discuss a custom solution? We're here to help."
-          }
-        </Typography>
+        <Grid item xs={12} md={6}>
+          <motion.form
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, type: 'spring' }}
+            style={{ position: 'relative' }}
+          >
+            <Grid container spacing={3}>
+              {['name', 'email', 'phone'].map((field) => (
+                <Grid item xs={12} key={field}>
+                  <motion.div 
+                    whileHover={{ scale: 1.02 }}
+                    whileFocus={{ scale: 1.02 }}
+                  >
+                    <TextField
+                      fullWidth
+                      variant="filled"
+                      label={field.charAt(0).toUpperCase() + field.slice(1)}
+                      name={field}
+                      value={formData[field as keyof typeof formData]}
+                      onChange={handleChange}
+                      sx={{
+                        '& .MuiFilledInput-root': {
+                          borderRadius: '12px',
+                          background: theme.palette.mode === 'dark' 
+                            ? 'rgba(255,255,255,0.05)' 
+                            : 'rgba(0,0,0,0.05)',
+                          transition: 'all 0.3s ease',
+                          '&:hover, &:focus-within': {
+                            background: theme.palette.mode === 'dark' 
+                              ? 'rgba(255,255,255,0.1)' 
+                              : 'rgba(0,0,0,0.1)',
+                            boxShadow: `0 0 0 2px ${theme.palette.primary.main}`
+                          },
+                          '& input': {
+                            py: 2,
+                            fontSize: '1.1rem'
+                          }
+                        }
+                      }}
+                    />
+                  </motion.div>
+                </Grid>
+              ))}
 
-        <FormContainer component="form" onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <StyledTextField
-                label="Full Name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                fullWidth
-                variant="outlined"
-              />
+              <Grid item xs={12}>
+                <motion.div whileHover={{ scale: 1.02 }}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    variant="filled"
+                    label="Message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    sx={{
+                      '& .MuiFilledInput-root': {
+                        borderRadius: '12px',
+                        background: theme.palette.mode === 'dark' 
+                          ? 'rgba(255,255,255,0.05)' 
+                          : 'rgba(0,0,0,0.05)',
+                        transition: 'all 0.3s ease',
+                        '&:hover, &:focus-within': {
+                          background: theme.palette.mode === 'dark' 
+                            ? 'rgba(255,255,255,0.1)' 
+                            : 'rgba(0,0,0,0.1)',
+                          boxShadow: `0 0 0 2px ${theme.palette.primary.main}`
+                        }
+                      }
+                    }}
+                  />
+                </motion.div>
+              </Grid>
+
+              <Grid item xs={12}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{ display: 'flex', justifyContent: 'flex-end' }}
+                >
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    size="large"
+                    sx={{
+                      px: 6,
+                      py: 2,
+                      borderRadius: '12px',
+                      fontSize: '1.1rem',
+                      background: `linear-gradient(45deg, 
+                        ${theme.palette.primary.main} 0%, 
+                        ${theme.palette.secondary.main} 100%)`,
+                      textTransform: 'none',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&:before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: '-100%',
+                        width: '100%',
+                        height: '100%',
+                        background: 'linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent)',
+                        transition: '0.5s'
+                      },
+                      '&:hover:before': {
+                        left: '100%'
+                      }
+                    }}
+                  >
+                    Send Message
+                  </Button>
+                </motion.div>
+              </Grid>
             </Grid>
-            
-            <Grid item xs={12} md={6}>
-              <StyledTextField
-                label="Email Address"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                fullWidth
-                variant="outlined"
-              />
-            </Grid>
+          </motion.form>
+        </Grid>
+      </Grid>
 
-            <Grid item xs={12}>
-              <StyledTextField
-                label="Phone Number"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleChange}
-                fullWidth
-                variant="outlined"
-              />
-            </Grid>
 
-            <Grid item xs={12}>
-              <StyledTextField
-                label={plan ? "Project Requirements" : "How Can We Help?"}
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                multiline
-                rows={4}
-                fullWidth
-                variant="outlined"
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} sx={{ textAlign: 'center', mt: 2 }}>
-              <SubmitButton
-                type="submit"
-                size="large"
-                sx={{ 
-                  width: isMobile ? '100%' : 'auto',
-                  px: 6,
-                  fontSize: '1.1rem'
-                }}
-              >
-                {plan ? 'Start Project Now' : 'Send Message'}
-              </SubmitButton>
-            </Grid>
-          </Grid>
-        </FormContainer>
-
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Prefer direct contact? Reach us at{' '}
-            <Box 
-              component="a" 
-              href="mailto:support@gluestack.com"
-              sx={{ 
-                color: 'primary.main',
-                textDecoration: 'none',
-                fontWeight: 600,
-                '&:hover': {
-                  textDecoration: 'underline'
-                }
-              }}
-            >
-              support@gluestack.com
-            </Box>
-          </Typography>
-        </Box>
-      </motion.div>
+{[...Array(20)].map((_, i) => (
+  <motion.div
+    key={i}
+    style={{
+      position: 'absolute',
+      background: `radial-gradient(circle, 
+        ${theme.palette.primary.main} 0%, 
+        transparent 70%)`,
+      borderRadius: '50%',
+      filter: 'blur(2px)',
+      width: 15,
+      height: 15
+    }}
+    initial={{
+      scale: Math.random() * 0.5 + 0.5,
+      opacity: 0.3,
+      x: `${Math.random() * 100 - 50}%`,
+      y: `${Math.random() * 100 - 50}%`
+    }}
+    animate={{
+      x: ['0%', `${Math.random() * 100 - 50}%`],
+      y: ['0%', `${Math.random() * 100 - 50}%`],
+      rotate: [0, 360]
+    }}
+    transition={{
+      duration: Math.random() * 10 + 10,
+      repeat: Infinity,
+      repeatType: 'mirror',
+      ease: 'linear'
+    }}
+  />
+))}
+   
     </Container>
   );
 };

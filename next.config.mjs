@@ -1,28 +1,35 @@
-// next.config.mjs
-import withBundleAnalyzer from '@next/bundle-analyzer'
+import postcss from 'postcss';
 
-const nextConfig = {
-  output: 'export',
-  trailingSlash: true,
-  compress: true,
-  productionBrowserSourceMaps: true,
-  images: {
-    unoptimized: true,
-    formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 86400,
-    domains: ['www.googletagmanager.com'],
-  },
+/** @type {import('next').NextConfig} */
+const config = {
   experimental: {
-    optimizeCss: true,
-    scrollRestoration: true,
+    esmExternals: 'loose', // ⚠ Consider removing this as per the Next.js warning
   },
-  env: {
-    NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
-  },
-  // For static exports, use _headers file instead of headers config
-  generateEtags: false
-}
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.css$/,
+      use: [
+        'style-loader',
+        {
+          loader: 'css-loader',
+          options: {
+            esModule: false,
+            url: {
+              filter: (url) => !url.startsWith('/_next/static/media'),
+            },
+          },
+        },
+        {
+          loader: 'postcss-loader',
+          options: {
+            implementation: postcss, // ✅ Use ES module import instead of require
+          },
+        },
+      ],
+    });
 
-export default withBundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-})(nextConfig)
+    return config;
+  },
+};
+
+export default config;

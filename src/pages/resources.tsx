@@ -6,9 +6,10 @@ import {
   useTheme, 
   useMediaQuery, 
   Box, 
-  Button 
+  Button,
+  alpha 
 } from '@mui/material';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import SEO from '../components/SEO';
 import { Cloud, VpnKey, Code } from '@mui/icons-material';
 import BlogCard from '../components/BlogCard';
@@ -18,7 +19,10 @@ const Resources: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const primaryGradient = theme.palette.gradients.primary;
+  const { scrollYProgress } = useScroll();
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
+ 
   const resources = [
     {
       id: 1,
@@ -42,13 +46,13 @@ const Resources: React.FC = () => {
       icon: <Code />,
     },
   ];
-
+      
   return (
     <Box
       sx={{
         backgroundColor: 'background.default',
-        minHeight: '100vh',
-        py: 8,
+        minHeight: '150vh',
+        py: 12,
         position: 'relative',
         overflow: 'hidden',
         '&:before': {
@@ -58,84 +62,209 @@ const Resources: React.FC = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'url(/grid-pattern.svg) repeat',
-          opacity: 0.1,
+          background: `
+            linear-gradient(45deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, 
+            ${alpha(theme.palette.secondary.light, 0.1)} 100%),
+            url(/noise-texture.png)
+          `,
+          opacity: 0.15,
         },
       }}
     >
-      <SEO
+      {/* Animated floating particles */}
+      <motion.div
+        style={{
+          y,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `radial-gradient(circle at 50% 50%, 
+            ${alpha(theme.palette.primary.light, 0.05)} 0%, 
+            transparent 60%)`,
+          zIndex: 0,
+        }}
+      />
+
+    <SEO
         title="Technical Resources - Expert Insights"
         description="Cutting-edge technical resources on cloud architecture, DevOps, and modern software development"
-      />
+      />. 
       
-      <Container maxWidth="lg" sx={{ position: 'relative' }}>
+      <Container maxWidth="xl" sx={{ position: 'relative' }}>
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
+          <Box sx={{ 
+            textAlign: 'center', 
+            mb: 10,
+            position: 'relative',
+            '&:after': {
+              content: '""',
+              position: 'absolute',
+              bottom: -40,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '120px',
+              height: '4px',
+              background: primaryGradient,
+              borderRadius: '2px'
+            }
+          }}>
             <Typography 
-              variant="h2" 
+              variant="h1" 
               sx={{ 
-                fontWeight: 800,
+                fontWeight: 900,
+                letterSpacing: '-0.03em',
+                mb: 2,
+                fontSize: isMobile ? '2.5rem' : '3.5rem',
                 background: primaryGradient,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                mb: 3,
-                fontSize: isMobile ? '2rem' : '2.75rem'
+                textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
               }}
             >
-              Expert Technical Resources
+             Resources
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: 'text.secondary',
+                maxWidth: 680,
+                mx: 'auto',
+                fontSize: isMobile ? '1rem' : '1.1rem',
+                lineHeight: 1.6
+              }}
+            >
+              Cutting-edge insights distilled from years of enterprise-grade implementations
             </Typography>
           </Box>
         </motion.div>
 
-        <Grid container spacing={isMobile ? 2 : 4}>
+        <Grid container spacing={isMobile ? 4 : 6} sx={{ position: 'relative', zIndex: 1 }}>
           {resources.map((resource, index) => (
-            <Grid item xs={12} sm={6} md={4} key={resource.id}>
+            <Grid item xs={12} md={4} key={resource.id}>
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
+                initial={{ opacity: 0, y: 60, rotateX: 90 }}
+                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{ 
+                  delay: index * 0.15,
+                  duration: 0.8,
+                  ease: [0.16, 1, 0.3, 1]
+                }}
+                whileHover={{
+                  scale: 1.03,
+                  transition: { duration: 0.3 }
+                }}
+                style={{
+                  perspective: 1000,
+                  transformStyle: 'preserve-3d'
+                }}
               >
-                <BlogCard {...resource} />
+                <BlogCard 
+                  {...resource}
+                  sx={{
+                    backdropFilter: 'blur(12px)',
+                    background: `
+                      linear-gradient(145deg, 
+                        ${alpha(theme.palette.background.paper, 0.8)}, 
+                        ${alpha(theme.palette.background.default, 0.9)}),
+                      ${alpha(theme.palette.primary.light, 0.05)}
+                    `,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+                    boxShadow: `
+                      0 32px 64px -16px ${alpha(theme.palette.primary.dark, 0.1)},
+                      0 16px 32px -16px ${alpha(theme.palette.secondary.dark, 0.1)}
+                    `,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      borderColor: alpha(theme.palette.primary.main, 0.4),
+                      boxShadow: `
+                        0 40px 80px -24px ${alpha(theme.palette.primary.dark, 0.2)},
+                        0 24px 48px -24px ${alpha(theme.palette.secondary.dark, 0.2)}
+                      `
+                    }
+                  }}
+                />
               </motion.div>
             </Grid>
           ))}
         </Grid>
 
-        <Box sx={{ textAlign: 'center', mt: 8 }}>
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              mb: 4, 
-              fontWeight: 600, 
-              color: 'text.primary'
-            }}
+        <Box sx={{ 
+          textAlign: 'center', 
+          mt: 12,
+          position: 'relative',
+          zIndex: 1
+        }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
           >
-            Need Custom Technical Guidance?
-          </Typography>
-          <NextLink href="/contact" passHref>
-            <Button
-              variant="contained"
-              sx={{
-                background: primaryGradient,
-                borderRadius: '50px',
-                px: 6,
-                py: 2,
+            <Typography 
+              variant="h4" 
+              sx={{ 
+                mb: 5,
                 fontWeight: 700,
-                color: 'common.white',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: theme.shadows[6],
-                }
+                color: 'text.primary',
+                letterSpacing: '-0.01em'
               }}
             >
-              Schedule Consultation
-            </Button>
-          </NextLink>
+              Tailored Technology Solutions
+            </Typography>
+            <NextLink href="/contact" passHref>
+              <Button
+                variant="contained"
+                sx={{
+                  background: primaryGradient,
+                  borderRadius: '16px',
+                  px: 8,
+                  py: 2.5,
+                  fontWeight: 700,
+                  fontSize: '1.1rem',
+                  color: 'common.white',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: theme.shadows[6],
+                    '&:before': {
+                      opacity: 1
+                    }
+                  },
+                  '&:before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    background: `linear-gradient(45deg, 
+                      ${alpha(theme.palette.common.white, 0.1)}, 
+                      ${alpha(theme.palette.common.white, 0.2)})`,
+                    opacity: 0,
+                    transition: 'opacity 0.3s ease'
+                  }
+                }}
+              >
+                Schedule Architecture Review
+                <Box 
+                  component="span" 
+                  sx={{ 
+                    ml: 2,
+                    display: 'inline-block',
+                    transform: 'translateY(2px)'
+                  }}
+                >
+                  ↗
+                </Box>
+              </Button>
+            </NextLink>
+          </motion.div>
         </Box>
       </Container>
     </Box>
