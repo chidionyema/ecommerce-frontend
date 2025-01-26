@@ -45,7 +45,7 @@ const GLASS_FILL = 'rgba(255, 255, 255, 0.95)';
 const BACKDROP_BLUR = 'blur(28px)';
 const PAGE_SIZE = 9;
 
-const logoShine = keyframes`
+const shine = keyframes`
   0% { background-position: -100% 0; }
   100% { background-position: 200% 0; }
 `;
@@ -53,6 +53,21 @@ const logoShine = keyframes`
 const float = keyframes`
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
+`;
+
+const premiumShine = keyframes`
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+`;
+
+const orbit = keyframes`
+  0% { transform: rotate(0deg) translateX(20px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(20px) rotate(-360deg); }
+`;
+
+const pulse = keyframes`
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
 `;
 
 const useDebounce = <T,>(value: T, delay: number): T => {
@@ -64,29 +79,58 @@ const useDebounce = <T,>(value: T, delay: number): T => {
   return debouncedValue;
 };
 
-const usePremiumCursor = () => {
-  const [cursor, setCursor] = useState({ x: -100, y: -100, variant: 'default' });
-  useEffect(() => {
-    const moveCursor = (e: MouseEvent) => setCursor({ x: e.clientX, y: e.clientY, variant: cursor.variant });
-    const handleHover = () => setCursor(c => ({ ...c, variant: 'hover' }));
-    const handleLeave = () => setCursor(c => ({ ...c, variant: 'default' }));
-    
-    const hoverables = document.querySelectorAll('button, a, [data-hover]');
-    hoverables.forEach(el => {
-      el.addEventListener('mouseenter', handleHover);
-      el.addEventListener('mouseleave', handleLeave);
-    });
-    window.addEventListener('mousemove', moveCursor);
-    return () => {
-      window.removeEventListener('mousemove', moveCursor);
-      hoverables.forEach(el => {
-        el.removeEventListener('mouseenter', handleHover);
-        el.removeEventListener('mouseleave', handleLeave);
-      });
-    };
-  }, []);
-  return cursor;
-};
+const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
+  position: 'relative',
+  borderRadius: '24px',
+  overflow: 'hidden',
+  background: `linear-gradient(152deg, ${alpha(PLATINUM, 0.92)} 0%, ${alpha(PLATINUM, 0.97)} 100%)`,
+  boxShadow: `0 32px 64px ${alpha(GOLD_ACCENT, 0.1)}`,
+  border: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`,
+  cursor: 'pointer',
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    background: `linear-gradient(120deg, ${alpha(GOLD_ACCENT, 0.05)} 0%, transparent 50%)`,
+    zIndex: 1,
+    pointerEvents: 'none'
+  },
+  '&:after': {
+    content: '""',
+    position: 'absolute',
+  inset: '-2px',
+    background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.1)} 0%, ${alpha(SECONDARY_GOLD, 0.05)} 100%)`,
+    zIndex: -1,
+    borderRadius: '26px',
+    animation: `${shine} 8s infinite`,
+  }
+}));
+
+const PremiumSpinner = styled(CircularProgress)(({ theme }) => ({
+  position: 'relative',
+  color: 'transparent',
+  '& .MuiCircularProgress-circle': {
+    stroke: `url(#premium-spinner-gradient)`,
+    strokeLinecap: 'round',
+    animation: `${pulse} 2s cubic-bezier(0.4, 0, 0.2, 1) infinite`,
+  },
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    inset: -8,
+    background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.2)}, ${alpha(PLATINUM, 0.1)}, ${alpha(SECONDARY_GOLD, 0.2)})`,
+    borderRadius: '50%',
+    filter: 'blur(12px)',
+    animation: `${premiumShine} 3s linear infinite`,
+  },
+  '&:after': {
+    content: '""',
+    position: 'absolute',
+    inset: -4,
+    border: `2px solid ${alpha(GOLD_ACCENT, 0.3)}`,
+    borderRadius: '50%',
+  }
+}));
 
 const Solutions: React.FC = () => {
   const theme = useTheme();
@@ -95,8 +139,7 @@ const Solutions: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: containerRef });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const cursor = usePremiumCursor();
-
+  
   const [displayedProjects, setDisplayedProjects] = useState<CVProject[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -141,16 +184,6 @@ const Solutions: React.FC = () => {
       setNavigatingId(null);
     }
   }, [router]);
-
-  const PremiumCardContainer = styled(motion.div)({
-    position: 'relative',
-    borderRadius: '24px',
-    overflow: 'hidden',
-    background: `linear-gradient(152deg, ${alpha(PLATINUM, 0.92)} 0%, ${alpha(PLATINUM, 0.97)} 100%)`,
-    boxShadow: `0 32px 64px ${alpha(GOLD_ACCENT, 0.1)}`,
-    border: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`,
-    cursor: 'pointer',
-  });
 
   const SearchField = styled(TextField)({
     '& .MuiFilledInput-root': {
@@ -216,21 +249,6 @@ const Solutions: React.FC = () => {
           />
         ))}
       </motion.div>
-
-      <Box sx={{
-        position: 'fixed',
-        pointerEvents: 'none',
-        zIndex: 9999,
-        borderRadius: '50%',
-        background: `radial-gradient(circle at center, ${alpha(GOLD_ACCENT, 0.15)} 0%, transparent 70%)`,
-        width: cursor.variant === 'hover' ? 120 : 60,
-        height: cursor.variant === 'hover' ? 120 : 60,
-        left: cursor.x,
-        top: cursor.y,
-        transform: 'translate(-50%, -50%)',
-        opacity: cursor.variant === 'hover' ? 0.3 : 0.15,
-        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-      }} />
 
       <AppBar position="sticky" sx={{
         backgroundColor: alpha(PLATINUM, 0.97),
@@ -342,19 +360,36 @@ const Solutions: React.FC = () => {
                       }} />
                       <Box sx={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                          <Avatar sx={{
-                            width: 64,
-                            height: 64,
-                            background: `linear-gradient(135deg, ${alpha(PLATINUM, 0.95)} 0%, ${alpha(PLATINUM, 0.85)} 100%)`,
-                            border: `2px solid ${alpha(GOLD_ACCENT, 0.2)}`,
-                            backdropFilter: BACKDROP_BLUR,
-                            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.1)',
-                            '& svg': { width: '2.2rem', height: '2.2rem', color: `${GOLD_ACCENT} !important` }
-                          }}>
-                            {project.icon ? 
-                              <project.icon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT }} /> : 
-                              <PaletteIcon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT }} />}
-                          </Avatar>
+                        <Avatar sx={{
+  width: 64,
+  height: 64,
+  border: `2px solid ${alpha(GOLD_ACCENT, 0.2)}`,
+  backdropFilter: BACKDROP_BLUR,
+  boxShadow: '0 12px 32px rgba(0, 0, 0, 0.1)',
+  position: 'relative',
+  background: 'transparent', // Set background to transparent
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    inset: '-2px',
+    background: `linear-gradient(45deg, ${GOLD_ACCENT}, ${SECONDARY_GOLD})`,
+    borderRadius: '50%',
+    zIndex: 0,
+  },
+  '&:after': {
+    content: '""',
+    position: 'absolute',
+    inset: '0',
+    background: `linear-gradient(135deg, ${alpha(PLATINUM, 0.95)} 0%, ${alpha(PLATINUM, 0.85)} 100%)`,
+    borderRadius: '50%',
+    zIndex: 1,
+  }
+}}>
+  {project.icon ? 
+    <project.icon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT, position: 'relative', zIndex: 2 }} /> : 
+    <PaletteIcon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT, position: 'relative', zIndex: 2 }} />}
+</Avatar>
+                         
                           <Box>
                             <Typography variant="subtitle1" sx={{
                               color: theme.palette.text.primary,
@@ -375,13 +410,25 @@ const Solutions: React.FC = () => {
                           </Box>
                         </Box>
                         <Typography variant="h5" sx={{
-                          color: theme.palette.text.primary,
-                          fontWeight: 800,
+                          background: `linear-gradient(45deg, ${theme.palette.text.primary} 0%, ${alpha(GOLD_ACCENT, 0.8)} 100%)`,
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          fontWeight: 900,
                           lineHeight: 1.4,
-                          fontSize: '1.5rem',
-                          letterSpacing: '0.1px',
-                          textShadow: '0 2px 12px rgba(0, 0, 0, 0.05)',
-                          fontFamily: "'Inter', sans-serif"
+                          fontSize: '1.6rem',
+                          letterSpacing: '-0.5px',
+                          fontFamily: "'Inter', sans-serif",
+                          position: 'relative',
+                          display: 'inline-block',
+                          '&:after': {
+                            content: '""',
+                            position: 'absolute',
+                            bottom: -4,
+                            left: 0,
+                            width: '40%',
+                            height: 2,
+                            background: `linear-gradient(90deg, ${GOLD_ACCENT}, transparent)`,
+                          }
                         }}>
                           {project.name}
                         </Typography>
@@ -447,11 +494,29 @@ const Solutions: React.FC = () => {
                           sx={{
                             background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.9)} 0%, ${alpha(SECONDARY_GOLD, 0.9)} 100%)`,
                             color: PLATINUM,
-                            borderRadius: '12px',
-                            padding: '12px',
+                            borderRadius: '16px',
+                            padding: '14px',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             position: 'relative',
-                            zIndex: 2,
+                            overflow: 'hidden',
+                            '&:hover': {
+                              transform: 'translateY(-2px)',
+                              boxShadow: `0 8px 24px ${alpha(GOLD_ACCENT, 0.3)}`,
+                              '&:after': {
+                                opacity: 1
+                              }
+                            },
+                            '&:after': {
+                              content: '""',
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              width: '100%',
+                              height: '100%',
+                              background: `linear-gradient(45deg, transparent 0%, ${alpha(PLATINUM, 0.2)} 100%)`,
+                              opacity: 0,
+                              transition: 'opacity 0.3s'
+                            }
                           }}
                         >
                           {navigatingId === project.id ? (
@@ -491,19 +556,36 @@ const Solutions: React.FC = () => {
                     }} />
                     <Box sx={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                        <Avatar sx={{
-                          width: 64,
-                          height: 64,
-                          background: `linear-gradient(135deg, ${alpha(PLATINUM, 0.95)} 0%, ${alpha(PLATINUM, 0.85)} 100%)`,
-                          border: `2px solid ${alpha(GOLD_ACCENT, 0.2)}`,
-                          backdropFilter: BACKDROP_BLUR,
-                          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.1)',
-                          '& svg': { width: '2.2rem', height: '2.2rem', color: `${GOLD_ACCENT} !important` }
-                        }}>
-                          {project.icon ? 
-                            <project.icon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT }} /> : 
-                            <PaletteIcon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT }} />}
-                        </Avatar>
+                      {/* Mobile Version Avatar - Update this section */}
+<Avatar sx={{
+  width: 64,
+  height: 64,
+  border: `2px solid ${alpha(GOLD_ACCENT, 0.2)}`,
+  backdropFilter: BACKDROP_BLUR,
+  boxShadow: '0 12px 32px rgba(0, 0, 0, 0.1)',
+  position: 'relative',
+  background: 'transparent',
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    inset: '-2px',
+    background: `linear-gradient(45deg, ${GOLD_ACCENT}, ${SECONDARY_GOLD})`,
+    borderRadius: '50%',
+    zIndex: 0,
+  },
+  '&:after': {
+    content: '""',
+    position: 'absolute',
+    inset: '0',
+    background: `linear-gradient(135deg, ${alpha(PLATINUM, 0.95)} 0%, ${alpha(PLATINUM, 0.85)} 100%)`,
+    borderRadius: '50%',
+    zIndex: 1,
+  }
+}}>
+  {project.icon ? 
+    <project.icon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT, position: 'relative', zIndex: 2 }} /> : 
+    <PaletteIcon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT, position: 'relative', zIndex: 2 }} />}
+</Avatar>
                         <Box>
                           <Typography variant="subtitle1" sx={{
                             color: theme.palette.text.primary,
@@ -524,13 +606,25 @@ const Solutions: React.FC = () => {
                         </Box>
                       </Box>
                       <Typography variant="h5" sx={{
-                        color: theme.palette.text.primary,
-                        fontWeight: 800,
+                        background: `linear-gradient(45deg, ${theme.palette.text.primary} 0%, ${alpha(GOLD_ACCENT, 0.8)} 100%)`,
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        fontWeight: 900,
                         lineHeight: 1.4,
-                        fontSize: '1.5rem',
-                        letterSpacing: '0.1px',
-                        textShadow: '0 2px 12px rgba(0, 0, 0, 0.05)',
-                        fontFamily: "'Inter', sans-serif"
+                        fontSize: '1.6rem',
+                        letterSpacing: '-0.5px',
+                        fontFamily: "'Inter', sans-serif",
+                        position: 'relative',
+                        display: 'inline-block',
+                        '&:after': {
+                          content: '""',
+                          position: 'absolute',
+                          bottom: -4,
+                          left: 0,
+                          width: '40%',
+                          height: 2,
+                          background: `linear-gradient(90deg, ${GOLD_ACCENT}, transparent)`,
+                        }
                       }}>
                         {project.name}
                       </Typography>
@@ -596,11 +690,29 @@ const Solutions: React.FC = () => {
                         sx={{
                           background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.9)} 0%, ${alpha(SECONDARY_GOLD, 0.9)} 100%)`,
                           color: PLATINUM,
-                          borderRadius: '12px',
-                          padding: '12px',
+                          borderRadius: '16px',
+                          padding: '14px',
                           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                           position: 'relative',
-                          zIndex: 2,
+                          overflow: 'hidden',
+                          '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: `0 8px 24px ${alpha(GOLD_ACCENT, 0.3)}`,
+                            '&:after': {
+                              opacity: 1
+                            }
+                          },
+                          '&:after': {
+                            content: '""',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            background: `linear-gradient(45deg, transparent 0%, ${alpha(PLATINUM, 0.2)} 100%)`,
+                            opacity: 0,
+                            transition: 'opacity 0.3s'
+                          }
                         }}
                       >
                         {navigatingId === project.id ? (
@@ -620,32 +732,121 @@ const Solutions: React.FC = () => {
           ))}
         </Grid>
 
-        <Box id="sentinel" sx={{ py: 6, textAlign: 'center' }}>
+        <Box id="sentinel" sx={{ 
+          py: 6, 
+          textAlign: 'center',
+          position: 'relative',
+          '&:before': {
+            content: '""',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '120%',
+            height: '120%',
+            transform: 'translate(-50%, -50%)',
+            background: `radial-gradient(circle at center, ${alpha(GOLD_ACCENT, 0.05)} 0%, transparent 70%)`,
+            filter: 'blur(40px)',
+            zIndex: -1
+          }
+        }}>
+          <svg width="0" height="0">
+            <linearGradient id="premium-spinner-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={GOLD_ACCENT} />
+              <stop offset="50%" stopColor={SECONDARY_GOLD} />
+              <stop offset="100%" stopColor={GOLD_ACCENT} />
+            </linearGradient>
+          </svg>
+        </Box>
+
+        <Box sx={{ 
+          position: 'relative',
+          textAlign: 'center',
+          mt: -12,
+          mb: 6,
+          height: 80,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
           {isLoading ? (
-            <CircularProgress size={40} thickness={4} sx={{
-              color: GOLD_ACCENT,
+            <Box sx={{
               position: 'relative',
-              '&:after': {
-                content: '""',
-                position: 'absolute',
-                top: -8,
-                left: -8,
-                right: -8,
-                bottom: -8,
-                border: `3px solid ${GOLD_ACCENT}`,
-                borderRadius: '50%',
-                animation: 'ripple 1.2s infinite',
-                filter: 'drop-shadow(0 2px 8px rgba(176, 143, 104, 0.2))'
+              display: 'inline-flex',
+              '&:hover > div': {
+                transform: 'scale(1.1)'
               }
-            }} />
+            }}>
+              <PremiumSpinner 
+                size={60} 
+                thickness={4}
+                sx={{
+                  transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  filter: 'drop-shadow(0 4px 12px rgba(176, 143, 104, 0.3))'
+                }}
+              />
+              <Box sx={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Box sx={{
+                  width: 16,
+                  height: 16,
+                  background: `linear-gradient(45deg, ${GOLD_ACCENT}, ${SECONDARY_GOLD})`,
+                  borderRadius: '50%',
+                  animation: `${orbit} 3s linear infinite`,
+                  boxShadow: `0 0 12px ${alpha(GOLD_ACCENT, 0.3)}`
+                }} />
+              </Box>
+            </Box>
           ) : hasMore ? (
-            <Typography variant="body2" sx={{ color: theme.palette.text.secondary, fontFamily: "'Inter', sans-serif" }}>
-              Scroll to load more
-            </Typography>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            >
+              <Typography variant="body2" sx={{ 
+                color: alpha(theme.palette.text.secondary, 0.8),
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 500,
+                letterSpacing: '0.5px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                '&:before, &:after': {
+                  content: '""',
+                  flex: 1,
+                  height: '1px',
+                  background: `linear-gradient(90deg, transparent, ${alpha(GOLD_ACCENT, 0.3)}, transparent)`
+                }
+              }}>
+                Scroll to discover more
+              </Typography>
+            </motion.div>
           ) : (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: theme.palette.text.secondary, fontFamily: "'Inter', sans-serif" }}>
-              <CheckCircleOutlineIcon color="success" />
-              <Typography variant="body2">All projects loaded</Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 2, 
+              color: alpha(theme.palette.text.secondary, 0.8),
+              fontFamily: "'Inter', sans-serif",
+              padding: 2,
+              borderRadius: 4,
+              background: alpha(PLATINUM, 0.9),
+              boxShadow: `0 8px 32px ${alpha(GOLD_ACCENT, 0.1)}`,
+              border: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`,
+              backdropFilter: BACKDROP_BLUR
+            }}>
+              <CheckCircleOutlineIcon sx={{ 
+                color: GOLD_ACCENT,
+                fontSize: '1.8rem',
+                filter: 'drop-shadow(0 2px 4px rgba(176, 143, 104, 0.3))' 
+              }} />
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                All premium case studies loaded
+              </Typography>
             </Box>
           )}
         </Box>

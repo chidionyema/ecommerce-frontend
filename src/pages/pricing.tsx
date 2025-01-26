@@ -77,56 +77,59 @@ const PremiumOverlay = styled(Box)(({ theme }) => ({
 }));
 
 const LazyPricingCard = styled(MotionBox, {
-  shouldForwardProp: (prop: string) => 
-    !['initial', 'animate', 'exit', 'whileHover', 'sx'].includes(prop)
-})<StyledMotionProps>(({ theme }) => ({
-  position: 'relative',
-  backdropFilter: 'blur(24px)',
-  background: `
-    linear-gradient(
-      145deg, 
-      ${alpha(theme.palette.background.paper, 0.96)}, 
-      ${alpha(theme.palette.background.default, 0.98)}
-    )`,
-  borderRadius: theme.shape.borderRadius * 3,
-  padding: theme.spacing(4),
-  border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
-  boxShadow: `
-    0 24px 48px ${alpha(theme.palette.primary.dark, 0.08)},
-    inset 0 0 0 1px ${alpha(theme.palette.common.white, 0.05)}`,
-  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-  height: '100%',
-  minHeight: { xs: '520px', md: '580px' },
-  display: 'flex',
-  flexDirection: 'column',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: `
-      0 40px 80px ${alpha(theme.palette.primary.dark, 0.15)},
-      inset 0 0 0 1px ${alpha(theme.palette.common.white, 0.1)}`,
-    '&::after': { opacity: 0.2 }
-  },
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 'inherit',
+    shouldForwardProp: (prop: string) => 
+      !['initial', 'animate', 'exit', 'whileHover', 'sx'].includes(prop)
+  })<StyledMotionProps>(({ theme }) => ({
+    position: 'relative',
+    backdropFilter: 'blur(24px)',
     background: `
-      radial-gradient(600px circle at var(--x) var(--y), 
-      ${alpha(theme.palette.primary.main, 0.1)}, 
-      transparent 60%)`,
-    opacity: 0,
-    transition: 'opacity 0.4s',
-    pointerEvents: 'none'
-  },
-  [theme.breakpoints.up('sm')]: {
-    padding: theme.spacing(5),
-    '&:hover::after': { opacity: 0.2 }
-  },
-}));
+      linear-gradient(
+        145deg, 
+        ${alpha(theme.palette.background.paper, 0.96)}, 
+        ${alpha(theme.palette.background.default, 0.98)}
+      )`,
+    borderRadius: theme.shape.borderRadius * 3,
+    padding: theme.spacing(4),
+    border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+    boxShadow: `
+      0 24px 48px ${alpha(theme.palette.primary.dark, 0.08)},
+      inset 0 0 0 1px ${alpha(theme.palette.common.white, 0.05)}`,
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    height: '100%',
+    minHeight: '520px', // Default mobile-first value
+    [theme.breakpoints.up('md')]: { // Desktop responsive override
+      minHeight: '580px',
+    },
+    display: 'flex',
+    flexDirection: 'column',
+    '&:hover': {
+      transform: 'translateY(-8px)',
+      boxShadow: `
+        0 40px 80px ${alpha(theme.palette.primary.dark, 0.15)},
+        inset 0 0 0 1px ${alpha(theme.palette.common.white, 0.1)}`,
+      '&::after': { opacity: 0.2 }
+    },
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: 'inherit',
+      background: `
+        radial-gradient(600px circle at var(--x) var(--y), 
+        ${alpha(theme.palette.primary.main, 0.1)}, 
+        transparent 60%)`,
+      opacity: 0,
+      transition: 'opacity 0.4s',
+      pointerEvents: 'none'
+    },
+    [theme.breakpoints.up('sm')]: {
+      padding: theme.spacing(5),
+      '&:hover::after': { opacity: 0.2 }
+    },
+  }));
 
 // Style Constants
 const listItemStyle = {
