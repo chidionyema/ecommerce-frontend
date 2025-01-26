@@ -1,4 +1,6 @@
-import { createTheme, styled } from '@mui/material/styles';
+// theme.ts
+import { createTheme, styled, alpha } from '@mui/material/styles';
+import type { ThemeOptions } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
@@ -18,7 +20,7 @@ declare module '@mui/material/styles' {
   }
 }
 
-const theme = createTheme({
+const baseTheme: ThemeOptions = {
   palette: {
     primary: {
       main: '#0A2342',
@@ -126,8 +128,11 @@ const theme = createTheme({
       }
     }
   }
-});
+};
 
+const theme = createTheme(baseTheme);
+
+// Custom styled components
 export const ProfessionalButton = styled(Button)(({ theme }) => ({
   fontSize: '1.1rem',
   borderRadius: theme.shape.borderRadius,

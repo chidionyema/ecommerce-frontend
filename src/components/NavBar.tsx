@@ -32,23 +32,39 @@ import { styled, useTheme, keyframes } from '@mui/material/styles';
 const DEEP_NAVY = '#0A1A2F';
 const PLATINUM = '#E5E4E2';
 const GOLD_ACCENT = '#C5A46D';
-const GLASS_BACKGROUND = 'rgba(10, 26, 47, 0.95)';
-const BACKDROP_BLUR = 'blur(20px)';
-const BORDER_RADIUS = '12px';
+const GLASS_BACKGROUND = 'rgba(10, 26, 47, 0.98)';
+const BACKDROP_BLUR = 'blur(24px)';
+const BORDER_RADIUS = '16px';
 const TRANSITION_TIMING = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
-// Subtle Animations
+// Enhanced Animations
 const logoShine = keyframes`
-  0% { background-position: -100% 0; }
+  0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+`;
+
+const float = keyframes`
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+`;
+
+const drawerItemAnimation = keyframes`
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
 `;
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: `${GLASS_BACKGROUND} !important`,
-  backdropFilter: BACKDROP_BLUR,
-  borderBottom: `1px solid ${alpha(PLATINUM, 0.1)}`,
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.18)',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  backdropFilter: `${BACKDROP_BLUR} saturate(180%)`,
+  borderBottom: `1px solid ${alpha(PLATINUM, 0.15)}`,
+  boxShadow: '0 16px 48px rgba(0, 0, 0, 0.25)',
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  height: '96px',
+  '&.scrolled': {
+    height: '72px',
+    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.3)',
+  }
 }));
 
 const LogoContainer = styled(Box)(({ theme }) => ({
@@ -56,102 +72,132 @@ const LogoContainer = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   gap: theme.spacing(1.5),
   cursor: 'pointer',
-  padding: theme.spacing(1.5, 2.5),
+  padding: theme.spacing(1.5, 3),
   borderRadius: BORDER_RADIUS,
-  background: alpha(DEEP_NAVY, 0.7),
+  background: `linear-gradient(145deg, ${alpha(DEEP_NAVY, 0.9)} 0%, ${alpha(DEEP_NAVY, 0.95)} 100%)`,
   backdropFilter: BACKDROP_BLUR,
-  border: `1px solid ${alpha(PLATINUM, 0.1)}`,
-  transition: 'all 0.3s ease',
+  border: `1px solid ${alpha(PLATINUM, 0.15)}`,
+  transition: 'all 0.4s ease',
   position: 'relative',
   overflow: 'hidden',
+  boxShadow: '4px 4px 12px rgba(0, 0, 0, 0.2)',
+  willChange: 'transform',
 
   '&:hover': {
-    background: alpha(DEEP_NAVY, 0.8),
-    transform: 'translateY(-1px)',
-    '&:after': { opacity: 0.3 }
+    transform: 'translateY(-2px)',
+    boxShadow: '6px 6px 16px rgba(0, 0, 0, 0.3)',
+    '&:after': { opacity: 0.4 }
   },
-// In the LogoContainer styled component's &:after selector
-'&:after': {
-  content: '""',
-  position: 'absolute',
-  top: 0,
-  left: '-100%', // Add quotes around the negative value
-  width: '200%',
-  height: '100%',
-  background: `linear-gradient(
-    90deg,
-    transparent 25%,
-    ${alpha(PLATINUM, 0.1)} 50%,
-    transparent 75%
-  )`,
-  animation: `${logoShine} 6s infinite linear`,
-  opacity: 0,
-  transition: 'opacity 0.3s ease',
-}
-}));
 
-const LogoText = styled(Typography)(({ theme }) => ({
-  fontWeight: 500,
-  fontSize: '1.8rem !important',
-  letterSpacing: '1.5px',
-  fontFamily: "'Avenir Next', sans-serif",
-  color: PLATINUM,
-  position: 'relative',
-  
+  '&:after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: '-200%',
+    width: '200%',
+    height: '100%',
+    background: `linear-gradient(
+      90deg,
+      transparent 25%,
+      ${alpha(PLATINUM, 0.2)} 50%,
+      transparent 75%
+    )`,
+    animation: `${logoShine} 8s infinite linear`,
+    opacity: 0,
+    transition: 'opacity 0.4s ease',
+  },
+
   '&:before': {
     content: '""',
     position: 'absolute',
-    bottom: '-4px',
-    left: 0,
-    width: '100%',
-    height: '1px',
-    background: GOLD_ACCENT,
-    transform: 'scaleX(0)',
-    transformOrigin: 'right',
-    transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-  },
-  
-  '&:hover:before': {
-    transform: 'scaleX(1)',
-    transformOrigin: 'left'
+    inset: 0,
+    borderRadius: BORDER_RADIUS,
+    padding: '2px',
+    background: `linear-gradient(45deg, ${GOLD_ACCENT} 0%, ${alpha(PLATINUM, 0.4)} 50%, ${GOLD_ACCENT} 100%)`,
+    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    WebkitMaskComposite: 'xor',
+    maskComposite: 'exclude',
+    animation: `${float} 6s infinite ${TRANSITION_TIMING}`,
   }
+}));
+
+const LogoText = styled(Typography)(({ theme }) => ({
+  fontWeight: 600,
+  fontSize: '2rem !important',
+  letterSpacing: '2px',
+  fontFamily: "'Bebas Neue', sans-serif",
+  background: `linear-gradient(45deg, ${PLATINUM} 30%, ${alpha(GOLD_ACCENT, 0.8)} 100%)`,
+  WebkitBackgroundClip: 'text',
+  backgroundClip: 'text',
+  color: 'transparent',
+  textShadow: `0 2px 8px ${alpha(DEEP_NAVY, 0.3)}`,
+  transition: 'all 0.4s ease',
+  position: 'relative',
+  zIndex: 1,
 }));
 
 const StyledNavButton = styled(Button, {
   shouldForwardProp: (prop) => !['active'].includes(prop as string),
 })<{ active?: boolean }>(({ theme, active }) => ({
-  color: alpha(PLATINUM, active ? 1 : 0.8),
-  fontSize: '1rem',
+  color: alpha(PLATINUM, active ? 1 : 0.9),
+  fontSize: '1.05rem',
   fontWeight: 500,
-  letterSpacing: '0.8px',
-  padding: theme.spacing(1.5, 2.5),
+  letterSpacing: '1px',
+  padding: theme.spacing(2, 3),
   borderRadius: BORDER_RADIUS,
   position: 'relative',
-  transition: 'all 0.3s ease',
+  transition: 'all 0.4s ease',
+  overflow: 'hidden',
+  willChange: 'transform',
   
   '&:before': {
+    content: '""',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: '2px',
+    background: GOLD_ACCENT,
+    transform: `scaleX(${active ? 1 : 0})`,
+    transformOrigin: 'right',
+    transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+  
+  '&:after': {
     content: '""',
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 'calc(100% + 16px)',
-    height: 'calc(100% + 16px)',
-    borderRadius: '16px',
+    width: '0',
+    height: '0',
+    borderRadius: '50%',
     background: alpha(GOLD_ACCENT, 0.1),
-    opacity: active ? 1 : 0,
-    transition: 'opacity 0.3s ease',
+    transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
   },
   
   '&:hover': {
-    color: PLATINUM,
-    background: alpha(PLATINUM, 0.03),
-    '&:before': { opacity: 1 }
+    transform: 'translateY(-2px)',
+    '&:before': {
+      transform: 'scaleX(1)',
+      transformOrigin: 'left'
+    },
+    '&:after': {
+      width: '150%',
+      height: '150%',
+      opacity: 0.3
+    },
+    '& .MuiButton-startIcon': {
+      animation: `${float} 1.2s ease infinite`
+    }
   },
   
   '& .MuiButton-startIcon': {
     color: GOLD_ACCENT,
-    transition: 'transform 0.3s ease',
+    transition: 'all 0.4s ease',
+    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+    willChange: 'transform',
   }
 }));
 
@@ -208,12 +254,13 @@ const NavBar: React.FC = () => {
       />
       
       <Slide in={!scrolled} direction="down" appear={false}>
-        <StyledAppBar position="sticky">
+        <StyledAppBar position="sticky" className={scrolled ? 'scrolled' : ''}>
           <Container maxWidth="xl">
             <Toolbar sx={{ 
               justifyContent: 'space-between', 
               py: 1,
-              minHeight: { xs: '64px', md: '80px' }
+              minHeight: { xs: '64px', md: '96px' },
+              transition: 'min-height 0.4s ease'
             }}>
               <MemoizedLogoContainer onClick={() => handleNavigation('/')}>
                 <LogoText>GluStack</LogoText>
@@ -274,8 +321,16 @@ const NavBar: React.FC = () => {
                 transition: 'all 0.3s ease'
               }} />
               <List>
-                {navItems.map(({ label, path }) => (
-                  <ListItem key={label} disablePadding>
+                {navItems.map(({ label, path }, index) => (
+                  <ListItem 
+                    key={label} 
+                    disablePadding
+                    sx={{
+                      animation: `${drawerItemAnimation} 0.4s ease forwards`,
+                      animationDelay: `${index * 0.1}s`,
+                      opacity: 0
+                    }}
+                  >
                     <Link href={path} passHref legacyBehavior>
                       <Button
                         component="a"

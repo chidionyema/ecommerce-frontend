@@ -8,7 +8,8 @@ import {
   useTheme, 
   styled,
   useMediaQuery,
-  alpha
+  alpha,
+  Theme
 } from '@mui/material';
 import { Info, Award, Clock, Users, Calendar, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/router';
@@ -58,11 +59,16 @@ const PremiumOverlay = styled(Box)(({ theme }) => ({
   pointerEvents: 'none'
 }));
 
-// Create a motion component first
-const MotionBox = motion(Box);
+// Motion component with proper typing
+const MotionBox = motion(
+  Box as React.ComponentType<React.HTMLAttributes<HTMLDivElement>>
+);
 
-// Then apply Material UI styles
-const LazyPricingCard = styled(MotionBox)(({ theme }) => ({
+// Styled component with explicit type parameters
+const LazyPricingCard = styled(MotionBox, {
+  shouldForwardProp: (prop) => 
+    !['initial', 'animate', 'exit', 'whileHover', 'sx'].includes(prop)
+})<React.ComponentProps<typeof MotionBox>>(({ theme }) => ({
   position: 'relative',
   backdropFilter: 'blur(24px)',
   background: `
@@ -122,14 +128,14 @@ const listItemStyle = {
   background: 'rgba(255, 255, 255, 0.02)',
 };
 
-const featureTextStyle = {
-  color: 'text.primary',
+const featureTextStyle = (theme: Theme) => ({
+  color: theme.palette.text.primary,
   fontSize: { xs: '0.9rem', sm: '1rem' },
   fontWeight: 500,
   lineHeight: 1.4,
-};
+});
 
-const featureListStyle = (isTouch: boolean) => ({
+const featureListStyle = (theme: Theme, isTouch: boolean) => ({
   pl: 0,
   listStyle: 'none',
   mb: 4,
@@ -142,7 +148,7 @@ const featureListStyle = (isTouch: boolean) => ({
   }
 });
 
-const ctaButtonStyle = (theme: any, isMobile: boolean) => ({
+const ctaButtonStyle = (theme: Theme, isMobile: boolean) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
   borderRadius: '12px',
   py: { xs: 2, sm: 3 },
@@ -155,12 +161,15 @@ const ctaButtonStyle = (theme: any, isMobile: boolean) => ({
 });
 
 // Feature Component
-const FeatureItem = memo<FeatureItemProps>(({ icon: Icon, text }) => (
-  <Box component="li" sx={listItemStyle}>
-    <Icon size={24} sx={{ color: 'primary.main', mr: 2 }} />
-    <Typography variant="body2" sx={featureTextStyle}>{text}</Typography>
-  </Box>
-));
+const FeatureItem = memo<FeatureItemProps>(({ icon: Icon, text }) => {
+  const theme = useTheme();
+  return (
+    <Box component="li" sx={listItemStyle}>
+      <Icon size={24} style={{ color: theme.palette.primary.main, marginRight: 16 }} />
+      <Typography variant="body2" sx={featureTextStyle(theme)}>{text}</Typography>
+    </Box>
+  );
+});
 
 const UltraPricingPage = () => {
   const theme = useTheme();
@@ -336,13 +345,7 @@ const UltraPricingPage = () => {
                     </Typography>
                   </Box>
 
-                  <Box component="ul" sx={{
-                    ...featureListStyle(isTouch),
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center'
-                  }}>
+                  <Box component="ul" sx={featureListStyle(theme, isTouch)}>
                     {getFeatures(planType)}
                   </Box>
 
