@@ -64,9 +64,9 @@ const MotionBox = motion(
   Box as React.ComponentType<React.HTMLAttributes<HTMLDivElement>>
 );
 
-// Styled component with explicit type parameters
+// Fixed styled component with explicit string type
 const LazyPricingCard = styled(MotionBox, {
-  shouldForwardProp: (prop) => 
+  shouldForwardProp: (prop: string) => 
     !['initial', 'animate', 'exit', 'whileHover', 'sx'].includes(prop)
 })<React.ComponentProps<typeof MotionBox>>(({ theme }) => ({
   position: 'relative',

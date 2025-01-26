@@ -148,8 +148,7 @@ const HeroSection = () => {
       pb: 12,
       position: 'relative',
       overflow: 'hidden',
-      // Add these properties for softer edges
-      borderRadius: { xs: '16px', sm: '24px' },
+      borderRadius: { xs: '12px', sm: '24px' },
       mx: { xs: 2, sm: 3 },
       my: 4,
       '&::before': {
@@ -157,9 +156,10 @@ const HeroSection = () => {
         position: 'absolute',
         inset: 0,
         borderRadius: 'inherit',
-        boxShadow: `0 0 48px ${alpha(theme.palette.primary.dark, 0.4)}`,
+        boxShadow: `0 24px 48px -12px ${alpha(theme.palette.primary.dark, 0.4)}`,
         zIndex: -1
-      }
+      },
+      transition: 'border-radius 0.3s ease-in-out'
     }}>
       <style>{globalStyles}</style>
       <Container maxWidth="md">

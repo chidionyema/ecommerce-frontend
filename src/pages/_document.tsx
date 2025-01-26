@@ -35,7 +35,7 @@ export default function Document() {
           type="font/woff2"
           crossOrigin="anonymous"
         />
-        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"></link>
+        
         {/* Security headers */}
         <meta httpEquiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval';" />
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
