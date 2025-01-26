@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { keyframes } from '@mui/system';
 import {
   AppBar,
   Toolbar,
@@ -17,32 +19,42 @@ import {
   Avatar,
   Badge,
   IconButton,
-  type Theme,
-  SxProps,
   useMediaQuery,
-  alpha
+  alpha,
+  styled,
+  GlobalStyles
 } from '@mui/material';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CodeIcon from '@mui/icons-material/Code';
+import PaletteIcon from '@mui/icons-material/Palette';
 import { cvProjects, type CVProject } from '../data/cvProjects';
 
 const Tilt = dynamic(() => import('react-parallax-tilt'), { 
   ssr: false,
-  loading: () => <div className="tilt-placeholder" />
+  loading: () => <div style={{ height: '100%', borderRadius: 24, background: '#f5f5f5' }} />
 });
 
+const LIGHT_SKY = '#F8FAFF';
+const PLATINUM = '#FFFFFF';
+const GOLD_ACCENT = '#B08F68';
+const SECONDARY_GOLD = '#C5A46D';
+const TEXT_PRIMARY = '#1A202C';
+const TEXT_SECONDARY = '#4A5568';
+const GLASS_FILL = 'rgba(255, 255, 255, 0.95)';
+const BACKDROP_BLUR = 'blur(28px)';
 const PAGE_SIZE = 9;
-const PREFETCH_DELAY = 150;
 
-interface ProjectCardProps {
-  project: CVProject;
-  theme: Theme;
-  navigatingId: string | null;
-  onHover: (projectId: string) => void;
-  onClick: (projectId: string) => void;
-}
+const logoShine = keyframes`
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+`;
+
+const float = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+`;
 
 const useDebounce = <T,>(value: T, delay: number): T => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -51,15 +63,6 @@ const useDebounce = <T,>(value: T, delay: number): T => {
     return () => clearTimeout(handler);
   }, [value, delay]);
   return debouncedValue;
-};
-
-const usePrefetch = () => {
-  const prefetchTimer = useRef<number>();
-  const prefetch = useCallback((url: string, delay: number) => {
-    prefetchTimer.current = window.setTimeout(() => fetch(url).catch(() => {}), delay);
-  }, []);
-  const cancel = useCallback(() => clearTimeout(prefetchTimer.current), []);
-  return { startPrefetch: prefetch, cancelPrefetch: cancel };
 };
 
 const usePremiumCursor = () => {
@@ -92,7 +95,6 @@ const Solutions: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: containerRef });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const { startPrefetch } = usePrefetch();
   const cursor = usePremiumCursor();
 
   const [displayedProjects, setDisplayedProjects] = useState<CVProject[]>([]);
@@ -102,7 +104,6 @@ const Solutions: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [navigatingId, setNavigatingId] = useState<string | null>(null);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const primaryGradient = theme.palette.gradients?.primary || 'linear-gradient(135deg, #1976d2 0%, #2196f3 100%)';
 
   const debouncedQuery = useDebounce(searchQuery, 300);
   const filteredProjects = useMemo(() => 
@@ -135,33 +136,147 @@ const Solutions: React.FC = () => {
     setNavigatingId(projectId);
     try {
       await router.push(`/projects/${projectId}`);
-    } finally {
+    } catch (error) {
+      console.error('Navigation failed:', error);
       setNavigatingId(null);
     }
   }, [router]);
 
-  const handleProjectHover = useCallback((projectId: string) => {
-    startPrefetch(`/projects/${projectId}`, PREFETCH_DELAY);
-  }, [startPrefetch]);
+  const PremiumCardContainer = styled(motion.div)({
+    position: 'relative',
+    borderRadius: '24px',
+    overflow: 'hidden',
+    background: `linear-gradient(152deg, ${alpha(PLATINUM, 0.92)} 0%, ${alpha(PLATINUM, 0.97)} 100%)`,
+    boxShadow: `0 32px 64px ${alpha(GOLD_ACCENT, 0.1)}`,
+    border: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`,
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    cursor: 'pointer',
+    '&:hover': {
+      transform: 'translateY(-8px) scale(1.02)',
+      boxShadow: `0 40px 80px ${alpha(GOLD_ACCENT, 0.2)}`,
+      '&:before, &:after': { opacity: 0.2 },
+      '& .shine-overlay': { opacity: 0.25 },
+      '& .nav-button': { transform: 'translateX(4px)' }
+    },
+    '&:before': {
+      content: '""',
+      position: 'absolute',
+      inset: 0,
+      background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.05)} 0%, transparent 50%, ${alpha(GOLD_ACCENT, 0.05)} 100%)`,
+      opacity: 0,
+      transition: 'opacity 0.4s ease',
+      pointerEvents: 'none'
+    },
+    '&:after': {
+      content: '""',
+      position: 'absolute',
+      inset: 0,
+      background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.15)} 0%, ${alpha(SECONDARY_GOLD, 0.1)} 100%)`,
+      opacity: 0,
+      transition: 'opacity 0.4s ease',
+      mixBlendMode: 'soft-light',
+      pointerEvents: 'none'
+    }
+  });
+
+  const SearchField = styled(TextField)({
+    '& .MuiFilledInput-root': {
+      backgroundColor: alpha(PLATINUM, 0.9),
+      borderRadius: '20px',
+      padding: '8px 24px',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      '&:hover': { backgroundColor: alpha(PLATINUM, 0.95), transform: 'scale(1.02)' },
+      '&.Mui-focused': { backgroundColor: PLATINUM, boxShadow: `0 0 0 2px ${alpha(GOLD_ACCENT, 0.2)}` }
+    },
+    '& .MuiInputAdornment-root': {
+      color: alpha(GOLD_ACCENT, 0.7),
+      marginRight: '12px'
+    }
+  });
 
   return (
-    <Box ref={containerRef} sx={styles.container}>
-      <motion.div style={styles.animatedBackground(y)}>
+    <Box ref={containerRef} sx={{
+      backgroundColor: LIGHT_SKY,
+      minHeight: '100vh',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      <GlobalStyles styles={{
+        '@keyframes ripple': {
+          '0%': { opacity: 1, transform: 'scale(0.8)' },
+          '100%': { opacity: 0, transform: 'scale(2.4)' }
+        },
+        '@keyframes float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' }
+        },
+        '@font-face': {
+          fontFamily: 'Inter',
+          fontStyle: 'normal',
+          fontDisplay: 'swap',
+          src: `url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap')`
+        }
+      }} />
+
+      <motion.div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 0,
+        pointerEvents: 'none',
+        y
+      }}>
         {[0, 1, 2, 3, 4].map(i => (
           <motion.div
             key={i}
-            style={styles.gradientBlob(i, theme)}
+            style={{
+              position: 'absolute',
+              background: `linear-gradient(45deg, ${alpha(SECONDARY_GOLD, 0.1)} 0%, ${alpha(PLATINUM, 0.2)} 100%)`,
+              borderRadius: '50%',
+              filter: 'blur(80px)',
+              opacity: 0.1,
+              width: 300 + i * 150,
+              height: 300 + i * 150,
+              top: `${i * 15}%`,
+              left: `${i * 10}%`,
+            }}
             animate={{ x: [0, 100, 0], y: [0, 50, 0], rotate: [0, 360] }}
             transition={{ duration: 20 + i * 5, repeat: Infinity, ease: 'linear' }}
           />
         ))}
       </motion.div>
 
-      <Box sx={styles.cursor(cursor, theme)} />
+      <Box sx={{
+        position: 'fixed',
+        pointerEvents: 'none',
+        zIndex: 9999,
+        borderRadius: '50%',
+        background: `radial-gradient(circle at center, ${alpha(GOLD_ACCENT, 0.15)} 0%, transparent 70%)`,
+        width: cursor.variant === 'hover' ? 120 : 60,
+        height: cursor.variant === 'hover' ? 120 : 60,
+        left: cursor.x,
+        top: cursor.y,
+        transform: 'translate(-50%, -50%)',
+        opacity: cursor.variant === 'hover' ? 0.3 : 0.15,
+        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+      }} />
 
-      <AppBar position="sticky" sx={styles.appBar(theme)}>
-        <Toolbar sx={styles.toolbar}>
-          <Box sx={styles.headerContainer}>
+      <AppBar position="sticky" sx={{
+        backgroundColor: alpha(PLATINUM, 0.97),
+        backdropFilter: BACKDROP_BLUR,
+        borderBottom: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`,
+        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.05)',
+        fontFamily: "'Inter', sans-serif"
+      }}>
+        <Toolbar sx={{ py: 4 }}>
+          <Box sx={{
+            width: '100%',
+            maxWidth: 800,
+            margin: '0 auto',
+            textAlign: 'center'
+          }}>
             <Typography 
               variant="h1" 
               sx={{ 
@@ -169,438 +284,267 @@ const Solutions: React.FC = () => {
                 letterSpacing: '-0.03em',
                 mb: 2,
                 fontSize: isMobile ? '2.5rem' : '3.5rem',
-                background: primaryGradient,
+                background: `linear-gradient(45deg, ${GOLD_ACCENT} 0%, ${SECONDARY_GOLD} 100%)`,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
+                textShadow: `0 4px 20px ${alpha(GOLD_ACCENT, 0.2)}`,
+                fontFamily: "'Inter', sans-serif"
               }}
             >
               Technical Portfolio
             </Typography>
-            <TextField
+            <SearchField
               variant="filled"
               placeholder="Search case studies..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              sx={styles.searchField}
+              sx={{ width: '100%' }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchOutlinedIcon sx={styles.searchIcon} />
+                    <SearchOutlinedIcon sx={{ fontSize: '1.5rem' }} />
                   </InputAdornment>
                 ),
-                sx: styles.searchInput
+                sx: {
+                  py: 2,
+                  fontSize: '1.1rem',
+                  color: TEXT_PRIMARY,
+                  fontFamily: "'Inter', sans-serif"
+                }
               }}
             />
           </Box>
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="xl" sx={styles.projectsContainer}>
+      <Container maxWidth="xl" sx={{ py: 8, position: 'relative', zIndex: 1 }}>
         <Grid container spacing={4}>
           {displayedProjects.map(project => (
             <Grid item xs={12} sm={6} md={4} key={project.id}>
-              <ProjectCard
-                project={project}
-                theme={theme}
-                navigatingId={navigatingId}
-                onHover={handleProjectHover}
-                onClick={handleViewDetails}
-              />
+              <Tilt
+                tiltMaxAngleX={3}
+                tiltMaxAngleY={3}
+                glareEnable={true}
+                glareMaxOpacity={0.1}
+                glareBorderRadius="24px"
+                transitionSpeed={500}
+                scale={1.02}
+                tiltEnable={!navigatingId}
+                glarePosition="all"
+                style={{ transformStyle: 'preserve-3d' }}
+              >
+                <PremiumCardContainer
+                  onClick={() => handleViewDetails(project.id)}
+                  style={{ opacity: navigatingId === project.id ? 0.7 : 1 }}
+                  whileHover={{ scale: 1.03 }}
+                  onMouseEnter={() => router.prefetch(`/projects/${project.id}`)}
+                >
+                  <Box sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '200%',
+                    height: '100%',
+                    background: `linear-gradient(90deg, transparent 25%, ${alpha(PLATINUM, 0.2)} 50%, transparent 75%)`,
+                    animation: `${logoShine} 6s infinite linear`,
+                    opacity: 0,
+                    transition: 'opacity 0.3s ease',
+                    pointerEvents: 'none'
+                  }} />
+                  
+                  <Box sx={{ position: 'relative', height: 200, overflow: 'hidden', p: 3 }}>
+                    <Box sx={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)',
+                      backdropFilter: BACKDROP_BLUR,
+                      zIndex: 1
+                    }} />
+                    <Box sx={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                        <Avatar sx={{
+                          width: 64,
+                          height: 64,
+                          background: `linear-gradient(135deg, ${alpha(PLATINUM, 0.95)} 0%, ${alpha(PLATINUM, 0.85)} 100%)`,
+                          border: `2px solid ${alpha(GOLD_ACCENT, 0.2)}`,
+                          backdropFilter: BACKDROP_BLUR,
+                          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.1)',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          '&:hover': { transform: 'scale(1.05) rotate(-5deg)' },
+                          '& svg': { width: '2.2rem', height: '2.2rem', color: `${GOLD_ACCENT} !important` }
+                        }}>
+                          {project.icon ? 
+                            <project.icon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT }} /> : 
+                            <PaletteIcon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT }} />}
+                        </Avatar>
+                        <Box>
+                          <Typography variant="subtitle1" sx={{
+                            color: TEXT_PRIMARY,
+                            fontWeight: 700,
+                            letterSpacing: '0.3px',
+                            fontFamily: "'Inter', sans-serif",
+                            fontSize: '1.1rem'
+                          }}>
+                            {project.clientName}
+                          </Typography>
+                          <Typography variant="caption" sx={{
+                            color: TEXT_SECONDARY,
+                            fontSize: '0.75rem',
+                            letterSpacing: '0.8px'
+                          }}>
+                            {project.timeline}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Typography variant="h5" sx={{
+                        color: TEXT_PRIMARY,
+                        fontWeight: 800,
+                        lineHeight: 1.4,
+                        fontSize: '1.5rem',
+                        letterSpacing: '0.1px',
+                        textShadow: '0 2px 12px rgba(0, 0, 0, 0.05)',
+                        fontFamily: "'Inter', sans-serif"
+                      }}>
+                        {project.name}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ p: 3, background: GLASS_FILL, borderTop: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`, backdropFilter: BACKDROP_BLUR }}>
+                    <Typography variant="body1" sx={{
+                      color: TEXT_SECONDARY,
+                      mb: 3,
+                      lineHeight: 1.6,
+                      fontSize: '0.95rem',
+                      minHeight: 100,
+                      fontWeight: 400
+                    }}>
+                      {project.description}
+                    </Typography>
+                    
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+                      {project.technologies.slice(0, 4).map((tech, index) => (
+                        <Chip
+                          key={index}
+                          label={tech}
+                          size="small"
+                          sx={{
+                            background: `linear-gradient(135deg, ${alpha(GOLD_ACCENT, 0.1)} 0%, ${alpha(SECONDARY_GOLD, 0.05)} 100%)`,
+                            color: TEXT_PRIMARY,
+                            fontWeight: 700,
+                            borderRadius: '12px',
+                            border: `1px solid ${alpha(GOLD_ACCENT, 0.2)}`,
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                              background: `linear-gradient(135deg, ${alpha(GOLD_ACCENT, 0.15)} 0%, ${alpha(SECONDARY_GOLD, 0.1)} 100%)`,
+                              transform: 'translateY(-3px)',
+                              boxShadow: '0 4px 12px rgba(176, 143, 104, 0.15)'
+                            }
+                          }}
+                        />
+                      ))}
+                    </Box>
+                    
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 2 }}>
+                      <Badge badgeContent={project.teamSize} sx={{
+                        '& .MuiBadge-badge': {
+                          right: -8,
+                          top: 16,
+                          background: alpha(GOLD_ACCENT, 0.9),
+                          color: PLATINUM,
+                          fontWeight: 700,
+                          fontFamily: "'Inter', sans-serif"
+                        }
+                      }}>
+                        <Typography variant="caption" sx={{
+                          color: TEXT_SECONDARY,
+                          fontSize: '0.75rem',
+                          letterSpacing: '0.8px',
+                          fontFamily: "'Inter', sans-serif"
+                        }}>
+                          Team Members
+                        </Typography>
+                      </Badge>
+                      
+                      <Link href={`/projects/${project.id}`} passHref legacyBehavior>
+                        <IconButton
+                          component="a"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewDetails(project.id);
+                          }}
+                          disabled={navigatingId === project.id}
+                          className="nav-button"
+                          sx={{
+                            background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.9)} 0%, ${alpha(SECONDARY_GOLD, 0.9)} 100%)`,
+                            color: PLATINUM,
+                            borderRadius: '12px',
+                            padding: '12px',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            position: 'relative',
+                            zIndex: 2,
+                            '&:hover': {
+                              transform: 'translateY(-2px)',
+                              boxShadow: `0 8px 24px ${alpha(GOLD_ACCENT, 0.2)}`
+                            }
+                          }}
+                        >
+                          {navigatingId === project.id ? (
+                            <CircularProgress size={24} sx={{ 
+                              color: PLATINUM,
+                              animation: `${float} 2s ease-in-out infinite`
+                            }} />
+                          ) : (
+                            <ArrowForwardIcon sx={{ 
+                              fontSize: '1.4rem',
+                              transition: 'transform 0.2s'
+                            }} />
+                          )}
+                        </IconButton>
+                      </Link>
+                    </Box>
+                  </Box>
+                </PremiumCardContainer>
+              </Tilt>
             </Grid>
           ))}
         </Grid>
 
-        <Box id="sentinel" sx={styles.loadingContainer}>
+        <Box id="sentinel" sx={{ py: 6, textAlign: 'center' }}>
           {isLoading ? (
-            <CircularProgress size={40} thickness={4} sx={styles.spinner(theme)} />
+            <CircularProgress size={40} thickness={4} sx={{
+              color: GOLD_ACCENT,
+              position: 'relative',
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                top: -8,
+                left: -8,
+                right: -8,
+                bottom: -8,
+                border: `3px solid ${GOLD_ACCENT}`,
+                borderRadius: '50%',
+                animation: 'ripple 1.2s infinite',
+                filter: 'drop-shadow(0 2px 8px rgba(176, 143, 104, 0.2))'
+              }
+            }} />
           ) : hasMore ? (
-            <Typography variant="body2" sx={styles.scrollText}>
+            <Typography variant="body2" sx={{ color: TEXT_SECONDARY, fontFamily: "'Inter', sans-serif" }}>
               Scroll to load more
             </Typography>
           ) : (
-            <Box sx={styles.endIndicator}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: TEXT_SECONDARY, fontFamily: "'Inter', sans-serif" }}>
               <CheckCircleOutlineIcon color="success" />
-              <Typography variant="body2" sx={styles.endText}>
-                All projects loaded
-              </Typography>
+              <Typography variant="body2">All projects loaded</Typography>
             </Box>
           )}
         </Box>
       </Container>
     </Box>
   );
-};
-
-const ProjectCard = React.memo<ProjectCardProps>(({ project, theme, navigatingId, onHover, onClick }) => (
-  <Tilt
-    tiltMaxAngleX={5}
-    tiltMaxAngleY={5}
-    glareEnable={true}
-    glareMaxOpacity={0.2}
-    glareBorderRadius="24px"
-    transitionSpeed={2000}
-    scale={1.03}
-    tiltEnable={!navigatingId}
-  >
-    <motion.div
-      initial={{ scale: 1 }}
-      whileHover={{ scale: 1.02, y: -8 }}
-      style={styles.cardContainer}
-      onMouseEnter={() => onHover(project.id)}
-    >
-      <Box sx={styles.cardHeader}>
-        <Box sx={styles.cardBackground(theme)} />
-        <Box sx={styles.glassOverlay} />
-        <Box sx={styles.cardContent}>
-          <Box sx={styles.clientInfo}>
-            <Avatar sx={styles.avatar(theme)}>
-              {project.icon ? React.createElement(project.icon, { sx: styles.icon }) : <CodeIcon sx={styles.icon} />}
-            </Avatar>
-            <Box>
-              <Typography variant="subtitle1" sx={styles.clientName}>
-                {project.clientName}
-              </Typography>
-              <Typography variant="caption" sx={styles.timeline}>
-                {project.timeline}
-              </Typography>
-            </Box>
-          </Box>
-          <Typography variant="h5" sx={styles.projectTitle}>
-            {project.name}
-          </Typography>
-        </Box>
-      </Box>
-
-      <Box sx={styles.cardBody(theme)}>
-        <Typography variant="body1" sx={styles.description}>
-          {project.description}
-        </Typography>
-        <Box sx={styles.chipContainer}>
-          {project.technologies.slice(0, 4).map((tech, index) => (
-            <Chip
-              key={index}
-              label={tech}
-              size="small"
-              sx={styles.techChip(theme)}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-            />
-          ))}
-        </Box>
-        <Box sx={styles.cardFooter}>
-          <Badge badgeContent={project.teamSize} sx={styles.teamBadge}>
-            <Typography variant="caption" sx={styles.teamText}>
-              Team Members
-            </Typography>
-          </Badge>
-          <IconButton
-            onClick={() => onClick(project.id)}
-            disabled={navigatingId === project.id}
-            sx={styles.caseStudyButton(theme)}
-          >
-            {navigatingId === project.id ? (
-              <CircularProgress size={24} sx={styles.buttonProgress} />
-            ) : (
-              <ArrowForwardIcon sx={styles.arrowIcon} />
-            )}
-          </IconButton>
-        </Box>
-      </Box>
-    </motion.div>
-  </Tilt>
-));
-
-const styles = {
-  container: {
-    backgroundColor: 'background.default',
-    minHeight: '100vh',
-    position: 'relative',
-    overflow: 'hidden',
-  } as SxProps<Theme>,
-
-  animatedBackground: (y: any) => ({
-    position: 'fixed' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 0,
-    pointerEvents: 'none' as const,
-    y
-  }),
-
-  gradientBlob: (index: number, theme: Theme) => ({
-    position: 'absolute' as const,
-    background: `linear-gradient(45deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
-    borderRadius: '50%',
-    filter: 'blur(80px)',
-    opacity: 0.08,
-    width: 300 + index * 150,
-    height: 300 + index * 150,
-    top: `${index * 15}%`,
-    left: `${index * 10}%`,
-  }),
-
-  cursor: (cursor: any, theme: Theme) => ({
-    position: 'fixed' as const,
-    pointerEvents: 'none' as const,
-    zIndex: 9999,
-    mixBlendMode: 'difference' as const,
-    borderRadius: '50%',
-    background: theme.palette.common.white,
-    width: cursor.variant === 'hover' ? 48 : 24,
-    height: cursor.variant === 'hover' ? 48 : 24,
-    left: cursor.x,
-    top: cursor.y,
-    transform: 'translate(-50%, -50%)',
-    opacity: cursor.variant === 'hover' ? 0.8 : 0.5,
-    transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)'
-  }),
-
-  appBar: (theme: Theme) => ({
-    backgroundColor: alpha(theme.palette.background.paper, 0.8),
-    backdropFilter: 'blur(24px)',
-    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1)'
-  }),
-
-  toolbar: { py: 4 },
-
-  headerContainer: {
-    width: '100%',
-    maxWidth: 800,
-    margin: '0 auto',
-    textAlign: 'center' as const
-  },
-
-  searchField: {
-    width: '100%',
-    '& .MuiFilledInput-root': {
-      backgroundColor: alpha('#fff', 0.1),
-      borderRadius: '16px',
-      '&:before, &:after': { display: 'none' },
-      transition: 'all 0.3s ease',
-      '&:hover': {
-        backgroundColor: alpha('#fff', 0.15)
-      }
-    }
-  },
-
-  searchInput: {
-    py: 2,
-    fontSize: '1.1rem',
-    color: 'text.primary'
-  },
-
-  searchIcon: {
-    color: 'text.secondary',
-    fontSize: '1.5rem'
-  },
-
-  projectsContainer: {
-    py: 8,
-    position: 'relative' as const,
-    zIndex: 1
-  },
-
-  cardContainer: {
-    height: '100%',
-    borderRadius: '24px',
-    overflow: 'hidden' as const,
-    boxShadow: '0 16px 40px rgba(0, 0, 0, 0.1)',
-    position: 'relative' as const,
-    transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-    willChange: 'transform'
-  },
-
-  cardHeader: {
-    position: 'relative' as const,
-    height: 200,
-    overflow: 'hidden' as const,
-    p: 3
-  },
-
-  cardBackground: (theme: Theme) => ({
-    position: 'absolute' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: `linear-gradient(45deg, ${theme.palette.primary.dark} 0%, ${theme.palette.secondary.dark} 100%)`,
-    opacity: 0.9
-  }),
-
-  glassOverlay: {
-    position: 'absolute' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)',
-    backdropFilter: 'blur(8px)',
-    zIndex: 1
-  },
-
-  cardContent: {
-    position: 'relative' as const,
-    zIndex: 2,
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  },
-
-  clientInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 2,
-    mb: 3
-  },
-
-  avatar: (theme: Theme) => ({
-    width: 56,
-    height: 56,
-    background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
-    transition: 'transform 0.3s ease',
-    '&:hover': {
-      transform: 'scale(1.1)'
-    }
-  }),
-
-  icon: {
-    fontSize: '1.75rem',
-    color: 'common.white'
-  },
-
-  clientName: {
-    color: 'common.white',
-    fontWeight: 'bold' as const,
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
-  },
-
-  timeline: {
-    color: 'rgba(255, 255, 255, 0.8)'
-  },
-
-  projectTitle: {
-    color: 'common.white',
-    fontWeight: 800,
-    lineHeight: 1.3,
-    textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
-  },
-
-  cardBody: (theme: Theme) => ({
-    p: 3,
-    backgroundColor: alpha(theme.palette.background.paper, 0.95),
-    borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-    backdropFilter: 'blur(12px)'
-  }),
-
-  description: {
-    color: 'text.secondary',
-    mb: 3,
-    lineHeight: 1.6,
-    minHeight: 100
-  },
-
-  chipContainer: {
-    display: 'flex',
-    flexWrap: 'wrap' as const,
-    gap: 1,
-    mb: 3
-  },
-
-  techChip: (theme: Theme) => ({
-    background: alpha(theme.palette.primary.main, 0.1),
-    color: theme.palette.primary.main,
-    fontWeight: 600,
-    borderRadius: '8px',
-    border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-    transition: 'all 0.3s ease',
-    '&:hover': {
-      background: alpha(theme.palette.primary.main, 0.2),
-      transform: 'translateY(-2px)'
-    }
-  }),
-
-  cardFooter: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    pt: 2
-  },
-
-  teamBadge: {
-    '& .MuiBadge-badge': {
-      right: -8,
-      top: 16,
-      backgroundColor: 'secondary.main',
-      fontWeight: 700
-    }
-  },
-
-  teamText: {
-    color: 'text.secondary'
-  },
-
-  caseStudyButton: (theme: Theme) => ({
-    background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-    color: 'common.white',
-    borderRadius: '12px',
-    padding: '12px',
-    transition: 'transform 0.3s, box-shadow 0.3s',
-    '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
-    }
-  }),
-
-  arrowIcon: {
-    transition: 'transform 0.2s',
-    '&:hover': { transform: 'translateX(4px)' }
-  },
-
-  buttonProgress: {
-    color: 'common.white'
-  },
-
-  loadingContainer: {
-    py: 6,
-    textAlign: 'center' as const
-  },
-
-  spinner: (theme: Theme) => ({
-    color: theme.palette.primary.main,
-    position: 'relative' as const,
-    '&:after': {
-      content: '""',
-      position: 'absolute' as const,
-      top: -8,
-      left: -8,
-      right: -8,
-      bottom: -8,
-      border: `3px solid ${theme.palette.primary.main}`,
-      borderRadius: '50%',
-      animation: 'ripple 1.2s infinite'
-    }
-  }),
-
-  scrollText: {
-    color: 'text.secondary'
-  },
-
-  endIndicator: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 2,
-    color: 'text.secondary'
-  },
-
-  endText: {
-    color: 'text.secondary'
-  }
 };
 
 export default Solutions;

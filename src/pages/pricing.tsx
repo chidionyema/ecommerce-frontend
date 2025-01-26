@@ -22,15 +22,12 @@ interface FeatureItemProps {
 const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
   position: 'relative',
   backdropFilter: 'blur(24px)',
-  background: `linear-gradient(145deg, 
-    ${alpha(theme.palette.background.paper, 0.96)}, 
-    ${alpha(theme.palette.background.default, 0.98)})`,
+  background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.96)}, ${alpha(theme.palette.background.default, 0.98)})`,
   borderRadius: theme.shape.borderRadius * 3,
   padding: theme.spacing(4),
   border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
   boxShadow: `0 48px 96px ${alpha(theme.palette.primary.dark, 0.1)}`,
   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-  willChange: 'transform, box-shadow',
   '&:hover': {
     transform: 'translateY(-12px) scale(1.02)',
     borderColor: alpha(theme.palette.primary.main, 0.6),
@@ -44,9 +41,7 @@ const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
     right: 0,
     bottom: 0,
     borderRadius: 'inherit',
-    background: `radial-gradient(800px circle at var(--x) var(--y), 
-      ${alpha(theme.palette.primary.main, 0.15)}, 
-      transparent 60%)`,
+    background: `radial-gradient(800px circle at var(--x) var(--y), ${alpha(theme.palette.primary.main, 0.15)}, transparent 60%)`,
     opacity: 0,
     transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     zIndex: 1,
@@ -64,6 +59,7 @@ const UltraPricingPage = () => {
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '40%']);
   const primaryGradient = theme.palette.gradients?.primary || 'linear-gradient(135deg, #1976d2 0%, #2196f3 100%)';
+  
   const handlePlanSelection = useCallback((planType: string) => {
     router.push(`/contact?plan=${encodeURIComponent(planType)}`);
   }, [router]);
@@ -83,30 +79,20 @@ const UltraPricingPage = () => {
   return (
     <LazyMotion features={domAnimation}>
       <Container maxWidth="xl" sx={{ py: 12, position: 'relative', overflow: 'hidden' }}>
-        <motion.div
-          style={{
-            y,
-            position: 'absolute',
-            left: '-20%',
-            right: '-20%',
-            height: '150%',
-            background: `
-              linear-gradient(45deg, 
-                ${alpha(theme.palette.primary.light, 0.03)} 0%, 
-                transparent 50%),
-              radial-gradient(circle at 70% 30%, 
-                ${alpha(theme.palette.secondary.light, 0.04)} 0%, 
-                transparent 70%)`,
-            zIndex: 0,
-            willChange: 'transform'
-          }}
-        />
+        <motion.div style={{
+          y,
+          position: 'absolute',
+          left: '-20%',
+          right: '-20%',
+          height: '150%',
+          background: `
+            linear-gradient(45deg, ${alpha(theme.palette.primary.light, 0.03)} 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, ${alpha(theme.palette.secondary.light, 0.04)} 0%, transparent 70%)`,
+          zIndex: 0,
+          willChange: 'transform'
+        }}/>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 80, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-        >
+        <motion.div initial={{ opacity: 0, y: 80, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}>
           <Box sx={{ 
             textAlign: 'center', 
             mb: 10,
@@ -119,87 +105,57 @@ const UltraPricingPage = () => {
               transform: 'translateX(-50%)',
               width: '160px',
               height: '4px',
-              background: `linear-gradient(
-                90deg, 
-                ${alpha(theme.palette.primary.main, 0)} 0%, 
-                ${theme.palette.primary.main} 50%, 
-                ${alpha(theme.palette.primary.main, 0)} 100%
-              )`,
+              background: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0)} 0%, ${theme.palette.primary.main} 50%, ${alpha(theme.palette.primary.main, 0)} 100%)`,
               borderRadius: '2px'
             }
           }}>
-            <Typography 
-              variant="h1" 
-              sx={{ 
-                fontWeight: 900,
-                letterSpacing: '-0.03em',
-                mb: 2,
-                fontSize: isMobile ? '2.5rem' : '3.5rem',
-                background: primaryGradient,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
-              }}
-            >
-              Technology Engagement
+            <Typography variant="h1" sx={{ 
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              mb: 2,
+              fontSize: isMobile ? '2.5rem' : '3.5rem',
+              background: primaryGradient,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
+            }}>
+              Technology Solutions
             </Typography>
-
-            <Typography
-              variant="subtitle1"
-              sx={{
-                color: 'text.secondary',
-                maxWidth: 800,
-                mx: 'auto',
-                fontSize: isMobile ? '1.1rem' : '1.2rem',
-                lineHeight: 1.6,
-                fontWeight: 400,
-                letterSpacing: '-0.01em'
-              }}
-            >
-              Bespoke enterprise solutions engineered for digital dominance
+            <Typography variant="subtitle1" sx={{
+              color: 'text.secondary',
+              maxWidth: 800,
+              mx: 'auto',
+              fontSize: isMobile ? '1.1rem' : '1.2rem',
+              lineHeight: 1.6,
+              fontWeight: 400,
+              letterSpacing: '-0.01em'
+            }}>
+              Custom enterprise solutions for digital innovation
             </Typography>
           </Box>
         </motion.div>
 
-        <Grid 
-          container 
-          spacing={6} 
-          sx={{ mb: 12, position: 'relative', zIndex: 1 }}
-          onMouseMove={handleMouseMove}
-        >
+        <Grid container spacing={6} sx={{ mb: 12, position: 'relative', zIndex: 1 }} onMouseMove={handleMouseMove}>
           {['hourly', 'project', 'retainer'].map((planType, index) => (
             <Grid item xs={12} md={4} key={planType} sx={{ display: 'flex' }}>
               <LazyPricingCard
                 className="luxury-card"
                 initial={{ opacity: 0, y: 100, rotateZ: -3 }}
                 animate={{ opacity: 1, y: 0, rotateZ: 0 }}
-                transition={{ 
-                  delay: index * 0.15,
-                  duration: 0.8,
-                  ease: [0.22, 1, 0.36, 1]
-                }}
-                whileHover={{
-                  scale: 1.03,
-                  transition: { type: 'spring', stiffness: 150, damping: 15 }
-                }}
+                transition={{ delay: index * 0.15, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ scale: 1.03, transition: { type: 'spring', stiffness: 150, damping: 15 } }}
                 sx={{ 
                   maxWidth: { md: 400 },
                   minHeight: { md: 720 },
+                  padding: { xs: 2, sm: 4 },
                   perspective: 1000,
                   transformStyle: 'preserve-3d'
                 }}
               >
                 <motion.div
                   animate={{ y: [0, -15, 0] }}
-                  transition={{ 
-                    duration: 4 + index,
-                    repeat: Infinity,
-                    ease: 'easeInOut'
-                  }}
-                  style={{ 
-                    textAlign: 'center',
-                    filter: `drop-shadow(0 12px 24px ${alpha(theme.palette.primary.main, 0.3)})`
-                  }}
+                  transition={{ duration: 4 + index, repeat: Infinity, ease: 'easeInOut' }}
+                  style={{ textAlign: 'center', filter: `drop-shadow(0 12px 24px ${alpha(theme.palette.primary.main, 0.3)})` }}
                 >
                   {planType === 'hourly' && <Clock size={64} style={iconStyle(theme)} />}
                   {planType === 'project' && <Briefcase size={64} style={iconStyle(theme)} />}
@@ -217,19 +173,14 @@ const UltraPricingPage = () => {
                     transform: 'translateX(-50%)',
                     width: '80%',
                     height: '2px',
-                    background: `linear-gradient(
-                      90deg, 
-                      ${alpha(theme.palette.primary.main, 0)} 0%, 
-                      ${theme.palette.primary.main} 50%, 
-                      ${alpha(theme.palette.primary.main, 0)} 100%
-                    )`,
+                    background: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0)} 0%, ${theme.palette.primary.main} 50%, ${alpha(theme.palette.primary.main, 0)} 100%)`,
                     borderRadius: '2px'
                   }
                 }}>
                   <Typography variant="h3" sx={titleStyle(theme)}>
-                    {planType === 'hourly' && 'Executive Consultation'}
-                    {planType === 'project' && 'Managed Excellence'}
-                    {planType === 'retainer' && 'Strategic Alliance'}
+                    {planType === 'hourly' && 'Expert Consultation'}
+                    {planType === 'project' && 'Managed Solutions'}
+                    {planType === 'retainer' && 'Strategic Partnership'}
                   </Typography>
                 </Box>
 
@@ -239,11 +190,7 @@ const UltraPricingPage = () => {
                   ))}
                 </Box>
 
-                <motion.div 
-                  whileHover={{ scale: 1.03 }} 
-                  whileTap={{ scale: 0.97 }}
-                  style={{ marginTop: 'auto', position: 'relative' }}
-                >
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} style={{ marginTop: 'auto', position: 'relative' }}>
                   <Button
                     variant="contained"
                     fullWidth
@@ -251,10 +198,10 @@ const UltraPricingPage = () => {
                     onClick={() => handlePlanSelection(planType)}
                   >
                     <Box component="span" sx={buttonContentStyle}>
-                      {planType === 'hourly' && 'Initiate Consultation'}
-                      {planType === 'project' && 'Commence Project'}
-                      {planType === 'retainer' && 'Establish Alliance'}
-                      <Box component="span" sx={arrowStyle}>⇾</Box>
+                      {planType === 'hourly' && 'Start Consultation'}
+                      {planType === 'project' && 'Begin Project'}
+                      {planType === 'retainer' && 'Create Partnership'}
+                      <Box component="span" sx={arrowStyle}>→</Box>
                     </Box>
                   </Button>
                 </motion.div>
@@ -263,14 +210,10 @@ const UltraPricingPage = () => {
           ))}
         </Grid>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-        >
+        <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4, duration: 0.8 }}>
           <Box sx={ctaSectionStyle(theme)}>
             <Typography variant="h2" sx={ctaTitleStyle}>
-              Architect Your Digital Empire
+              Build Your Digital Future
             </Typography>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
@@ -279,8 +222,8 @@ const UltraPricingPage = () => {
                 sx={finalCtaButtonStyle(theme)}
                 onClick={() => handlePlanSelection('vip-consultation')}
               >
-                Commence Transformation
-                <Box component="span" sx={finalArrowStyle}>⟢</Box>
+                Start Digital Transformation
+                <Box component="span" sx={{ ...finalArrowStyle, ml: { xs: 1, sm: 2 } }}>⟢</Box>
               </Button>
             </motion.div>
           </Box>
@@ -295,14 +238,11 @@ const FeatureItem = memo<FeatureItemProps>(({ icon: Icon, text }) => {
   return (
     <Box component="li" sx={listItemStyle}>
       <Icon size={24} style={{ color: theme.palette.primary.main, marginRight: 16 }} />
-      <Typography variant="body2" sx={featureTextStyle}>
-        {text}
-      </Typography>
+      <Typography variant="body2" sx={featureTextStyle}>{text}</Typography>
     </Box>
   );
 });
 
-// Style constants
 const iconStyle = (theme: any) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
   WebkitBackgroundClip: 'text',
@@ -355,9 +295,7 @@ const featureTextStyle = {
 };
 
 const ctaButtonStyle = (theme: any) => ({
-  background: `linear-gradient(135deg, 
-    ${theme.palette.primary.main} 0%, 
-    ${theme.palette.secondary.main} 100%)`,
+  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
   borderRadius: '16px',
   py: 3,
   fontWeight: 700,
@@ -368,9 +306,7 @@ const ctaButtonStyle = (theme: any) => ({
   '&:hover': {
     transform: 'translateY(-2px)',
     boxShadow: `0 16px 32px ${alpha(theme.palette.primary.main, 0.3)}`,
-    '&:before': {
-      opacity: 1
-    }
+    '&:before': { opacity: 1 }
   },
   '&:before': {
     content: '""',
@@ -379,9 +315,7 @@ const ctaButtonStyle = (theme: any) => ({
     left: 0,
     width: '100%',
     height: '100%',
-    background: `linear-gradient(45deg, 
-      ${alpha(theme.palette.common.white, 0.1)}, 
-      ${alpha(theme.palette.common.white, 0.2)})`,
+    background: `linear-gradient(45deg, ${alpha(theme.palette.common.white, 0.1)}, ${alpha(theme.palette.common.white, 0.2)})`,
     opacity: 0,
     transition: 'opacity 0.3s ease'
   }
@@ -402,9 +336,7 @@ const arrowStyle = {
 };
 
 const ctaSectionStyle = (theme: any) => ({
-  background: `linear-gradient(135deg, 
-    ${alpha(theme.palette.primary.main, 0.9)}, 
-    ${alpha(theme.palette.secondary.main, 0.9)})`,
+  background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.9)}, ${alpha(theme.palette.secondary.main, 0.9)})`,
   color: 'common.white',
   borderRadius: 6,
   p: 8,
@@ -432,24 +364,24 @@ const ctaTitleStyle = {
 };
 
 const finalCtaButtonStyle = (theme: any) => ({
-  px: 8,
-  py: 3,
+  px: { xs: 4, sm: 8 },
+  py: { xs: 2, sm: 3 },
   borderRadius: '16px',
   fontWeight: 700,
-  fontSize: '1.1rem',
+  fontSize: { xs: '0.9rem', sm: '1.1rem' },
   transition: 'all 0.3s ease',
-  background: `linear-gradient(135deg, 
-    ${alpha(theme.palette.common.white, 0.2)} 0%, 
-    ${alpha(theme.palette.common.white, 0.1)} 100%)`,
+  whiteSpace: 'normal',
+  textAlign: 'center',
+  lineHeight: 1.3,
+  background: `linear-gradient(135deg, ${alpha(theme.palette.common.white, 0.2)} 0%, ${alpha(theme.palette.common.white, 0.1)} 100%)`,
   backdropFilter: 'blur(8px)',
   border: `1px solid ${alpha(theme.palette.common.white, 0.3)}`,
   '&:hover': {
-    transform: 'translateY(-2px) scale(1.05)'
+    transform: 'translateY(-2px) scale(1.02)'
   }
 });
 
 const finalArrowStyle = {
-  ml: 2,
   display: 'inline-flex',
   transform: 'rotate(-45deg)',
   transition: 'transform 0.3s ease'
@@ -458,19 +390,19 @@ const finalArrowStyle = {
 const getFeatures = (planType: string) => {
   const features = {
     hourly: [
-      { icon: Clock, text: 'On-demand senior architects' },
-      { icon: Award, text: '15+ years experience guarantee' },
-      { icon: Calendar, text: '24/7 flexible availability' }
+      { icon: Clock, text: 'Immediate expert access' },
+      { icon: Award, text: 'Proven track record' },
+      { icon: Calendar, text: 'Flexible scheduling' }
     ],
     project: [
-      { icon: Briefcase, text: 'End-to-end solution ownership' },
-      { icon: Users, text: 'Dedicated cross-functional team' },
-      { icon: Calendar, text: 'Agile milestone tracking' }
+      { icon: Briefcase, text: 'Full project ownership' },
+      { icon: Users, text: 'Dedicated team' },
+      { icon: Calendar, text: 'Agile milestones' }
     ],
     retainer: [
-      { icon: Info, text: 'Priority SLA response times' },
-      { icon: Award, text: 'Technology roadmap' },
-      { icon: Calendar, text: 'Predictable investment' }
+      { icon: Info, text: 'Priority support' },
+      { icon: Award, text: 'Strategic roadmap' },
+      { icon: Calendar, text: 'Predictable budgeting' }
     ]
   };
 
