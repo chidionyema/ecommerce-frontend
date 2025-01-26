@@ -178,8 +178,7 @@ const UltraPricingPage = () => {
                   ease: [0.16, 1, 0.3, 1] 
                 }}
                 whileHover={!isTouch ? { 
-                  scale: 1.02, 
-                  '&::after': { opacity: 0.2 }
+                  scale: 1.02
                 } : {}}
                 sx={{
                   '&:active': isTouch ? { 
