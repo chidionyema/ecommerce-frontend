@@ -18,16 +18,15 @@ const Contact: React.FC = () => {
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
-  // Premium plan titles
+  // Premium plan titles with emojis
   const { plan } = router.query;
   const planTitles: { [key: string]: string } = {
-    hourly: 'Elite Hourly Consultation',
-    project: 'Tailored Project Engagement',
-    retainer: 'Executive Retainer Partnership',
-    consultation: 'Strategic Innovation Session'
+    hourly: '🌟 Priority Hourly Consult',
+    project: '🚀 Tailored Project Partnership',
+    retainer: '💎 Executive Retainer Program',
+    consultation: '🔮 Strategic Vision Session'
   };
 
-  // Form handling with premium UX
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -37,13 +36,12 @@ const Contact: React.FC = () => {
     e.preventDefault();
     const submissionData = {
       ...formData,
-      selectedPlan: planTitles[plan as string] || 'Enterprise Consultation'
+      selectedPlan: planTitles[plan as string] || 'Strategic Collaboration'
     };
     console.log('Form Data Submitted:', submissionData);
     router.push('/thank-you');
   };
 
-  // Premium gradient generator
   const getGradient = (angle: number = 45) => 
     `linear-gradient(${angle}deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`;
 
@@ -59,7 +57,7 @@ const Contact: React.FC = () => {
         ${alpha(theme.palette.background.paper, 0.1)} 0%, 
         ${alpha(theme.palette.background.default, 0.8)} 100%)`
     }}>
-      {/* Luxury background elements */}
+      {/* Animated gradient background */}
       <motion.div
         style={{
           position: 'absolute',
@@ -78,10 +76,8 @@ const Contact: React.FC = () => {
         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
       />
       
-      {/* Diamond-pattern overlay */}
+      {/* Frosted glass overlay */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
         style={{
           position: 'absolute',
           inset: 0,
@@ -91,7 +87,6 @@ const Contact: React.FC = () => {
             transparent 1px,
             transparent 10px)`,
           backdropFilter: 'blur(40px)',
-          WebkitBackdropFilter: 'blur(40px)',
           zIndex: -1
         }}
       />
@@ -112,7 +107,6 @@ const Contact: React.FC = () => {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               position: 'relative',
-              textShadow: '0 4px 20px rgba(0,0,0,0.15)',
               '&:after': {
                 content: '""',
                 position: 'absolute',
@@ -122,24 +116,22 @@ const Contact: React.FC = () => {
                 height: '4px',
                 background: getGradient(),
                 borderRadius: '2px',
-                transformOrigin: 'left center',
                 animation: 'scaleInOut 2s infinite'
               }
             }}>
-              {planTitles[plan as string] || "Executive Consultation"}
+              {planTitles[plan as string] || "Let's Create Something Amazing"}
             </Typography>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
+            
+            <motion.div transition={{ delay: 0.4 }}>
               <Typography variant="body1" sx={{ 
                 mb: 4, 
                 fontSize: '1.1rem',
-                color: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.8)',
-                fontStyle: 'italic'
+                color: 'text.secondary',
+                lineHeight: 1.7
               }}>
-                {plan ? `Complete your bespoke consultation request for ${planTitles[plan as string]}` : "Begin your transformation journey with a confidential discussion"}
+                {plan ? 
+                  `Ready to elevate your project? Share a few details and we'll craft a solution that's uniquely yours.` : 
+                  "Whether you're exploring possibilities or ready to launch, let's start a conversation that matters."}
               </Typography>
             </motion.div>
           </motion.div>
@@ -151,26 +143,31 @@ const Contact: React.FC = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, type: 'spring' }}
-            style={{ position: 'relative' }}
           >
             <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
               whileHover={{ scale: 1.005 }}
-              style={{ background: alpha(theme.palette.background.paper, 0.8), borderRadius: '24px', padding: '2rem', backdropFilter: 'blur(20px)' }}
+              style={{ 
+                background: alpha(theme.palette.background.paper, 0.8), 
+                borderRadius: '24px', 
+                padding: '2rem', 
+                backdropFilter: 'blur(20px)',
+                boxShadow: '0 16px 40px rgba(0,0,0,0.1)'
+              }}
             >
               <Grid container spacing={3}>
-                {['name', 'email', 'phone'].map((field) => (
+                {[
+                  { field: 'name', label: 'Your Name' },
+                  { field: 'email', label: 'Best Email' },
+                  { field: 'phone', label: 'Direct Line' }
+                ].map(({ field, label }) => (
                   <Grid item xs={12} key={field}>
-                    <motion.div 
-                      whileHover={{ scale: 1.02 }}
-                      whileFocus={{ scale: 1.02 }}
-                    >
+                    <motion.div whileHover={{ scale: 1.02 }}>
                       <TextField
                         fullWidth
                         variant="filled"
-                        label={field.charAt(0).toUpperCase() + field.slice(1)}
+                        label={label}
                         name={field}
+                        placeholder={`Enter your ${field}`}
                         value={formData[field as keyof typeof formData]}
                         onChange={handleChange}
                         sx={{
@@ -201,8 +198,9 @@ const Contact: React.FC = () => {
                       multiline
                       rows={4}
                       variant="filled"
-                      label="Strategic Vision"
+                      label="Share Your Vision"
                       name="message"
+                      placeholder="Tell us about your goals, challenges, and dreams..."
                       value={formData.message}
                       onChange={handleChange}
                       sx={{
@@ -236,7 +234,7 @@ const Contact: React.FC = () => {
                         borderRadius: '12px',
                         fontSize: '1.1rem',
                         background: getGradient(),
-                        color: theme.palette.common.white,
+                        color: 'common.white',
                         textTransform: 'none',
                         position: 'relative',
                         overflow: 'hidden',
@@ -252,18 +250,10 @@ const Contact: React.FC = () => {
                         },
                         '&:hover:before': {
                           left: '100%'
-                        },
-                        '&:after': {
-                          content: '""',
-                          position: 'absolute',
-                          inset: 0,
-                          border: '2px solid transparent',
-                          borderRadius: '12px',
-                          animation: 'borderPulse 2s infinite'
                         }
                       }}
                     >
-                      Initiate Partnership
+                      Start Our Journey →
                     </Button>
                   </motion.div>
                 </Grid>
@@ -273,8 +263,8 @@ const Contact: React.FC = () => {
         </Grid>
       </Grid>
 
-      {/* Luxury particles */}
-      {[...Array(40)].map((_, i) => (
+      {/* Subtle animated particles */}
+      {[...Array(20)].map((_, i) => (
         <motion.div
           key={i}
           style={{
@@ -285,21 +275,19 @@ const Contact: React.FC = () => {
             borderRadius: '50%',
             filter: 'blur(2px)',
             width: Math.random() * 15 + 5,
-            height: Math.random() * 15 + 5
+            height: Math.random() * 15 + 5,
+            opacity: 0.15
           }}
           initial={{
-            scale: Math.random() * 0.5 + 0.5,
-            opacity: 0.2,
             x: `${Math.random() * 100 - 50}%`,
             y: `${Math.random() * 100 - 50}%`
           }}
           animate={{
-            x: ['0%', `${Math.random() * 100 - 50}%`],
-            y: ['0%', `${Math.random() * 100 - 50}%`],
-            rotate: [0, 360]
+            x: ['0%', `${Math.random() * 20 - 10}%`],
+            y: ['0%', `${Math.random() * 20 - 10}%`]
           }}
           transition={{
-            duration: Math.random() * 20 + 10,
+            duration: Math.random() * 10 + 5,
             repeat: Infinity,
             repeatType: 'mirror',
             ease: 'linear'
