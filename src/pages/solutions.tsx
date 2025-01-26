@@ -29,6 +29,8 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import PaletteIcon from '@mui/icons-material/Palette';
 import { cvProjects, type CVProject } from '../data/cvProjects';
 
+
+
 const Tilt = dynamic(() => import('react-parallax-tilt'), { 
   ssr: false,
   loading: () => <div style={{ height: '100%', borderRadius: 24, background: '#f5f5f5' }} />
@@ -38,8 +40,6 @@ const LIGHT_SKY = '#F8FAFF';
 const PLATINUM = '#FFFFFF';
 const GOLD_ACCENT = '#B08F68';
 const SECONDARY_GOLD = '#C5A46D';
-const TEXT_PRIMARY = '#1A202C';
-const TEXT_SECONDARY = '#4A5568';
 const GLASS_FILL = 'rgba(255, 255, 255, 0.95)';
 const BACKDROP_BLUR = 'blur(28px)';
 const PAGE_SIZE = 9;
@@ -89,6 +89,7 @@ const usePremiumCursor = () => {
 
 const Solutions: React.FC = () => {
   const theme = useTheme();
+  const primaryGradient = theme.palette.gradients.primary;
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: containerRef });
@@ -276,22 +277,21 @@ const Solutions: React.FC = () => {
             margin: '0 auto',
             textAlign: 'center'
           }}>
-            <Typography 
-              variant="h1" 
-              sx={{ 
-                fontWeight: 900,
-                letterSpacing: '-0.03em',
-                mb: 2,
-                fontSize: isMobile ? '2.5rem' : '3.5rem',
-                background: `linear-gradient(45deg, ${GOLD_ACCENT} 0%, ${SECONDARY_GOLD} 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textShadow: `0 4px 20px ${alpha(GOLD_ACCENT, 0.2)}`,
-                fontFamily: "'Inter', sans-serif"
-              }}
-            >
-              Technical Portfolio
-            </Typography>
+                    <Typography 
+                          variant="h1" 
+                          sx={{ 
+                            fontWeight: 900,
+                            letterSpacing: '-0.03em',
+                            mb: 2,
+                            fontSize: isMobile ? '2.5rem' : '3.5rem',
+                            background: primaryGradient,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
+                          }}
+                        >
+                            Our Solutions
+                        </Typography>
             <SearchField
               variant="filled"
               placeholder="Search case studies..."
@@ -307,7 +307,7 @@ const Solutions: React.FC = () => {
                 sx: {
                   py: 2,
                   fontSize: '1.1rem',
-                  color: TEXT_PRIMARY,
+                  color: theme.palette.text.primary, // Aligned with Resources page
                   fontFamily: "'Inter', sans-serif"
                 }
               }}
@@ -383,7 +383,7 @@ const Solutions: React.FC = () => {
                           </Avatar>
                           <Box>
                             <Typography variant="subtitle1" sx={{
-                              color: TEXT_PRIMARY,
+                              color: theme.palette.text.primary, // Aligned with Resources page
                               fontWeight: 700,
                               letterSpacing: '0.3px',
                               fontFamily: "'Inter', sans-serif",
@@ -392,7 +392,7 @@ const Solutions: React.FC = () => {
                               {project.clientName}
                             </Typography>
                             <Typography variant="caption" sx={{
-                              color: TEXT_SECONDARY,
+                              color: theme.palette.text.secondary, // Aligned with Resources page
                               fontSize: '0.75rem',
                               letterSpacing: '0.8px'
                             }}>
@@ -401,7 +401,7 @@ const Solutions: React.FC = () => {
                           </Box>
                         </Box>
                         <Typography variant="h5" sx={{
-                          color: TEXT_PRIMARY,
+                          color: theme.palette.text.primary, // Aligned with Resources page
                           fontWeight: 800,
                           lineHeight: 1.4,
                           fontSize: '1.5rem',
@@ -416,7 +416,7 @@ const Solutions: React.FC = () => {
 
                     <Box sx={{ p: 3, background: GLASS_FILL, borderTop: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`, backdropFilter: BACKDROP_BLUR }}>
                       <Typography variant="body1" sx={{
-                        color: TEXT_SECONDARY,
+                        color: theme.palette.text.secondary, // Aligned with Resources page
                         mb: 3,
                         lineHeight: 1.6,
                         fontSize: '0.95rem',
@@ -434,7 +434,7 @@ const Solutions: React.FC = () => {
                             size="small"
                             sx={{
                               background: `linear-gradient(135deg, ${alpha(GOLD_ACCENT, 0.1)} 0%, ${alpha(SECONDARY_GOLD, 0.05)} 100%)`,
-                              color: TEXT_PRIMARY,
+                              color: theme.palette.text.primary, // Aligned with Resources page
                               fontWeight: 700,
                               borderRadius: '12px',
                               border: `1px solid ${alpha(GOLD_ACCENT, 0.2)}`,
@@ -461,7 +461,7 @@ const Solutions: React.FC = () => {
                           }
                         }}>
                           <Typography variant="caption" sx={{
-                            color: TEXT_SECONDARY,
+                            color: theme.palette.text.secondary, // Aligned with Resources page
                             fontSize: '0.75rem',
                             letterSpacing: '0.8px',
                             fontFamily: "'Inter', sans-serif"
@@ -563,7 +563,7 @@ const Solutions: React.FC = () => {
                         </Avatar>
                         <Box>
                           <Typography variant="subtitle1" sx={{
-                            color: TEXT_PRIMARY,
+                            color: theme.palette.text.primary, // Aligned with Resources page
                             fontWeight: 700,
                             letterSpacing: '0.3px',
                             fontFamily: "'Inter', sans-serif",
@@ -572,7 +572,7 @@ const Solutions: React.FC = () => {
                             {project.clientName}
                           </Typography>
                           <Typography variant="caption" sx={{
-                            color: TEXT_SECONDARY,
+                            color: theme.palette.text.secondary, // Aligned with Resources page
                             fontSize: '0.75rem',
                             letterSpacing: '0.8px'
                           }}>
@@ -581,7 +581,7 @@ const Solutions: React.FC = () => {
                         </Box>
                       </Box>
                       <Typography variant="h5" sx={{
-                        color: TEXT_PRIMARY,
+                        color: theme.palette.text.primary, // Aligned with Resources page
                         fontWeight: 800,
                         lineHeight: 1.4,
                         fontSize: '1.5rem',
@@ -596,7 +596,7 @@ const Solutions: React.FC = () => {
 
                   <Box sx={{ p: 3, background: GLASS_FILL, borderTop: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`, backdropFilter: BACKDROP_BLUR }}>
                     <Typography variant="body1" sx={{
-                      color: TEXT_SECONDARY,
+                      color: theme.palette.text.secondary, // Aligned with Resources page
                       mb: 3,
                       lineHeight: 1.6,
                       fontSize: '0.95rem',
@@ -614,7 +614,7 @@ const Solutions: React.FC = () => {
                           size="small"
                           sx={{
                             background: `linear-gradient(135deg, ${alpha(GOLD_ACCENT, 0.1)} 0%, ${alpha(SECONDARY_GOLD, 0.05)} 100%)`,
-                            color: TEXT_PRIMARY,
+                            color: theme.palette.text.primary, // Aligned with Resources page
                             fontWeight: 700,
                             borderRadius: '12px',
                             border: `1px solid ${alpha(GOLD_ACCENT, 0.2)}`,
@@ -641,7 +641,7 @@ const Solutions: React.FC = () => {
                         }
                       }}>
                         <Typography variant="caption" sx={{
-                          color: TEXT_SECONDARY,
+                          color: theme.palette.text.secondary, // Aligned with Resources page
                           fontSize: '0.75rem',
                           letterSpacing: '0.8px',
                           fontFamily: "'Inter', sans-serif"
@@ -713,11 +713,11 @@ const Solutions: React.FC = () => {
               }
             }} />
           ) : hasMore ? (
-            <Typography variant="body2" sx={{ color: TEXT_SECONDARY, fontFamily: "'Inter', sans-serif" }}>
+            <Typography variant="body2" sx={{ color: theme.palette.text.secondary, fontFamily: "'Inter', sans-serif" }}>
               Scroll to load more
             </Typography>
           ) : (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: TEXT_SECONDARY, fontFamily: "'Inter', sans-serif" }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: theme.palette.text.secondary, fontFamily: "'Inter', sans-serif" }}>
               <CheckCircleOutlineIcon color="success" />
               <Typography variant="body2">All projects loaded</Typography>
             </Box>
