@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { keyframes } from '@mui/system';
 import {
@@ -27,7 +26,6 @@ import {
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import CodeIcon from '@mui/icons-material/Code';
 import PaletteIcon from '@mui/icons-material/Palette';
 import { cvProjects, type CVProject } from '../data/cvProjects';
 
@@ -152,7 +150,7 @@ const Solutions: React.FC = () => {
     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: 'pointer',
     '&:hover': {
-      transform: 'translateY(-8px) scale(1.02)',
+      transform: !isMobile ? 'translateY(-8px) scale(1.02)' : 'none',
       boxShadow: `0 40px 80px ${alpha(GOLD_ACCENT, 0.2)}`,
       '&:before, &:after': { opacity: 0.2 },
       '& .shine-overlay': { opacity: 0.25 },
@@ -200,6 +198,7 @@ const Solutions: React.FC = () => {
       minHeight: '100vh',
       position: 'relative',
       overflow: 'hidden',
+      touchAction: 'manipulation'
     }}>
       <GlobalStyles styles={{
         '@keyframes ripple': {
@@ -321,24 +320,206 @@ const Solutions: React.FC = () => {
         <Grid container spacing={4}>
           {displayedProjects.map(project => (
             <Grid item xs={12} sm={6} md={4} key={project.id}>
-              <Tilt
-                tiltMaxAngleX={3}
-                tiltMaxAngleY={3}
-                glareEnable={true}
-                glareMaxOpacity={0.1}
-                glareBorderRadius="24px"
-                transitionSpeed={500}
-                scale={1.02}
-                tiltEnable={!navigatingId}
-                glarePosition="all"
-                style={{ transformStyle: 'preserve-3d' }}
-              >
+              {!isMobile ? (
+                <Tilt
+                  tiltMaxAngleX={3}
+                  tiltMaxAngleY={3}
+                  glareEnable={true}
+                  glareMaxOpacity={0.1}
+                  glareBorderRadius="24px"
+                  transitionSpeed={500}
+                  scale={1.02}
+                  tiltEnable={!navigatingId}
+                  glarePosition="all"
+                  style={{ transformStyle: 'preserve-3d' }}
+                >
+                  <PremiumCardContainer
+                    onClick={() => handleViewDetails(project.id)}
+                    style={{ opacity: navigatingId === project.id ? 0.7 : 1 }}
+                    whileHover={{ scale: 1.03 }}
+                    onMouseEnter={() => router.prefetch(`/projects/${project.id}`)}
+                    sx={{ WebkitTapHighlightColor: 'transparent' }}
+                  >
+                    <Box sx={{
+                      position: 'absolute',
+                      top: 0,
+                      left: '-100%',
+                      width: '200%',
+                      height: '100%',
+                      background: `linear-gradient(90deg, transparent 25%, ${alpha(PLATINUM, 0.2)} 50%, transparent 75%)`,
+                      animation: `${logoShine} 6s infinite linear`,
+                      opacity: 0,
+                      transition: 'opacity 0.3s ease',
+                      pointerEvents: 'none'
+                    }} />
+                    
+                    <Box sx={{ position: 'relative', height: 200, overflow: 'hidden', p: 3 }}>
+                      <Box sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)',
+                        backdropFilter: BACKDROP_BLUR,
+                        zIndex: 1
+                      }} />
+                      <Box sx={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                          <Avatar sx={{
+                            width: 64,
+                            height: 64,
+                            background: `linear-gradient(135deg, ${alpha(PLATINUM, 0.95)} 0%, ${alpha(PLATINUM, 0.85)} 100%)`,
+                            border: `2px solid ${alpha(GOLD_ACCENT, 0.2)}`,
+                            backdropFilter: BACKDROP_BLUR,
+                            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.1)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': { transform: 'scale(1.05) rotate(-5deg)' },
+                            '& svg': { width: '2.2rem', height: '2.2rem', color: `${GOLD_ACCENT} !important` }
+                          }}>
+                            {project.icon ? 
+                              <project.icon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT }} /> : 
+                              <PaletteIcon sx={{ fontSize: '2.2rem', color: GOLD_ACCENT }} />}
+                          </Avatar>
+                          <Box>
+                            <Typography variant="subtitle1" sx={{
+                              color: TEXT_PRIMARY,
+                              fontWeight: 700,
+                              letterSpacing: '0.3px',
+                              fontFamily: "'Inter', sans-serif",
+                              fontSize: '1.1rem'
+                            }}>
+                              {project.clientName}
+                            </Typography>
+                            <Typography variant="caption" sx={{
+                              color: TEXT_SECONDARY,
+                              fontSize: '0.75rem',
+                              letterSpacing: '0.8px'
+                            }}>
+                              {project.timeline}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <Typography variant="h5" sx={{
+                          color: TEXT_PRIMARY,
+                          fontWeight: 800,
+                          lineHeight: 1.4,
+                          fontSize: '1.5rem',
+                          letterSpacing: '0.1px',
+                          textShadow: '0 2px 12px rgba(0, 0, 0, 0.05)',
+                          fontFamily: "'Inter', sans-serif"
+                        }}>
+                          {project.name}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ p: 3, background: GLASS_FILL, borderTop: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`, backdropFilter: BACKDROP_BLUR }}>
+                      <Typography variant="body1" sx={{
+                        color: TEXT_SECONDARY,
+                        mb: 3,
+                        lineHeight: 1.6,
+                        fontSize: '0.95rem',
+                        minHeight: 100,
+                        fontWeight: 400
+                      }}>
+                        {project.description}
+                      </Typography>
+                      
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+                        {project.technologies.slice(0, 4).map((tech, index) => (
+                          <Chip
+                            key={index}
+                            label={tech}
+                            size="small"
+                            sx={{
+                              background: `linear-gradient(135deg, ${alpha(GOLD_ACCENT, 0.1)} 0%, ${alpha(SECONDARY_GOLD, 0.05)} 100%)`,
+                              color: TEXT_PRIMARY,
+                              fontWeight: 700,
+                              borderRadius: '12px',
+                              border: `1px solid ${alpha(GOLD_ACCENT, 0.2)}`,
+                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                              '&:hover': {
+                                background: `linear-gradient(135deg, ${alpha(GOLD_ACCENT, 0.15)} 0%, ${alpha(SECONDARY_GOLD, 0.1)} 100%)`,
+                                transform: 'translateY(-3px)',
+                                boxShadow: '0 4px 12px rgba(176, 143, 104, 0.15)'
+                              }
+                            }}
+                          />
+                        ))}
+                      </Box>
+                      
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 2 }}>
+                        <Badge badgeContent={project.teamSize} sx={{
+                          '& .MuiBadge-badge': {
+                            right: -8,
+                            top: 16,
+                            background: alpha(GOLD_ACCENT, 0.9),
+                            color: PLATINUM,
+                            fontWeight: 700,
+                            fontFamily: "'Inter', sans-serif"
+                          }
+                        }}>
+                          <Typography variant="caption" sx={{
+                            color: TEXT_SECONDARY,
+                            fontSize: '0.75rem',
+                            letterSpacing: '0.8px',
+                            fontFamily: "'Inter', sans-serif"
+                          }}>
+                            Team Members
+                          </Typography>
+                        </Badge>
+                        
+                        <IconButton
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleViewDetails(project.id);
+                          }}
+                          disabled={navigatingId === project.id}
+                          className="nav-button"
+                          sx={{
+                            background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.9)} 0%, ${alpha(SECONDARY_GOLD, 0.9)} 100%)`,
+                            color: PLATINUM,
+                            borderRadius: '12px',
+                            padding: '12px',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            position: 'relative',
+                            zIndex: 2,
+                            '&:hover': {
+                              transform: 'translateY(-2px)',
+                              boxShadow: `0 8px 24px ${alpha(GOLD_ACCENT, 0.2)}`
+                            },
+                            '&:active': {
+                              transform: 'scale(0.95)'
+                            }
+                          }}
+                        >
+                          {navigatingId === project.id ? (
+                            <CircularProgress size={24} sx={{ 
+                              color: PLATINUM,
+                              animation: `${float} 2s ease-in-out infinite`
+                            }} />
+                          ) : (
+                            <ArrowForwardIcon sx={{ 
+                              fontSize: '1.4rem',
+                              transition: 'transform 0.2s'
+                            }} />
+                          )}
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  </PremiumCardContainer>
+                </Tilt>
+              ) : (
                 <PremiumCardContainer
                   onClick={() => handleViewDetails(project.id)}
                   style={{ opacity: navigatingId === project.id ? 0.7 : 1 }}
-                  whileHover={{ scale: 1.03 }}
-                  onMouseEnter={() => router.prefetch(`/projects/${project.id}`)}
+                  sx={{
+                    WebkitTapHighlightColor: 'transparent',
+                    touchAction: 'pan-y'
+                  }}
                 >
+                  {/* Mobile card content (same as desktop but without Tilt wrapper) */}
                   <Box sx={{
                     position: 'absolute',
                     top: 0,
@@ -469,46 +650,46 @@ const Solutions: React.FC = () => {
                         </Typography>
                       </Badge>
                       
-                      <Link href={`/projects/${project.id}`} passHref legacyBehavior>
-                        <IconButton
-                          component="a"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewDetails(project.id);
-                          }}
-                          disabled={navigatingId === project.id}
-                          className="nav-button"
-                          sx={{
-                            background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.9)} 0%, ${alpha(SECONDARY_GOLD, 0.9)} 100%)`,
+                      <IconButton
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleViewDetails(project.id);
+                        }}
+                        disabled={navigatingId === project.id}
+                        className="nav-button"
+                        sx={{
+                          background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.9)} 0%, ${alpha(SECONDARY_GOLD, 0.9)} 100%)`,
+                          color: PLATINUM,
+                          borderRadius: '12px',
+                          padding: '12px',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          position: 'relative',
+                          zIndex: 2,
+                          '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: `0 8px 24px ${alpha(GOLD_ACCENT, 0.2)}`
+                          },
+                          '&:active': {
+                            transform: 'scale(0.95)'
+                          }
+                        }}
+                      >
+                        {navigatingId === project.id ? (
+                          <CircularProgress size={24} sx={{ 
                             color: PLATINUM,
-                            borderRadius: '12px',
-                            padding: '12px',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            position: 'relative',
-                            zIndex: 2,
-                            '&:hover': {
-                              transform: 'translateY(-2px)',
-                              boxShadow: `0 8px 24px ${alpha(GOLD_ACCENT, 0.2)}`
-                            }
-                          }}
-                        >
-                          {navigatingId === project.id ? (
-                            <CircularProgress size={24} sx={{ 
-                              color: PLATINUM,
-                              animation: `${float} 2s ease-in-out infinite`
-                            }} />
-                          ) : (
-                            <ArrowForwardIcon sx={{ 
-                              fontSize: '1.4rem',
-                              transition: 'transform 0.2s'
-                            }} />
-                          )}
-                        </IconButton>
-                      </Link>
+                            animation: `${float} 2s ease-in-out infinite`
+                          }} />
+                        ) : (
+                          <ArrowForwardIcon sx={{ 
+                            fontSize: '1.4rem',
+                            transition: 'transform 0.2s'
+                          }} />
+                        )}
+                      </IconButton>
                     </Box>
                   </Box>
                 </PremiumCardContainer>
-              </Tilt>
+              )}
             </Grid>
           ))}
         </Grid>
