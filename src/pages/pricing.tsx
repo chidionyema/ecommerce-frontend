@@ -58,7 +58,11 @@ const PremiumOverlay = styled(Box)(({ theme }) => ({
   pointerEvents: 'none'
 }));
 
-const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
+// Create a motion component first
+const MotionBox = motion(Box);
+
+// Then apply Material UI styles
+const LazyPricingCard = styled(MotionBox)(({ theme }) => ({
   position: 'relative',
   backdropFilter: 'blur(24px)',
   background: `
