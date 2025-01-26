@@ -1,45 +1,88 @@
 import { useState } from 'react';
-import { useTheme, Container, Grid, TextField, Button, Typography, useMediaQuery, alpha } from '@mui/material';
+import { 
+  useTheme, 
+  Container, 
+  Grid, 
+  TextField, 
+  Button, 
+  Typography, 
+  useMediaQuery, 
+  alpha, 
+  CircularProgress, 
+  Alert 
+} from '@mui/material';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/router';
+
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+}
+
+const planTitles: Record<string, string> = {
+  hourly: '🌟 Priority Hourly Consult',
+  project: '🚀 Tailored Project Partnership',
+  retainer: '💎 Executive Retainer Program',
+  consultation: '🔮 Strategic Vision Session'
+};
 
 const Contact: React.FC = () => {
   const theme = useTheme();
   const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     phone: '',
     message: '',
   });
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  
   // Enhanced scroll animations
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-
-  // Premium plan titles with emojis
-  const { plan } = router.query;
-  const planTitles: { [key: string]: string } = {
-    hourly: '🌟 Priority Hourly Consult',
-    project: '🚀 Tailored Project Partnership',
-    retainer: '💎 Executive Retainer Program',
-    consultation: '🔮 Strategic Vision Session'
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const submissionData = {
-      ...formData,
-      selectedPlan: planTitles[plan as string] || 'Strategic Collaboration'
-    };
-    console.log('Form Data Submitted:', submissionData);
-    router.push('/thank-you');
+    setLoading(true);
+    setError('');
+    setSuccess(false);
+
+    try {
+      const form = new FormData();
+      form.append('name', formData.name);
+      form.append('email', formData.email);
+      form.append('phone', formData.phone);
+      form.append('message', formData.message);
+      form.append('plan', planTitles[router.query.plan as string] || 'General Inquiry');
+
+      const response = await fetch('https://your-worker.your-domain.com', {
+        method: 'POST',
+        body: form
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.errors?.join(', ') || 'Submission failed');
+      }
+
+      setSuccess(true);
+      setTimeout(() => router.push('/thank-you'), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getGradient = (angle: number = 45) => 
@@ -119,7 +162,7 @@ const Contact: React.FC = () => {
                 animation: 'scaleInOut 2s infinite'
               }
             }}>
-              {planTitles[plan as string] || "Let's Create Something Amazing"}
+              {planTitles[router.query.plan as string] || "Let's Create Something Amazing"}
             </Typography>
             
             <motion.div transition={{ delay: 0.4 }}>
@@ -129,7 +172,7 @@ const Contact: React.FC = () => {
                 color: 'text.secondary',
                 lineHeight: 1.7
               }}>
-                {plan ? 
+                {router.query.plan ? 
                   `Ready to elevate your project? Share a few details and we'll craft a solution that's uniquely yours.` : 
                   "Whether you're exploring possibilities or ready to launch, let's start a conversation that matters."}
               </Typography>
@@ -155,6 +198,22 @@ const Contact: React.FC = () => {
               }}
             >
               <Grid container spacing={3}>
+                {error && (
+                  <Grid item xs={12}>
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                      {error}
+                    </Alert>
+                  </Grid>
+                )}
+
+                {success && (
+                  <Grid item xs={12}>
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                      Message sent successfully!
+                    </Alert>
+                  </Grid>
+                )}
+
                 {[
                   { field: 'name', label: 'Your Name' },
                   { field: 'email', label: 'Best Email' },
@@ -170,6 +229,7 @@ const Contact: React.FC = () => {
                         placeholder={`Enter your ${field}`}
                         value={formData[field as keyof typeof formData]}
                         onChange={handleChange}
+                        disabled={loading}
                         sx={{
                           '& .MuiFilledInput-root': {
                             borderRadius: '12px',
@@ -203,6 +263,7 @@ const Contact: React.FC = () => {
                       placeholder="Tell us about your goals, challenges, and dreams..."
                       value={formData.message}
                       onChange={handleChange}
+                      disabled={loading}
                       sx={{
                         '& .MuiFilledInput-root': {
                           borderRadius: '12px',
@@ -228,6 +289,7 @@ const Contact: React.FC = () => {
                       type="submit"
                       variant="contained"
                       size="large"
+                      disabled={loading}
                       sx={{
                         px: 6,
                         py: 2,
@@ -253,7 +315,11 @@ const Contact: React.FC = () => {
                         }
                       }}
                     >
-                      Start Our Journey →
+                      {loading ? (
+                        <CircularProgress size={24} sx={{ color: 'white' }} />
+                      ) : (
+                        'Start Our Journey →'
+                      )}
                     </Button>
                   </motion.div>
                 </Grid>

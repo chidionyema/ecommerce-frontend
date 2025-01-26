@@ -29,12 +29,13 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import PaletteIcon from '@mui/icons-material/Palette';
 import { cvProjects, type CVProject } from '../data/cvProjects';
 
-
-
-const Tilt = dynamic(() => import('react-parallax-tilt'), { 
-  ssr: false,
-  loading: () => <div style={{ height: '100%', borderRadius: 24, background: '#f5f5f5' }} />
-});
+const Tilt = dynamic(
+  () => import('react-parallax-tilt').then((mod) => mod.default),
+  { 
+    ssr: false,
+    loading: () => <div style={{ height: '100%', borderRadius: 24, background: '#f5f5f5' }} />
+  }
+);
 
 const LIGHT_SKY = '#F8FAFF';
 const PLATINUM = '#FFFFFF';
@@ -148,34 +149,7 @@ const Solutions: React.FC = () => {
     background: `linear-gradient(152deg, ${alpha(PLATINUM, 0.92)} 0%, ${alpha(PLATINUM, 0.97)} 100%)`,
     boxShadow: `0 32px 64px ${alpha(GOLD_ACCENT, 0.1)}`,
     border: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`,
-    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: 'pointer',
-    '&:hover': {
-      transform: !isMobile ? 'translateY(-8px) scale(1.02)' : 'none',
-      boxShadow: `0 40px 80px ${alpha(GOLD_ACCENT, 0.2)}`,
-      '&:before, &:after': { opacity: 0.2 },
-      '& .shine-overlay': { opacity: 0.25 },
-      '& .nav-button': { transform: 'translateX(4px)' }
-    },
-    '&:before': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.05)} 0%, transparent 50%, ${alpha(GOLD_ACCENT, 0.05)} 100%)`,
-      opacity: 0,
-      transition: 'opacity 0.4s ease',
-      pointerEvents: 'none'
-    },
-    '&:after': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.15)} 0%, ${alpha(SECONDARY_GOLD, 0.1)} 100%)`,
-      opacity: 0,
-      transition: 'opacity 0.4s ease',
-      mixBlendMode: 'soft-light',
-      pointerEvents: 'none'
-    }
   });
 
   const SearchField = styled(TextField)({
@@ -183,8 +157,7 @@ const Solutions: React.FC = () => {
       backgroundColor: alpha(PLATINUM, 0.9),
       borderRadius: '20px',
       padding: '8px 24px',
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      '&:hover': { backgroundColor: alpha(PLATINUM, 0.95), transform: 'scale(1.02)' },
+      '&:hover': { backgroundColor: alpha(PLATINUM, 0.95) },
       '&.Mui-focused': { backgroundColor: PLATINUM, boxShadow: `0 0 0 2px ${alpha(GOLD_ACCENT, 0.2)}` }
     },
     '& .MuiInputAdornment-root': {
@@ -205,10 +178,6 @@ const Solutions: React.FC = () => {
         '@keyframes ripple': {
           '0%': { opacity: 1, transform: 'scale(0.8)' },
           '100%': { opacity: 0, transform: 'scale(2.4)' }
-        },
-        '@keyframes float': {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' }
         },
         '@font-face': {
           fontFamily: 'Inter',
@@ -277,21 +246,21 @@ const Solutions: React.FC = () => {
             margin: '0 auto',
             textAlign: 'center'
           }}>
-                    <Typography 
-                          variant="h1" 
-                          sx={{ 
-                            fontWeight: 900,
-                            letterSpacing: '-0.03em',
-                            mb: 2,
-                            fontSize: isMobile ? '2.5rem' : '3.5rem',
-                            background: primaryGradient,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
-                          }}
-                        >
-                            Our Solutions
-                        </Typography>
+            <Typography 
+              variant="h1" 
+              sx={{ 
+                fontWeight: 900,
+                letterSpacing: '-0.03em',
+                mb: 2,
+                fontSize: isMobile ? '2.5rem' : '3.5rem',
+                background: primaryGradient,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
+              }}
+            >
+              Our Solutions
+            </Typography>
             <SearchField
               variant="filled"
               placeholder="Search case studies..."
@@ -307,7 +276,7 @@ const Solutions: React.FC = () => {
                 sx: {
                   py: 2,
                   fontSize: '1.1rem',
-                  color: theme.palette.text.primary, // Aligned with Resources page
+                  color: theme.palette.text.primary,
                   fontFamily: "'Inter', sans-serif"
                 }
               }}
@@ -327,32 +296,39 @@ const Solutions: React.FC = () => {
                   glareEnable={true}
                   glareMaxOpacity={0.1}
                   glareBorderRadius="24px"
-                  transitionSpeed={500}
+                  transitionSpeed={1500}
                   scale={1.02}
                   tiltEnable={!navigatingId}
                   glarePosition="all"
-                  style={{ transformStyle: 'preserve-3d' }}
+                  gyroscope={true}
+                  style={{ 
+                    transformStyle: 'preserve-3d',
+                    backfaceVisibility: 'hidden',
+                    willChange: 'transform'
+                  }}
                 >
                   <PremiumCardContainer
                     onClick={() => handleViewDetails(project.id)}
                     style={{ opacity: navigatingId === project.id ? 0.7 : 1 }}
-                    whileHover={{ scale: 1.03 }}
+                    whileHover={{
+                      scale: 1.03,
+                      y: -8,
+                      transition: { 
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 15,
+                        mass: 0.5
+                      }
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 400,
+                      damping: 20
+                    }}
                     onMouseEnter={() => router.prefetch(`/projects/${project.id}`)}
                     sx={{ WebkitTapHighlightColor: 'transparent' }}
                   >
-                    <Box sx={{
-                      position: 'absolute',
-                      top: 0,
-                      left: '-100%',
-                      width: '200%',
-                      height: '100%',
-                      background: `linear-gradient(90deg, transparent 25%, ${alpha(PLATINUM, 0.2)} 50%, transparent 75%)`,
-                      animation: `${logoShine} 6s infinite linear`,
-                      opacity: 0,
-                      transition: 'opacity 0.3s ease',
-                      pointerEvents: 'none'
-                    }} />
-                    
                     <Box sx={{ position: 'relative', height: 200, overflow: 'hidden', p: 3 }}>
                       <Box sx={{
                         position: 'absolute',
@@ -373,8 +349,6 @@ const Solutions: React.FC = () => {
                             border: `2px solid ${alpha(GOLD_ACCENT, 0.2)}`,
                             backdropFilter: BACKDROP_BLUR,
                             boxShadow: '0 12px 32px rgba(0, 0, 0, 0.1)',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover': { transform: 'scale(1.05) rotate(-5deg)' },
                             '& svg': { width: '2.2rem', height: '2.2rem', color: `${GOLD_ACCENT} !important` }
                           }}>
                             {project.icon ? 
@@ -383,7 +357,7 @@ const Solutions: React.FC = () => {
                           </Avatar>
                           <Box>
                             <Typography variant="subtitle1" sx={{
-                              color: theme.palette.text.primary, // Aligned with Resources page
+                              color: theme.palette.text.primary,
                               fontWeight: 700,
                               letterSpacing: '0.3px',
                               fontFamily: "'Inter', sans-serif",
@@ -392,7 +366,7 @@ const Solutions: React.FC = () => {
                               {project.clientName}
                             </Typography>
                             <Typography variant="caption" sx={{
-                              color: theme.palette.text.secondary, // Aligned with Resources page
+                              color: theme.palette.text.secondary,
                               fontSize: '0.75rem',
                               letterSpacing: '0.8px'
                             }}>
@@ -401,7 +375,7 @@ const Solutions: React.FC = () => {
                           </Box>
                         </Box>
                         <Typography variant="h5" sx={{
-                          color: theme.palette.text.primary, // Aligned with Resources page
+                          color: theme.palette.text.primary,
                           fontWeight: 800,
                           lineHeight: 1.4,
                           fontSize: '1.5rem',
@@ -416,7 +390,7 @@ const Solutions: React.FC = () => {
 
                     <Box sx={{ p: 3, background: GLASS_FILL, borderTop: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`, backdropFilter: BACKDROP_BLUR }}>
                       <Typography variant="body1" sx={{
-                        color: theme.palette.text.secondary, // Aligned with Resources page
+                        color: theme.palette.text.secondary,
                         mb: 3,
                         lineHeight: 1.6,
                         fontSize: '0.95rem',
@@ -434,16 +408,10 @@ const Solutions: React.FC = () => {
                             size="small"
                             sx={{
                               background: `linear-gradient(135deg, ${alpha(GOLD_ACCENT, 0.1)} 0%, ${alpha(SECONDARY_GOLD, 0.05)} 100%)`,
-                              color: theme.palette.text.primary, // Aligned with Resources page
+                              color: theme.palette.text.primary,
                               fontWeight: 700,
                               borderRadius: '12px',
                               border: `1px solid ${alpha(GOLD_ACCENT, 0.2)}`,
-                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                              '&:hover': {
-                                background: `linear-gradient(135deg, ${alpha(GOLD_ACCENT, 0.15)} 0%, ${alpha(SECONDARY_GOLD, 0.1)} 100%)`,
-                                transform: 'translateY(-3px)',
-                                boxShadow: '0 4px 12px rgba(176, 143, 104, 0.15)'
-                              }
                             }}
                           />
                         ))}
@@ -461,7 +429,7 @@ const Solutions: React.FC = () => {
                           }
                         }}>
                           <Typography variant="caption" sx={{
-                            color: theme.palette.text.secondary, // Aligned with Resources page
+                            color: theme.palette.text.secondary,
                             fontSize: '0.75rem',
                             letterSpacing: '0.8px',
                             fontFamily: "'Inter', sans-serif"
@@ -476,7 +444,6 @@ const Solutions: React.FC = () => {
                             handleViewDetails(project.id);
                           }}
                           disabled={navigatingId === project.id}
-                          className="nav-button"
                           sx={{
                             background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.9)} 0%, ${alpha(SECONDARY_GOLD, 0.9)} 100%)`,
                             color: PLATINUM,
@@ -485,13 +452,6 @@ const Solutions: React.FC = () => {
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             position: 'relative',
                             zIndex: 2,
-                            '&:hover': {
-                              transform: 'translateY(-2px)',
-                              boxShadow: `0 8px 24px ${alpha(GOLD_ACCENT, 0.2)}`
-                            },
-                            '&:active': {
-                              transform: 'scale(0.95)'
-                            }
                           }}
                         >
                           {navigatingId === project.id ? (
@@ -500,10 +460,7 @@ const Solutions: React.FC = () => {
                               animation: `${float} 2s ease-in-out infinite`
                             }} />
                           ) : (
-                            <ArrowForwardIcon sx={{ 
-                              fontSize: '1.4rem',
-                              transition: 'transform 0.2s'
-                            }} />
+                            <ArrowForwardIcon sx={{ fontSize: '1.4rem' }} />
                           )}
                         </IconButton>
                       </Box>
@@ -514,25 +471,13 @@ const Solutions: React.FC = () => {
                 <PremiumCardContainer
                   onClick={() => handleViewDetails(project.id)}
                   style={{ opacity: navigatingId === project.id ? 0.7 : 1 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   sx={{
                     WebkitTapHighlightColor: 'transparent',
                     touchAction: 'pan-y'
                   }}
                 >
-                  {/* Mobile card content (same as desktop but without Tilt wrapper) */}
-                  <Box sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: '-100%',
-                    width: '200%',
-                    height: '100%',
-                    background: `linear-gradient(90deg, transparent 25%, ${alpha(PLATINUM, 0.2)} 50%, transparent 75%)`,
-                    animation: `${logoShine} 6s infinite linear`,
-                    opacity: 0,
-                    transition: 'opacity 0.3s ease',
-                    pointerEvents: 'none'
-                  }} />
-                  
                   <Box sx={{ position: 'relative', height: 200, overflow: 'hidden', p: 3 }}>
                     <Box sx={{
                       position: 'absolute',
@@ -553,8 +498,6 @@ const Solutions: React.FC = () => {
                           border: `2px solid ${alpha(GOLD_ACCENT, 0.2)}`,
                           backdropFilter: BACKDROP_BLUR,
                           boxShadow: '0 12px 32px rgba(0, 0, 0, 0.1)',
-                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                          '&:hover': { transform: 'scale(1.05) rotate(-5deg)' },
                           '& svg': { width: '2.2rem', height: '2.2rem', color: `${GOLD_ACCENT} !important` }
                         }}>
                           {project.icon ? 
@@ -563,7 +506,7 @@ const Solutions: React.FC = () => {
                         </Avatar>
                         <Box>
                           <Typography variant="subtitle1" sx={{
-                            color: theme.palette.text.primary, // Aligned with Resources page
+                            color: theme.palette.text.primary,
                             fontWeight: 700,
                             letterSpacing: '0.3px',
                             fontFamily: "'Inter', sans-serif",
@@ -572,7 +515,7 @@ const Solutions: React.FC = () => {
                             {project.clientName}
                           </Typography>
                           <Typography variant="caption" sx={{
-                            color: theme.palette.text.secondary, // Aligned with Resources page
+                            color: theme.palette.text.secondary,
                             fontSize: '0.75rem',
                             letterSpacing: '0.8px'
                           }}>
@@ -581,7 +524,7 @@ const Solutions: React.FC = () => {
                         </Box>
                       </Box>
                       <Typography variant="h5" sx={{
-                        color: theme.palette.text.primary, // Aligned with Resources page
+                        color: theme.palette.text.primary,
                         fontWeight: 800,
                         lineHeight: 1.4,
                         fontSize: '1.5rem',
@@ -596,7 +539,7 @@ const Solutions: React.FC = () => {
 
                   <Box sx={{ p: 3, background: GLASS_FILL, borderTop: `1px solid ${alpha(GOLD_ACCENT, 0.1)}`, backdropFilter: BACKDROP_BLUR }}>
                     <Typography variant="body1" sx={{
-                      color: theme.palette.text.secondary, // Aligned with Resources page
+                      color: theme.palette.text.secondary,
                       mb: 3,
                       lineHeight: 1.6,
                       fontSize: '0.95rem',
@@ -614,16 +557,10 @@ const Solutions: React.FC = () => {
                           size="small"
                           sx={{
                             background: `linear-gradient(135deg, ${alpha(GOLD_ACCENT, 0.1)} 0%, ${alpha(SECONDARY_GOLD, 0.05)} 100%)`,
-                            color: theme.palette.text.primary, // Aligned with Resources page
+                            color: theme.palette.text.primary,
                             fontWeight: 700,
                             borderRadius: '12px',
                             border: `1px solid ${alpha(GOLD_ACCENT, 0.2)}`,
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover': {
-                              background: `linear-gradient(135deg, ${alpha(GOLD_ACCENT, 0.15)} 0%, ${alpha(SECONDARY_GOLD, 0.1)} 100%)`,
-                              transform: 'translateY(-3px)',
-                              boxShadow: '0 4px 12px rgba(176, 143, 104, 0.15)'
-                            }
                           }}
                         />
                       ))}
@@ -641,7 +578,7 @@ const Solutions: React.FC = () => {
                         }
                       }}>
                         <Typography variant="caption" sx={{
-                          color: theme.palette.text.secondary, // Aligned with Resources page
+                          color: theme.palette.text.secondary,
                           fontSize: '0.75rem',
                           letterSpacing: '0.8px',
                           fontFamily: "'Inter', sans-serif"
@@ -656,7 +593,6 @@ const Solutions: React.FC = () => {
                           handleViewDetails(project.id);
                         }}
                         disabled={navigatingId === project.id}
-                        className="nav-button"
                         sx={{
                           background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.9)} 0%, ${alpha(SECONDARY_GOLD, 0.9)} 100%)`,
                           color: PLATINUM,
@@ -665,13 +601,6 @@ const Solutions: React.FC = () => {
                           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                           position: 'relative',
                           zIndex: 2,
-                          '&:hover': {
-                            transform: 'translateY(-2px)',
-                            boxShadow: `0 8px 24px ${alpha(GOLD_ACCENT, 0.2)}`
-                          },
-                          '&:active': {
-                            transform: 'scale(0.95)'
-                          }
                         }}
                       >
                         {navigatingId === project.id ? (
@@ -680,10 +609,7 @@ const Solutions: React.FC = () => {
                             animation: `${float} 2s ease-in-out infinite`
                           }} />
                         ) : (
-                          <ArrowForwardIcon sx={{ 
-                            fontSize: '1.4rem',
-                            transition: 'transform 0.2s'
-                          }} />
+                          <ArrowForwardIcon sx={{ fontSize: '1.4rem' }} />
                         )}
                       </IconButton>
                     </Box>

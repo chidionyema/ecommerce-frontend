@@ -27,10 +27,11 @@ const globalStyles = `
 `;
 
 const ProfessionalButton = styled(motion(Button))(({ theme }) => ({
-  padding: '16px 32px',
-  borderRadius: '14px',
+  padding: '14px 32px',
+  borderRadius: '12px',
   fontWeight: 700,
   fontSize: '1rem',
+  letterSpacing: '0.5px',
   textTransform: 'none',
   border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -105,7 +106,10 @@ const ValuePropositionItem = styled(motion(Box))(({ theme }) => ({
   transition: 'all 0.3s ease',
   backdropFilter: 'blur(8px)',
   willChange: 'transform',
-  '&:hover': { background: alpha(theme.palette.common.white, 0.1), transform: 'translateX(4px)' }
+  '&:hover': { 
+    background: alpha(theme.palette.common.white, 0.1), 
+    transform: 'translateX(4px)' 
+  }
 }));
 
 const techIcons = [
@@ -140,8 +144,22 @@ const HeroSection = () => {
       background: `linear-gradient(135deg,${alpha(theme.palette.primary.dark, 0.98)} 0%,${alpha(theme.palette.secondary.dark, 0.95)} 100%)`,
       color: 'white',
       py: 8,
+      pt: 10,
+      pb: 12,
       position: 'relative',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      // Add these properties for softer edges
+      borderRadius: { xs: '16px', sm: '24px' },
+      mx: { xs: 2, sm: 3 },
+      my: 4,
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        borderRadius: 'inherit',
+        boxShadow: `0 0 48px ${alpha(theme.palette.primary.dark, 0.4)}`,
+        zIndex: -1
+      }
     }}>
       <style>{globalStyles}</style>
       <Container maxWidth="md">
@@ -173,18 +191,37 @@ const HeroSection = () => {
           
           <Typography variant="body1" sx={{
             textAlign: 'center',
-            mb: 4,
+            mb: 3,
             fontSize: '1rem',
             fontWeight: 300,
             opacity: 0.9,
             lineHeight: 1.6,
             maxWidth: '680px',
-            margin: '0 auto'
+            margin: '0 auto',
+            transform: 'translateZ(0)',
+            willChange: 'transform'
           }}>
             Strategic technology solutions combining enterprise robustness with agile innovation
           </Typography>
 
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 2, 
+            justifyContent: 'center', 
+            flexWrap: 'wrap',
+            mt: 4,
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: -24,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '120px',
+              height: '2px',
+              background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.common.white, 0.3)}, transparent)`,
+            }
+          }}>
             <ProfessionalButton
               variant="contained"
               onClick={() => router.push('/contact')}
@@ -199,7 +236,14 @@ const HeroSection = () => {
             <ProfessionalButton
               variant="outlined"
               onClick={() => router.push('/solutions')}
-              sx={{ color: 'white', borderColor: alpha(theme.palette.common.white, 0.3), '&:hover': { borderColor: theme.palette.secondary.main } }}>
+              sx={{ 
+                color: 'white', 
+                borderColor: alpha(theme.palette.common.white, 0.3), 
+                '&:hover': { 
+                  borderColor: theme.palette.secondary.main,
+                  background: alpha(theme.palette.secondary.main, 0.1) 
+                } 
+              }}>
               View Case Studies
             </ProfessionalButton>
           </Box>
