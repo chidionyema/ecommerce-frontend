@@ -16,10 +16,12 @@ import { Info, Award, Clock, Users, Calendar, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { motion, useScroll, useTransform, LazyMotion, domAnimation, MotionProps } from 'framer-motion';
 
+// Theme augmentation for MUI
 declare module '@mui/material/styles' {
   interface Palette {
     gradients: {
       primary: string;
+      secondary: string;
     };
   }
 }
@@ -75,8 +77,8 @@ const PremiumOverlay = styled(Box)(({ theme }) => ({
 }));
 
 const LazyPricingCard = styled(MotionBox, {
-  shouldForwardProp: (prop) => 
-    !['initial', 'animate', 'exit', 'whileHover', 'sx'].includes(prop.toString())
+  shouldForwardProp: (prop: string) => 
+    !['initial', 'animate', 'exit', 'whileHover', 'sx'].includes(prop)
 })<StyledMotionProps>(({ theme }) => ({
   position: 'relative',
   backdropFilter: 'blur(24px)',

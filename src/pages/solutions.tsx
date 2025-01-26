@@ -259,7 +259,7 @@ const Solutions: React.FC = () => {
                 textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
               }}
             >
-              Client Solutions
+              Our Solutions
             </Typography>
             <SearchField
               variant="filled"
