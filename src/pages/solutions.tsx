@@ -8,8 +8,6 @@ import {
   Box,
   Typography,
   Grid,
-  TextField,
-  InputAdornment,
   Container,
   Chip,
   IconButton,
@@ -18,7 +16,6 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { cvProjects, type CVProject } from '../data/cvProjects';
 
@@ -32,17 +29,38 @@ const Tilt = dynamic(
 );
 
 /* --------------------------- Colors & Constants --------------------------- */
+// Example brand tokens (adjust if needed to match the rest of your site):
+const DEEP_NAVY = '#0A1A2F';
+const PLATINUM = '#E5E4E2';
+const GOLD_ACCENT = '#C5A46D';
+
+// A light background color for the page
 const LIGHT_SKY = '#F8FAFF';
+
+// A bit of blur for container backgrounds
 const BACKDROP_BLUR = 'blur(28px)';
+
+// Pagination size
 const PAGE_SIZE = 9;
 
 /* --------------------------- Styled Components --------------------------- */
+
+/**
+ * PremiumCardContainer
+ *  - Uses a custom gradient that references your brand colors
+ *  - Maintains the vibrant 3D effect + glass styling
+ */
 const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
   position: 'relative',
   borderRadius: 24,
   overflow: 'hidden',
   cursor: 'pointer',
-  background: `linear-gradient(145deg, #F4A261, #2A9D8F, #E63946)`,
+  // Updated gradient referencing brand colors at alpha levels
+  background: `linear-gradient(145deg,
+    ${alpha(GOLD_ACCENT, 0.6)},
+    ${alpha(PLATINUM, 0.3)},
+    ${alpha(DEEP_NAVY, 0.5)}
+  )`,
   boxShadow: `
     0 20px 50px ${alpha(theme.palette.primary.dark, 0.3)},
     inset 0 0 10px ${alpha(theme.palette.common.white, 0.1)}
@@ -50,6 +68,7 @@ const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
   border: `2px solid transparent`,
   backgroundClip: 'padding-box',
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+
   '&:hover': {
     transform: 'translateY(-8px) scale(1.05)',
     boxShadow: `
@@ -57,18 +76,23 @@ const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
       inset 0 0 15px ${alpha(theme.palette.common.white, 0.15)}
     `,
   },
+  // Subtle “border glow” effect
   '&::before': {
     content: '""',
     position: 'absolute',
     inset: '-2px',
     borderRadius: 24,
-    background: `linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15))`,
+    background: `linear-gradient(145deg,
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.15)
+    )`,
     zIndex: 0,
   },
   '.content-overlay': {
     position: 'absolute',
     inset: 0,
     borderRadius: 24,
+    // Glass effect overlay
     backgroundColor: alpha('#fff', 0.8),
     zIndex: 1,
     backdropFilter: 'blur(10px)',
@@ -80,19 +104,14 @@ const Solutions = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [displayedProjects, setDisplayedProjects] = useState<CVProject[]>([]);
 
-  // Debounce search input
-  const debouncedQuery = useMemo(() => {
-    const handler = setTimeout(() => searchQuery, 300);
-    return () => clearTimeout(handler);
-  }, [searchQuery]);
-
-  // Filtered projects
+  // Filtered projects based on search
   const filteredProjects = useMemo(() => {
     return cvProjects.filter(
       (proj) =>
@@ -112,11 +131,14 @@ const Solutions = () => {
     }
   }, [page, filteredProjects, isLoading]);
 
-  // Handle infinite scroll
+  // Infinite scroll effect
   useEffect(() => {
     if (!hasMore) return;
     const onScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 500) {
+      if (
+        window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.offsetHeight - 500
+      ) {
         setPage((prev) => prev + 1);
       }
     };
@@ -126,19 +148,17 @@ const Solutions = () => {
 
   // Navigate to project details
   const handleViewDetails = useCallback(
-    async (projectId: string) => {
-      try {
-        await router.push(`/projects/${projectId}`);
-      } catch (err) {
+    (projectId: string) => {
+      router.push(`/projects/${projectId}`).catch((err) => {
         console.error('Navigation failed:', err);
-      }
+      });
     },
     [router]
   );
 
   return (
     <Box sx={{ backgroundColor: LIGHT_SKY, minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
-      {/* Header */}
+      {/* (Optional) Page Header */}
       <AppBar
         position="sticky"
         sx={{
@@ -175,7 +195,7 @@ const Solutions = () => {
                 letterSpacing: '-0.03em',
                 mb: 2,
                 fontSize: isMobile ? '2.5rem' : '3.5rem',
-                background: theme.palette.gradients.primary,
+                background: theme.palette.gradients?.primary || 'linear-gradient(to right, #0A1A2F, #C5A46D)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
@@ -212,18 +232,23 @@ const Solutions = () => {
                 >
                   <Box className="content-overlay" />
                   <Box sx={{ p: 3, position: 'relative', zIndex: 4 }}>
+                    {/* Client / Project Header */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                       <project.icon style={{ fontSize: '2rem' }} />
                       <Typography variant="h6" sx={{ fontWeight: 600 }}>
                         {project.clientName}
                       </Typography>
                     </Box>
+
+                    {/* Project Name & Description */}
                     <Typography variant="h5" sx={{ mb: 1, fontWeight: 700 }}>
                       {project.name}
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
                       {project.description}
                     </Typography>
+
+                    {/* Tech Chips */}
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
                       {project.technologies.map((tech) => (
                         <Chip
@@ -237,6 +262,8 @@ const Solutions = () => {
                         />
                       ))}
                     </Box>
+
+                    {/* Arrow Icon */}
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                       <IconButton sx={{ color: theme.palette.primary.main }}>
                         <ArrowForwardIcon />
