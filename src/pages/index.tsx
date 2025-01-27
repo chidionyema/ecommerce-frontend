@@ -565,7 +565,7 @@ const WhyPartnerSection = () => {
         )`,
         color: 'white',
         position: 'relative',
-        overflow: 'hidden',
+
         '&::before': {
           content: '""',
           position: 'absolute',
