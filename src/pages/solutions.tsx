@@ -18,44 +18,65 @@ import {
 import { useTheme } from '@mui/material/styles';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { cvProjects, type CVProject } from '../data/cvProjects';
+import ReactDOM from 'react-dom';
 
 // Dynamically import tilt for 3D parallax effect
-const Tilt = dynamic(
-  () => import('react-parallax-tilt').then((mod) => mod.default),
-  {
-    ssr: false,
-    loading: () => <div style={{ height: '100%', borderRadius: 24, background: '#f5f5f5' }} />,
-  }
-);
+const Tilt = dynamic(() => import('react-parallax-tilt').then((mod) => mod.default), {
+  ssr: false,
+  loading: () => <div style={{ height: '100%', borderRadius: 24, background: '#f5f5f5' }} />,
+});
 
 /* --------------------------- Colors & Constants --------------------------- */
-// Example brand tokens (adjust if needed to match the rest of your site):
 const DEEP_NAVY = '#0A1A2F';
 const PLATINUM = '#E5E4E2';
 const GOLD_ACCENT = '#C5A46D';
-
-// A light background color for the page
-const LIGHT_SKY = '#F8FAFF';
-
-// A bit of blur for container backgrounds
+const LIGHT_SKY = '#F8FAFF'; // Page background
 const BACKDROP_BLUR = 'blur(28px)';
-
-// Pagination size
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 9; // For pagination
 
 /* --------------------------- Styled Components --------------------------- */
 
+/** 
+ * IconBackground: A circular goldish background behind each icon 
+ */
+/* --------------------------- Styled Components --------------------------- */
+
+const IconBackground = styled(Box)(({ theme }) => ({
+  width: 56, // Adjusted size for consistency
+  height: 56,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: '50%',
+  background: `linear-gradient(
+    135deg,
+    ${alpha(theme.palette.primary.main, 0.85)},
+    ${alpha(theme.palette.secondary.main, 0.65)}
+  )`,
+  boxShadow: `
+    0 4px 12px ${alpha(theme.palette.primary.dark, 0.3)},
+    inset 0 -2px 6px ${alpha(theme.palette.secondary.light, 0.2)}
+  `,
+  transition: 'all 0.3s ease-in-out',
+  '&:hover': {
+    transform: 'scale(1.1)',
+    boxShadow: `
+      0 6px 16px ${alpha(theme.palette.primary.dark, 0.4)},
+      inset 0 -2px 8px ${alpha(theme.palette.secondary.light, 0.3)}
+    `,
+  },
+}));
+
+
 /**
  * PremiumCardContainer
- *  - Uses a custom gradient that references your brand colors
- *  - Maintains the vibrant 3D effect + glass styling
+ * - Vibrant 3D effect, glassy background, and tilt animations
  */
 const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
   position: 'relative',
   borderRadius: 24,
   overflow: 'hidden',
   cursor: 'pointer',
-  // Updated gradient referencing brand colors at alpha levels
   background: `linear-gradient(145deg,
     ${alpha(GOLD_ACCENT, 0.6)},
     ${alpha(PLATINUM, 0.3)},
@@ -68,7 +89,6 @@ const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
   border: `2px solid transparent`,
   backgroundClip: 'padding-box',
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-
   '&:hover': {
     transform: 'translateY(-8px) scale(1.05)',
     boxShadow: `
@@ -92,15 +112,16 @@ const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
     position: 'absolute',
     inset: 0,
     borderRadius: 24,
-    // Glass effect overlay
     backgroundColor: alpha('#fff', 0.8),
     zIndex: 1,
     backdropFilter: 'blur(10px)',
   },
 }));
 
-/* ----------------------------- Main Component ----------------------------- */
-const Solutions = () => {
+/* --------------------------------------------------------------------------
+ *  Solutions Page
+ * -------------------------------------------------------------------------- */
+const Solutions: React.FC = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -113,14 +134,13 @@ const Solutions = () => {
 
   // Filtered projects based on search
   const filteredProjects = useMemo(() => {
-    return cvProjects.filter(
-      (proj) =>
-        proj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        proj.technologies.some((tech) => tech.toLowerCase().includes(searchQuery.toLowerCase()))
+    return cvProjects.filter((proj) =>
+      proj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      proj.technologies.some((tech) => tech.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   }, [searchQuery]);
 
-  // Pagination logic
+  // Load initial page of projects
   useEffect(() => {
     if (!isLoading) {
       setIsLoading(true);
@@ -131,10 +151,10 @@ const Solutions = () => {
     }
   }, [page, filteredProjects, isLoading]);
 
-  // Infinite scroll effect
+  // Infinite scroll
   useEffect(() => {
     if (!hasMore) return;
-    const onScroll = () => {
+    const handleScroll = () => {
       if (
         window.innerHeight + document.documentElement.scrollTop >=
         document.documentElement.offsetHeight - 500
@@ -142,11 +162,10 @@ const Solutions = () => {
         setPage((prev) => prev + 1);
       }
     };
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMore]);
 
-  // Navigate to project details
   const handleViewDetails = useCallback(
     (projectId: string) => {
       router.push(`/projects/${projectId}`).catch((err) => {
@@ -158,7 +177,7 @@ const Solutions = () => {
 
   return (
     <Box sx={{ backgroundColor: LIGHT_SKY, minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
-      {/* (Optional) Page Header */}
+      {/* Page Header */}
       <AppBar
         position="sticky"
         sx={{
@@ -195,7 +214,7 @@ const Solutions = () => {
                 letterSpacing: '-0.03em',
                 mb: 2,
                 fontSize: isMobile ? '2.5rem' : '3.5rem',
-                background: theme.palette.gradients?.primary || 'linear-gradient(to right, #0A1A2F, #C5A46D)',
+                background: theme.palette.gradients?.primary || `linear-gradient(to right, ${DEEP_NAVY}, ${GOLD_ACCENT})`,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
@@ -231,16 +250,23 @@ const Solutions = () => {
                   onClick={() => handleViewDetails(project.id)}
                 >
                   <Box className="content-overlay" />
+
                   <Box sx={{ p: 3, position: 'relative', zIndex: 4 }}>
-                    {/* Client / Project Header */}
+                    {/* Icon + Title */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                      <project.icon style={{ fontSize: '2rem' }} />
+                      {/* Wrap the function-based icon with IconBackground + createElement */}
+                      <IconBackground>
+                        {React.createElement(project.icon, {
+                          size: 24, // lucide-react prop
+                          color: theme.palette.primary.main,
+                        })}
+                      </IconBackground>
+
                       <Typography variant="h6" sx={{ fontWeight: 600 }}>
                         {project.clientName}
                       </Typography>
                     </Box>
 
-                    {/* Project Name & Description */}
                     <Typography variant="h5" sx={{ mb: 1, fontWeight: 700 }}>
                       {project.name}
                     </Typography>
@@ -251,19 +277,11 @@ const Solutions = () => {
                     {/* Tech Chips */}
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
                       {project.technologies.map((tech) => (
-                        <Chip
-                          key={tech}
-                          label={tech}
-                          size="small"
-                          sx={{
-                            background: alpha(theme.palette.primary.light, 0.15),
-                            color: theme.palette.primary.main,
-                          }}
-                        />
+                        <Chip key={tech} label={tech} size="small" />
                       ))}
                     </Box>
 
-                    {/* Arrow Icon */}
+                    {/* CTA Arrow */}
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                       <IconButton sx={{ color: theme.palette.primary.main }}>
                         <ArrowForwardIcon />

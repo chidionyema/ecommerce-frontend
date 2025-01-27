@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { 
-  useTheme, 
-  Container, 
-  Grid, 
-  TextField, 
-  Button, 
-  Typography, 
-  useMediaQuery, 
-  alpha, 
-  CircularProgress, 
-  Alert 
+import {
+  useTheme,
+  Container,
+  Grid,
+  TextField,
+  Button,
+  Typography,
+  useMediaQuery,
+  alpha,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/router';
@@ -25,7 +25,7 @@ const planTitles: Record<string, string> = {
   hourly: '🌟 Priority Hourly Consult',
   project: '🚀 Tailored Project Partnership',
   retainer: '💎 Executive Retainer Program',
-  consultation: '🔮 Strategic Vision Session'
+  consultation: '🔮 Strategic Vision Session',
 };
 
 const Contact: React.FC = () => {
@@ -41,14 +41,13 @@ const Contact: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  
-  // Enhanced scroll animations
+
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,11 +66,11 @@ const Contact: React.FC = () => {
 
       const response = await fetch('https://your-worker.your-domain.com', {
         method: 'POST',
-        body: form
+        body: form,
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.errors?.join(', ') || 'Submission failed');
       }
@@ -85,22 +84,21 @@ const Contact: React.FC = () => {
     }
   };
 
-  const getGradient = (angle: number = 45) => 
+  const getGradient = (angle: number = 45) =>
     `linear-gradient(${angle}deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`;
 
   return (
-    <Container maxWidth="lg" sx={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      position: 'relative',
-      overflow: 'hidden',
-      py: 10,
-      background: `radial-gradient(circle at center, 
-        ${alpha(theme.palette.background.paper, 0.1)} 0%, 
-        ${alpha(theme.palette.background.default, 0.8)} 100%)`
-    }}>
-      {/* Animated gradient background */}
+    <Container
+      maxWidth="lg"
+      sx={{
+        py: 10, // Increased padding
+        position: 'relative',
+        overflow: 'hidden',
+        background: `radial-gradient(circle at center, 
+          ${alpha(theme.palette.background.paper, 0.1)} 0%, 
+          ${alpha(theme.palette.background.default, 0.8)} 100%)`,
+      }}
+    >
       <motion.div
         style={{
           position: 'absolute',
@@ -113,13 +111,12 @@ const Contact: React.FC = () => {
           opacity: 0.08,
           zIndex: -2,
           rotate: 15,
-          scale: 1.2
+          scale: 1.2,
         }}
         animate={{ rotate: [15, 25, 15] }}
-        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
       />
-      
-      {/* Frosted glass overlay */}
+
       <motion.div
         style={{
           position: 'absolute',
@@ -130,7 +127,7 @@ const Contact: React.FC = () => {
             transparent 1px,
             transparent 10px)`,
           backdropFilter: 'blur(40px)',
-          zIndex: -1
+          zIndex: -1,
         }}
       />
 
@@ -141,42 +138,33 @@ const Contact: React.FC = () => {
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.8, type: 'spring' }}
           >
-            <Typography variant="h2" sx={{
-              fontWeight: 900,
-              mb: 3,
-              fontSize: isMobile ? '2.5rem' : '3.5rem',
-              lineHeight: 1.2,
-              background: getGradient(-45),
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              position: 'relative',
-              '&:after': {
-                content: '""',
-                position: 'absolute',
-                bottom: -8,
-                left: 0,
-                width: '60px',
-                height: '4px',
-                background: getGradient(),
-                borderRadius: '2px',
-                animation: 'scaleInOut 2s infinite'
-              }
-            }}>
+            <Typography
+              variant="h2"
+              sx={{
+                fontWeight: 900,
+                mb: 3,
+                fontSize: isMobile ? '2.5rem' : '3.5rem',
+                lineHeight: 1.2,
+                background: getGradient(-45),
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
               {planTitles[router.query.plan as string] || "Let's Create Something Amazing"}
             </Typography>
-            
-            <motion.div transition={{ delay: 0.4 }}>
-              <Typography variant="body1" sx={{ 
-                mb: 4, 
+            <Typography
+              variant="body1"
+              sx={{
+                mb: 4,
                 fontSize: '1.1rem',
                 color: 'text.secondary',
-                lineHeight: 1.7
-              }}>
-                {router.query.plan ? 
-                  `Ready to elevate your project? Share a few details and we'll craft a solution that's uniquely yours.` : 
-                  "Whether you're exploring possibilities or ready to launch, let's start a conversation that matters."}
-              </Typography>
-            </motion.div>
+                lineHeight: 1.7,
+              }}
+            >
+              {router.query.plan
+                ? `Ready to elevate your project? Share a few details and we'll craft a solution that's uniquely yours.`
+                : "Whether you're exploring possibilities or ready to launch, let's start a conversation that matters."}
+            </Typography>
           </motion.div>
         </Grid>
 
@@ -188,178 +176,77 @@ const Contact: React.FC = () => {
             transition={{ delay: 0.2, type: 'spring' }}
           >
             <motion.div
-              whileHover={{ scale: 1.005 }}
-              style={{ 
-                background: alpha(theme.palette.background.paper, 0.8), 
-                borderRadius: '24px', 
-                padding: '2rem', 
+              style={{
+                background: alpha(theme.palette.background.paper, 0.8),
+                borderRadius: '24px',
+                padding: '2.5rem', // Increased padding
                 backdropFilter: 'blur(20px)',
-                boxShadow: '0 16px 40px rgba(0,0,0,0.1)'
+                boxShadow: '0 16px 40px rgba(0,0,0,0.1)',
               }}
             >
               <Grid container spacing={3}>
                 {error && (
                   <Grid item xs={12}>
-                    <Alert severity="error" sx={{ mb: 2 }}>
-                      {error}
-                    </Alert>
+                    <Alert severity="error">{error}</Alert>
                   </Grid>
                 )}
-
                 {success && (
                   <Grid item xs={12}>
-                    <Alert severity="success" sx={{ mb: 2 }}>
-                      Message sent successfully!
-                    </Alert>
+                    <Alert severity="success">Message sent successfully!</Alert>
                   </Grid>
                 )}
 
-                {[
-                  { field: 'name', label: 'Your Name' },
-                  { field: 'email', label: 'Best Email' },
-                  { field: 'phone', label: 'Direct Line' }
-                ].map(({ field, label }) => (
+                {['name', 'email', 'phone'].map((field) => (
                   <Grid item xs={12} key={field}>
-                    <motion.div whileHover={{ scale: 1.02 }}>
-                      <TextField
-                        fullWidth
-                        variant="filled"
-                        label={label}
-                        name={field}
-                        placeholder={`Enter your ${field}`}
-                        value={formData[field as keyof typeof formData]}
-                        onChange={handleChange}
-                        disabled={loading}
-                        sx={{
-                          '& .MuiFilledInput-root': {
-                            borderRadius: '12px',
-                            background: alpha(theme.palette.background.paper, 0.1),
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover, &:focus-within': {
-                              background: alpha(theme.palette.primary.main, 0.08),
-                              boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.3)}`
-                            },
-                            '& input': {
-                              py: 2,
-                              fontSize: '1.1rem',
-                              fontWeight: 500
-                            }
-                          }
-                        }}
-                      />
-                    </motion.div>
-                  </Grid>
-                ))}
-
-                <Grid item xs={12}>
-                  <motion.div whileHover={{ scale: 1.02 }}>
                     <TextField
                       fullWidth
-                      multiline
-                      rows={4}
                       variant="filled"
-                      label="Share Your Vision"
-                      name="message"
-                      placeholder="Tell us about your goals, challenges, and dreams..."
-                      value={formData.message}
+                      label={`Enter your ${field}`}
+                      name={field}
+                      value={formData[field as keyof FormData]}
                       onChange={handleChange}
                       disabled={loading}
                       sx={{
                         '& .MuiFilledInput-root': {
                           borderRadius: '12px',
                           background: alpha(theme.palette.background.paper, 0.1),
-                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                          '&:hover, &:focus-within': {
-                            background: alpha(theme.palette.primary.main, 0.08),
-                            boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.3)}`
-                          }
-                        }
+                          '&:hover': {
+                            background: alpha(theme.palette.primary.main, 0.1),
+                          },
+                        },
                       }}
                     />
-                  </motion.div>
-                </Grid>
-
+                  </Grid>
+                ))}
                 <Grid item xs={12}>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    style={{ display: 'flex', justifyContent: 'flex-end' }}
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={6} // Increased rows for more space
+                    variant="filled"
+                    label="Share Your Vision"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    disabled={loading}
+                    sx={{ py: 2 }}
                   >
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      size="large"
-                      disabled={loading}
-                      sx={{
-                        px: 6,
-                        py: 2,
-                        borderRadius: '12px',
-                        fontSize: '1.1rem',
-                        background: getGradient(),
-                        color: 'common.white',
-                        textTransform: 'none',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        '&:before': {
-                          content: '""',
-                          position: 'absolute',
-                          top: 0,
-                          left: '-100%',
-                          width: '100%',
-                          height: '100%',
-                          background: 'linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent)',
-                          transition: '0.5s'
-                        },
-                        '&:hover:before': {
-                          left: '100%'
-                        }
-                      }}
-                    >
-                      {loading ? (
-                        <CircularProgress size={24} sx={{ color: 'white' }} />
-                      ) : (
-                        'Start Our Journey →'
-                      )}
-                    </Button>
-                  </motion.div>
+                    {loading ? <CircularProgress size={24} /> : 'Send Message'}
+                  </Button>
                 </Grid>
               </Grid>
             </motion.div>
           </motion.form>
         </Grid>
       </Grid>
-
-      {/* Subtle animated particles */}
-      {[...Array(20)].map((_, i) => (
-        <motion.div
-          key={i}
-          style={{
-            position: 'absolute',
-            background: `radial-gradient(circle, 
-              ${i % 2 === 0 ? theme.palette.primary.main : theme.palette.secondary.main} 0%, 
-              transparent 70%)`,
-            borderRadius: '50%',
-            filter: 'blur(2px)',
-            width: Math.random() * 15 + 5,
-            height: Math.random() * 15 + 5,
-            opacity: 0.15
-          }}
-          initial={{
-            x: `${Math.random() * 100 - 50}%`,
-            y: `${Math.random() * 100 - 50}%`
-          }}
-          animate={{
-            x: ['0%', `${Math.random() * 20 - 10}%`],
-            y: ['0%', `${Math.random() * 20 - 10}%`]
-          }}
-          transition={{
-            duration: Math.random() * 10 + 5,
-            repeat: Infinity,
-            repeatType: 'mirror',
-            ease: 'linear'
-          }}
-        />
-      ))}
     </Container>
   );
 };

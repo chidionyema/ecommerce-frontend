@@ -22,6 +22,7 @@ const swirl = `
   }
 `;
 
+/* ----------------------------- GLOBAL STYLES -------------------------------------- */
 const globalStyles = `
   :root {
     --persuasive-1: #e63946;
@@ -102,7 +103,7 @@ const TechIconContainer = styled(Box)({
 
 const FeatureCard = styled(motion(Box))(({ theme }) => ({
   padding: theme.spacing(3),
-  borderRadius: '20px',
+  borderRadius: '20px', // 20px to match your requested shape
   height: '100%',
   position: 'relative',
   overflow: 'hidden',
@@ -112,7 +113,7 @@ const FeatureCard = styled(motion(Box))(({ theme }) => ({
       ${alpha(theme.palette.background.paper, 0.95)},
       ${alpha(theme.palette.background.default, 0.98)}
     ),
-    url('/noise-texture.png') /* <--- subtle noise texture */
+    url('/noise-texture.png') 
   `,
   backgroundSize: 'cover',
   border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
@@ -159,7 +160,7 @@ const ValuePropositionItem = styled(motion(Box))(({ theme }) => ({
   '&:hover': { 
     background: alpha(theme.palette.common.white, 0.1), 
     transform: 'translateX(4px)',
-    boxShadow: `0 6px 18px ${alpha(theme.palette.primary.main, 0.1)}` // NEW/UPDATED subtle glow
+    boxShadow: `0 6px 18px ${alpha(theme.palette.primary.main, 0.1)}`
   }
 }));
 
@@ -183,7 +184,7 @@ const techIcons = [
 ];
 
 /* -------------------------------------------------------------------------- */
-/*                                    HeroSection                             */
+/*                                   HeroSection                              */
 /* -------------------------------------------------------------------------- */
 const HeroSection = () => {
   const theme = useTheme();
@@ -191,116 +192,148 @@ const HeroSection = () => {
   const router = useRouter();
 
   return (
-    <Box component="section" sx={{
-      minHeight: '70vh',
-      display: 'flex',
-      alignItems: 'center',
-      background: `linear-gradient(135deg,${alpha(theme.palette.primary.dark, 0.98)} 0%,${alpha(theme.palette.secondary.dark, 0.95)} 100%)`,
-      color: 'white',
-      py: 8,
-      pt: 10,
-      pb: 12,
-      position: 'relative',
-      overflow: 'hidden',
-      // NEW/UPDATED swirling conic gradient overlay
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: '-50%',
-        left: '-50%',
-        width: '200%',
-        height: '200%',
-        background: `conic-gradient(
-          from 90deg,
-          ${alpha(theme.palette.primary.light, 0.15)},
-          transparent 80%
-        )`,
-        animation: 'swirlConic 30s linear infinite',
-        zIndex: 0
-      }
-    }}>
-      <style>{globalStyles}</style>
-      <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <Typography variant="h1" sx={{
-            textAlign: 'center',
-            mb: 3,
-            fontWeight: 800,
-            fontSize: isMobile ? '2rem' : '2.5rem',
-            lineHeight: 1.2,
-            // NEW/UPDATED advanced gradient
-            background: `linear-gradient(45deg,${theme.palette.common.white} 30%,${alpha(theme.palette.secondary.light, 0.9)} 100%)`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            position: 'relative',
-            '&:after': {
-              content: '""',
-              position: 'absolute',
-              bottom: '-8px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '60%',
-              height: '2px',
-              background: theme.palette.secondary.main,
-              borderRadius: '2px'
-            }
-          }}>
+    <Box
+      component="section"
+      sx={{
+        // For consistent "box" shape on mobile:
+        borderRadius: '20px',
+        overflow: 'hidden',
+        mx: 'auto', // ensures center alignment
+        my: 2,
+        width: '100%',
+        [theme.breakpoints.down('sm')]: {
+          maxWidth: '95%', // or 100%, as you prefer
+        },
+        // The large gradient background
+        background: `linear-gradient(135deg,
+          ${alpha(theme.palette.primary.dark, 0.98)} 0%,
+          ${alpha(theme.palette.secondary.dark, 0.95)} 100%)`,
+        color: 'white',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          background: `conic-gradient(
+            from 90deg,
+            ${alpha(theme.palette.primary.light, 0.15)},
+            transparent 80%
+          )`,
+          animation: 'swirlConic 30s linear infinite',
+          zIndex: 0
+        }
+      }}
+    >
+      <Container 
+        maxWidth="xl" 
+        sx={{ 
+          py: 16,     // Taller hero
+          pt: 20,     // Taller hero
+          pb: 20,     // Taller hero
+          position: 'relative', 
+          zIndex: 1
+        }}
+      >
+        <style>{globalStyles}</style>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ duration: 0.6 }}
+        >
+          <Typography
+            variant="h1"
+            sx={{
+              textAlign: 'center',
+              mb: 3,
+              fontWeight: 800,
+              fontSize: isMobile ? '2rem' : '2.5rem',
+              lineHeight: 1.2,
+              background: `linear-gradient(45deg,
+                ${theme.palette.common.white} 30%,
+                ${alpha(theme.palette.secondary.light, 0.9)} 100%)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              position: 'relative',
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: '-8px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '60%',
+                height: '2px',
+                background: theme.palette.secondary.main,
+                borderRadius: '2px'
+              }
+            }}
+          >
             Precision Engineering for Digital Excellence
           </Typography>
 
-          <Typography variant="caption" sx={{
-            display: 'block',
-            textAlign: 'center',
-            mt: 2,
-            color: alpha(theme.palette.common.white, 0.8),
-            fontWeight: 500,
-            letterSpacing: '1px',
-            textTransform: 'uppercase',
-            '& span': {
-              display: 'inline-block',
-              mx: 1.5,
-              verticalAlign: 'middle'
-            }
-          }}>
+          <Typography
+            variant="caption"
+            sx={{
+              display: 'block',
+              textAlign: 'center',
+              mt: 2,
+              color: alpha(theme.palette.common.white, 0.8),
+              fontWeight: 500,
+              letterSpacing: '1px',
+              textTransform: 'uppercase',
+              '& span': {
+                display: 'inline-block',
+                mx: 1.5,
+                verticalAlign: 'middle'
+              }
+            }}
+          >
             <span>Trusted by</span> 
             <FaMicrosoft style={{ color: theme.palette.success.main }} />
             <FaGoogle style={{ color: theme.palette.error.main }} /> 
             <FaAws style={{ color: theme.palette.warning.main }} />
           </Typography>
           
-          <Typography variant="body1" sx={{
-            textAlign: 'center',
-            mb: 3,
-            fontSize: '1rem',
-            fontWeight: 300,
-            opacity: 0.9,
-            lineHeight: 1.6,
-            maxWidth: '680px',
-            margin: '0 auto',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}>
+          <Typography
+            variant="body1"
+            sx={{
+              textAlign: 'center',
+              mb: 3,
+              fontSize: '1rem',
+              fontWeight: 300,
+              opacity: 0.9,
+              lineHeight: 1.6,
+              maxWidth: '680px',
+              margin: '0 auto'
+            }}
+          >
             Strategic technology solutions combining enterprise robustness with agile innovation
           </Typography>
 
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 2, 
-            justifyContent: 'center', 
-            flexWrap: 'wrap',
-            mt: 4,
-            position: 'relative',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: -24,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '120px',
-              height: '2px',
-              background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.common.white, 0.3)}, transparent)`,
-            }
-          }}>
+          <Box
+            sx={{ 
+              display: 'flex', 
+              gap: 2, 
+              justifyContent: 'center', 
+              flexWrap: 'wrap',
+              mt: 4,
+              position: 'relative',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: -24,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '120px',
+                height: '2px',
+                background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.common.white, 0.3)}, transparent)`,
+              }
+            }}
+          >
             <ProfessionalButton
               variant="contained"
               onClick={() => router.push('/free-consult')}
@@ -318,7 +351,9 @@ const HeroSection = () => {
               onClick={() => router.push('/contact')}
               endIcon={<ArrowRightAlt />}
               sx={{
-                background: `linear-gradient(45deg,${theme.palette.error.dark} 0%,${theme.palette.warning.dark} 100%)`,
+                background: `linear-gradient(45deg,
+                  ${theme.palette.error.dark} 0%,
+                  ${theme.palette.warning.dark} 100%)`,
                 color: 'white',
                 position: 'relative',
                 overflow: 'hidden',
@@ -361,6 +396,9 @@ const HeroSection = () => {
   );
 };
 
+/* -------------------------------------------------------------------------- */
+/*                                  TechnologyCards                           */
+/* -------------------------------------------------------------------------- */
 const TechnologyCards = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -371,7 +409,6 @@ const TechnologyCards = () => {
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     const now = Date.now();
     if (now - lastTimeRef.current < 32) return;
-    
     lastTimeRef.current = now;
     
     animationFrameRef.current = requestAnimationFrame(() => {
@@ -402,9 +439,6 @@ const TechnologyCards = () => {
       sx={{ 
         py: 8, 
         position: 'relative',
-        transform: 'translateZ(0)',
-        backfaceVisibility: 'hidden',
-        // NEW: subtle radial background
         background: `
           radial-gradient(ellipse at center,
             ${alpha(theme.palette.primary.light, 0.05)},
@@ -413,14 +447,16 @@ const TechnologyCards = () => {
       }}
     >
       <Container maxWidth="xl">
-        <Typography variant="h2" sx={{ 
-          textAlign: 'center', 
-          mb: 6, 
-          fontWeight: 800,
-          fontSize: isMobile ? '1.75rem' : '2.25rem',
-          willChange: 'transform',
-        }}>
-          Core  Expertise
+        <Typography 
+          variant="h2" 
+          sx={{ 
+            textAlign: 'center', 
+            mb: 6, 
+            fontWeight: 800,
+            fontSize: isMobile ? '1.75rem' : '2.25rem',
+          }}
+        >
+          Core Expertise
         </Typography>
         
         <Grid container spacing={isMobile ? 2 : 4}>
@@ -449,35 +485,50 @@ const TechnologyCards = () => {
                 }}
               >
                 {tech.special && (
-                  <Box sx={{
-                    position: 'absolute',
-                    top: 8,
-                    right: 8,
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    color: tech.color,
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px'
-                  }}>
+                  <Box 
+                    sx={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      color: tech.color,
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px'
+                    }}
+                  >
                     Most Popular
                   </Box>
                 )}
-                <Box sx={{ height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                <Box 
+                  sx={{ 
+                    height: 80, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    mb: 2 
+                  }}
+                >
                   <TechIconContainer>
                     <Box className="tech-gradient" />
-                    <motion.div whileHover={{ scale: 1.1 }} transition={{ type: 'spring', stiffness: 300 }}>
+                    <motion.div 
+                      whileHover={{ scale: 1.1 }} 
+                      transition={{ type: 'spring', stiffness: 300 }}
+                    >
                       {React.cloneElement(tech.icon, { size: 40, style: { color: tech.color } })}
                     </motion.div>
                   </TechIconContainer>
                 </Box>
                 <CardTitle techcolor={tech.color}>{tech.title}</CardTitle>
-                <Typography variant="body2" sx={{ 
-                  color: 'text.secondary', 
-                  textAlign: 'center', 
-                  lineHeight: 1.6, 
-                  fontSize: '0.9rem',
-                  willChange: 'transform'
-                }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: 'text.secondary', 
+                    textAlign: 'center', 
+                    lineHeight: 1.6, 
+                    fontSize: '0.9rem'
+                  }}
+                >
                   {tech.description}
                 </Typography>
               </FeatureCard>
@@ -489,35 +540,58 @@ const TechnologyCards = () => {
   );
 };
 
+/* -------------------------------------------------------------------------- */
+/*                               WhyPartnerSection                            */
+/* -------------------------------------------------------------------------- */
 const WhyPartnerSection = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Box component="section" sx={{ 
-      py: 8, 
-      background: `linear-gradient(135deg,${alpha(theme.palette.primary.dark, 0.98)},${alpha(theme.palette.secondary.dark, 0.95)})`, 
-      color: 'white',
-      position: 'relative',
-      overflow: 'hidden',
-      // NEW swirling background in partner section
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: '-50%',
-        left: '-50%',
-        width: '200%',
-        height: '200%',
-        background: `conic-gradient(
-          from 45deg,
-          ${alpha(theme.palette.primary.light, 0.06)},
-          transparent 70%
+    <Box
+      component="section"
+      sx={{
+        // Same shape & container approach as Hero
+        borderRadius: '20px',
+        overflow: 'hidden',
+        mx: 'auto',
+        my: 2,
+        width: '100%',
+        [theme.breakpoints.down('sm')]: {
+          maxWidth: '95%',
+        },
+        background: `linear-gradient(135deg,
+          ${alpha(theme.palette.primary.dark, 0.98)},
+          ${alpha(theme.palette.secondary.dark, 0.95)}
         )`,
-        animation: 'swirlConic 40s linear infinite',
-        zIndex: 0,
-      }
-    }}>
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+        color: 'white',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          background: `conic-gradient(
+            from 45deg,
+            ${alpha(theme.palette.primary.light, 0.06)},
+            transparent 70%
+          )`,
+          animation: 'swirlConic 40s linear infinite',
+          zIndex: 0,
+        }
+      }}
+    >
+      <Container 
+        maxWidth="xl" 
+        sx={{ 
+          position: 'relative', 
+          zIndex: 1,
+          py: 8
+        }}
+      >
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
             <motion.div 
@@ -526,20 +600,24 @@ const WhyPartnerSection = () => {
               viewport={{ once: true, margin: "100px" }}
               transition={{ duration: 0.6 }}
             >
-              <Typography variant="h3" sx={{ 
-                mb: 2, 
-                fontWeight: 800, 
-                fontSize: isMobile ? '1.75rem' : '2rem',
-                willChange: 'transform'
-              }}>
+              <Typography 
+                variant="h3" 
+                sx={{ 
+                  mb: 2, 
+                  fontWeight: 800, 
+                  fontSize: isMobile ? '1.75rem' : '2rem',
+                }}
+              >
                 Why Partner With Us
               </Typography>
-              <Typography variant="body1" sx={{ 
-                opacity: 0.9, 
-                lineHeight: 1.6, 
-                fontWeight: 300,
-                willChange: 'transform'
-              }}>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  opacity: 0.9, 
+                  lineHeight: 1.6, 
+                  fontWeight: 300
+                }}
+              >
                 Enterprise-grade development process combining security, scalability, and innovation
               </Typography>
             </motion.div>
@@ -559,15 +637,27 @@ const WhyPartnerSection = () => {
                 viewport={{ once: true, margin: "100px" }}
                 transition={{ delay: idx * 0.1 + 0.3 }}
               >
-                <CheckCircleOutline sx={{ mr: 2, color: theme.palette.success.main, fontSize: '1.5rem' }} />
+                <CheckCircleOutline 
+                  sx={{ 
+                    mr: 2, 
+                    color: theme.palette.success.main, 
+                    fontSize: '1.5rem' 
+                  }} 
+                />
                 <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  <Typography 
+                    variant="body1" 
+                    sx={{ fontWeight: 600 }}
+                  >
                     {item.replace(/\(.*?\)/, '')}
                   </Typography>
-                  <Typography variant="caption" sx={{ 
-                    color: alpha(theme.palette.common.white, 0.7),
-                    fontWeight: 500
-                  }}>
+                  <Typography 
+                    variant="caption" 
+                    sx={{ 
+                      color: alpha(theme.palette.common.white, 0.7),
+                      fontWeight: 500
+                    }}
+                  >
                     {item.match(/\((.*?)\)/)?.[1]}
                   </Typography>
                 </Box>
@@ -580,6 +670,9 @@ const WhyPartnerSection = () => {
   );
 };
 
+/* -------------------------------------------------------------------------- */
+/*                                  HomePage                                  */
+/* -------------------------------------------------------------------------- */
 const HomePage = () => {
   return (
     <Box component="main">
@@ -587,8 +680,14 @@ const HomePage = () => {
         <title>Precision Tech Solutions</title>
         <meta name="description" content="Enterprise-grade technology solutions with precision engineering" />
       </Head>
+
+      {/* Hero */}
       <HeroSection />
+
+      {/* Tech Cards */}
       <TechnologyCards />
+
+      {/* Why Partner */}
       <WhyPartnerSection />
     </Box>
   );
