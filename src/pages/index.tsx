@@ -210,7 +210,6 @@ const HeroSection = () => {
           ${alpha(theme.palette.secondary.dark, 0.95)} 100%)`,
         color: 'white',
         position: 'relative',
-        overflow: 'hidden',
         '&::before': {
           content: '""',
           position: 'absolute',
