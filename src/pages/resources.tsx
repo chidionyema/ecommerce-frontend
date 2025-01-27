@@ -1,24 +1,31 @@
-import React from 'react';
-import { 
-  Box, 
-  Container, 
-  Grid, 
-  Typography, 
-  useTheme, 
-  useMediaQuery, 
+// -------------------------------------
+// pages/Resources.tsx
+// -------------------------------------
+
+import React from 'react'; // Ensure React is imported once at the top
+import {
+  Box,
+  Container,
+  Grid,
+  Typography,
+  useTheme,
+  useMediaQuery,
   Button,
-  alpha 
+  alpha,
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import SEO from '../components/SEO';
-import BlogCard from '../components/BlogCard';
-import { Cloud, VpnKey, Code } from '@mui/icons-material';
 import NextLink from 'next/link';
+import BlogCard from '../components/BlogCard'; // Correct relative path to BlogCard
+
+import { Cloud, VpnKey, Code } from '@mui/icons-material'; // Example icons
 
 const Resources: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const primaryGradient = theme.palette.gradients.primary;
+
+  const primaryGradient =
+    theme.palette.gradients?.primary ||
+    `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`;
 
   const resources = [
     {
@@ -48,7 +55,7 @@ const Resources: React.FC = () => {
     <Box
       sx={{
         backgroundColor: 'background.default',
-        minHeight: '150vh',
+        minHeight: '100vh',
         pt: 8,
         pb: 12,
         position: 'relative',
@@ -61,22 +68,16 @@ const Resources: React.FC = () => {
           width: '100%',
           height: '100%',
           background: `
-            linear-gradient(45deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, 
-            ${alpha(theme.palette.secondary.light, 0.1)} 100%),
-            url(/noise-texture.png)
+            linear-gradient(45deg,
+              ${alpha(theme.palette.primary.light, 0.1)} 0%,
+              ${alpha(theme.palette.secondary.light, 0.1)} 100%),
+            url('/noise-texture.png')
           `,
           opacity: 0.15,
         },
       }}
     >
-      {/* SEO */}
-      <SEO
-        title="Technical Resources - Expert Insights"
-        description="Cutting-edge technical resources on cloud architecture, DevOps, and modern software development."
-      />
-
       <Container maxWidth="xl" sx={{ position: 'relative' }}>
-        {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -90,11 +91,11 @@ const Resources: React.FC = () => {
               '&:after': {
                 content: '""',
                 position: 'absolute',
-                bottom: -20, // Spacing below the underline
+                bottom: -20,
                 left: '50%',
                 transform: 'translateX(-50%)',
-                width: '120px', // Length of the underline
-                height: '3px', // Thickness of the underline
+                width: '120px',
+                height: '3px',
                 background: `linear-gradient(90deg, transparent 0%, ${theme.palette.primary.main} 50%, transparent 100%)`,
                 borderRadius: '2px',
                 opacity: 0.8,
@@ -132,13 +133,12 @@ const Resources: React.FC = () => {
           </Box>
         </motion.div>
 
-        {/* Blog Cards */}
-        <Grid container spacing={isMobile ? 4 : 6}>
+        <Grid container spacing={isMobile ? 4 : 6} alignItems="stretch">
           {resources.map((resource, index) => (
             <Grid item xs={12} md={4} key={resource.id}>
               <motion.div
-                initial={{ opacity: 0, y: 60, rotateX: 90 }}
-                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                initial={{ opacity: 0, y: 60 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{
                   delay: index * 0.15,
                   duration: 0.8,
@@ -152,6 +152,9 @@ const Resources: React.FC = () => {
                 <BlogCard
                   {...resource}
                   sx={{
+                    height: { xs: 420, sm: 460, md: 520 },
+                    display: 'flex',
+                    flexDirection: 'column',
                     backdropFilter: 'blur(12px)',
                     background: `
                       linear-gradient(145deg, 
@@ -160,10 +163,6 @@ const Resources: React.FC = () => {
                       ${alpha(theme.palette.primary.light, 0.05)}
                     `,
                     border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
-                    boxShadow: `
-                      0 32px 64px -16px ${alpha(theme.palette.primary.dark, 0.1)},
-                      0 16px 32px -16px ${alpha(theme.palette.secondary.dark, 0.1)}
-                    `,
                     transition: 'all 0.3s ease',
                     '&:hover': {
                       borderColor: alpha(theme.palette.primary.main, 0.4),
@@ -179,7 +178,6 @@ const Resources: React.FC = () => {
           ))}
         </Grid>
 
-        {/* Call to Action */}
         <Box sx={{ textAlign: 'center', mt: 10 }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -208,12 +206,6 @@ const Resources: React.FC = () => {
                   fontWeight: 700,
                   fontSize: '1.1rem',
                   color: 'common.white',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: theme.shadows[6],
-                  },
                 }}
               >
                 Schedule Architecture Review

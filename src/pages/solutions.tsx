@@ -18,9 +18,7 @@ import {
 import { useTheme } from '@mui/material/styles';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { cvProjects, type CVProject } from '../data/cvProjects';
-import ReactDOM from 'react-dom';
 
-// Dynamically import tilt for 3D parallax effect
 const Tilt = dynamic(() => import('react-parallax-tilt').then((mod) => mod.default), {
   ssr: false,
   loading: () => <div style={{ height: '100%', borderRadius: 24, background: '#f5f5f5' }} />,
@@ -30,19 +28,13 @@ const Tilt = dynamic(() => import('react-parallax-tilt').then((mod) => mod.defau
 const DEEP_NAVY = '#0A1A2F';
 const PLATINUM = '#E5E4E2';
 const GOLD_ACCENT = '#C5A46D';
-const LIGHT_SKY = '#F8FAFF'; // Page background
+const LIGHT_SKY = '#F8FAFF';
 const BACKDROP_BLUR = 'blur(28px)';
-const PAGE_SIZE = 9; // For pagination
+const PAGE_SIZE = 9;
 
 /* --------------------------- Styled Components --------------------------- */
-
-/** 
- * IconBackground: A circular goldish background behind each icon 
- */
-/* --------------------------- Styled Components --------------------------- */
-
 const IconBackground = styled(Box)(({ theme }) => ({
-  width: 56, // Adjusted size for consistency
+  width: 56,
   height: 56,
   display: 'flex',
   alignItems: 'center',
@@ -67,11 +59,6 @@ const IconBackground = styled(Box)(({ theme }) => ({
   },
 }));
 
-
-/**
- * PremiumCardContainer
- * - Vibrant 3D effect, glassy background, and tilt animations
- */
 const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
   position: 'relative',
   borderRadius: 24,
@@ -89,6 +76,13 @@ const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
   border: `2px solid transparent`,
   backgroundClip: 'padding-box',
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  height: 300, // Default mobile height
+  [theme.breakpoints.up('sm')]: {
+    height: 350,
+  },
+  [theme.breakpoints.up('md')]: {
+    height: 400,
+  },
   '&:hover': {
     transform: 'translateY(-8px) scale(1.05)',
     boxShadow: `
@@ -96,7 +90,6 @@ const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
       inset 0 0 15px ${alpha(theme.palette.common.white, 0.15)}
     `,
   },
-  // Subtle “border glow” effect
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -118,9 +111,6 @@ const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
   },
 }));
 
-/* --------------------------------------------------------------------------
- *  Solutions Page
- * -------------------------------------------------------------------------- */
 const Solutions: React.FC = () => {
   const router = useRouter();
   const theme = useTheme();
@@ -132,7 +122,6 @@ const Solutions: React.FC = () => {
   const [hasMore, setHasMore] = useState(true);
   const [displayedProjects, setDisplayedProjects] = useState<CVProject[]>([]);
 
-  // Filtered projects based on search
   const filteredProjects = useMemo(() => {
     return cvProjects.filter((proj) =>
       proj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -140,7 +129,6 @@ const Solutions: React.FC = () => {
     );
   }, [searchQuery]);
 
-  // Load initial page of projects
   useEffect(() => {
     if (!isLoading) {
       setIsLoading(true);
@@ -151,7 +139,6 @@ const Solutions: React.FC = () => {
     }
   }, [page, filteredProjects, isLoading]);
 
-  // Infinite scroll
   useEffect(() => {
     if (!hasMore) return;
     const handleScroll = () => {
@@ -177,7 +164,6 @@ const Solutions: React.FC = () => {
 
   return (
     <Box sx={{ backgroundColor: LIGHT_SKY, minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
-      {/* Page Header */}
       <AppBar
         position="sticky"
         sx={{
@@ -214,7 +200,7 @@ const Solutions: React.FC = () => {
                 letterSpacing: '-0.03em',
                 mb: 2,
                 fontSize: isMobile ? '2.5rem' : '3.5rem',
-                background: theme.palette.gradients?.primary || `linear-gradient(to right, ${DEEP_NAVY}, ${GOLD_ACCENT})`,
+                background: `linear-gradient(to right, ${DEEP_NAVY}, ${GOLD_ACCENT})`,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
@@ -238,30 +224,38 @@ const Solutions: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Main Content */}
       <Container maxWidth="xl" sx={{ py: isMobile ? 4 : 8 }}>
         <Grid container spacing={4}>
           {displayedProjects.map((project) => (
             <Grid item xs={12} sm={6} md={4} key={project.id}>
-              <Tilt tiltReverse scale={1.02} glareEnable glareBorderRadius="24px">
+              <Tilt 
+                tiltReverse 
+                scale={1.02} 
+                glareEnable 
+                glareBorderRadius="24px"
+                style={{ height: '100%' }}
+              >
                 <PremiumCardContainer
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleViewDetails(project.id)}
                 >
                   <Box className="content-overlay" />
-
-                  <Box sx={{ p: 3, position: 'relative', zIndex: 4 }}>
-                    {/* Icon + Title */}
+                  <Box sx={{ 
+                    p: 3, 
+                    position: 'relative', 
+                    zIndex: 4,
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                      {/* Wrap the function-based icon with IconBackground + createElement */}
                       <IconBackground>
                         {React.createElement(project.icon, {
-                          size: 24, // lucide-react prop
+                          size: 24,
                           color: theme.palette.primary.main,
                         })}
                       </IconBackground>
-
                       <Typography variant="h6" sx={{ fontWeight: 600 }}>
                         {project.clientName}
                       </Typography>
@@ -270,19 +264,36 @@ const Solutions: React.FC = () => {
                     <Typography variant="h5" sx={{ mb: 1, fontWeight: 700 }}>
                       {project.name}
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        mb: 2,
+                        color: 'text.secondary',
+                        flex: 1,
+                        overflow: 'hidden',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                      }}
+                    >
                       {project.description}
                     </Typography>
 
-                    {/* Tech Chips */}
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+                    <Box sx={{ 
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 1,
+                      mb: 3,
+                      maxHeight: 80,
+                      overflowY: 'auto',
+                    }}>
                       {project.technologies.map((tech) => (
                         <Chip key={tech} label={tech} size="small" />
                       ))}
                     </Box>
 
-                    {/* CTA Arrow */}
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'flex-end' }}>
                       <IconButton sx={{ color: theme.palette.primary.main }}>
                         <ArrowForwardIcon />
                       </IconButton>

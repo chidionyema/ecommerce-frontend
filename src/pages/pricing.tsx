@@ -64,60 +64,98 @@ const PremiumOverlay = styled(Box)(({ theme }) => ({
   pointerEvents: 'none'
 }));
 
+const PremiumButton = styled(Button)(({ theme }) => ({
+  position: 'relative',
+  overflow: 'hidden',
+  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+  borderRadius: '12px',
+  minHeight: '56px',
+  padding: theme.spacing(2, 4),
+  fontSize: '1.1rem',
+  fontWeight: 700,
+  letterSpacing: '0.05em',
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: `linear-gradient(45deg, ${alpha(theme.palette.common.white, 0.1)} 0%, transparent 100%)`,
+    opacity: 0,
+    transition: 'opacity 0.3s ease'
+  },
+  '&:hover': {
+    boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.3)}`,
+    transform: 'translateY(-2px)',
+    '&:before': {
+      opacity: 1
+    }
+  },
+  '&:active': {
+    transform: 'translateY(1px)'
+  },
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '1.15rem',
+    minHeight: '60px'
+  }
+}));
+
 const LazyPricingCard = styled(MotionBox, {
-    shouldForwardProp: (prop: string) => 
-      !['initial', 'animate', 'exit', 'whileHover', 'sx'].includes(prop)
-  })<StyledMotionProps>(({ theme }) => ({
-    position: 'relative',
-    backdropFilter: 'blur(24px)',
-    background: `
-      linear-gradient(
-        145deg, 
-        ${alpha(theme.palette.background.paper, 0.96)}, 
-        ${alpha(theme.palette.background.default, 0.98)}
-      )`,
-    borderRadius: theme.shape.borderRadius * 3,
-    padding: theme.spacing(4),
-    border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+  shouldForwardProp: (prop: string) => 
+    !['initial', 'animate', 'exit', 'whileHover', 'sx'].includes(prop)
+})<StyledMotionProps>(({ theme }) => ({
+  position: 'relative',
+  backdropFilter: 'blur(24px)',
+  background: `
+    linear-gradient(
+      145deg, 
+      ${alpha(theme.palette.background.paper, 0.96)}, 
+      ${alpha(theme.palette.background.default, 0.98)}
+    )`,
+  borderRadius: theme.shape.borderRadius * 3,
+  padding: theme.spacing(4),
+  border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+  boxShadow: `
+    0 24px 48px ${alpha(theme.palette.primary.dark, 0.08)},
+    inset 0 0 0 1px ${alpha(theme.palette.common.white, 0.05)}`,
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  height: '100%',
+  minHeight: '520px',
+  [theme.breakpoints.up('md')]: {
+    minHeight: '580px',
+  },
+  display: 'flex',
+  flexDirection: 'column',
+  '&:hover': {
+    transform: 'translateY(-12px)',
     boxShadow: `
-      0 24px 48px ${alpha(theme.palette.primary.dark, 0.08)},
-      inset 0 0 0 1px ${alpha(theme.palette.common.white, 0.05)}`,
-    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-    height: '100%',
-    minHeight: '520px',
-    [theme.breakpoints.up('md')]: {
-      minHeight: '580px',
-    },
-    display: 'flex',
-    flexDirection: 'column',
-    '&:hover': {
-      transform: 'translateY(-8px)',
-      boxShadow: `
-        0 40px 80px ${alpha(theme.palette.primary.dark, 0.15)},
-        inset 0 0 0 1px ${alpha(theme.palette.common.white, 0.1)}`,
-      '&::after': { opacity: 0.2 }
-    },
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      borderRadius: 'inherit',
-      background: `
-        radial-gradient(600px circle at var(--x) var(--y), 
-        ${alpha(theme.palette.primary.main, 0.1)}, 
-        transparent 60%)`,
-      opacity: 0,
-      transition: 'opacity 0.4s',
-      pointerEvents: 'none'
-    },
-    [theme.breakpoints.up('sm')]: {
-      padding: theme.spacing(5),
-      '&:hover::after': { opacity: 0.2 }
-    },
-  }));
+      0 48px 96px ${alpha(theme.palette.primary.dark, 0.2)},
+      inset 0 0 0 1px ${alpha(theme.palette.common.white, 0.15)}`,
+    '&::after': { opacity: 0.25 }
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 'inherit',
+    background: `
+      radial-gradient(600px circle at var(--x) var(--y), 
+      ${alpha(theme.palette.primary.main, 0.1)}, 
+      transparent 60%)`,
+    opacity: 0,
+    transition: 'opacity 0.4s',
+    pointerEvents: 'none'
+  },
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(5),
+    '&:hover::after': { opacity: 0.25 }
+  },
+}));
 
 const UltraPricingPage = () => {
   const theme = useTheme();
@@ -302,13 +340,16 @@ const UltraPricingPage = () => {
                         display: 'flex',
                         alignItems: 'center',
                         mb: 2,
-                        p: { xs: 1.5, sm: 2 },
+                        p: { xs: 2, sm: 2.5 },
                         borderRadius: 2,
-                        transition: 'all 0.2s ease',
-                        background: 'rgba(255, 255, 255, 0.02)',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        background: alpha(theme.palette.primary.light, 0.03),
+                        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                         '&:hover': !isTouch ? {
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          transform: 'translateX(4px)'
+                          background: alpha(theme.palette.primary.light, 0.08),
+                          transform: 'translateX(8px)',
+                          borderColor: alpha(theme.palette.primary.main, 0.3),
+                          boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.1)}`
                         } : {}
                       }
                     }}>
@@ -316,30 +357,23 @@ const UltraPricingPage = () => {
                     </Box>
 
                     <motion.div 
-                      whileHover={!isTouch ? { scale: 1.03 } : {}} 
-                      whileTap={{ scale: 0.97 }} 
+                      whileHover={!isTouch ? { scale: 1.05 } : {}} 
+                      whileTap={{ scale: 0.98 }} 
                       style={{ marginTop: 'auto', position: 'relative' }}
                     >
-                      <Button
-                        variant="contained"
+                      <PremiumButton
                         fullWidth
+                        onClick={() => handlePlanSelection(planType)}
                         sx={{
-                          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                          borderRadius: '12px',
-                          py: { xs: 2, sm: 3 },
-                          fontSize: { xs: '1rem', sm: '1.1rem' },
-                          fontWeight: 700,
-                          letterSpacing: '0.05em',
                           '&:hover': {
-                            boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.3)}`
+                            boxShadow: `0 16px 40px ${alpha(theme.palette.primary.main, 0.4)}`
                           }
                         }}
-                        onClick={() => handlePlanSelection(planType)}
                       >
                         {planType === 'hourly' && 'Start Consultation'}
                         {planType === 'project' && 'Begin Project'}
                         {planType === 'retainer' && 'Create Partnership'}
-                      </Button>
+                      </PremiumButton>
                     </motion.div>
                   </LazyPricingCard>
                 </PremiumCardWrapper>
@@ -354,25 +388,49 @@ const UltraPricingPage = () => {
 
 const FeatureItem = memo<FeatureItemProps>(({ icon: Icon, text }) => {
   const theme = useTheme();
+  const isTouch = useTouchDevice();
+
   return (
     <Box component="li" sx={{
       display: 'flex',
       alignItems: 'center',
       mb: 2,
-      p: { xs: 1.5, sm: 2 },
+      p: { xs: 2, sm: 2.5 },
       borderRadius: 2,
-      transition: 'all 0.2s ease',
-      background: 'rgba(255, 255, 255, 0.02)',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      background: alpha(theme.palette.primary.light, 0.03),
+      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+      '&:hover': !isTouch ? {
+        background: alpha(theme.palette.primary.light, 0.08),
+        transform: 'translateX(8px)',
+        borderColor: alpha(theme.palette.primary.main, 0.3),
+        boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.1)}`
+      } : {}
     }}>
-      <Icon size={24} style={{ color: theme.palette.primary.main, marginRight: 16 }} />
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 48,
+        height: 48,
+        borderRadius: '12px',
+        background: alpha(theme.palette.primary.main, 0.1),
+        mr: 3,
+        flexShrink: 0
+      }}>
+        <Icon size={24} style={{ 
+          color: theme.palette.primary.main,
+          filter: `drop-shadow(0 2px 4px ${alpha(theme.palette.primary.main, 0.2)})`
+        }} />
+      </Box>
       <Typography variant="body2" sx={{
         color: theme.palette.text.primary,
-        fontSize: { xs: '0.9rem', sm: '1rem' },
+        fontSize: '1rem',
         fontWeight: 500,
-        lineHeight: 1.4,
+        lineHeight: 1.5,
       }}>{text}</Typography>
     </Box>
   );
 });
 
-export default UltraPricingPage;
+export default UltraPricingPage
