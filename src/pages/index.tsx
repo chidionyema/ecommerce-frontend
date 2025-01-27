@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import {
@@ -18,8 +18,7 @@ import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import {
   FaPython, FaReact, FaNodeJs, FaAws, FaDocker, FaJava,
-  FaMicrosoft, FaBrain, FaDatabase, FaGoogle, FaChartLine,
-  FaCloud, FaCodeBranch, FaLinux, FaApple
+  FaMicrosoft, FaBrain, FaDatabase, FaGoogle, FaLinux
 } from 'react-icons/fa';
 
 /* -----------------------------------------------------------------------------
@@ -46,7 +45,7 @@ const globalStyles = `
 `;
 
 /* -----------------------------------------------------------------------------
- *  Color Variables
+ * Color Variables
  ----------------------------------------------------------------------------- */
 const PAGE_BG = '#F9FAFD';
 const PRIMARY_DARK = '#0A1A2F';
@@ -54,9 +53,27 @@ const SECONDARY_DARK = '#532F73';
 const LIGHT_ACCENT = '#F2E7FE';
 
 /* -----------------------------------------------------------------------------
- *  Scarcity & Social Proof Hooks
+ * Tech Icons Data
  ----------------------------------------------------------------------------- */
-function useSeatsLeft(initialSeats = 5) {
+const techIcons = [
+  { id: 'python', title: 'Python', icon: <FaPython />, color: '#3776AB' },
+  { id: 'react', title: 'React', icon: <FaReact />, color: '#61DAFB' },
+  { id: 'nodejs', title: 'Node.js', icon: <FaNodeJs />, color: '#68A063' },
+  { id: 'aws', title: 'AWS', icon: <FaAws />, color: '#FF9900' },
+  { id: 'docker', title: 'Docker', icon: <FaDocker />, color: '#2496ED' },
+  { id: 'java', title: 'Java', icon: <FaJava />, color: '#007396' },
+  { id: 'dotnet', title: '.NET', icon: <FaMicrosoft />, color: '#512BD4' },
+  { id: 'ai-ml', title: 'AI/ML', icon: <FaBrain />, color: '#FF6F00' },
+  { id: 'database', title: 'Database', icon: <FaDatabase />, color: '#7A5CAB' },
+  { id: 'gcp', title: 'Google Cloud', icon: <FaGoogle />, color: '#4285F4' },
+  { id: 'linux', title: 'Linux', icon: <FaLinux />, color: '#FCC624' },
+  { id: 'azure', title: 'Azure', icon: <FaMicrosoft />, color: '#0089D6' },
+];
+
+/* -----------------------------------------------------------------------------
+ * Scarcity & Social Proof Hooks
+ ----------------------------------------------------------------------------- */
+const useSeatsLeft = (initialSeats = 5) => {
   const [seatsLeft, setSeatsLeft] = useState(initialSeats);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -65,7 +82,7 @@ function useSeatsLeft(initialSeats = 5) {
     return () => clearInterval(interval);
   }, []);
   return seatsLeft;
-}
+};
 
 const engagementsList = [
   'Oliver from Berlin started a Cloud Pilot',
@@ -74,7 +91,7 @@ const engagementsList = [
   'Clara from NYC booked a 6-month retainer'
 ];
 
-function useRecentEngagements() {
+const useRecentEngagements = () => {
   const [engagementIndex, setEngagementIndex] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -83,10 +100,10 @@ function useRecentEngagements() {
     return () => clearInterval(interval);
   }, []);
   return engagementsList[engagementIndex];
-}
+};
 
 /* -----------------------------------------------------------------------------
- *  Hero Section with Scarcity Elements
+ * Hero Section
  ----------------------------------------------------------------------------- */
 const PersuasiveButton = styled(motion(Button))(({ theme }) => ({
   padding: '14px 28px',
@@ -111,7 +128,7 @@ const PersuasiveButton = styled(motion(Button))(({ theme }) => ({
   }
 }));
 
-const HeroSection: React.FC = () => {
+const HeroSection = () => {
   const theme = useTheme();
   const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -150,9 +167,23 @@ const HeroSection: React.FC = () => {
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
           <Alert severity="info" sx={{
-            display: 'inline-block',
-            backgroundColor: alpha(theme.palette.info.light, 0.15),
+            display: 'inline-flex',
+            alignItems: 'center',
+            backgroundColor: alpha(theme.palette.info.main, 0.2),
+            color: theme.palette.info.contrastText,
             mb: 3,
+            py: 1,
+            px: 3,
+            borderRadius: '8px',
+            border: `1px solid ${alpha(theme.palette.info.main, 0.3)}`,
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            backdropFilter: 'blur(8px)',
+            '& .MuiAlert-icon': {
+              color: theme.palette.info.light,
+              paddingRight: '8px',
+              fontSize: '1.2rem'
+            }
           }}>
             Limited-Time Offer: Free Cloud Readiness Assessment
           </Alert>
@@ -173,7 +204,7 @@ const HeroSection: React.FC = () => {
         <Typography variant="h6" sx={{ mb: 4, color: alpha('#fff', 0.85) }}>
           Trusted by industry leaders worldwide
           <Box sx={{ mt: 2, '& svg': { mx: 2, fontSize: 28 } }}>
-            <FaMicrosoft /><FaGoogle /><FaAws /><FaApple />
+            <FaMicrosoft /><FaGoogle /><FaAws /><FaMicrosoft />
           </Box>
         </Typography>
 
@@ -204,87 +235,159 @@ const HeroSection: React.FC = () => {
 };
 
 /* -----------------------------------------------------------------------------
- *  Core Technologies Section
+ * Enhanced Technology Cards
  ----------------------------------------------------------------------------- */
-const techIcons = [
-  { id: 'python', title: 'Python', icon: <FaPython />, color: '#3776AB' },
-  { id: 'react', title: 'React', icon: <FaReact />, color: '#61DAFB' },
-  { id: 'nodejs', title: 'Node.js', icon: <FaNodeJs />, color: '#68A063' },
-  { id: 'aws', title: 'AWS', icon: <FaAws />, color: '#FF9900' },
-  { id: 'docker', title: 'Docker', icon: <FaDocker />, color: '#2496ED' },
-  { id: 'java', title: 'Java', icon: <FaJava />, color: '#007396' },
-  { id: 'dotnet', title: '.NET', icon: <FaMicrosoft />, color: '#512BD4' },
-  { id: 'ai-ml', title: 'AI/ML', icon: <FaBrain />, color: '#FF6F00' },
-  { id: 'database', title: 'Database', icon: <FaDatabase />, color: '#7A5CAB' },
-  { id: 'gcp', title: 'Google Cloud', icon: <FaGoogle />, color: '#4285F4' },
-  { id: 'linux', title: 'Linux', icon: <FaLinux />, color: '#FCC624' },
-  { id: 'azure', title: 'Azure', icon: <FaMicrosoft />, color: '#0089D6' },
-];
-
-const TechIconContainer = styled(Box)({
-  position: 'relative',
-  willChange: 'transform',
-  '& .tech-gradient': {
-    position: 'absolute',
-    width: '120%',
-    height: '120%',
-    background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%)',
-    opacity: 0,
-    transition: 'all 0.4s ease',
-    mixBlendMode: 'soft-light',
-  },
-});
-
-const TechCard = styled(motion(Box))(({ theme }) => ({
+const TechCard = styled(motion(Box))<{ techcolor: string }>(({ theme, techcolor }) => ({
   padding: theme.spacing(3),
-  borderRadius: '20px',
+  borderRadius: '24px',
   background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.95)}, ${alpha(theme.palette.background.default, 0.98)})`,
-  border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+  border: '1px solid transparent',
   textAlign: 'center',
   position: 'relative',
   overflow: 'hidden',
+  backdropFilter: 'blur(12px)',
+  transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
   '&:hover': {
-    transform: 'translateY(-6px)',
-    boxShadow: `0 24px 48px -8px ${alpha(theme.palette.primary.main, 0.15)}`,
-    '& .tech-gradient': { opacity: 0.6, transform: 'scale(1.1) rotate(8deg)' },
+    transform: 'translateY(-8px)',
+    boxShadow: `0 32px 64px -12px ${alpha(techcolor, 0.2)}`,
+  },
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    inset: '-2px',
+    zIndex: -1,
+    background: `conic-gradient(from 90deg at 50% 50%, ${techcolor}, ${alpha(techcolor, 0.3)}, ${techcolor})`,
+    borderRadius: '26px',
+    animation: 'swirlConic 4s linear infinite',
+    opacity: 0,
+    transition: 'opacity 0.3s ease',
+  },
+  '&:hover::before': {
+    opacity: 1,
+  },
+}));
+
+const TechIconContainer = styled(motion.div)(({ theme }) => ({
+  position: 'relative',
+  display: 'inline-flex',
+  padding: theme.spacing(2),
+  borderRadius: '16px',
+  marginBottom: theme.spacing(3),
+  '&:hover': {
+    '& .icon-gradient': {
+      opacity: 0.6,
+      transform: 'scale(1.2)',
+    },
+    '& svg': {
+      filter: `drop-shadow(0 8px 16px ${alpha(theme.palette.primary.main, 0.3)})`,
+    },
+  },
+  '& .icon-gradient': {
+    position: 'absolute',
+    inset: 0,
+    background: `radial-gradient(circle at center, ${alpha(theme.palette.primary.main, 0.15)} 0%, transparent 70%)`,
+    opacity: 0,
+    transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+  },
+  '& svg': {
+    fontSize: '4.5rem',
+    transition: 'all 0.3s ease',
+    filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))',
   },
 }));
 
 const CardTitle = styled(Typography)<{ techcolor: string }>(({ techcolor }) => ({
-  color: techcolor,
-  fontWeight: 700,
-  letterSpacing: '-0.5px',
+  background: `linear-gradient(45deg, ${techcolor}, ${alpha(techcolor, 0.7)})`,
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  fontWeight: 800,
+  letterSpacing: '-0.75px',
+  marginBottom: '0.5rem',
   textAlign: 'center',
 }));
 
-const TechnologyCards: React.FC = () => {
+const TechnologyCards = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Box sx={{ py: 8, background: `radial-gradient(ellipse at center, ${alpha(theme.palette.primary.light, 0.05)}, transparent 80%)` }}>
+    <Box sx={{ 
+      py: 10,
+      background: `radial-gradient(ellipse at top left, ${alpha(theme.palette.primary.light, 0.05)}, transparent 80%),
+                  linear-gradient(150deg, ${PAGE_BG} 0%, ${alpha(SECONDARY_DARK, 0.03)} 100%)`
+    }}>
       <Container maxWidth="xl">
-        <Typography variant="h2" sx={{ textAlign: 'center', mb: 6, fontWeight: 800 }}>
+        <Typography variant="h2" sx={{ 
+          textAlign: 'center', 
+          mb: 8, 
+          fontWeight: 900,
+          background: `linear-gradient(90deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
+        }}>
           Core Technologies
         </Typography>
-        <Grid container spacing={isMobile ? 2 : 4}>
+        <Grid container spacing={isMobile ? 3 : 4}>
           {techIcons.map((tech, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={tech.id}>
               <TechCard
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
+                techcolor={tech.color}
+                initial={{ opacity: 0, y: 40, rotateZ: -2 }}
+                whileInView={{ opacity: 1, y: 0, rotateZ: 0 }}
+                viewport={{ once: true, margin: "-20%" }}
+                transition={{ 
+                  type: 'spring',
+                  delay: index * 0.05,
+                  stiffness: 80,
+                  damping: 12
+                }}
+                whileHover={{ scale: 1.02 }}
               >
-                <TechIconContainer>
-                  <Box className="tech-gradient" />
-                  <Box sx={{ fontSize: 60, color: tech.color, mb: 2 }}>
+                <TechIconContainer whileHover={{ scale: 1.05 }}>
+                  <Box className="icon-gradient" />
+                  <Box 
+                    component={motion.div}
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                    sx={{ color: tech.color }}
+                  >
                     {tech.icon}
                   </Box>
                 </TechIconContainer>
-                <CardTitle techcolor={tech.color}>{tech.title}</CardTitle>
-                <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center' }}>
-             
-                </Typography>
+                
+                <CardTitle variant="h5" techcolor={tech.color}>
+                  {tech.title}
+                </CardTitle>
+                
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <Typography variant="body2" sx={{
+                    color: 'text.secondary',
+                    textAlign: 'center',
+                    fontWeight: 500,
+                    lineHeight: 1.6
+                  }}>
+                    Enterprise-grade solutions with {tech.title.toLowerCase()} integration
+                  </Typography>
+                </motion.div>
+
+                <Box
+                  component={motion.div}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: `radial-gradient(circle at var(--x) var(--y), ${alpha(tech.color, 0.1)} 0%, transparent 70%)`,
+                    pointerEvents: 'none',
+                  }}
+                />
               </TechCard>
             </Grid>
           ))}
@@ -295,9 +398,9 @@ const TechnologyCards: React.FC = () => {
 };
 
 /* -----------------------------------------------------------------------------
- *  Why Partner Section
+ * Why Partner Section
  ----------------------------------------------------------------------------- */
-const WhyPartnerSection: React.FC = () => {
+const WhyPartnerSection = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -339,7 +442,7 @@ const WhyPartnerSection: React.FC = () => {
 };
 
 /* -----------------------------------------------------------------------------
- *  Main Page
+ * Main Page Component
  ----------------------------------------------------------------------------- */
 export default function HomePage() {
   return (
