@@ -1,28 +1,25 @@
 import React from 'react';
 import { 
+  Box, 
   Container, 
   Grid, 
   Typography, 
   useTheme, 
   useMediaQuery, 
-  Box, 
   Button,
   alpha 
 } from '@mui/material';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import SEO from '../components/SEO';
-import { Cloud, VpnKey, Code } from '@mui/icons-material';
 import BlogCard from '../components/BlogCard';
+import { Cloud, VpnKey, Code } from '@mui/icons-material';
 import NextLink from 'next/link';
 
 const Resources: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const primaryGradient = theme.palette.gradients.primary;
-  const { scrollYProgress } = useScroll();
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
- 
   const resources = [
     {
       id: 1,
@@ -46,13 +43,14 @@ const Resources: React.FC = () => {
       icon: <Code />,
     },
   ];
-      
+
   return (
     <Box
       sx={{
         backgroundColor: 'background.default',
         minHeight: '150vh',
-        py: 12,
+        pt: 8,
+        pb: 12,
         position: 'relative',
         overflow: 'hidden',
         '&:before': {
@@ -71,52 +69,41 @@ const Resources: React.FC = () => {
         },
       }}
     >
-      {/* Animated floating particles */}
-      <motion.div
-        style={{
-          y,
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `radial-gradient(circle at 50% 50%, 
-            ${alpha(theme.palette.primary.light, 0.05)} 0%, 
-            transparent 60%)`,
-          zIndex: 0,
-        }}
+      {/* SEO */}
+      <SEO
+        title="Technical Resources - Expert Insights"
+        description="Cutting-edge technical resources on cloud architecture, DevOps, and modern software development."
       />
 
-    <SEO
-        title="Technical Resources - Expert Insights"
-        description="Cutting-edge technical resources on cloud architecture, DevOps, and modern software development"
-      />. 
-      
       <Container maxWidth="xl" sx={{ position: 'relative' }}>
-        <motion.div 
+        {/* Header Section */}
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Box sx={{ 
-            textAlign: 'center', 
-            mb: 10,
-            position: 'relative',
-            '&:after': {
-              content: '""',
-              position: 'absolute',
-              bottom: -40,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '120px',
-              height: '4px',
-              background: primaryGradient,
-              borderRadius: '2px'
-            }
-          }}>
-            <Typography 
-              variant="h1" 
-              sx={{ 
+          <Box
+            sx={{
+              textAlign: 'center',
+              mb: 8,
+              position: 'relative',
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: -20, // Spacing below the underline
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '120px', // Length of the underline
+                height: '3px', // Thickness of the underline
+                background: `linear-gradient(90deg, transparent 0%, ${theme.palette.primary.main} 50%, transparent 100%)`,
+                borderRadius: '2px',
+                opacity: 0.8,
+              },
+            }}
+          >
+            <Typography
+              variant="h1"
+              sx={{
                 fontWeight: 900,
                 letterSpacing: '-0.03em',
                 mb: 2,
@@ -124,10 +111,10 @@ const Resources: React.FC = () => {
                 background: primaryGradient,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`
+                textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
               }}
             >
-             Resources
+              Resources
             </Typography>
             <Typography
               variant="subtitle1"
@@ -136,35 +123,33 @@ const Resources: React.FC = () => {
                 maxWidth: 680,
                 mx: 'auto',
                 fontSize: isMobile ? '1rem' : '1.1rem',
-                lineHeight: 1.6
+                lineHeight: 1.6,
+                fontWeight: 400,
               }}
             >
-              Cutting-edge insights distilled from years of enterprise-grade implementations
+              Cutting-edge insights distilled from years of enterprise-grade implementations.
             </Typography>
           </Box>
         </motion.div>
 
-        <Grid container spacing={isMobile ? 4 : 6} sx={{ position: 'relative', zIndex: 1 }}>
+        {/* Blog Cards */}
+        <Grid container spacing={isMobile ? 4 : 6}>
           {resources.map((resource, index) => (
             <Grid item xs={12} md={4} key={resource.id}>
               <motion.div
                 initial={{ opacity: 0, y: 60, rotateX: 90 }}
                 animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                transition={{ 
+                transition={{
                   delay: index * 0.15,
                   duration: 0.8,
-                  ease: [0.16, 1, 0.3, 1]
+                  ease: [0.16, 1, 0.3, 1],
                 }}
                 whileHover={{
                   scale: 1.03,
-                  transition: { duration: 0.3 }
-                }}
-                style={{
-                  perspective: 1000,
-                  transformStyle: 'preserve-3d'
+                  transition: { duration: 0.3 },
                 }}
               >
-                <BlogCard 
+                <BlogCard
                   {...resource}
                   sx={{
                     backdropFilter: 'blur(12px)',
@@ -185,8 +170,8 @@ const Resources: React.FC = () => {
                       boxShadow: `
                         0 40px 80px -24px ${alpha(theme.palette.primary.dark, 0.2)},
                         0 24px 48px -24px ${alpha(theme.palette.secondary.dark, 0.2)}
-                      `
-                    }
+                      `,
+                    },
                   }}
                 />
               </motion.div>
@@ -194,24 +179,20 @@ const Resources: React.FC = () => {
           ))}
         </Grid>
 
-        <Box sx={{ 
-          textAlign: 'center', 
-          mt: 12,
-          position: 'relative',
-          zIndex: 1
-        }}>
+        {/* Call to Action */}
+        <Box sx={{ textAlign: 'center', mt: 10 }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <Typography 
-              variant="h4" 
-              sx={{ 
+            <Typography
+              variant="h4"
+              sx={{
                 mb: 5,
                 fontWeight: 700,
                 color: 'text.primary',
-                letterSpacing: '-0.01em'
+                letterSpacing: '-0.01em',
               }}
             >
               Tailored Technology Solutions
@@ -232,36 +213,10 @@ const Resources: React.FC = () => {
                   '&:hover': {
                     transform: 'translateY(-2px)',
                     boxShadow: theme.shadows[6],
-                    '&:before': {
-                      opacity: 1
-                    }
                   },
-                  '&:before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    background: `linear-gradient(45deg, 
-                      ${alpha(theme.palette.common.white, 0.1)}, 
-                      ${alpha(theme.palette.common.white, 0.2)})`,
-                    opacity: 0,
-                    transition: 'opacity 0.3s ease'
-                  }
                 }}
               >
                 Schedule Architecture Review
-                <Box 
-                  component="span" 
-                  sx={{ 
-                    ml: 2,
-                    display: 'inline-block',
-                    transform: 'translateY(2px)'
-                  }}
-                >
-                  ↗
-                </Box>
               </Button>
             </NextLink>
           </motion.div>

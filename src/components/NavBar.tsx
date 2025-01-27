@@ -1,6 +1,5 @@
 import React, { useState, useCallback, memo, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import {
   AppBar,
   Toolbar,
@@ -28,195 +27,435 @@ import {
 } from '@mui/icons-material';
 import { styled, useTheme, keyframes } from '@mui/material/styles';
 
-// Premium Design Tokens
+/* --------------------------------------------------------------------------
+ *  Premium Design Tokens
+ * -------------------------------------------------------------------------- */
 const DEEP_NAVY = '#0A1A2F';
 const PLATINUM = '#E5E4E2';
 const GOLD_ACCENT = '#C5A46D';
-const GLASS_BACKGROUND = 'rgba(10, 26, 47, 0.98)';
+const GLASS_BACKGROUND = 'rgba(10, 26, 47, 0.9)';
 const BACKDROP_BLUR = 'blur(24px)';
-const BORDER_RADIUS = '16px';
-const TRANSITION_TIMING = 'cubic-bezier(0.4, 0, 0.2, 1)';
+const BORDER_RADIUS = 24; // Increased for a more dramatic, modern feel
 
-// Enhanced Animations
-const logoShine = keyframes`
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* --------------------------------------------------------------------------
+ *  Keyframe Animations
+ * -------------------------------------------------------------------------- */
+/** Creates a soft shimmering bar at the top of the AppBar */
+const shimmerBar = keyframes`
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 `;
 
-const float = keyframes`
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0px); }
+const rotate = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 `;
 
-const drawerItemAnimation = keyframes`
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+const hologramEffect = keyframes`
+  0% {
+    filter: drop-shadow(0 0 4px ${alpha(GOLD_ACCENT, 0.4)});
+  }
+  50% {
+    filter: drop-shadow(0 0 10px ${alpha(GOLD_ACCENT, 0.7)}) hue-rotate(25deg);
+  }
+  100% {
+    filter: drop-shadow(0 0 4px ${alpha(GOLD_ACCENT, 0.4)});
+  }
 `;
 
+const drawerItemEntrance = keyframes`
+  0% {
+    opacity: 0; 
+    transform: translateX(30px) rotateY(90deg); 
+  }
+  100% {
+    opacity: 1; 
+    transform: translateX(0) rotateY(0); 
+  }
+`;
+
+const brandGlow = keyframes`
+  0% {
+    text-shadow: 0 0 4px ${alpha(GOLD_ACCENT, 0.3)};
+  }
+  50% {
+    text-shadow: 0 0 12px ${alpha(GOLD_ACCENT, 0.6)};
+  }
+  100% {
+    text-shadow: 0 0 4px ${alpha(GOLD_ACCENT, 0.3)};
+  }
+`;
+
+/** A swirling halo effect behind the new brand icon. */
+const iconHalo = keyframes`
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: blur(0) brightness(1);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    filter: blur(2px) brightness(1.25);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: blur(0) brightness(1);
+  }
+`;
+
+/** Promo bar text gradient shimmer on hover */
+const promoTextGlow = keyframes`
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+`;
+
+/** Pulsing ring effect around the CTA button on hover */
+const ctaRingPulse = keyframes`
+  0% {
+    box-shadow: 0 0 0 0px ${alpha(GOLD_ACCENT, 0.6)};
+  }
+  100% {
+    box-shadow: 0 0 0 12px transparent;
+  }
+`;
+
+/* --------------------------------------------------------------------------
+ *  Custom GluStack Icon (inline SVG)
+ *  - A geometric, stacked-cube motif in a gold hue
+ * -------------------------------------------------------------------------- */
+const GluStackIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    width="36"
+    height="36"
+    viewBox="0 0 64 64"
+    fill="none"
+    {...props}
+    style={{ display: 'block' }}
+  >
+    {/* Top cube */}
+    <path
+      fill={GOLD_ACCENT}
+      d="M32 6 L10 18 L32 30 L54 18 Z"
+    />
+    {/* Middle cube */}
+    <path
+      fill={alpha(GOLD_ACCENT, 0.9)}
+      d="M32 30 L10 18 L10 42 L32 54 L54 42 L54 18 Z"
+    />
+    {/* Very bottom small shadow or highlight */}
+    <path
+      fill={alpha(GOLD_ACCENT, 0.6)}
+      d="M10 42 L32 54 L32 59 L10 47 Z"
+    />
+    <path
+      fill={alpha(GOLD_ACCENT, 0.8)}
+      d="M54 42 L32 54 L32 59 L54 47 Z"
+    />
+  </svg>
+);
+
+/* --------------------------------------------------------------------------
+ *  Styled Components
+ * -------------------------------------------------------------------------- */
+
+/** Glassy, conic backdrop for the AppBar. */
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: `${GLASS_BACKGROUND} !important`,
   backdropFilter: `${BACKDROP_BLUR} saturate(180%)`,
+  position: 'sticky',
   borderBottom: `1px solid ${alpha(PLATINUM, 0.15)}`,
   boxShadow: '0 16px 48px rgba(0, 0, 0, 0.25)',
-  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-  height: '96px',
+  transition: 'all 0.4s ease',
+  minHeight: '100px',
+  overflow: 'visible',
+
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '4px',
+    background: `linear-gradient(
+      120deg,
+      ${alpha(GOLD_ACCENT, 0.3)} 0%,
+      ${alpha(PLATINUM, 0.1)} 50%,
+      ${alpha(GOLD_ACCENT, 0.3)} 100%
+    )`,
+    backgroundSize: '200% 100%',
+    animation: `${shimmerBar} 6s linear infinite`,
+    zIndex: 3,
+  },
+
   '&.scrolled': {
-    height: '72px',
+    minHeight: '70px',
     boxShadow: '0 12px 40px rgba(0, 0, 0, 0.3)',
-  }
+    '& $LogoContainer': {
+      transform: 'scale(0.9)',
+    },
+  },
 }));
 
+/**
+ * 3D container for the brand icon with rotating conic gradient behind it.
+ */
 const LogoContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(1.5),
   cursor: 'pointer',
-  padding: theme.spacing(1.5, 3),
-  borderRadius: BORDER_RADIUS,
-  background: `linear-gradient(145deg, ${alpha(DEEP_NAVY, 0.9)} 0%, ${alpha(DEEP_NAVY, 0.95)} 100%)`,
-  backdropFilter: BACKDROP_BLUR,
-  border: `1px solid ${alpha(PLATINUM, 0.15)}`,
-  transition: 'all 0.4s ease',
+  padding: theme.spacing(1.5, 2),
   position: 'relative',
+  borderRadius: BORDER_RADIUS,
+  background: `linear-gradient(
+    145deg,
+    ${alpha(DEEP_NAVY, 0.85)} 0%,
+    ${alpha(DEEP_NAVY, 0.95)} 100%
+  )`,
+  backdropFilter: BACKDROP_BLUR,
+  boxShadow: `4px 4px 12px rgba(0, 0, 0, 0.2)`,
+  perspective: 1000,
+  transformStyle: 'preserve-3d',
+  transition: 'transform 0.4s ease',
   overflow: 'hidden',
-  boxShadow: '4px 4px 12px rgba(0, 0, 0, 0.2)',
-  willChange: 'transform',
 
   '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: '6px 6px 16px rgba(0, 0, 0, 0.3)',
-    '&:after': { opacity: 0.4 }
+    transform: 'translateY(-2px) scale(1.04)',
+    boxShadow: '6px 6px 20px rgba(0, 0, 0, 0.35)',
   },
 
-  '&:after': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: '-200%',
-    width: '200%',
-    height: '100%',
-    background: `linear-gradient(
-      90deg,
-      transparent 25%,
-      ${alpha(PLATINUM, 0.2)} 50%,
-      transparent 75%
-    )`,
-    animation: `${logoShine} 8s infinite linear`,
-    opacity: 0,
-    transition: 'opacity 0.4s ease',
-  },
-
-  '&:before': {
+  '&::before': {
     content: '""',
     position: 'absolute',
     inset: 0,
     borderRadius: BORDER_RADIUS,
-    padding: '2px',
-    background: `linear-gradient(45deg, ${GOLD_ACCENT} 0%, ${alpha(PLATINUM, 0.4)} 50%, ${GOLD_ACCENT} 100%)`,
-    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    WebkitMaskComposite: 'xor',
-    maskComposite: 'exclude',
-    animation: `${float} 6s infinite ${TRANSITION_TIMING}`,
-  }
+    background: `conic-gradient(
+      ${alpha(GOLD_ACCENT, 0.25)},
+      ${alpha(PLATINUM, 0.1)},
+      ${alpha(GOLD_ACCENT, 0.25)}
+    )`,
+    animation: `${rotate} 12s linear infinite`,
+    opacity: 0.12,
+    zIndex: 1,
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    borderRadius: BORDER_RADIUS,
+    animation: `${hologramEffect} 3.5s infinite`,
+    zIndex: 2,
+  },
 }));
+(LogoContainer as any).displayName = 'LogoContainer';
 
-const LogoText = styled(Typography)(({ theme }) => ({
-  fontWeight: 600,
-  fontSize: '2rem !important',
-  letterSpacing: '2px',
-  fontFamily: "'Bebas Neue', sans-serif",
-  background: `linear-gradient(45deg, ${PLATINUM} 30%, ${alpha(GOLD_ACCENT, 0.8)} 100%)`,
-  WebkitBackgroundClip: 'text',
-  backgroundClip: 'text',
-  color: 'transparent',
-  textShadow: `0 2px 8px ${alpha(DEEP_NAVY, 0.3)}`,
-  transition: 'all 0.4s ease',
+/**
+ * “Halo” behind the custom GluStackIcon.
+ */
+const IconHaloWrapper = styled(Box)(({ theme }) => ({
   position: 'relative',
-  zIndex: 1,
+  width: 50,
+  height: 50,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 3,
+
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    width: 56,
+    height: 56,
+    borderRadius: '50%',
+    backgroundColor: alpha(GOLD_ACCENT, 0.1),
+    zIndex: -1,
+    animation: `${iconHalo} 4.5s infinite`,
+  },
 }));
 
+/**
+ * Shimmering brand text with a gentle pulsing glow.
+ */
+const LogoText = styled(Typography)(({ theme }) => ({
+  fontWeight: 800,
+  fontSize: '2.4rem',
+  letterSpacing: '5px',
+  fontFamily: "'Bebas Neue', sans-serif",
+  background: `linear-gradient(
+    45deg,
+    ${alpha(PLATINUM, 0.85)} 25%,
+    ${GOLD_ACCENT} 50%,
+    ${PLATINUM} 75%
+  )`,
+  backgroundSize: '200% auto',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  position: 'relative',
+  transition: 'all 0.4s ease',
+  animation: `${brandGlow} 3.5s ease-in-out infinite`,
+}));
+
+/**
+ * Promo Text with a subtle gradient + glow on hover
+ */
+const PromoText = styled(Typography)(({ theme }) => ({
+  letterSpacing: '1px',
+  fontWeight: 500,
+  textAlign: 'center',
+  fontSize: '0.9rem',
+  background: `linear-gradient(
+    90deg,
+    ${alpha(GOLD_ACCENT, 0.9)} 0%,
+    ${alpha(PLATINUM, 0.7)} 50%,
+    ${alpha(GOLD_ACCENT, 0.9)} 100%
+  )`,
+  backgroundSize: '200% 200%',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  transition: 'background-position 0.3s ease',
+  '&:hover': {
+    animation: `${promoTextGlow} 3s infinite`,
+  },
+  // Slight color fallback if gradient doesn't load
+  color: GOLD_ACCENT,
+}));
+
+/**
+ * Main nav items (desktop).
+ */
 const StyledNavButton = styled(Button, {
   shouldForwardProp: (prop) => !['active'].includes(prop as string),
 })<{ active?: boolean }>(({ theme, active }) => ({
   color: alpha(PLATINUM, active ? 1 : 0.9),
-  fontSize: '1.05rem',
-  fontWeight: 500,
+  fontSize: '1.15rem',
+  fontWeight: 600,
   letterSpacing: '1px',
   padding: theme.spacing(2, 3),
   borderRadius: BORDER_RADIUS,
   position: 'relative',
   transition: 'all 0.4s ease',
   overflow: 'hidden',
-  willChange: 'transform',
-  
-  '&:before': {
-    content: '""',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    width: '100%',
-    height: '2px',
-    background: GOLD_ACCENT,
-    transform: `scaleX(${active ? 1 : 0})`,
-    transformOrigin: 'right',
-    transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-  },
-  
-  '&:after': {
-    content: '""',
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '0',
-    height: '0',
-    borderRadius: '50%',
-    background: alpha(GOLD_ACCENT, 0.1),
-    transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-  },
-  
+  textTransform: 'none',
+  backdropFilter: 'blur(4px)',
+
   '&:hover': {
-    transform: 'translateY(-2px)',
-    '&:before': {
+    transform: 'translateY(-1px)',
+    backgroundColor: alpha(DEEP_NAVY, 0.4),
+    '&::after': {
       transform: 'scaleX(1)',
-      transformOrigin: 'left'
     },
-    '&:after': {
-      width: '150%',
-      height: '150%',
-      opacity: 0.3
-    },
-    '& .MuiButton-startIcon': {
-      animation: `${float} 1.2s ease infinite`
-    }
   },
-  
+
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    borderRadius: BORDER_RADIUS,
+    background: active ? alpha(GOLD_ACCENT, 0.07) : 'transparent',
+    border: `1px solid ${alpha(GOLD_ACCENT, active ? 0.4 : 0.1)}`,
+    zIndex: -2,
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    bottom: 4,
+    left: '50%',
+    transform: `translateX(-50%) scaleX(${active ? 1 : 0})`,
+    width: '40%',
+    height: '2px',
+    background: `linear-gradient(
+      90deg,
+      transparent 0%,
+      ${GOLD_ACCENT} 50%,
+      transparent 100%
+    )`,
+    borderRadius: 4,
+    transition: 'transform 0.4s ease',
+    zIndex: -1,
+  },
+
   '& .MuiButton-startIcon': {
     color: GOLD_ACCENT,
-    transition: 'all 0.4s ease',
-    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
-    willChange: 'transform',
-  }
+    transition: 'all 0.3s ease',
+    transform: `scale(${active ? 1.05 : 1})`,
+  },
+  '&:hover .MuiButton-startIcon': {
+    filter: `drop-shadow(0 2px 4px ${alpha(GOLD_ACCENT, 0.4)})`,
+    transform: 'scale(1.1)',
+  },
 }));
 
+/**
+ * The CTA button with a glowing ring effect on hover.
+ */
+const CTAPremiumButton = styled(Button)(({ theme }) => ({
+  color: DEEP_NAVY,
+  background: `linear-gradient(to right, ${alpha(GOLD_ACCENT, 1)} 0%, ${alpha(PLATINUM, 0.4)} 100%)`,
+  fontWeight: 700,
+  textTransform: 'none',
+  borderRadius: BORDER_RADIUS,
+  padding: theme.spacing(1.5, 3),
+  position: 'relative',
+  overflow: 'hidden',
+  boxShadow: `0 8px 24px ${alpha(GOLD_ACCENT, 0.4)}`,
+  transition: 'background 0.3s ease, transform 0.3s ease',
+  '&:hover': {
+    background: `linear-gradient(to right, ${alpha(GOLD_ACCENT, 0.9)} 0%, ${alpha(PLATINUM, 0.6)} 100%)`,
+    transform: 'translateY(-2px)',
+    '&::before': {
+      animation: `${ctaRingPulse} 1s infinite`,
+    },
+  },
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    borderRadius: BORDER_RADIUS,
+    pointerEvents: 'none',
+    boxShadow: `0 0 0 0 ${alpha(GOLD_ACCENT, 0.6)}`,
+  },
+}));
+
+/**
+ * Mobile Drawer styling.
+ */
+const PremiumDrawer = styled(Drawer)(({ theme }) => ({
+  '& .MuiDrawer-paper': {
+    width: 300,
+    background: `${alpha(DEEP_NAVY, 0.98)} !important`,
+    backdropFilter: `${BACKDROP_BLUR} saturate(180%)`,
+    borderLeft: `1px solid ${alpha(PLATINUM, 0.15)}`,
+    boxShadow: `-16px 0 48px ${alpha(DEEP_NAVY, 0.5)}`,
+    overflowX: 'hidden',
+  },
+  '& .MuiListItem-root': {
+    animation: `${drawerItemEntrance} 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+    transformOrigin: 'right center',
+  },
+}));
+
+/* --------------------------------------------------------------------------
+ *  Memoized Components
+ * -------------------------------------------------------------------------- */
 const MemoizedNavButton = memo(StyledNavButton);
 const MemoizedLogoContainer = memo(LogoContainer);
 
+/* --------------------------------------------------------------------------
+ *  Navbar Component
+ * -------------------------------------------------------------------------- */
 const NavBar: React.FC = () => {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    ['/', '/solutions', '/resources', '/pricing', '/contact'].forEach(route => router.prefetch(route));
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [router]);
 
   const navItems = [
     { label: 'Home', path: '/', icon: <HomeIcon /> },
@@ -226,48 +465,91 @@ const NavBar: React.FC = () => {
     { label: 'Contact', path: '/contact', icon: <ContactMailIcon /> },
   ];
 
-  const handleDrawerToggle = useCallback(() => setMobileOpen(prev => !prev), []);
-  const handleNavigation = useCallback((path: string) => {
-    if (isMobile) setMobileOpen(false);
-    document.documentElement.classList.add('page-transition');
-    router.push(path).then(() => {
-      setTimeout(() => document.documentElement.classList.remove('page-transition'), 300);
-    });
-  }, [router, isMobile]);
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+
+    // Pre-fetch routes for snappier navigation
+    navItems.forEach(({ path }) => router.prefetch(path));
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [router, navItems]);
+
+  const handleDrawerToggle = useCallback(() => {
+    setMobileOpen((prev) => !prev);
+  }, []);
+
+  const handleNavigation = useCallback(
+    (path: string) => {
+      if (isMobile) setMobileOpen(false);
+      document.documentElement.classList.add('page-transition');
+      router.push(path).then(() => {
+        setTimeout(() => document.documentElement.classList.remove('page-transition'), 300);
+      });
+    },
+    [router, isMobile]
+  );
 
   return (
     <>
+      {/* Global page transition styles */}
       <GlobalStyles
         styles={{
           '@keyframes fadeIn': {
             from: { opacity: 0, transform: 'translateY(10px)' },
-            to: { opacity: 1, transform: 'translateY(0)' }
+            to: { opacity: 1, transform: 'translateY(0)' },
           },
           '.page-transition': {
             viewTransitionName: 'root-transition',
             animation: 'fadeIn 300ms ease-out',
           },
           '.page-transition::view-transition-old(root), .page-transition::view-transition-new(root)': {
-            animationDuration: '300ms'
-          }
+            animationDuration: '300ms',
+          },
         }}
       />
-      
+
+      {/* Top Promo Bar */}
+      <AppBar
+        sx={{
+          backgroundColor: alpha(DEEP_NAVY, 0.85),
+          backdropFilter: BACKDROP_BLUR,
+          boxShadow: 'none',
+          position: 'static',
+        }}
+      >
+        <Container maxWidth="xl">
+          <Toolbar sx={{ minHeight: 36, justifyContent: 'center' }}>
+            <PromoText variant="body2">
+              Discover next-level AI/ML solutions. Limited-time offer inside.
+            </PromoText>
+          </Toolbar>
+        </Container>
+      </AppBar>
+
+      {/* Main AppBar */}
       <Slide in={!scrolled} direction="down" appear={false}>
         <StyledAppBar position="sticky" className={scrolled ? 'scrolled' : ''}>
           <Container maxWidth="xl">
-            <Toolbar sx={{ 
-              justifyContent: 'space-between', 
-              py: 1,
-              minHeight: { xs: '64px', md: '96px' },
-              transition: 'min-height 0.4s ease'
-            }}>
+            <Toolbar
+              sx={{
+                justifyContent: 'space-between',
+                py: 1.25,
+                transition: 'min-height 0.4s ease',
+                minHeight: { xs: '68px', md: '100px' },
+              }}
+            >
+              {/* IconHaloWrapper + Brand Text */}
               <MemoizedLogoContainer onClick={() => handleNavigation('/')}>
-                <LogoText>GluStack</LogoText>
+                <IconHaloWrapper>
+                  <GluStackIcon />
+                </IconHaloWrapper>
+                <LogoText>GLUSTACK</LogoText>
               </MemoizedLogoContainer>
 
+              {/* Desktop Nav */}
               {!isMobile ? (
-                <Box display="flex" gap={1}>
+                <Box display="flex" gap={2}>
                   {navItems.map(({ label, path, icon }) => (
                     <MemoizedNavButton
                       key={label}
@@ -278,17 +560,22 @@ const NavBar: React.FC = () => {
                       {label}
                     </MemoizedNavButton>
                   ))}
+                  {/* CTA Button */}
+                  <CTAPremiumButton onClick={() => alert('Promo CTA clicked!')}>
+                    Free Architecture Review
+                  </CTAPremiumButton>
                 </Box>
               ) : (
-                <IconButton 
+                /* Mobile Drawer Toggle */
+                <IconButton
                   onClick={handleDrawerToggle}
-                  sx={{ 
-                    color: PLATINUM, 
-                    '&:hover': { 
+                  sx={{
+                    color: PLATINUM,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
                       background: alpha(PLATINUM, 0.1),
-                      transform: 'rotate(90deg)'
+                      transform: 'rotate(90deg)',
                     },
-                    transition: 'all 0.3s ease'
                   }}
                 >
                   <MenuIcon sx={{ fontSize: '2rem' }} />
@@ -297,66 +584,67 @@ const NavBar: React.FC = () => {
             </Toolbar>
           </Container>
 
-          <Drawer
+          {/* Mobile Drawer */}
+          <PremiumDrawer
             anchor="right"
             open={mobileOpen}
             onClose={handleDrawerToggle}
-            transitionDuration={400}
-            sx={{
-              '& .MuiDrawer-paper': {
-                width: 320,
-                background: alpha(DEEP_NAVY, 0.98),
-                backdropFilter: BACKDROP_BLUR,
-                borderLeft: `1px solid ${alpha(PLATINUM, 0.1)}`,
-              },
-            }}
+            transitionDuration={600}
           >
             <Box p={2}>
-              <MemoizedLogoContainer onClick={() => handleNavigation('/')}>
-                <LogoText>GluStack</LogoText>
+              <MemoizedLogoContainer
+                onClick={() => handleNavigation('/')}
+                sx={{ mb: 2 }}
+              >
+                <IconHaloWrapper>
+                  <GluStackIcon />
+                </IconHaloWrapper>
+                <LogoText>GLUSTACK</LogoText>
               </MemoizedLogoContainer>
-              <Divider sx={{ 
-                my: 2, 
-                borderColor: alpha(PLATINUM, 0.1),
-                transition: 'all 0.3s ease'
-              }} />
+
+              <Divider
+                sx={{
+                  my: 1,
+                  borderColor: alpha(PLATINUM, 0.1),
+                  transition: 'all 0.3s ease',
+                }}
+              />
+
               <List>
                 {navItems.map(({ label, path }, index) => (
-                  <ListItem 
-                    key={label} 
+                  <ListItem
+                    key={label}
                     disablePadding
                     sx={{
-                      animation: `${drawerItemAnimation} 0.4s ease forwards`,
+                      animation: `${drawerItemEntrance} 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
                       animationDelay: `${index * 0.1}s`,
-                      opacity: 0
+                      opacity: 0,
                     }}
                   >
-                    <Link href={path} passHref legacyBehavior>
-                      <Button
-                        component="a"
-                        fullWidth
-                        onClick={() => handleNavigation(path)}
-                        sx={{
-                          color: alpha(PLATINUM, 0.8),
-                          py: 1.5,
-                          px: 3,
-                          justifyContent: 'flex-start',
-                          fontSize: '1.1rem',
-                          '&:hover': { 
-                            color: PLATINUM,
-                            background: alpha(PLATINUM, 0.05)
-                          },
-                          transition: 'all 0.3s ease'
-                        }}
-                      >
-                        {label}
-                      </Button>
-                    </Link>
+                    <Button
+                      fullWidth
+                      onClick={() => handleNavigation(path)}
+                      sx={{
+                        color: alpha(PLATINUM, 0.9),
+                        py: 1.5,
+                        px: 3,
+                        justifyContent: 'flex-start',
+                        fontSize: '1.1rem',
+                        textTransform: 'none',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          color: PLATINUM,
+                          background: alpha(PLATINUM, 0.05),
+                        },
+                      }}
+                    >
+                      {label}
+                    </Button>
                   </ListItem>
                 ))}
               </List>
             </Box>
-          </Drawer>
+          </PremiumDrawer>
         </StyledAppBar>
       </Slide>
     </>

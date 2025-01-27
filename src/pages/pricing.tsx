@@ -16,17 +16,6 @@ import { Info, Award, Clock, Users, Calendar, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { motion, useScroll, useTransform, LazyMotion, domAnimation, MotionProps } from 'framer-motion';
 
-// Theme augmentation for MUI
-declare module '@mui/material/styles' {
-  interface Palette {
-    gradients: {
-      primary: string;
-      secondary: string;
-    };
-  }
-}
-
-// SVG Noise Texture
 const noiseSVG = encodeURIComponent(`
   <svg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'>
     <filter id='n'>
@@ -49,7 +38,6 @@ const useTouchDevice = () => {
   return isTouch;
 };
 
-// Motion component with proper typing
 const MotionBox = motion(Box);
 
 interface StyledMotionProps extends MotionProps {
@@ -96,8 +84,8 @@ const LazyPricingCard = styled(MotionBox, {
       inset 0 0 0 1px ${alpha(theme.palette.common.white, 0.05)}`,
     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     height: '100%',
-    minHeight: '520px', // Default mobile-first value
-    [theme.breakpoints.up('md')]: { // Desktop responsive override
+    minHeight: '520px',
+    [theme.breakpoints.up('md')]: {
       minHeight: '580px',
     },
     display: 'flex',
@@ -130,59 +118,6 @@ const LazyPricingCard = styled(MotionBox, {
       '&:hover::after': { opacity: 0.2 }
     },
   }));
-
-// Style Constants
-const listItemStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  mb: 2,
-  p: { xs: 1.5, sm: 2 },
-  borderRadius: 2,
-  transition: 'all 0.2s ease',
-  background: 'rgba(255, 255, 255, 0.02)',
-};
-
-const featureTextStyle = (theme: Theme) => ({
-  color: theme.palette.text.primary,
-  fontSize: { xs: '0.9rem', sm: '1rem' },
-  fontWeight: 500,
-  lineHeight: 1.4,
-});
-
-const featureListStyle = (theme: Theme, isTouch: boolean) => ({
-  pl: 0,
-  listStyle: 'none',
-  mb: 4,
-  '& li': {
-    ...listItemStyle,
-    '&:hover': !isTouch ? {
-      background: 'rgba(255, 255, 255, 0.05)',
-      transform: 'translateX(4px)'
-    } : {}
-  }
-});
-
-const ctaButtonStyle = (theme: Theme) => ({
-  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-  borderRadius: '12px',
-  py: { xs: 2, sm: 3 },
-  fontSize: { xs: '1rem', sm: '1.1rem' },
-  fontWeight: 700,
-  letterSpacing: '0.05em',
-  '&:hover': {
-    boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.3)}`
-  }
-});
-
-const FeatureItem = memo<FeatureItemProps>(({ icon: Icon, text }) => {
-  const theme = useTheme();
-  return (
-    <Box component="li" sx={listItemStyle}>
-      <Icon size={24} style={{ color: theme.palette.primary.main, marginRight: 16 }} />
-      <Typography variant="body2" sx={featureTextStyle(theme)}>{text}</Typography>
-    </Box>
-  );
-});
 
 const UltraPricingPage = () => {
   const theme = useTheme();
@@ -237,7 +172,7 @@ const UltraPricingPage = () => {
   return (
     <StyledEngineProvider injectFirst>
       <LazyMotion features={domAnimation}>
-        <Container maxWidth="xl" sx={{ py: { xs: 6, md: 12 }, position: 'relative' }}>
+        <Container maxWidth="xl" sx={{ pt: 8, pb: { xs: 6, md: 12 }, position: 'relative' }}>
           <motion.div style={{
             y,
             position: 'absolute',
@@ -282,7 +217,7 @@ const UltraPricingPage = () => {
                 lineHeight: 1.1,
                 textShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
               }}>
-                Technology Solutions
+                Engagement Options
               </Typography>
               <Typography variant="subtitle1" sx={{
                 color: 'text.secondary',
@@ -359,7 +294,24 @@ const UltraPricingPage = () => {
                       </Typography>
                     </Box>
 
-                    <Box component="ul" sx={featureListStyle(theme, isTouch)}>
+                    <Box component="ul" sx={{
+                      pl: 0,
+                      listStyle: 'none',
+                      mb: 4,
+                      '& li': {
+                        display: 'flex',
+                        alignItems: 'center',
+                        mb: 2,
+                        p: { xs: 1.5, sm: 2 },
+                        borderRadius: 2,
+                        transition: 'all 0.2s ease',
+                        background: 'rgba(255, 255, 255, 0.02)',
+                        '&:hover': !isTouch ? {
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          transform: 'translateX(4px)'
+                        } : {}
+                      }
+                    }}>
                       {getFeatures(planType)}
                     </Box>
 
@@ -371,7 +323,17 @@ const UltraPricingPage = () => {
                       <Button
                         variant="contained"
                         fullWidth
-                        sx={ctaButtonStyle(theme)}
+                        sx={{
+                          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                          borderRadius: '12px',
+                          py: { xs: 2, sm: 3 },
+                          fontSize: { xs: '1rem', sm: '1.1rem' },
+                          fontWeight: 700,
+                          letterSpacing: '0.05em',
+                          '&:hover': {
+                            boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.3)}`
+                          }
+                        }}
                         onClick={() => handlePlanSelection(planType)}
                       >
                         {planType === 'hourly' && 'Start Consultation'}
@@ -389,5 +351,28 @@ const UltraPricingPage = () => {
     </StyledEngineProvider>
   );
 };
+
+const FeatureItem = memo<FeatureItemProps>(({ icon: Icon, text }) => {
+  const theme = useTheme();
+  return (
+    <Box component="li" sx={{
+      display: 'flex',
+      alignItems: 'center',
+      mb: 2,
+      p: { xs: 1.5, sm: 2 },
+      borderRadius: 2,
+      transition: 'all 0.2s ease',
+      background: 'rgba(255, 255, 255, 0.02)',
+    }}>
+      <Icon size={24} style={{ color: theme.palette.primary.main, marginRight: 16 }} />
+      <Typography variant="body2" sx={{
+        color: theme.palette.text.primary,
+        fontSize: { xs: '0.9rem', sm: '1rem' },
+        fontWeight: 500,
+        lineHeight: 1.4,
+      }}>{text}</Typography>
+    </Box>
+  );
+});
 
 export default UltraPricingPage;
