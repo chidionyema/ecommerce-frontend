@@ -589,7 +589,7 @@ const ProjectDetails: React.FC = () => {
 };
 
 const QuickFacts: React.FC<{
-  teamSize: string;
+  teamSize: number;  // Changed from string to number
   timeline: string;
   technologies: string[];
   stakeholders: string[];
