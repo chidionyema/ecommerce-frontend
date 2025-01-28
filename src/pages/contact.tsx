@@ -142,7 +142,7 @@ const Contact: React.FC = () => {
             >
               {router.query.plan
                 ? `Let's co-create your vision with surgical precision. Share your objectives and we'll orchestrate transformative results.`
-                : "Initiate your bespoke digital evolution. Our elite engineering team awaits your directive."}
+                : "Partner with our expert engineering team to bring your unique digital vision to life. Let’s create tailored solutions that empower your success."}
             </Typography>
           </motion.div>
         </Grid>

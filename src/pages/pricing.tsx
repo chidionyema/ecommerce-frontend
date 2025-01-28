@@ -180,18 +180,7 @@ const PricingGrid = () => {
                 opacity: 0.8
               }
             }}>
-              <Typography variant="h1" sx={{ 
-                fontWeight: 900,
-                letterSpacing: '-0.03em',
-                mb: 3,
-                fontSize: isMobile ? '2.75rem' : '4rem',
-                background: TITLE_GRADIENT,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                lineHeight: 1.1
-              }}>
-                Engagement Models
-              </Typography>
+        
 
               {/* Add an H2 for accessibility/SEO if needed */}
               <Typography variant="h2" sx={{

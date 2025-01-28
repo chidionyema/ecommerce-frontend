@@ -162,18 +162,7 @@ const Solutions = () => {
               opacity: 0.8
             }
           }}>
-            <Typography variant="h1" sx={{ 
-              fontWeight: 900,
-              letterSpacing: '-0.03em',
-              mb: 3,
-              fontSize: isMobile ? '2.75rem' : '4rem',
-              background: TITLE_GRADIENT,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              lineHeight: 1.1,
-            }}>
-               Client Solutions
-            </Typography>
+       
 
             {/* H2 for SEO / structure */}
             <Typography variant="h2" sx={{
@@ -183,7 +172,7 @@ const Solutions = () => {
               fontSize: isMobile ? '1.7rem' : '2rem',
               color: PRIMARY_DARK,
             }}>
-             Empowering Innovation, One Project at a Time
+           Driving Innovation Through Every Project
             </Typography>
 
             <Typography variant="subtitle1" sx={{
@@ -194,7 +183,7 @@ const Solutions = () => {
               lineHeight: 1.6,
               fontWeight: 500
             }}>
-              Cutting-edge insights distilled from years of enterprise-grade implementations.
+      Harnessing years of expertise to deliver impactful, enterprise-grade solutions tailored to your unique needs.
             </Typography>
           </Box>
         </motion.div>      
