@@ -14,13 +14,6 @@ import {
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/router';
 
-interface FormData {
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-}
-
 const planTitles: Record<string, string> = {
   hourly: '🌟 Priority Hourly Consult',
   project: '🚀 Tailored Project Partnership',
@@ -28,10 +21,18 @@ const planTitles: Record<string, string> = {
   consultation: '🔮 Strategic Vision Session',
 };
 
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+}
+
 const Contact: React.FC = () => {
   const theme = useTheme();
   const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -42,6 +43,7 @@ const Contact: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  // Minimal parallax effect
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
@@ -57,12 +59,16 @@ const Contact: React.FC = () => {
     setSuccess(false);
 
     try {
+      // Example submission logic
       const form = new FormData();
       form.append('name', formData.name);
       form.append('email', formData.email);
       form.append('phone', formData.phone);
       form.append('message', formData.message);
-      form.append('plan', planTitles[router.query.plan as string] || 'General Inquiry');
+      form.append(
+        'plan',
+        planTitles[router.query.plan as string] || 'General Inquiry',
+      );
 
       const response = await fetch('https://your-worker.your-domain.com', {
         method: 'POST',
@@ -70,7 +76,6 @@ const Contact: React.FC = () => {
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.errors?.join(', ') || 'Submission failed');
       }
@@ -91,7 +96,7 @@ const Contact: React.FC = () => {
     <Container
       maxWidth="lg"
       sx={{
-        py: 10, // Increased padding
+        py: 10,
         position: 'relative',
         overflow: 'hidden',
         background: `radial-gradient(circle at center, 
@@ -99,6 +104,7 @@ const Contact: React.FC = () => {
           ${alpha(theme.palette.background.default, 0.8)} 100%)`,
       }}
     >
+      {/* Rotating gradient behind form */}
       <motion.div
         style={{
           position: 'absolute',
@@ -117,6 +123,7 @@ const Contact: React.FC = () => {
         transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
       />
 
+      {/* Subtle grid pattern + blur */}
       <motion.div
         style={{
           position: 'absolute',
@@ -131,7 +138,14 @@ const Contact: React.FC = () => {
         }}
       />
 
-      <Grid container spacing={6} component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <Grid
+        container
+        spacing={6}
+        component={motion.div}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        {/* LEFT COLUMN */}
         <Grid item xs={12} md={6}>
           <motion.div
             initial={{ x: -100, opacity: 0 }}
@@ -150,7 +164,8 @@ const Contact: React.FC = () => {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              {planTitles[router.query.plan as string] || "Let's Create Something Amazing"}
+              {planTitles[router.query.plan as string] ||
+                "Let's Create Something Amazing"}
             </Typography>
             <Typography
               variant="body1"
@@ -168,6 +183,7 @@ const Contact: React.FC = () => {
           </motion.div>
         </Grid>
 
+        {/* RIGHT COLUMN (FORM) */}
         <Grid item xs={12} md={6}>
           <motion.form
             onSubmit={handleSubmit}
@@ -179,12 +195,13 @@ const Contact: React.FC = () => {
               style={{
                 background: alpha(theme.palette.background.paper, 0.8),
                 borderRadius: '24px',
-                padding: '2.5rem', // Increased padding
+                padding: '2.5rem',
                 backdropFilter: 'blur(20px)',
                 boxShadow: '0 16px 40px rgba(0,0,0,0.1)',
               }}
             >
               <Grid container spacing={3}>
+                {/* ERROR / SUCCESS */}
                 {error && (
                   <Grid item xs={12}>
                     <Alert severity="error">{error}</Alert>
@@ -196,6 +213,7 @@ const Contact: React.FC = () => {
                   </Grid>
                 )}
 
+                {/* FIELDS */}
                 {['name', 'email', 'phone'].map((field) => (
                   <Grid item xs={12} key={field}>
                     <TextField
@@ -218,19 +236,32 @@ const Contact: React.FC = () => {
                     />
                   </Grid>
                 ))}
+
+                {/* MESSAGE */}
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
                     multiline
-                    rows={6} // Increased rows for more space
+                    rows={6}
                     variant="filled"
                     label="Share Your Vision"
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
                     disabled={loading}
+                    sx={{
+                      '& .MuiFilledInput-root': {
+                        borderRadius: '12px',
+                        background: alpha(
+                          theme.palette.background.paper,
+                          0.1,
+                        ),
+                      },
+                    }}
                   />
                 </Grid>
+
+                {/* SUBMIT */}
                 <Grid item xs={12}>
                   <Button
                     type="submit"

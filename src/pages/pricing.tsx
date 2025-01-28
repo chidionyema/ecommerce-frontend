@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import { 
   Box, 
   Typography, 
@@ -12,7 +12,8 @@ import {
 } from '@mui/material';
 import { Info, Award, Clock, Users, Calendar, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { motion, LazyMotion, domAnimation } from 'framer-motion';
+import { motion, LazyMotion, domAnimation, useMotionValue, useTransform } from 'framer-motion';
+import { keyframes } from '@emotion/react';
 
 const PRIMARY_DARK = '#0A1A2F';
 const SECONDARY_DARK = '#532F73';
@@ -29,9 +30,24 @@ const noiseSVG = encodeURIComponent(`
   </svg>
 `);
 
+const gradientShift = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
+
+const shine = keyframes`
+  from { left: -50%; }
+  to { left: 150%; }
+`;
+
 const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
   position: 'relative',
-  background: alpha(theme.palette.background.paper, 0.65),
+  background: `
+    ${alpha(theme.palette.background.paper, 0.65)},
+    url("data:image/svg+xml;utf8,${noiseSVG}")
+  `,
+  backgroundBlendMode: 'soft-light',
   borderRadius: '24px',
   padding: theme.spacing(4),
   border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
@@ -42,6 +58,7 @@ const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
   minHeight: 500,
   overflow: 'hidden',
+  perspective: 1000,
   '&:hover': {
     transform: 'translateY(-8px)',
     boxShadow: `0 32px 64px -12px ${alpha(PRIMARY_DARK, 0.2)}`,
@@ -67,14 +84,19 @@ const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
     inset: 0,
     borderRadius: '24px',
     padding: '2px',
-    background: `linear-gradient(145deg, 
-      ${alpha(PRIMARY_DARK, 0.2)} 0%, 
-      ${alpha(SECONDARY_DARK, 0.2)} 50%,
-      ${alpha(PRIMARY_DARK, 0.2)} 100%)`,
+    background: `
+      linear-gradient(
+        145deg, 
+        ${alpha(PRIMARY_DARK, 0.2)} 0%, 
+        ${alpha(SECONDARY_DARK, 0.2)} 50%,
+        ${alpha(PRIMARY_DARK, 0.2)} 100%
+      )`,
     WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
     mask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
     WebkitMaskComposite: 'xor',
     maskComposite: 'exclude',
+    animation: `${gradientShift} 8s linear infinite`,
+    backgroundSize: '200% 200%',
   }
 }));
 
@@ -116,14 +138,14 @@ const PricingGrid = () => {
     }
   ];
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const target = e.currentTarget as HTMLElement; // Add type assertion here
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    const target = e.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     target.style.setProperty('--mouse-x', `${x}px`);
     target.style.setProperty('--mouse-y', `${y}px`);
-  };
+  }, []);
 
   return (
     <LazyMotion features={domAnimation}>
@@ -157,7 +179,8 @@ const PricingGrid = () => {
               background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              lineHeight: 1.1
+              lineHeight: 1.1,
+              textShadow: `0 2px 4px ${alpha(PRIMARY_DARK, 0.2)}`
             }}>
               Engagement Options
             </Typography>
@@ -174,61 +197,103 @@ const PricingGrid = () => {
         </motion.div>
 
         <Grid container spacing={4}>
-          {plans.map((plan, index) => (
-            <Grid item xs={12} sm={6} md={4} key={plan.type}>
-              <LazyPricingCard
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                onMouseMove={handleMouseMove}
-                sx={{ background: plan.gradient }}
-              >
-                <Box sx={{ 
-                  mb: 3, 
-                  textAlign: 'center',
-                  minHeight: 72
-                }}>
-                  <Typography variant="h4" sx={{
-                    fontWeight: 800,
-                    background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    fontSize: isMobile ? '1.5rem' : '1.75rem'
-                  }}>
-                    {plan.title}
-                  </Typography>
-                </Box>
+          {plans.map((plan, index) => {
+            const rotateX = useMotionValue(0);
+            const rotateY = useMotionValue(0);
+            
+            const handleCardMouseMove = (e: React.MouseEvent) => {
+              handleMouseMove(e);
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              const centerX = rect.width / 2;
+              const centerY = rect.height / 2;
+              rotateX.set((y - centerY) / 20);
+              rotateY.set(-(x - centerX) / 20);
+            };
 
-                <Box sx={{ flexGrow: 1, mb: 3 }}>
-                  {plan.features.map((feature) => (
-                    <FeatureItem 
-                      key={feature.text}
-                      icon={feature.icon}
-                      text={feature.text}
-                    />
-                  ))}
-                </Box>
-
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={() => router.push(`/contact?plan=${plan.type}`)}
-                  sx={{
-                    mt: 'auto',
-                    height: 56,
-                    background: `linear-gradient(90deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
-                    fontWeight: 700,
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: `0 8px 24px ${alpha(PRIMARY_DARK, 0.3)}`
-                    }
+            return (
+              <Grid item xs={12} sm={6} md={4} key={plan.type}>
+                <LazyPricingCard
+                  initial={{ opacity: 0, y: 40, scale: 0.95, rotateX: 10 }}
+                  animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  onMouseMove={handleCardMouseMove}
+                  onMouseLeave={() => {
+                    rotateX.set(0);
+                    rotateY.set(0);
                   }}
+                  style={{ rotateX, rotateY }}
+                  sx={{ background: plan.gradient }}
                 >
-                  Get Started
-                </Button>
-              </LazyPricingCard>
-            </Grid>
-          ))}
+                  <Box sx={{ position: 'absolute', inset: 0, zIndex: 0,
+                    background: `url("data:image/svg+xml;utf8,${noiseSVG}")`,
+                    opacity: 0.05,
+                    mixBlendMode: 'overlay',
+                    pointerEvents: 'none',
+                  }} />
+                  
+                  <Box sx={{ 
+                    mb: 3, 
+                    textAlign: 'center',
+                    minHeight: 72
+                  }}>
+                    <Typography variant="h4" sx={{
+                      fontWeight: 800,
+                      background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      fontSize: isMobile ? '1.5rem' : '1.75rem'
+                    }}>
+                      {plan.title}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ flexGrow: 1, mb: 3 }}>
+                    {plan.features.map((feature, featureIndex) => (
+                      <motion.div
+                        key={feature.text}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 + featureIndex * 0.05 }}
+                      >
+                        <FeatureItem 
+                          icon={feature.icon}
+                          text={feature.text}
+                        />
+                      </motion.div>
+                    ))}
+                  </Box>
+
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={() => router.push(`/contact?plan=${plan.type}`)}
+                    sx={{
+                      mt: 'auto',
+                      height: 56,
+                      position: 'relative',
+                      overflow: 'hidden',
+                      background: `linear-gradient(90deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
+                      fontWeight: 700,
+                      transformOrigin: 'center',
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: `0 8px 24px ${alpha(PRIMARY_DARK, 0.3)}`,
+                        '&::after': {
+                          animation: `${shine} 1s ease`,
+                        }
+                      }
+                    }}
+                  >
+                    <Typography variant="button" sx={{ position: 'relative', zIndex: 1 }}>
+                      Get Started
+                    </Typography>
+                  </Button>
+                </LazyPricingCard>
+              </Grid>
+            )}
+          )}
         </Grid>
       </Container>
     </LazyMotion>
@@ -236,7 +301,6 @@ const PricingGrid = () => {
 };
 
 const FeatureItem = memo<{ icon: React.ElementType; text: string }>(({ icon: Icon, text }) => {
-  const theme = useTheme();
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -255,6 +319,7 @@ const FeatureItem = memo<{ icon: React.ElementType; text: string }>(({ icon: Ico
       <motion.div
         animate={{ 
           scale: isHovered ? 1.15 : 1,
+          y: isHovered ? -2 : 0,
           color: isHovered ? SECONDARY_DARK : alpha(PRIMARY_DARK, 0.8)
         }}
         transition={{ type: 'spring', stiffness: 300 }}
