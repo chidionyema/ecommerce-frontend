@@ -68,7 +68,10 @@ const Contact: React.FC = () => {
     setSuccess(false);
 
     try {
-      // Submission logic remains same
+      // Replace this with your actual form submission logic (e.g., API call)
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate a 2-second delay
+      setSuccess(true);
+      setFormData({ name: '', email: '', phone: '', message: '' }); // Clear the form
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -78,19 +81,19 @@ const Contact: React.FC = () => {
 
   return (
     <Container
-      maxWidth="lg" // Changed from md to lg for wider container
+      maxWidth="lg"
       sx={{
-        py: { xs: 8, md: 12 }, // Increased padding
+        py: { xs: 8, md: 12 },
         position: 'relative',
         overflow: 'hidden',
         background: '#f8fafc',
       }}
     >
-      <Grid 
-        container 
-        spacing={{ xs: 4, md: 8 }} // Increased spacing
-        component={motion.div} 
-        initial={{ opacity: 0 }} 
+      <Grid
+        container
+        spacing={{ xs: 6, md: 16 }} 
+        component={motion.div}
+        initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
         <Grid item xs={12} md={6}>
@@ -99,45 +102,48 @@ const Contact: React.FC = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, type: 'spring' }}
           >
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4, // Increased gap
-              mb: { xs: 6, md: 8 }, // Increased margin
-              padding: { xs: 3, md: 4 }, // Increased padding
-              background: 'white',
-              borderRadius: theme.shape.borderRadius,
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-            }}>
-              {planIcons[router.query.plan as string] || <Code sx={{ fontSize: 48, color: theme.palette.primary.dark }} />} {/* Larger icon */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                mb: { xs: 6, md: 8 },
+                padding: { xs: 3, md: 4 },
+                background: 'white',
+                borderRadius: theme.shape.borderRadius,
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+              }}
+            >
+              {planIcons[router.query.plan as string] || <Code sx={{ fontSize: 48, color: theme.palette.primary.dark }} />}
               <Typography
                 variant="h2"
                 sx={{
                   fontWeight: 800,
-                  fontSize: { xs: '2rem', md: '3rem' }, // Larger font size
+                  fontSize: { xs: '2rem', md: '3rem' },
                   lineHeight: 1.1,
                   color: '#1e293b',
                   fontFamily: "'Barlow', sans-serif",
-                  letterSpacing: '-1px', // Increased letter spacing
+                  letterSpacing: '-1px',
                 }}
               >
                 {planTitles[router.query.plan as string] || "Architecting Digital Excellence"}
               </Typography>
             </Box>
-            
+
             <Typography
               variant="body1"
               sx={{
-                mb: 6, // Increased margin
-                fontSize: { xs: '1.1rem', md: '1.25rem' }, // Larger font size
+                mb: 6,
+                fontSize: { xs: '1.1rem', md: '1.25rem' },
                 color: '#475569',
                 lineHeight: 1.8,
-                padding: { xs: 3, md: 4 }, // Increased padding
+                padding: { xs: 3, md: 4 },
                 background: 'white',
+                
                 borderRadius: theme.shape.borderRadius,
                 border: '1px solid #e2e8f0',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
               }}
             >
               {router.query.plan
@@ -158,17 +164,17 @@ const Contact: React.FC = () => {
               style={{
                 background: 'white',
                 borderRadius: theme.shape.borderRadius,
-                padding: theme.spacing(4), // Increased padding
+                padding: theme.spacing(4),
                 border: '1px solid #e2e8f0',
-                boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)',
               }}
               whileHover={{ scale: isMobile ? 1 : 1.02 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
-              <Grid container spacing={3}> {/* Increased spacing */}
+              <Grid container spacing={4}>
                 {error && (
                   <Grid item xs={12}>
-                    <Alert severity="error" sx={{ mb: 3, fontSize: '1rem' }}> {/* Larger alert */}
+                    <Alert severity="error" sx={{ mb: 3, fontSize: '1rem' }}>
                       {error}
                     </Alert>
                   </Grid>
@@ -176,14 +182,14 @@ const Contact: React.FC = () => {
 
                 {success && (
                   <Grid item xs={12}>
-                    <Alert severity="success" sx={{ mb: 3, fontSize: '1rem' }}> {/* Larger alert */}
+                    <Alert severity="success" sx={{ mb: 3, fontSize: '1rem' }}>
                       Message sent successfully!
                     </Alert>
                   </Grid>
                 )}
 
                 {[
-                  { field: 'name', icon: <AccountCircle fontSize="medium" /> }, // Larger icon
+                  { field: 'name', icon: <AccountCircle fontSize="medium" /> },
                   { field: 'email', icon: <Email fontSize="medium" /> },
                   { field: 'phone', icon: <Phone fontSize="medium" /> },
                 ].map(({ field, icon }) => (

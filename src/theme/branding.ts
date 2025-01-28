@@ -47,13 +47,25 @@ export const noiseSVG = encodeURIComponent(`
   </svg>
 `);
 
+export const animatedGradient = keyframes`
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+`;
 // theme/branding.ts
+/*
 export const TITLE_GRADIENT = `linear-gradient(
   135deg,
   ${PRIMARY_DARK} 0%,
   ${SECONDARY_DARK} 50%,
   ${RED_ACCENT} 100%
-)`;
-
+)`;*/
+export const TITLE_GRADIENT = 'linear-gradient(45deg, #448AFF, #673AB7)'; 
 
 export const TECH_GRADIENT_SHADOW = '#4361EE'; // Or another color that matches the gradient

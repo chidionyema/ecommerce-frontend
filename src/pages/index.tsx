@@ -34,6 +34,7 @@ import {
   SECONDARY_DARK,
   LIGHT_ACCENT,
   PAGE_BG,
+  animatedGradient
 } from '../theme/branding';
 
 /* -----------------------------------------------------------------------------
@@ -137,11 +138,8 @@ const HeroSection = () => {
           md: 8     // 32px on desktop
         },
         pb: isMobile ? 12 : 20,
-        background: `
-          linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.94)}, ${alpha(SECONDARY_DARK, 0.92)}),
-          radial-gradient(circle at 20% 80%, ${alpha(LIGHT_ACCENT, 0.15)} 0%, transparent 40%),
-          radial-gradient(circle at 80% 20%, ${alpha('#F72585', 0.1)} 0%, transparent 40%)
-        `,
+        background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`, // Use the same animated gradient as LuxAppBar
+        animation: `${animatedGradient} 10s ease infinite`, // Apply the animation
         color: '#fff',
         textAlign: 'center',
         borderBottom: `1px solid ${alpha('#fff', 0.1)}`,

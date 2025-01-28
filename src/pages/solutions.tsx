@@ -61,10 +61,9 @@ const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
 
   '&:hover': {
     transform: 'translateY(-8px)',
-    borderColor: alpha(SECONDARY_DARK, 0.3),
     boxShadow: `0 40px 80px -24px ${alpha(SECONDARY_DARK, 0.2)}`,
+    borderColor: TITLE_GRADIENT, // Apply TITLE_GRADIENT to border on hover
   },
-
   '.content-overlay': {
     position: 'absolute',
     inset: 0,
@@ -319,10 +318,30 @@ const Solutions = () => {
                         ))}
                       </Box>
 
-                      <Box sx={{ flexShrink: 0, display: 'flex', justifyContent: 'flex-end' }}>
-                        <IconButton sx={{ color: PRIMARY_DARK }}>
-                          <ArrowForwardIcon />
-                        </IconButton>
+                      <Box sx={{ 
+                          flexShrink: 0, 
+                          display: 'flex', 
+                          justifyContent: 'flex-end', 
+                          position: 'relative' // Add relative positioning to the Box
+                        }}>
+                      <IconButton sx={{ 
+                        position: 'relative', 
+                        '&::before': {  
+                          content: '""',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          background: TITLE_GRADIENT,
+                          WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
+                          mask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
+                          WebkitMaskComposite: 'source-over', // Change to source-over
+                          maskComposite: 'source-over', // Change to source-over
+                        }
+                      }}> 
+                        <ArrowForwardIcon />
+                      </IconButton>
                       </Box>
                     </Box>
                   </PremiumCardContainer>

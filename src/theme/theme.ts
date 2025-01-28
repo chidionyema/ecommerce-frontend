@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 
+
 declare module '@mui/material/styles' {
   interface Palette {
     gradients: {
@@ -49,8 +50,9 @@ const baseTheme: ThemeOptions = {
     }
   },
   typography: {
-    fontFamily: 'Inter, system-ui, sans-serif',
+    fontFamily: '"Inter", "Roboto", "Arial", sans-serif', // Primary font
     h1: {
+      fontFamily: '"Poppins", "Roboto", "Arial", sans-serif', // Secondary font for headings
       fontSize: '3rem',
       fontWeight: 700,
       lineHeight: 1.15,
@@ -131,7 +133,6 @@ const baseTheme: ThemeOptions = {
 };
 
 const theme = createTheme(baseTheme);
-
 // Custom styled components
 export const ProfessionalButton = styled(Button)(({ theme }) => ({
   fontSize: '1.1rem',
@@ -173,7 +174,6 @@ export const FeatureCard = styled(Paper)(({ theme }) => ({
     transform: 'translateY(-4px)'
   }
 }));
-
 
 
 export default theme;
