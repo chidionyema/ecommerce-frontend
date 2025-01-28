@@ -41,28 +41,36 @@ const shine = keyframes`
   to { left: 150%; }
 `;
 
+const holographicEffect = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
+
 const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
   position: 'relative',
   background: `
-    ${alpha(theme.palette.background.paper, 0.65)},
+    ${alpha(theme.palette.background.paper, 0.85)},
     url("data:image/svg+xml;utf8,${noiseSVG}")
   `,
-  backgroundBlendMode: 'soft-light',
-  borderRadius: '24px',
+  backgroundBlendMode: 'overlay',
+  borderRadius: '32px',
   padding: theme.spacing(4),
-  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+  border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
-  backdropFilter: BACKDROP_BLUR,
+  backdropFilter: `${BACKDROP_BLUR} brightness(120%)`,
   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-  minHeight: 500,
+  minHeight: 560,
   overflow: 'hidden',
   perspective: 1000,
+  boxShadow: `0 24px 48px -12px ${alpha(PRIMARY_DARK, 0.15)}`,
   '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: `0 32px 64px -12px ${alpha(PRIMARY_DARK, 0.2)}`,
-    '&::before': { opacity: 0.3 }
+    transform: 'translateY(-12px)',
+    boxShadow: `0 40px 80px -16px ${alpha(SECONDARY_DARK, 0.25)}`,
+    '&::before': { opacity: 0.4 },
+    '&::after': { opacity: 1 }
   },
   '&::before': {
     content: '""',
@@ -71,7 +79,7 @@ const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
     background: `
       radial-gradient(
         400px circle at var(--mouse-x) var(--mouse-y),
-        ${alpha(SECONDARY_DARK, 0.1)} 0%,
+        ${alpha(SECONDARY_DARK, 0.15)} 0%,
         transparent 60%
       )`,
     opacity: 0,
@@ -82,14 +90,14 @@ const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
     content: '""',
     position: 'absolute',
     inset: 0,
-    borderRadius: '24px',
+    borderRadius: '32px',
     padding: '2px',
     background: `
       linear-gradient(
         145deg, 
-        ${alpha(PRIMARY_DARK, 0.2)} 0%, 
-        ${alpha(SECONDARY_DARK, 0.2)} 50%,
-        ${alpha(PRIMARY_DARK, 0.2)} 100%
+        ${alpha(PRIMARY_DARK, 0.3)} 0%, 
+        ${alpha(SECONDARY_DARK, 0.3)} 50%,
+        ${alpha(PRIMARY_DARK, 0.3)} 100%
       )`,
     WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
     mask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
@@ -97,6 +105,8 @@ const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
     maskComposite: 'exclude',
     animation: `${gradientShift} 8s linear infinite`,
     backgroundSize: '200% 200%',
+    opacity: 0.8,
+    transition: 'opacity 0.4s ease'
   }
 }));
 
@@ -109,32 +119,35 @@ const PricingGrid = () => {
     { 
       type: 'hourly',
       title: 'Expert Consultation',
-      gradient: `linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.08)}, ${alpha(SECONDARY_DARK, 0.05)})`,
+      gradient: `linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.1)}, ${alpha(SECONDARY_DARK, 0.08)})`,
       features: [
         { icon: Clock, text: 'Flexible hourly consulting' },
         { icon: Award, text: 'Expert technical guidance' },
         { icon: Calendar, text: 'Priority scheduling' }
-      ]
+      ],
+      price: '$295/hr'
     },
     { 
       type: 'project',
       title: 'Managed Solutions',
-      gradient: `linear-gradient(135deg, ${alpha(SECONDARY_DARK, 0.08)}, ${alpha(PRIMARY_DARK, 0.05)})`,
+      gradient: `linear-gradient(135deg, ${alpha(SECONDARY_DARK, 0.1)}, ${alpha(PRIMARY_DARK, 0.08)})`,
       features: [
         { icon: Briefcase, text: 'End-to-end project management' },
         { icon: Users, text: 'Dedicated engineering team' },
         { icon: Award, text: 'Quality assurance guarantee' }
-      ]
+      ],
+      price: 'Custom Quote'
     },
     { 
       type: 'retainer',
       title: 'Strategic Partnership',
-      gradient: `linear-gradient(135deg, ${alpha(LIGHT_ACCENT, 0.08)}, ${alpha(SECONDARY_DARK, 0.05)})`,
+      gradient: `linear-gradient(135deg, ${alpha(LIGHT_ACCENT, 0.1)}, ${alpha(SECONDARY_DARK, 0.08)})`,
       features: [
         { icon: Users, text: '24/7 technical support' },
         { icon: Award, text: 'Strategic technology roadmap' },
         { icon: Info, text: 'Monthly performance reviews' }
-      ]
+      ],
+      price: 'Starting at $15k/mo'
     }
   ];
 
@@ -149,7 +162,7 @@ const PricingGrid = () => {
 
   return (
     <LazyMotion features={domAnimation}>
-      <Container maxWidth="lg" sx={{ py: 8 }}>
+      <Container maxWidth="lg" sx={{ py: 10 }}>
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -157,7 +170,7 @@ const PricingGrid = () => {
         >
           <Box sx={{ 
             textAlign: 'center', 
-            mb: 6,
+            mb: 8,
             position: 'relative',
             '&::after': {
               content: '""',
@@ -174,32 +187,34 @@ const PricingGrid = () => {
             <Typography variant="h1" sx={{ 
               fontWeight: 900,
               letterSpacing: '-0.03em',
-              mb: 2,
-              fontSize: isMobile ? '2.5rem' : '3.5rem',
+              mb: 3,
+              fontSize: isMobile ? '2.75rem' : '4rem',
               background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               lineHeight: 1.1,
-              textShadow: `0 2px 4px ${alpha(PRIMARY_DARK, 0.2)}`
+              textShadow: `0 4px 8px ${alpha(PRIMARY_DARK, 0.15)}`
             }}>
-              Engagement Options
+              Engagement Models
             </Typography>
             <Typography variant="subtitle1" sx={{
               color: 'text.secondary',
               maxWidth: 800,
               mx: 'auto',
-              fontSize: isMobile ? '1rem' : '1.1rem',
-              lineHeight: 1.5
+              fontSize: isMobile ? '1.1rem' : '1.25rem',
+              lineHeight: 1.6,
+              fontWeight: 500
             }}>
-              Custom enterprise solutions for digital innovation
+              Tailored enterprise solutions with transparent pricing and elite support
             </Typography>
           </Box>
         </motion.div>
 
-        <Grid container spacing={4}>
+        <Grid container spacing={4} sx={{ position: 'relative', zIndex: 1 }}>
           {plans.map((plan, index) => {
             const rotateX = useMotionValue(0);
             const rotateY = useMotionValue(0);
+            const zIndex = useMotionValue(1);
             
             const handleCardMouseMove = (e: React.MouseEvent) => {
               handleMouseMove(e);
@@ -208,54 +223,86 @@ const PricingGrid = () => {
               const y = e.clientY - rect.top;
               const centerX = rect.width / 2;
               const centerY = rect.height / 2;
-              rotateX.set((y - centerY) / 20);
-              rotateY.set(-(x - centerX) / 20);
+              rotateX.set((y - centerY) / 24);
+              rotateY.set(-(x - centerX) / 24);
+              zIndex.set(2);
             };
 
             return (
               <Grid item xs={12} sm={6} md={4} key={plan.type}>
                 <LazyPricingCard
-                  initial={{ opacity: 0, y: 40, scale: 0.95, rotateX: 10 }}
+                  initial={{ opacity: 0, y: 60, scale: 0.97, rotateX: 15 }}
                   animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.15, type: 'spring', stiffness: 100 }}
                   onMouseMove={handleCardMouseMove}
                   onMouseLeave={() => {
                     rotateX.set(0);
                     rotateY.set(0);
+                    zIndex.set(1);
                   }}
-                  style={{ rotateX, rotateY }}
+                  style={{ rotateX, rotateY, zIndex }}
                   sx={{ background: plan.gradient }}
                 >
-                  <Box sx={{ position: 'absolute', inset: 0, zIndex: 0,
-                    background: `url("data:image/svg+xml;utf8,${noiseSVG}")`,
-                    opacity: 0.05,
+                  <Box sx={{ 
+                    position: 'absolute', 
+                    inset: 0,
+                    zIndex: 0,
+                    background: `
+                      linear-gradient(45deg, 
+                        ${alpha(PRIMARY_DARK, 0.05)}, 
+                        ${alpha(SECONDARY_DARK, 0.03)}),
+                      url("data:image/svg+xml;utf8,${noiseSVG}")`,
+                    opacity: 0.15,
                     mixBlendMode: 'overlay',
                     pointerEvents: 'none',
                   }} />
                   
                   <Box sx={{ 
-                    mb: 3, 
+                    mb: 4, 
                     textAlign: 'center',
-                    minHeight: 72
+                    minHeight: 96,
+                    position: 'relative'
                   }}>
-                    <Typography variant="h4" sx={{
-                      fontWeight: 800,
+                    <Typography variant="h3" sx={{
+                      fontWeight: 900,
                       background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
-                      fontSize: isMobile ? '1.5rem' : '1.75rem'
+                      fontSize: isMobile ? '1.75rem' : '2.25rem',
+                      letterSpacing: '-0.02em',
+                      pb: 1,
+                      position: 'relative',
+                      display: 'inline-block',
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: 0,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '60%',
+                        height: '2px',
+                        background: `linear-gradient(90deg, transparent, ${alpha(SECONDARY_DARK, 0.4)}, transparent)`
+                      }
                     }}>
                       {plan.title}
                     </Typography>
+                    <Typography variant="h5" sx={{
+                      mt: 2,
+                      fontWeight: 700,
+                      color: SECONDARY_DARK,
+                      fontSize: isMobile ? '1.5rem' : '1.75rem'
+                    }}>
+                      {plan.price}
+                    </Typography>
                   </Box>
 
-                  <Box sx={{ flexGrow: 1, mb: 3 }}>
+                  <Box sx={{ flexGrow: 1, mb: 4 }}>
                     {plan.features.map((feature, featureIndex) => (
                       <motion.div
                         key={feature.text}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 + featureIndex * 0.05 }}
+                        transition={{ delay: index * 0.15 + featureIndex * 0.08 }}
                       >
                         <FeatureItem 
                           icon={feature.icon}
@@ -265,31 +312,55 @@ const PricingGrid = () => {
                     ))}
                   </Box>
 
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    onClick={() => router.push(`/contact?plan=${plan.type}`)}
-                    sx={{
-                      mt: 'auto',
-                      height: 56,
-                      position: 'relative',
-                      overflow: 'hidden',
-                      background: `linear-gradient(90deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
-                      fontWeight: 700,
-                      transformOrigin: 'center',
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: `0 8px 24px ${alpha(PRIMARY_DARK, 0.3)}`,
-                        '&::after': {
-                          animation: `${shine} 1s ease`,
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      onClick={() => router.push(`/contact?plan=${plan.type}`)}
+                      sx={{
+                        height: 56,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        background: `
+                          linear-gradient(90deg, 
+                            ${PRIMARY_DARK}, 
+                            ${SECONDARY_DARK})`,
+                        borderRadius: '14px',
+                        fontWeight: 800,
+                        fontSize: '1.1rem',
+                        letterSpacing: '-0.01em',
+                        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                        '&:hover': {
+                          transform: 'translateY(-3px)',
+                          boxShadow: `0 12px 24px ${alpha(SECONDARY_DARK, 0.3)}`,
+                          '&::after': {
+                            animation: `${shine} 1.2s ease`,
+                          }
                         }
-                      }
-                    }}
-                  >
-                    <Typography variant="button" sx={{ position: 'relative', zIndex: 1 }}>
-                      Get Started
-                    </Typography>
-                  </Button>
+                      }}
+                    >
+                      <Box sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: `
+                          linear-gradient(90deg, 
+                            transparent 20%, 
+                            ${alpha(LIGHT_ACCENT, 0.2)} 50%, 
+                            transparent 80%)`,
+                        animation: `${holographicEffect} 3s infinite linear`
+                      }} />
+                      <Typography variant="button" sx={{ 
+                        position: 'relative', 
+                        zIndex: 1,
+                        textShadow: `0 2px 4px ${alpha(PRIMARY_DARK, 0.2)}`
+                      }}>
+                        Start Now
+                      </Typography>
+                    </Button>
+                  </motion.div>
                 </LazyPricingCard>
               </Grid>
             )}
@@ -302,6 +373,7 @@ const PricingGrid = () => {
 
 const FeatureItem = memo<{ icon: React.ElementType; text: string }>(({ icon: Icon, text }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const theme = useTheme();
 
   return (
     <Box 
@@ -309,29 +381,47 @@ const FeatureItem = memo<{ icon: React.ElementType; text: string }>(({ icon: Ico
         display: 'flex', 
         alignItems: 'center', 
         p: 2,
-        borderRadius: '8px',
+        borderRadius: '12px',
         transition: 'all 0.3s ease',
-        background: isHovered ? alpha(SECONDARY_DARK, 0.05) : 'transparent'
+        background: isHovered ? alpha(SECONDARY_DARK, 0.08) : 'transparent',
+        backdropFilter: 'blur(4px)',
+        cursor: 'pointer',
+        position: 'relative',
+        '&:hover': {
+          '&::after': {
+            opacity: 1
+          }
+        },
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '12px',
+          border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+          opacity: 0,
+          transition: 'opacity 0.3s ease'
+        }
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <motion.div
         animate={{ 
-          scale: isHovered ? 1.15 : 1,
-          y: isHovered ? -2 : 0,
+          scale: isHovered ? 1.25 : 1,
+          y: isHovered ? -4 : 0,
           color: isHovered ? SECONDARY_DARK : alpha(PRIMARY_DARK, 0.8)
         }}
         transition={{ type: 'spring', stiffness: 300 }}
       >
-        <Icon size={22} />
+        <Icon size={24} />
       </motion.div>
       <Typography variant="body1" sx={{ 
         ml: 3, 
-        fontWeight: 500,
+        fontWeight: 600,
         color: isHovered ? PRIMARY_DARK : 'text.secondary',
         transition: 'color 0.3s ease',
-        lineHeight: 1.3
+        lineHeight: 1.4,
+        fontSize: '1.1rem'
       }}>
         {text}
       </Typography>

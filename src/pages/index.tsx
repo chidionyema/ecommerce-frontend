@@ -574,6 +574,49 @@ const TechnologyShowcase = () => {
     </Box>
   );
 };
+/* -----------------------------------------------------------------------------
+ * Why Partner Section
+ ----------------------------------------------------------------------------- */
+const WhyPartnerSection = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  return (
+    <Box sx={{
+      background: `linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.98)}, ${alpha(SECONDARY_DARK, 0.95)})`,
+      color: 'white',
+      py: 8
+    }}>
+      <Container maxWidth="lg">
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={6}>
+            <Typography variant="h3" sx={{ mb: 3, fontWeight: 800 }}>
+              Why Choose Us
+            </Typography>
+            <Typography variant="body1" sx={{ opacity: 0.9 }}>
+              Combining enterprise robustness with agile innovation for digital excellence
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            {[
+              'Military-grade Security & Compliance',
+              '24/7 Production Support (99.99% Uptime)',
+              'Full Development Lifecycle Management',
+              'Scalable Cloud Architectures',
+              'AI-Driven Analytics & Optimization',
+              'Cross-Platform Integration Expertise'
+            ].map((item, idx) => (
+              <Box key={item} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <CheckCircleOutline sx={{ mr: 2, color: theme.palette.success.main }} />
+                <Typography variant="body1">{item}</Typography>
+              </Box>
+            ))}
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
+  );
+};
 
 /* -----------------------------------------------------------------------------
  * MAIN PAGE COMPONENT
@@ -592,6 +635,7 @@ export default function HomePage() {
       {/* NavBar is imported at a higher layout level, or you can place <NavBar /> above. */}
       <HeroSection />
       <TechnologyShowcase />
+ <WhyPartnerSection />
     </Box>
   );
 }
