@@ -131,7 +131,11 @@ const HeroSection = () => {
       sx={{
         position: 'relative',
         overflow: 'hidden',
-        pt: isMobile ? 12 : 18,
+        pt: { 
+          xs: 4,    // 16px on mobile
+          sm: 6,    // 24px on tablet
+          md: 8     // 32px on desktop
+        },
         pb: isMobile ? 12 : 20,
         background: `
           linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.94)}, ${alpha(SECONDARY_DARK, 0.92)}),
@@ -141,6 +145,11 @@ const HeroSection = () => {
         color: '#fff',
         textAlign: 'center',
         borderBottom: `1px solid ${alpha('#fff', 0.1)}`,
+        mt: { 
+          xs: 4,   // Negative margin to offset padding on mobile
+          sm: 6,   // Negative margin to offset padding on tablet
+          md: 8    // Negative margin to offset padding on desktop
+        }
       }}
     >
       <style>{globalStyles}</style>

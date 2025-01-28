@@ -59,11 +59,14 @@ const LuxAppBar = styled(AppBar)(({ theme }) => ({
   minHeight: 120,
   borderRadius: BORDER_RADIUS,
   margin: '12px',
+  padding: theme.spacing(2, 3), // Add padding
+  marginBottom: theme.spacing(4),
   width: 'calc(100% - 24px)',
   [theme.breakpoints.down('sm')]: {
     margin: '6px',
     width: 'calc(100% - 12px)',
-    padding: theme.spacing(1, 0), 
+    padding: theme.spacing(1, 2),
+    marginBottom: theme.spacing(1.5), 
   },
 }));
 
@@ -77,7 +80,8 @@ const BrandContainer = styled(Box)(({ theme }) => ({
   borderRadius: BORDER_RADIUS,
   border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
   background: alpha(PRIMARY_DARK, 0.3),
-  marginTop: theme.spacing(1.5),
+  margin: theme.spacing(1.5),
+  
   '&:hover': {
     transform: 'translateX(4px)',
     '& svg': { transform: 'rotate(180deg)' },
@@ -96,6 +100,7 @@ const LuxBadge = styled(Box)({
   textTransform: 'uppercase',
   color: LIGHT_ACCENT,
   marginTop: '8px',
+  marginBottom: '5px',
   '&:before': {
     content: '""',
     position: 'absolute',
@@ -134,13 +139,16 @@ const NavButton = styled(Button)<{ active?: boolean }>(({ theme, active }) => ({
 const CTALuxButton = styled(Button)(({ theme }) => ({
   background: TECH_GRADIENT,
   color: LIGHT_ACCENT,
-  padding: '12px 24px',
+  padding: '8px 16px',
+  minWidth: '100px',
+  maxWidth: '180px',
   borderRadius: BORDER_RADIUS,
   fontWeight: 700,
   fontSize: '0.875rem',
   letterSpacing: '1px',
   position: 'relative',
   overflow: 'hidden',
+  whiteSpace: 'nowrap', 
   border: `1px solid ${alpha(LIGHT_ACCENT, 0.3)}`,
   '&:before': {
     content: '""',
@@ -176,11 +184,12 @@ const PremiumBadge = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: theme.spacing(0.5),
-  background: '#2E7D32',
+  background: `linear-gradient(135deg, #4CAF50, #66BB6A)`,
   color: alpha(LIGHT_ACCENT, 0.9),
   padding: theme.spacing(0.5, 1.5),
   borderRadius: '6px',
   border: `1px solid ${alpha('#1B5E20', 0.3)}`,
+  width: '160px',
   fontWeight: 600,
   fontSize: '0.65rem',
   cursor: 'pointer',
@@ -196,8 +205,9 @@ const ScarcityBadge = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: theme.spacing(0.5),
-  background: `linear-gradient(45deg, ${theme.palette.error.main}, #FF4D4D)`,
+  background: `linear-gradient(135deg, #E53935, #FF6F61)`,
   color: LIGHT_ACCENT,
+  width: '160px',
   padding: theme.spacing(0.5, 1.5),
   borderRadius: '6px',
   boxShadow: `0 8px 32px ${alpha(theme.palette.error.main, 0.3)}`,
@@ -289,8 +299,15 @@ const NavBar: React.FC = () => {
                   </NavButton>
                 ))}
 
-                <CTALuxButton onClick={() => router.push('/contact')}>
-                  Schedule Consultation
+          <CTALuxButton 
+                onClick={() => router.push('/contact')}
+                sx={{
+                  width: 'auto', // Allow button to size to content
+                  px: 2, // Add horizontal padding
+                  flexShrink: 0, // Prevent button from shrinking
+                }}
+              >
+                  Book Consultation
                 </CTALuxButton>
               </Box>
             )}
@@ -299,11 +316,10 @@ const NavBar: React.FC = () => {
               <Stack
                 spacing={1}
                 sx={{
-                  position: 'absolute',
-                  right: theme.spacing(4),
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  alignItems: 'flex-end',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  marginLeft: theme.spacing(1.5), // Space between consultation button and multistack
+                  alignItems: 'flex-start',
                   border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
                   borderRadius: BORDER_RADIUS,
                   padding: theme.spacing(1),
@@ -312,7 +328,7 @@ const NavBar: React.FC = () => {
               >
                 <PremiumBadge onClick={() => router.push('/contact?offer=cloudAssess')}>
                   <AssessmentIcon sx={{ fontSize: 14 }} />
-                  Free Cloud Assessment
+                  Free Stack Review
                 </PremiumBadge>
                 
                 <ScarcityBadge>
@@ -331,7 +347,15 @@ const NavBar: React.FC = () => {
         </Container>
       </LuxAppBar>
 
-      <Box sx={{ height: { xs: 80, md: 80 } }} />
+      <Box 
+        sx={{ 
+          height: { 
+            xs: '140px',  
+            sm: '160px', 
+            md: '180px'  
+          } 
+        }} 
+      />
 
       <MobileNavPanel open={mobileOpen}>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
