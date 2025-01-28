@@ -91,8 +91,6 @@ const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
   }
 }));
 
-const TITLE_GRADIENT  = 'linear-gradient(45deg, #4361EE 0%, #3A0CA3 100%)';
-
 const PricingGrid = () => {
   const theme = useTheme();
   const router = useRouter();
@@ -167,35 +165,30 @@ const PricingGrid = () => {
               opacity: 0.8
             }
           }}>
-          
-         
- <Typography
-              variant="h1"
-              sx={{
-                fontWeight: 900,
-                letterSpacing: '-0.03em',
-                mb: 2,
-                fontSize: isMobile ? '2.5rem' : '3.5rem',
-                background: TITLE_GRADIENT,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                lineHeight: 1.1
-              }}
-            >
+            <Typography variant="h1" sx={{ 
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              mb: 3,
+              fontSize: isMobile ? '2.75rem' : '4rem',
+              background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              lineHeight: 1.1,
+              textShadow: `0 4px 8px ${alpha(PRIMARY_DARK, 0.15)}`
+            }}>
               Engagement Models
             </Typography>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                color: 'text.secondary',
-                maxWidth: 800,
-                mx: 'auto',
-                fontSize: isMobile ? '1rem' : '1.1rem',
-                lineHeight: 1.5
-              }}
-            >
-             Tailored enterprise solutions with transparent pricing and elite support.
+            <Typography variant="subtitle1" sx={{
+              color: 'text.secondary',
+              maxWidth: 800,
+              mx: 'auto',
+              fontSize: isMobile ? '1.1rem' : '1.25rem',
+              lineHeight: 1.6,
+              fontWeight: 500
+            }}>
+              Tailored enterprise solutions with transparent pricing and elite support
             </Typography>
+
             
           </Box>
         </motion.div>

@@ -163,49 +163,47 @@ const Resources: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Box sx={{ 
-            textAlign: 'center', 
-            mb: 6,
-            position: 'relative',
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              bottom: -32,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '120px',
-              height: '3px',
-              background: `linear-gradient(90deg, transparent, ${PRIMARY_DARK}, transparent)`,
-              opacity: 0.8
-            }
-          }}>
-            <Typography
-              variant="h1"
-              sx={{
-                fontWeight: 900,
-                letterSpacing: '-0.03em',
-                mb: 2,
-                fontSize: isMobile ? '2.5rem' : '3.5rem',
-                background: TITLE_GRADIENT,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                lineHeight: 1.1
-              }}
-            >
-              Premium Resources
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                color: 'text.secondary',
-                maxWidth: 800,
-                mx: 'auto',
-                fontSize: isMobile ? '1rem' : '1.1rem',
-                lineHeight: 1.5
-              }}
-            >
-              Cutting-edge insights distilled from years of enterprise-grade implementations.
-            </Typography>
+         
+              <Box sx={{ 
+                        textAlign: 'center', 
+                        mb: 8,
+                        position: 'relative',
+                        '&::after': {
+                          content: '""',
+                          position: 'absolute',
+                          bottom: -32,
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: '120px',
+                          height: '3px',
+                          background: `linear-gradient(90deg, transparent, ${PRIMARY_DARK}, transparent)`,
+                          opacity: 0.8
+                        }
+                      }}>
+                        <Typography variant="h1" sx={{ 
+                          fontWeight: 900,
+                          letterSpacing: '-0.03em',
+                          mb: 3,
+                          fontSize: isMobile ? '2.75rem' : '4rem',
+                          background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          lineHeight: 1.1,
+                          textShadow: `0 4px 8px ${alpha(PRIMARY_DARK, 0.15)}`
+                        }}>
+                          Premium Resources
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{
+                          color: 'text.secondary',
+                          maxWidth: 800,
+                          mx: 'auto',
+                          fontSize: isMobile ? '1.1rem' : '1.25rem',
+                          lineHeight: 1.6,
+                          fontWeight: 500
+                        }}>
+                          Cutting-edge insights distilled from years of enterprise-grade implementations.
+                        </Typography>
+            
           </Box>
         </motion.div>
 
