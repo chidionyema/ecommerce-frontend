@@ -312,13 +312,13 @@ const NavBar = memo(() => {
                   background: alpha(PRIMARY_DARK, 0.3),
                 }}
               >
-                {navItems.map((item) => (
-                  <Link href={item.path} key={item.path} passHref legacyBehavior>
-                    <NavButton as="a" active={router.pathname === item.path}>
-                      {item.label}
+              {navItems.map((item) => (
+                <Link href={item.path} key={item.path} passHref legacyBehavior>
+                    <NavButton active={router.pathname === item.path}> {/* Remove as="a" */}
+                        {item.label}
                     </NavButton>
-                  </Link>
-                ))}
+                </Link>
+            ))}
               </Box>
             )}
 
