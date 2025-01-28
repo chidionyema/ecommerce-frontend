@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState, useEffect } from 'react';
+import React, { memo, useState } from 'react';
 import { 
   Box, 
   Typography, 
@@ -9,14 +9,12 @@ import {
   styled,
   useMediaQuery,
   alpha,
-  Theme,
   StyledEngineProvider
 } from '@mui/material';
 import { Info, Award, Clock, Users, Calendar, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { motion, LazyMotion, domAnimation } from 'framer-motion';
 
-// Noise texture SVG for background effect
 const noiseSVG = encodeURIComponent(`
   <svg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'>
     <filter id='n'>
@@ -37,6 +35,14 @@ const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
   flexDirection: 'column',
   backdropFilter: 'blur(12px)',
   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+  minHeight: 500,
+  [theme.breakpoints.down('md')]: {
+    minHeight: 480,
+  },
+  [theme.breakpoints.down('sm')]: {
+    minHeight: 'auto',
+    height: 'auto',
+  },
   '&:hover': {
     background: alpha(theme.palette.background.paper, 0.8),
     transform: 'translateY(-8px)'
@@ -75,7 +81,6 @@ const PricingGrid = () => {
   const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Color schemes from original version
   const plans = [
     { 
       type: 'hourly',
@@ -113,7 +118,6 @@ const PricingGrid = () => {
     <StyledEngineProvider injectFirst>
       <LazyMotion features={domAnimation}>
         <Container maxWidth="lg" sx={{ py: 8 }}>
-          {/* Added Page Header */}
           <motion.div 
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -162,7 +166,19 @@ const PricingGrid = () => {
             </Box>
           </motion.div>
 
-          <Grid container spacing={4}>
+          <Grid 
+            container 
+            spacing={{ xs: 0, sm: 4 }}
+            sx={{ 
+              '& > .MuiGrid-item': { 
+                display: 'flex', 
+                flexDirection: 'column',
+                [theme.breakpoints.down('sm')]: {
+                  '&:not(:last-child)': { mb: 4 }
+                }
+              } 
+            }}
+          >
             {plans.map((plan, index) => (
               <Grid item xs={12} sm={6} md={4} key={plan.type}>
                 <LazyPricingCard
@@ -171,17 +187,41 @@ const PricingGrid = () => {
                   transition={{ delay: index * 0.1 }}
                   sx={{ background: plan.gradient }}
                 >
-                  <Box sx={{ mb: 3, textAlign: 'center' }}>
+                  <Box sx={{ 
+                    mb: 3, 
+                    textAlign: 'center', 
+                    minHeight: 72,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
                     <Typography variant="h4" fontWeight={800} sx={{
                       background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                       WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent'
+                      WebkitTextFillColor: 'transparent',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      px: 1,
+                      width: '100%',
+                      fontSize: { xs: '1.5rem', md: '1.75rem' }
                     }}>
                       {plan.title}
                     </Typography>
                   </Box>
 
-                  <Box sx={{ flexGrow: 1, mb: 3 }}>
+                  <Box sx={{ 
+                    flexGrow: 1,
+                    mb: 3,
+                    height: 240,
+                    [theme.breakpoints.down('md')]: {
+                      height: 220,
+                    },
+                    [theme.breakpoints.down('sm')]: {
+                      height: 'auto',
+                      minHeight: 200,
+                    }
+                  }}>
                     {plan.features.map((feature) => (
                       <FeatureItem 
                         key={feature.text}
@@ -197,8 +237,11 @@ const PricingGrid = () => {
                     onClick={() => router.push(`/contact?plan=${plan.type}`)}
                     sx={{
                       mt: 'auto',
+                      height: { xs: 56, sm: 48 },
+                      minHeight: 48,
                       background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                       fontWeight: 700,
+                      fontSize: { xs: '1rem', sm: '0.875rem' },
                       '&:hover': {
                         transform: 'translateY(-2px)',
                         boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.3)}`
@@ -222,15 +265,19 @@ const FeatureItem = memo<{ icon: React.ElementType; text: string }>(({ icon: Ico
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      p: 2,
-      mb: 2,
-      borderRadius: 2,
-      transition: 'all 0.3s ease',
-      background: isHovered ? alpha(theme.palette.primary.main, 0.05) : 'transparent'
-    }}>
+    <Box 
+      sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        p: 2,
+        height: '100%',
+        borderRadius: 2,
+        transition: 'all 0.3s ease',
+        background: isHovered ? alpha(theme.palette.primary.main, 0.05) : 'transparent'
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <motion.div
         animate={{ 
           scale: isHovered ? 1.15 : 1,
@@ -243,7 +290,14 @@ const FeatureItem = memo<{ icon: React.ElementType; text: string }>(({ icon: Ico
       <Typography variant="body1" sx={{ 
         ml: 3, 
         fontWeight: 500,
-        color: isHovered ? theme.palette.text.primary : theme.palette.text.secondary
+        display: '-webkit-box',
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        color: isHovered ? theme.palette.text.primary : theme.palette.text.secondary,
+        transition: 'color 0.3s ease',
+        fontSize: { xs: '0.875rem', sm: '1rem' },
+        lineHeight: 1.3,
       }}>
         {text}
       </Typography>
