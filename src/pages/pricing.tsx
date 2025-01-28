@@ -214,7 +214,7 @@ const PricingGrid = () => {
           {plans.map((plan, index) => {
             const rotateX = useMotionValue(0);
             const rotateY = useMotionValue(0);
-            const zIndex = useMotionValue(1);
+            const [zIndex, setZIndex] = useState(1);
             
             const handleCardMouseMove = (e: React.MouseEvent) => {
               handleMouseMove(e);
@@ -225,7 +225,7 @@ const PricingGrid = () => {
               const centerY = rect.height / 2;
               rotateX.set((y - centerY) / 24);
               rotateY.set(-(x - centerX) / 24);
-              zIndex.set(2);
+              setZIndex(2);
             };
 
             return (
@@ -238,8 +238,9 @@ const PricingGrid = () => {
                   onMouseLeave={() => {
                     rotateX.set(0);
                     rotateY.set(0);
-                    zIndex.set(1);
+                    setZIndex(1);
                   }}
+
                   style={{ rotateX, rotateY, zIndex }}
                   sx={{ background: plan.gradient }}
                 >
