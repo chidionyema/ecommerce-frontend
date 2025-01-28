@@ -46,3 +46,11 @@ export const noiseSVG = encodeURIComponent(`
     <rect width='100%' height='100%' filter='url(#n)'/>
   </svg>
 `);
+
+// theme/branding.ts
+export const TITLE_GRADIENT = `linear-gradient(
+  135deg,
+  ${PRIMARY_DARK} 0%,
+  ${SECONDARY_DARK} 50%,
+  ${RED_ACCENT} 100%
+)`;

@@ -140,35 +140,64 @@ const Solutions = () => {
         description="Explore our portfolio of enterprise-grade technical solutions and client success stories."
       />
 
-      <Container maxWidth="xl" sx={{ py: isMobile ? 4 : 8, position: 'relative' }}>
-        <Typography
-          variant="h1"
-          sx={{
-            textAlign: 'center',
-            mb: 1,
-            fontWeight: 900,
-            fontSize: isMobile ? '2.5rem' : '3.5rem',
-            background: primaryGradient,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
+<Container maxWidth="lg" sx={{ position: 'relative' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          Client Solutions
-        </Typography>
+          <Box sx={{ 
+            textAlign: 'center', 
+            mb: 8,
+            position: 'relative',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              bottom: -32,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '120px',
+              height: '3px',
+              background: `linear-gradient(90deg, transparent, ${PRIMARY_DARK}, transparent)`,
+              opacity: 0.8
+            }
+          }}>
+            <Typography variant="h1" sx={{ 
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              mb: 3,
+              fontSize: isMobile ? '2.75rem' : '4rem',
+              background: TITLE_GRADIENT,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              lineHeight: 1.1,
+            }}>
+               Client Solutions
+            </Typography>
 
-        {/* Additional h2 for SEO / structure */}
-        <Typography
-          variant="h2"
-          sx={{
-            textAlign: 'center',
-            mb: 6,
-            fontWeight: 700,
-            fontSize: isMobile ? '1.7rem' : '2rem',
-            color: PRIMARY_DARK,
-          }}
-        >
-          Empowering Innovation, One Project at a Time
-        </Typography>
+            {/* H2 for SEO / structure */}
+            <Typography variant="h2" sx={{
+              fontWeight: 700,
+              mt: 1,
+              mb: 3,
+              fontSize: isMobile ? '1.7rem' : '2rem',
+              color: PRIMARY_DARK,
+            }}>
+             Empowering Innovation, One Project at a Time
+            </Typography>
+
+            <Typography variant="subtitle1" sx={{
+              color: 'text.secondary',
+              maxWidth: 800,
+              mx: 'auto',
+              fontSize: isMobile ? '1.1rem' : '1.25rem',
+              lineHeight: 1.6,
+              fontWeight: 500
+            }}>
+              Cutting-edge insights distilled from years of enterprise-grade implementations.
+            </Typography>
+          </Box>
+        </motion.div>      
 
         <Grid container spacing={isMobile ? 4 : 6}>
           {displayedProjects.map((project, index) => (

@@ -66,17 +66,21 @@ const LuxAppBar = styled(AppBar)(({ theme }) => ({
   },
 }));
 
-const BrandContainer = styled(Box)({
+const BrandContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '12px',
+  gap: theme.spacing(1.5),
   cursor: 'pointer',
   transition: 'transform 0.3s ease',
+  padding: theme.spacing(1, 2),
+  borderRadius: BORDER_RADIUS,
+  border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
+  background: alpha(PRIMARY_DARK, 0.3),
   '&:hover': {
     transform: 'translateX(4px)',
     '& svg': { transform: 'rotate(180deg)' },
   },
-});
+}));
 
 const LuxBadge = styled(Box)({
   position: 'relative',
@@ -169,14 +173,14 @@ const MobileNavPanel = styled(Box)<{ open?: boolean }>(({ theme, open }) => ({
 const PremiumBadge = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
-  gap: theme.spacing(1),
+  gap: theme.spacing(0.5),
   background: '#2E7D32',
   color: alpha(LIGHT_ACCENT, 0.9),
-  padding: theme.spacing(0.75, 2),
-  borderRadius: '8px',
+  padding: theme.spacing(0.5, 1.5),
+  borderRadius: '6px',
   border: `1px solid ${alpha('#1B5E20', 0.3)}`,
   fontWeight: 600,
-  fontSize: '0.7rem',
+  fontSize: '0.65rem',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
   '&:hover': {
@@ -189,14 +193,14 @@ const PremiumBadge = styled(Box)(({ theme }) => ({
 const ScarcityBadge = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
-  gap: theme.spacing(1),
+  gap: theme.spacing(0.5),
   background: `linear-gradient(45deg, ${theme.palette.error.main}, #FF4D4D)`,
   color: LIGHT_ACCENT,
-  padding: theme.spacing(0.75, 2),
-  borderRadius: '8px',
+  padding: theme.spacing(0.5, 1.5),
+  borderRadius: '6px',
   boxShadow: `0 8px 32px ${alpha(theme.palette.error.main, 0.3)}`,
   fontWeight: 600,
-  fontSize: '0.7rem',
+  fontSize: '0.65rem',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
   '&:hover': {
@@ -249,7 +253,7 @@ const NavBar: React.FC = () => {
                   fontSize: { xs: '1.8rem', sm: '2rem', md: '2.2rem' },
                   fontWeight: 800,
                   letterSpacing: '-0.5px',
-                  background: TECH_GRADIENT,
+                  background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                 }}>
@@ -267,7 +271,11 @@ const NavBar: React.FC = () => {
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: 3,
-                flexShrink: 0
+                flexShrink: 0,
+                border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
+                borderRadius: BORDER_RADIUS,
+                padding: theme.spacing(1),
+                background: alpha(PRIMARY_DARK, 0.3),
               }}>
                 {navItems.map((item) => (
                   <NavButton
@@ -293,16 +301,20 @@ const NavBar: React.FC = () => {
                   right: theme.spacing(4),
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  alignItems: 'flex-end'
+                  alignItems: 'flex-end',
+                  border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
+                  borderRadius: BORDER_RADIUS,
+                  padding: theme.spacing(1),
+                  background: alpha(PRIMARY_DARK, 0.3),
                 }}
               >
                 <PremiumBadge onClick={() => router.push('/contact?offer=cloudAssess')}>
-                  <AssessmentIcon sx={{ fontSize: 16 }} />
+                  <AssessmentIcon sx={{ fontSize: 14 }} />
                   Free Cloud Assessment
                 </PremiumBadge>
                 
                 <ScarcityBadge>
-                  <WhatshotIcon sx={{ fontSize: 16 }} />
+                  <WhatshotIcon sx={{ fontSize: 14 }} />
                   {seatsLeft} SLOTS LEFT
                 </ScarcityBadge>
               </Stack>
@@ -336,12 +348,12 @@ const NavBar: React.FC = () => {
         }}>
           <Stack direction="column" spacing={1} sx={{ width: '100%', mb: 2 }}>
             <PremiumBadge sx={{ justifyContent: 'center', width: '100%' }}>
-              <AssessmentIcon sx={{ fontSize: 16 }} />
+              <AssessmentIcon sx={{ fontSize: 14 }} />
               Free Cloud Assessment
             </PremiumBadge>
 
             <ScarcityBadge sx={{ justifyContent: 'center', width: '100%' }}>
-              <WhatshotIcon sx={{ fontSize: 16 }} />
+              <WhatshotIcon sx={{ fontSize: 14 }} />
               {seatsLeft} SLOTS LEFT
             </ScarcityBadge>
           </Stack>
