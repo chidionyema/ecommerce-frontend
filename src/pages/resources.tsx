@@ -9,25 +9,23 @@ import {
   useMediaQuery,
   alpha,
 } from '@mui/material';
-import { motion, LazyMotion, domAnimation, useMotionValue, useTransform } from 'framer-motion';
+import { motion, LazyMotion, domAnimation, useMotionValue } from 'framer-motion';
 import { Cloud, VpnKey, Code } from '@mui/icons-material';
 import NextLink from 'next/link';
 import { styled } from '@mui/material/styles'; 
 import SEO from '../components/SEO';
 
-// NEW (aligned with NavBar)
+// Brand tokens – unify references:
 import {
   PRIMARY_DARK,
   SECONDARY_DARK,
+  LIGHT_ACCENT,
+  PAGE_BG,
   BACKDROP_BLUR,
   gradientShift,
   noiseSVG,
+  TITLE_GRADIENT,
 } from '../theme/branding';
-
-
-// You can keep a “title gradient” but use the same brand colors:
-const TITLE_GRADIENT  = 'linear-gradient(45deg, #4361EE 0%, #3A0CA3 100%)';
-
 
 const LazyResourceCard = styled(motion(Box))(({ theme }) => ({
   position: 'relative',
@@ -131,7 +129,7 @@ const Resources: React.FC = () => {
 
   return (
     <Box sx={{
-      backgroundColor: '#F9FAFD',
+      backgroundColor: PAGE_BG,
       minHeight: '100vh',
       pt: 8,
       pb: 12,
@@ -163,53 +161,62 @@ const Resources: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-         
-              <Box sx={{ 
-                        textAlign: 'center', 
-                        mb: 8,
-                        position: 'relative',
-                        '&::after': {
-                          content: '""',
-                          position: 'absolute',
-                          bottom: -32,
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          width: '120px',
-                          height: '3px',
-                          background: `linear-gradient(90deg, transparent, ${PRIMARY_DARK}, transparent)`,
-                          opacity: 0.8
-                        }
-                      }}>
-                        <Typography variant="h1" sx={{ 
-                          fontWeight: 900,
-                          letterSpacing: '-0.03em',
-                          mb: 3,
-                          fontSize: isMobile ? '2.75rem' : '4rem',
-                          background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                          lineHeight: 1.1,
-                          textShadow: `0 4px 8px ${alpha(PRIMARY_DARK, 0.15)}`
-                        }}>
-                          Premium Resources
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{
-                          color: 'text.secondary',
-                          maxWidth: 800,
-                          mx: 'auto',
-                          fontSize: isMobile ? '1.1rem' : '1.25rem',
-                          lineHeight: 1.6,
-                          fontWeight: 500
-                        }}>
-                          Cutting-edge insights distilled from years of enterprise-grade implementations.
-                        </Typography>
-            
+          <Box sx={{ 
+            textAlign: 'center', 
+            mb: 8,
+            position: 'relative',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              bottom: -32,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '120px',
+              height: '3px',
+              background: `linear-gradient(90deg, transparent, ${PRIMARY_DARK}, transparent)`,
+              opacity: 0.8
+            }
+          }}>
+            <Typography variant="h1" sx={{ 
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              mb: 3,
+              fontSize: isMobile ? '2.75rem' : '4rem',
+              background: TITLE_GRADIENT,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              lineHeight: 1.1,
+            }}>
+              Premium Resources
+            </Typography>
+
+            {/* H2 for SEO / structure */}
+            <Typography variant="h2" sx={{
+              fontWeight: 700,
+              mt: 1,
+              mb: 3,
+              fontSize: isMobile ? '1.7rem' : '2rem',
+              color: PRIMARY_DARK,
+            }}>
+              Explore Our Expert Guides
+            </Typography>
+
+            <Typography variant="subtitle1" sx={{
+              color: 'text.secondary',
+              maxWidth: 800,
+              mx: 'auto',
+              fontSize: isMobile ? '1.1rem' : '1.25rem',
+              lineHeight: 1.6,
+              fontWeight: 500
+            }}>
+              Cutting-edge insights distilled from years of enterprise-grade implementations.
+            </Typography>
           </Box>
         </motion.div>
 
         <LazyMotion features={domAnimation}>
           <Grid container spacing={4}>
-          {resources.map((resource, index) => {
+            {resources.map((resource, index) => {
               const rotateX = useMotionValue(0);
               const rotateY = useMotionValue(0);
               const [cardZIndex, setCardZIndex] = useState(1);
@@ -225,6 +232,7 @@ const Resources: React.FC = () => {
                 rotateY.set(-(x - centerX) / 24);
                 setCardZIndex(2);
               };
+
               return (
                 <Grid item xs={12} md={4} key={resource.id}>
                   <LazyResourceCard
@@ -316,8 +324,8 @@ const Resources: React.FC = () => {
                     </motion.div>
                   </LazyResourceCard>
                 </Grid>
-              )}
-            )}
+              );
+            })}
           </Grid>
         </LazyMotion>
       </Container>

@@ -1,4 +1,3 @@
-// components/BlogCard.tsx
 import React from 'react';
 import { 
   Card, 
@@ -116,6 +115,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ title, summary, path, icon, sx = []
                 mb: 3,
                 fontWeight: 700,
                 lineHeight: 1.3,
+                // Example gradient usage:
                 background: theme.palette.gradients?.primary,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent'

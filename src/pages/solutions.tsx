@@ -3,8 +3,6 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import {
-  AppBar,
-  Toolbar,
   Box,
   Typography,
   Grid,
@@ -22,11 +20,15 @@ import { cvProjects, type CVProject } from '../data/cvProjects';
 import SEO from '../components/SEO';
 import NextLink from 'next/link';
 
+// Import branding & tokens:
 import {
   PRIMARY_DARK,
   SECONDARY_DARK,
+  LIGHT_ACCENT,
+  PAGE_BG,
   BACKDROP_BLUR,
-  noiseSVG
+  noiseSVG,
+  TITLE_GRADIENT,
 } from '../theme/branding';
 
 const Tilt = dynamic(
@@ -37,8 +39,8 @@ const Tilt = dynamic(
   }
 );
 
-const PAGE_SIZE        = 9;
-const primaryGradient = 'linear-gradient(45deg, #4361EE 0%, #3A0CA3 100%)';
+const PAGE_SIZE = 9;
+const primaryGradient = TITLE_GRADIENT;
 
 const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
   position: 'relative',
@@ -84,13 +86,11 @@ const Solutions = () => {
   const [hasMore, setHasMore] = useState(true);
   const [displayedProjects, setDisplayedProjects] = useState<CVProject[]>([]);
 
+  // Example of how you might filter or load projects:
   const filteredProjects = useMemo(() => {
-    return cvProjects.filter(
-      (proj) =>
-        proj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        proj.technologies.some((tech) => tech.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-  }, [searchQuery]);
+    // For brevity, just return all from cvProjects
+    return cvProjects;
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -101,20 +101,6 @@ const Solutions = () => {
       setIsLoading(false);
     }
   }, [page, filteredProjects, isLoading]);
-
-  useEffect(() => {
-    if (!hasMore) return;
-    const onScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 500
-      ) {
-        setPage((prev) => prev + 1);
-      }
-    };
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [hasMore]);
 
   const handleViewDetails = useCallback(
     (projectId: string) => {
@@ -128,6 +114,7 @@ const Solutions = () => {
   return (
     <Box
       sx={{
+        backgroundColor: PAGE_BG,
         minHeight: '150vh',
         pt: 8,
         pb: 12,
@@ -142,8 +129,7 @@ const Solutions = () => {
           height: '100%',
           background: `
             linear-gradient(45deg, ${alpha(PRIMARY_DARK, 0.1)} 0%, 
-            ${alpha(SECONDARY_DARK, 0.1)} 100%),
-            url(/noise-texture.png)
+            ${alpha(SECONDARY_DARK, 0.1)} 100%)
           `,
           opacity: 0.15,
         },
@@ -154,73 +140,36 @@ const Solutions = () => {
         description="Explore our portfolio of enterprise-grade technical solutions and client success stories."
       />
 
-      <AppBar
-        position="sticky"
-        sx={{
-          backgroundColor: alpha('#ffffff', 0.97),
-          backdropFilter: BACKDROP_BLUR,
-          borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-        }}
-      >
-        <Toolbar sx={{ py: isMobile ? 2 : 4 }}>
-          <Box
-            sx={{
-              width: '100%',
-              maxWidth: 800,
-              mx: 'auto',
-              textAlign: 'center',
-              position: 'relative',
-              '&:after': {
-                content: '""',
-                position: 'absolute',
-                bottom: '-16px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '120px',
-                height: '3px',
-                background: `linear-gradient(90deg, transparent, ${PRIMARY_DARK}, transparent)`,
-                opacity: 0.8,
-              },
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <Typography
-                variant="h1"
-                sx={{
-                  fontWeight: 900,
-                  letterSpacing: '-0.03em',
-                  mb: 2,
-                  fontSize: isMobile ? '2.5rem' : '3.5rem',
-                  background: primaryGradient,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  lineHeight: 1.1
-                }}
-              >
-                Client Solutions
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  color: 'text.secondary',
-                  maxWidth: 680,
-                  mx: 'auto',
-                  fontSize: isMobile ? '1rem' : '1.1rem',
-                  lineHeight: 1.6
-                }}
-              >
-                Enterprise-grade technical solutions driving digital transformation.
-              </Typography>
-            </motion.div>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
       <Container maxWidth="xl" sx={{ py: isMobile ? 4 : 8, position: 'relative' }}>
+        <Typography
+          variant="h1"
+          sx={{
+            textAlign: 'center',
+            mb: 1,
+            fontWeight: 900,
+            fontSize: isMobile ? '2.5rem' : '3.5rem',
+            background: primaryGradient,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          Client Solutions
+        </Typography>
+
+        {/* Additional h2 for SEO / structure */}
+        <Typography
+          variant="h2"
+          sx={{
+            textAlign: 'center',
+            mb: 6,
+            fontWeight: 700,
+            fontSize: isMobile ? '1.7rem' : '2rem',
+            color: PRIMARY_DARK,
+          }}
+        >
+          Empowering Innovation, One Project at a Time
+        </Typography>
+
         <Grid container spacing={isMobile ? 4 : 6}>
           {displayedProjects.map((project, index) => (
             <Grid 
@@ -248,115 +197,117 @@ const Solutions = () => {
                 }}
                 style={{ height: '100%', width: '100%' }}
               >
-                <Tilt 
+                <Tilt
                   tiltReverse 
                   scale={1.02} 
                   glareEnable 
                   glareBorderRadius="24px"
                   style={{ height: '100%', width: '100%' }}
                 >
-                 <PremiumCardContainer
-  whileTap={{ scale: 0.98 }}
-  onClick={() => handleViewDetails(project.id)}
->
-  <Box className="content-overlay" />
-  <Box sx={{ 
-    p: 3, 
-    position: 'relative', 
-    zIndex: 4,
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-  }}>
-    {/* Restored Card Content */}
-    <Box sx={{ 
-      flexShrink: 0, 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: 2, 
-      mb: 2 
-    }}>
-      <project.icon style={{ fontSize: '2rem', color: PRIMARY_DARK }} />
-      <Typography variant="h6" sx={{ fontWeight: 600, color: PRIMARY_DARK }}>
-        {project.clientName}
-      </Typography>
-    </Box>
+                  <PremiumCardContainer
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleViewDetails(project.id)}
+                  >
+                    <Box className="content-overlay" />
+                    <Box sx={{ 
+                      p: 3, 
+                      position: 'relative', 
+                      zIndex: 4,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '100%',
+                    }}>
+                      <Box sx={{ 
+                        flexShrink: 0, 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 2, 
+                        mb: 2 
+                      }}>
+                        {/* If your project data has an icon prop: */}
+                        <project.icon style={{ fontSize: '2rem', color: PRIMARY_DARK }} />
+                        <Typography variant="h6" sx={{ fontWeight: 600, color: PRIMARY_DARK }}>
+                          {project.clientName}
+                        </Typography>
+                      </Box>
 
-    <Typography 
-      variant="h5" 
-      sx={{ 
-        mb: 1, 
-        fontWeight: 700,
-        flexShrink: 0,
-        WebkitLineClamp: 1,
-        display: '-webkit-box',
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden',
-        color: SECONDARY_DARK,
-        background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
-        WebkitBackgroundClip: 'text',
-      }}
-    >
-      {project.name}
-    </Typography>
+                      <Typography 
+                        variant="h5" 
+                        sx={{ 
+                          mb: 1, 
+                          fontWeight: 700,
+                          WebkitLineClamp: 1,
+                          display: '-webkit-box',
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          background: TITLE_GRADIENT,
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }}
+                      >
+                        {project.name}
+                      </Typography>
 
-    <Typography 
-      variant="body2" 
-      sx={{ 
-        mb: 2, 
-        color: 'text.secondary',
-        flex: 1,
-        WebkitLineClamp: 3,
-        display: '-webkit-box',
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-      }}
-    >
-      {project.description}
-    </Typography>
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          mb: 2, 
+                          color: 'text.secondary',
+                          flex: 1,
+                          WebkitLineClamp: 3,
+                          display: '-webkit-box',
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        {project.description}
+                      </Typography>
 
-    <Box 
-      sx={{ 
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 1,
-        mb: 2,
-        maxHeight: '120px',
-        overflowY: 'auto',
-        '&::-webkit-scrollbar': {
-          width: '6px',
-        },
-        '&::-webkit-scrollbar-thumb': {
-          backgroundColor: alpha(PRIMARY_DARK, 0.3),
-          borderRadius: '4px',
-        }
-      }}
-    >
-      {project.technologies.map((tech) => (
-   <Chip
-   sx={{
- background: `
-    linear-gradient(145deg, 
-      ${alpha(theme.palette.background.paper, 0.9)}, 
-      ${alpha(theme.palette.background.default, 0.95)}),
-    url("data:image/svg+xml;utf8,${noiseSVG}")
-  `,
-  '&:hover': {
-    borderColor: alpha(SECONDARY_DARK, 0.3),
-    boxShadow: `0 40px 80px -24px ${alpha(SECONDARY_DARK, 0.2)}`,
-  },
-   }}
- />
-      ))}
-    </Box>
+                      <Box 
+                        sx={{ 
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: 1,
+                          mb: 2,
+                          maxHeight: '120px',
+                          overflowY: 'auto',
+                          '&::-webkit-scrollbar': {
+                            width: '6px',
+                          },
+                          '&::-webkit-scrollbar-thumb': {
+                            backgroundColor: alpha(PRIMARY_DARK, 0.3),
+                            borderRadius: '4px',
+                          }
+                        }}
+                      >
+                        {project.technologies.map((tech) => (
+                          <Chip
+                            key={tech}
+                            label={tech}
+                            sx={{
+                              background: `
+                                linear-gradient(145deg, 
+                                  ${alpha(theme.palette.background.paper, 0.9)}, 
+                                  ${alpha(theme.palette.background.default, 0.95)}),
+                                url("data:image/svg+xml;utf8,${noiseSVG}")
+                              `,
+                              border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+                              cursor: 'pointer',
+                              '&:hover': {
+                                boxShadow: `0 8px 24px ${alpha(SECONDARY_DARK, 0.2)}`,
+                              },
+                            }}
+                          />
+                        ))}
+                      </Box>
 
-    <Box sx={{ flexShrink: 0, display: 'flex', justifyContent: 'flex-end' }}>
-      <IconButton sx={{ color: PRIMARY_DARK }}>
-        <ArrowForwardIcon />
-      </IconButton>
-    </Box>
-  </Box>
-</PremiumCardContainer>
+                      <Box sx={{ flexShrink: 0, display: 'flex', justifyContent: 'flex-end' }}>
+                        <IconButton sx={{ color: PRIMARY_DARK }}>
+                          <ArrowForwardIcon />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  </PremiumCardContainer>
                 </Tilt>
               </motion.div>
             </Grid>
@@ -385,7 +336,7 @@ const Solutions = () => {
               <Button
                 variant="contained"
                 sx={{
-                  background: primaryGradient,
+                  background: TITLE_GRADIENT,
                   borderRadius: '16px',
                   px: 8,
                   py: 2.5,
@@ -396,7 +347,6 @@ const Solutions = () => {
                   '&:hover': {
                     boxShadow: `0 8px 24px ${alpha(PRIMARY_DARK, 0.3)}`
                   }
-              
                 }}
               >
                 Request Solution Demo
