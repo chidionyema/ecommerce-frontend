@@ -30,13 +30,15 @@ const Tilt = dynamic(
   }
 );
 
-// Unified purple color scheme
-const PRIMARY_DARK = '#0A1A2F';
-const SECONDARY_DARK = '#532F73';
-const LIGHT_ACCENT = '#F2E7FE';
-const BACKDROP_BLUR = 'blur(28px)';
-const PAGE_SIZE = 9;
-const primaryGradient = `linear-gradient(135deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`;
+// Use the same brand colors as NavBar:
+const PRIMARY_DARK     = '#0A1A2F';
+const SECONDARY_DARK   = '#1A2F4B';           // replaced #532F73
+          // replaced #F2E7FE
+const BACKDROP_BLUR    = 'blur(28px)';
+const PAGE_SIZE        = 9;
+
+
+const primaryGradient = 'linear-gradient(135deg, #4361EE 0%, #3A0CA3 100%)'
 
 const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
   position: 'relative',

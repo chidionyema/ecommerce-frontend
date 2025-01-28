@@ -15,10 +15,16 @@ import NextLink from 'next/link';
 import { keyframes } from '@emotion/react';
 import { styled } from '@mui/material/styles'; 
 import SEO from '../components/SEO';
-const PRIMARY_DARK = '#0A1A2F';
-const SECONDARY_DARK = '#532F73';
-const BACKDROP_BLUR = 'blur(28px)';
-const TITLE_GRADIENT = `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`;
+
+// NEW (aligned with NavBar)
+const PRIMARY_DARK    = '#0A1A2F';
+const SECONDARY_DARK  = '#1A2F4B';
+const LIGHT_ACCENT    = '#F5F9FF';
+const BACKDROP_BLUR   = 'blur(28px)';
+
+// You can keep a “title gradient” but use the same brand colors:
+const TITLE_GRADIENT  = 'linear-gradient(45deg, #4361EE 0%, #3A0CA3 100%)';
+
 
 const noiseSVG = encodeURIComponent(`
   <svg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'>

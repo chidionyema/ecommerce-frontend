@@ -15,11 +15,13 @@ import { useRouter } from 'next/router';
 import { motion, LazyMotion, domAnimation, useMotionValue, useTransform } from 'framer-motion';
 import { keyframes } from '@emotion/react';
 
-const PRIMARY_DARK = '#0A1A2F';
-const SECONDARY_DARK = '#532F73';
-const LIGHT_ACCENT = '#F2E7FE';
-const PAGE_BG = '#F9FAFD';
-const BACKDROP_BLUR = 'blur(28px)';
+const PRIMARY_DARK   = '#0A1A2F';
+const SECONDARY_DARK = '#1A2F4B';
+const LIGHT_ACCENT   = '#F5F9FF';
+const PAGE_BG        = '#F9FAFD';     
+const BACKDROP_BLUR  = 'blur(28px)';
+// e.g. inside pricing card backgrounds:
+const BRAND_GRADIENT = 'linear-gradient(135deg, #4361EE 0%, #3A0CA3 100%)';
 
 const noiseSVG = encodeURIComponent(`
   <svg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'>
