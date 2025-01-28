@@ -63,6 +63,7 @@ const LuxAppBar = styled(AppBar)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     margin: '6px',
     width: 'calc(100% - 12px)',
+    padding: theme.spacing(1, 0), 
   },
 }));
 
@@ -76,6 +77,7 @@ const BrandContainer = styled(Box)(({ theme }) => ({
   borderRadius: BORDER_RADIUS,
   border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
   background: alpha(PRIMARY_DARK, 0.3),
+  marginTop: theme.spacing(1.5),
   '&:hover': {
     transform: 'translateX(4px)',
     '& svg': { transform: 'rotate(180deg)' },
@@ -345,6 +347,7 @@ const NavBar: React.FC = () => {
           justifyContent: 'center',
           gap: 3,
           mt: -4,
+          marginTop: theme.spacing(2),
         }}>
           <Stack direction="column" spacing={1} sx={{ width: '100%', mb: 2 }}>
             <PremiumBadge sx={{ justifyContent: 'center', width: '100%' }}>
