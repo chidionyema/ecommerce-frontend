@@ -12,6 +12,7 @@ import {
   useMediaQuery,
   Divider,
   useTheme,
+  Stack,
 } from '@mui/material';
 import { styled, keyframes } from '@mui/material/styles';
 import CodeIcon from '@mui/icons-material/Code';
@@ -79,16 +80,16 @@ const BrandContainer = styled(Box)({
 
 const LuxBadge = styled(Box)({
   position: 'relative',
-  padding: '6px 16px',
+  padding: '4px 12px',
   background: alpha(LIGHT_ACCENT, 0.08),
   borderRadius: '8px',
   border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
-  fontSize: '0.75rem',
+  fontSize: '0.7rem',
   fontWeight: 700,
   letterSpacing: '1.2px',
   textTransform: 'uppercase',
   color: LIGHT_ACCENT,
-  marginTop: '12px',
+  marginTop: '8px',
   '&:before': {
     content: '""',
     position: 'absolute',
@@ -171,16 +172,17 @@ const PremiumBadge = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1),
   background: '#2E7D32',
   color: alpha(LIGHT_ACCENT, 0.9),
-  padding: theme.spacing(1, 2),
+  padding: theme.spacing(0.75, 2),
   borderRadius: '8px',
   border: `1px solid ${alpha('#1B5E20', 0.3)}`,
   fontWeight: 600,
-  fontSize: '0.75rem',
+  fontSize: '0.7rem',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
   '&:hover': {
     background: '#1B5E20',
     transform: 'translateY(-2px)',
+    boxShadow: `0 4px 16px ${alpha('#1B5E20', 0.3)}`,
   },
 }));
 
@@ -195,6 +197,12 @@ const ScarcityBadge = styled(Box)(({ theme }) => ({
   boxShadow: `0 8px 32px ${alpha(theme.palette.error.main, 0.3)}`,
   fontWeight: 600,
   fontSize: '0.7rem',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: `0 4px 16px ${alpha(theme.palette.error.main, 0.3)}`,
+  },
 }));
 
 const NavBar: React.FC = () => {
@@ -226,7 +234,8 @@ const NavBar: React.FC = () => {
             minHeight: 100,
             justifyContent: 'space-between',
             gap: 4,
-            flexWrap: 'nowrap'
+            flexWrap: 'nowrap',
+            position: 'relative'
           }}>
             <BrandContainer onClick={() => handleNavigate('/')}>
               <CodeIcon sx={{
@@ -260,16 +269,6 @@ const NavBar: React.FC = () => {
                 gap: 3,
                 flexShrink: 0
               }}>
-                <PremiumBadge onClick={() => router.push('/contact?offer=cloudAssess')}>
-                  <AssessmentIcon sx={{ fontSize: 18 }} />
-                  Free Cloud Assessment
-                </PremiumBadge>
-
-                <ScarcityBadge>
-                  <WhatshotIcon sx={{ fontSize: 16 }} />
-                  {seatsLeft} SLOTS LEFT
-                </ScarcityBadge>
-
                 {navItems.map((item) => (
                   <NavButton
                     key={item.path}
@@ -284,6 +283,29 @@ const NavBar: React.FC = () => {
                   Schedule Consultation
                 </CTALuxButton>
               </Box>
+            )}
+
+            {!isMobile && (
+              <Stack
+                spacing={1}
+                sx={{
+                  position: 'absolute',
+                  right: theme.spacing(4),
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  alignItems: 'flex-end'
+                }}
+              >
+                <PremiumBadge onClick={() => router.push('/contact?offer=cloudAssess')}>
+                  <AssessmentIcon sx={{ fontSize: 16 }} />
+                  Free Cloud Assessment
+                </PremiumBadge>
+                
+                <ScarcityBadge>
+                  <WhatshotIcon sx={{ fontSize: 16 }} />
+                  {seatsLeft} SLOTS LEFT
+                </ScarcityBadge>
+              </Stack>
             )}
 
             {isMobile && (
@@ -312,15 +334,17 @@ const NavBar: React.FC = () => {
           gap: 3,
           mt: -4,
         }}>
-          <PremiumBadge sx={{ justifyContent: 'center' }}>
-            <AssessmentIcon sx={{ fontSize: 22 }} />
-            Free Cloud Assessment
-          </PremiumBadge>
+          <Stack direction="column" spacing={1} sx={{ width: '100%', mb: 2 }}>
+            <PremiumBadge sx={{ justifyContent: 'center', width: '100%' }}>
+              <AssessmentIcon sx={{ fontSize: 16 }} />
+              Free Cloud Assessment
+            </PremiumBadge>
 
-          <ScarcityBadge sx={{ justifyContent: 'center' }}>
-            <WhatshotIcon sx={{ fontSize: 20 }} />
-            {seatsLeft} SLOTS LEFT
-          </ScarcityBadge>
+            <ScarcityBadge sx={{ justifyContent: 'center', width: '100%' }}>
+              <WhatshotIcon sx={{ fontSize: 16 }} />
+              {seatsLeft} SLOTS LEFT
+            </ScarcityBadge>
+          </Stack>
 
           {navItems.map((item) => (
             <Button
