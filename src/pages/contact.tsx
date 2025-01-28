@@ -112,7 +112,8 @@ const Contact: React.FC = () => {
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
+                justifyContent: "flex-start", 
+                alignItems: "left",
                 gap: 4,
                 mb: { xs: 6, md: 8 },
                 padding: { xs: 3, md: 4 },
@@ -130,7 +131,7 @@ const Contact: React.FC = () => {
               <Typography
                 variant="h2"
                 sx={{
-                  fontWeight: 800,
+                  fontWeight: 700,
                   fontSize: { xs: "2rem", md: "3rem" },
                   lineHeight: 1.1,
                   color: "#1e293b",

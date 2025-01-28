@@ -48,9 +48,10 @@ const useSeatsLeft = (initialSeats = 5) => {
       setSeatsLeft(prev => Math.max(1, prev - 1));
     }, 70000);
     return () => clearInterval(interval);
-  },); // <-- Empty dependency array here
+  }, []); // Added empty dependency array
   return seatsLeft;
 };
+
 const LuxAppBar = styled(AppBar)(({ theme }) => ({
   position: "fixed",
   background: alpha(PRIMARY_DARK, 0.92),
@@ -258,9 +259,7 @@ const NavBar = memo(() => {
     { label: "Pricing", path: "/pricing", icon: <LocalAtmIcon /> },
     { label: "Contact", path: "/contact", icon: <ContactMailIcon /> },
   ];
-
-  const handleNavToggle = useCallback(() => setMobileOpen(prev =>!prev),);
-
+  const handleNavToggle = useCallback(() => setMobileOpen(prev => !prev), []);// Add the dependency array
   return (
     <>
       <LuxAppBar>
