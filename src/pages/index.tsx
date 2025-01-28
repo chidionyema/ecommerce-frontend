@@ -103,28 +103,19 @@ const useRecentEngagements = () => {
 };
 
 /* -----------------------------------------------------------------------------
- * Hero Section
+ * Enhanced Hero Section
  ----------------------------------------------------------------------------- */
 const PersuasiveButton = styled(motion(Button))(({ theme }) => ({
-  padding: '14px 28px',
-  borderRadius: '12px',
+  padding: '16px 32px',
+  borderRadius: '14px',
   fontWeight: 700,
-  fontSize: '1rem',
+  fontSize: '1.1rem',
   letterSpacing: '0.8px',
   textTransform: 'none',
-  border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-  transition: 'all 0.4s ease',
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
-    transform: 'translateY(-3px)',
-    boxShadow: `0 10px 30px ${alpha(theme.palette.primary.main, 0.2)}`,
-    background: `linear-gradient(
-      90deg,
-      ${alpha(theme.palette.primary.light, 0.15)},
-      ${alpha(theme.palette.secondary.light, 0.25)},
-      ${alpha(theme.palette.primary.light, 0.15)}
-    )`,
-    backgroundSize: '200% 100%',
-    animation: 'shine 1.5s infinite linear',
+    transform: 'translateY(-2px)',
+    boxShadow: `0 12px 24px ${alpha(theme.palette.primary.main, 0.2)}`,
   }
 }));
 
@@ -139,191 +130,353 @@ const HeroSection = () => {
     <Box sx={{
       position: 'relative',
       overflow: 'hidden',
-      pt: isMobile ? 10 : 14,
-      pb: isMobile ? 10 : 16,
-      background: `linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.94)}, ${alpha(SECONDARY_DARK, 0.92)})`,
+      pt: isMobile ? 12 : 18,
+      pb: isMobile ? 12 : 20,
+      background: `
+        linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.94)}, ${alpha(SECONDARY_DARK, 0.92)}),
+        radial-gradient(circle at 20% 80%, ${alpha(LIGHT_ACCENT, 0.15)} 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, ${alpha('#F72585', 0.1)} 0%, transparent 40%)
+      `,
       color: '#fff',
       textAlign: 'center',
+      borderBottom: `1px solid ${alpha('#fff', 0.1)}`,
     }}>
       <style>{globalStyles}</style>
 
+      {/* Scarcity Timer */}
       <motion.div
-        animate={{ rotate: [0, 10, -10, 0] }}
-        transition={{ repeat: Infinity, duration: 2 }}
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 200 }}
         style={{
           position: 'absolute',
-          top: '16px',
-          right: '16px',
-          background: alpha('#FFB300', 0.95),
+          top: '32px',
+          right: '32px',
+          background: `linear-gradient(45deg, ${theme.palette.error.main}, #FF6B6B)`,
           color: '#fff',
-          padding: '6px 14px',
-          borderRadius: '14px',
-          zIndex: 999
+          padding: '8px 20px',
+          borderRadius: '16px',
+          zIndex: 999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          boxShadow: `0 8px 24px ${alpha(theme.palette.error.main, 0.3)}`
         }}
       >
-        {seatsLeft} SLOTS REMAIN
+        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+          <span style={{ fontSize: '1.2rem', marginRight: 8 }}>🔥</span>
+        </motion.div>
+        <Box>
+          <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', lineHeight: 1.2 }}>
+            {seatsLeft} SLOTS LEFT
+          </Typography>
+          <Typography variant="caption" sx={{ fontSize: '0.7em', opacity: 0.9 }}>
+            Next price increase in 2:59
+          </Typography>
+        </Box>
       </motion.div>
 
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-        <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-          <Alert severity="info" sx={{
+        {/* Offer Badge */}
+        <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+          <Box sx={{
             display: 'inline-flex',
             alignItems: 'center',
-            backgroundColor: alpha(theme.palette.info.main, 0.2),
-            color: theme.palette.info.contrastText,
-            mb: 3,
-            py: 1,
-            px: 3,
-            borderRadius: '8px',
-            border: `1px solid ${alpha(theme.palette.info.main, 0.3)}`,
-            fontSize: '0.95rem',
-            fontWeight: 600,
-            backdropFilter: 'blur(8px)',
-            '& .MuiAlert-icon': {
-              color: theme.palette.info.light,
-              paddingRight: '8px',
-              fontSize: '1.2rem'
+            backgroundColor: alpha('#4CC9F0', 0.15),
+            color: '#fff',
+            mb: 4,
+            py: 1.5,
+            px: 4,
+            borderRadius: '12px',
+            border: `1px solid ${alpha('#4CC9F0', 0.3)}`,
+            fontSize: '1rem',
+            fontWeight: 700,
+            backdropFilter: 'blur(12px)',
+            position: 'relative',
+            overflow: 'hidden',
+            '&:before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: '-100%',
+              width: '200%',
+              height: '100%',
+              background: `linear-gradient(90deg, transparent 25%, ${alpha('#4CC9F0', 0.2)} 50%, transparent 75%)`,
+              animation: 'shine 3s infinite',
             }
           }}>
-            Limited-Time Offer: Free Cloud Readiness Assessment
-          </Alert>
+            <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ repeat: Infinity, duration: 2 }} style={{ marginRight: 12 }}>
+              🎁
+            </motion.div>
+            Free Cloud Readiness Assessment
+          </Box>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-          <Typography variant="h1" sx={{
-            fontWeight: 800,
-            fontSize: isMobile ? '2rem' : '3rem',
-            background: `linear-gradient(90deg, ${alpha(theme.palette.primary.light, 0.7)}, ${alpha(theme.palette.secondary.light, 0.9)})`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+        {/* Main Headline */}
+        <Box sx={{ 
+          maxWidth: '1200px',
+          mx: 'auto',
+          mb: isMobile ? 4 : 6,
+          position: 'relative',
+          '&:after': {
+            content: '""',
+            position: 'absolute',
+            bottom: -24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '60%',
+            height: '2px',
+            background: `linear-gradient(90deg, transparent, ${alpha('#fff', 0.3)}, transparent)`,
+          }
+        }}>
+          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.9] }}>
+            <Typography variant="h1" sx={{
+              fontWeight: 900,
+              fontSize: isMobile ? '2.5rem' : '4rem',
+              lineHeight: 1.1,
+              letterSpacing: '-0.03em',
+              mb: 2,
+              textShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+              background: `linear-gradient(45deg, #fff 30%, ${alpha(LIGHT_ACCENT, 0.9)})`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              <Box component="span" sx={{ display: 'block' }}>Enterprise-Grade</Box>
+              <Box component="span" sx={{ 
+                display: 'block',
+                background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>
+                Digital Transformation
+              </Box>
+            </Typography>
+          </motion.div>
+        </Box>
+
+        {/* Trust Indicators */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} style={{ marginBottom: '2rem' }}>
+          <Typography variant="subtitle1" sx={{
+            color: alpha('#fff', 0.85),
+            mb: 2,
+            fontWeight: 500,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '1rem',
+            flexWrap: 'wrap'
           }}>
-            Enterprise-Grade Digital Transformation
+            Trusted by global innovators
+            <Box sx={{ 
+              display: 'flex',
+              gap: '2rem',
+              '& svg': {
+                fontSize: 32,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-3px)',
+                  filter: 'drop-shadow(0 4px 8px rgba(255, 255, 255, 0.2))'
+                }
+              }
+            }}>
+              <FaMicrosoft /><FaGoogle /><FaAws /><FaJava /><FaDocker />
+            </Box>
           </Typography>
         </motion.div>
 
-        <Typography variant="h6" sx={{ mb: 4, color: alpha('#fff', 0.85) }}>
-          Trusted by industry leaders worldwide
-          <Box sx={{ mt: 2, '& svg': { mx: 2, fontSize: 28 } }}>
-            <FaMicrosoft /><FaGoogle /><FaAws /><FaMicrosoft />
-          </Box>
-        </Typography>
-
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+        {/* CTAs */}
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: 3, 
+          flexWrap: 'wrap',
+          position: 'relative',
+          zIndex: 2,
+          mt: 6
+        }}>
           <PersuasiveButton
             variant="contained"
             onClick={() => router.push('/contact?offer=cloudAssess')}
             sx={{
-              background: `linear-gradient(90deg, ${alpha('#2a9d8f', 0.7)}, ${alpha('#264653', 0.9)})`,
-              color: '#fff',
+              background: `linear-gradient(135deg, ${alpha('#4361EE', 0.9)}, ${alpha('#3A0CA3', 0.9)})`,
+              minWidth: 260,
+              '&:hover': { background: `linear-gradient(135deg, ${alpha('#4361EE', 1)}, ${alpha('#3A0CA3', 1)})` }
             }}
           >
-            Free Cloud Assessment
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <motion.div animate={{ y: [-2, 2, -2] }} transition={{ duration: 1.5, repeat: Infinity }}>🚀</motion.div>
+              Start Free Assessment
+            </Box>
           </PersuasiveButton>
 
           <PersuasiveButton
             variant="outlined"
-            endIcon={<ArrowRightAlt />}
             onClick={() => router.push('/pricing')}
-            sx={{ color: '#fff', borderColor: alpha('#fff', 0.25) }}
+            sx={{ 
+              color: '#fff', 
+              borderColor: alpha('#fff', 0.3),
+              minWidth: 260,
+              background: alpha('#fff', 0.1),
+              '&:hover': { background: alpha('#fff', 0.2), borderColor: alpha('#fff', 0.5) }
+            }}
           >
-            Enterprise Pricing
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              Enterprise Solutions
+              <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+                <ArrowRightAlt sx={{ fontSize: 20 }} />
+              </motion.div>
+            </Box>
           </PersuasiveButton>
         </Box>
+
+        {/* Social Proof */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} style={{ marginTop: '3rem' }}>
+          <Typography variant="body2" sx={{
+            color: alpha('#fff', 0.8),
+            fontStyle: 'italic',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.5rem'
+          }}>
+            <CheckCircleOutline sx={{ fontSize: 16, color: theme.palette.success.light }} />
+            {recentEngagement}
+          </Typography>
+        </motion.div>
       </Container>
+
+      {/* Background Pattern */}
+      <Box sx={{
+        position: 'absolute',
+        inset: 0,
+        zIndex: 0,
+        background: `
+          repeating-linear-gradient(45deg, ${alpha('#fff', 0.02)} 0px, ${alpha('#fff', 0.02)} 2px, transparent 2px, transparent 8px)
+        `,
+        pointerEvents: 'none'
+      }} />
     </Box>
   );
 };
 
 /* -----------------------------------------------------------------------------
- * Enhanced Technology Cards
+ * Enhanced Technology Showcase Section
  ----------------------------------------------------------------------------- */
-const TechCard = styled(motion(Box))<{ techcolor: string }>(({ theme, techcolor }) => ({
-  padding: theme.spacing(3),
-  borderRadius: '24px',
-  background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.95)}, ${alpha(theme.palette.background.default, 0.98)})`,
-  border: '1px solid transparent',
-  textAlign: 'center',
+const TechIconWrapper = styled(Box)(({ theme }) => ({
   position: 'relative',
-  overflow: 'hidden',
-  backdropFilter: 'blur(12px)',
-  transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: `0 32px 64px -12px ${alpha(techcolor, 0.2)}`,
-  },
+  display: 'inline-flex',
   '&::before': {
     content: '""',
     position: 'absolute',
-    inset: '-2px',
-    zIndex: -1,
-    background: `conic-gradient(from 90deg at 50% 50%, ${techcolor}, ${alpha(techcolor, 0.3)}, ${techcolor})`,
-    borderRadius: '26px',
-    animation: 'swirlConic 4s linear infinite',
-    opacity: 0,
-    transition: 'opacity 0.3s ease',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '120%',
+    height: '120%',
+    background: 'radial-gradient(circle, currentColor 0%, transparent 70%)',
+    opacity: 0.1,
+    zIndex: 0,
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
   },
-  '&:hover::before': {
-    opacity: 1,
-  },
-}));
-
-const TechIconContainer = styled(motion.div)(({ theme }) => ({
-  position: 'relative',
-  display: 'inline-flex',
-  padding: theme.spacing(2),
-  borderRadius: '16px',
-  marginBottom: theme.spacing(3),
-  '&:hover': {
-    '& .icon-gradient': {
-      opacity: 0.6,
-      transform: 'scale(1.2)',
-    },
-    '& svg': {
-      filter: `drop-shadow(0 8px 16px ${alpha(theme.palette.primary.main, 0.3)})`,
-    },
-  },
-  '& .icon-gradient': {
+  '&::after': {
+    content: '""',
     position: 'absolute',
-    inset: 0,
-    background: `radial-gradient(circle at center, ${alpha(theme.palette.primary.main, 0.15)} 0%, transparent 70%)`,
-    opacity: 0,
-    transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
-  },
-  '& svg': {
-    fontSize: '4.5rem',
-    transition: 'all 0.3s ease',
-    filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))',
-  },
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: '50%',
+    border: '2px solid currentColor',
+    opacity: 0.1,
+    zIndex: 0
+  }
 }));
 
-const CardTitle = styled(Typography)<{ techcolor: string }>(({ techcolor }) => ({
-  background: `linear-gradient(45deg, ${techcolor}, ${alpha(techcolor, 0.7)})`,
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  fontWeight: 800,
-  letterSpacing: '-0.75px',
-  marginBottom: '0.5rem',
+const TechCard = styled(motion(Box))<{ techcolor: string }>(({ theme, techcolor }) => ({
+  padding: theme.spacing(4),
+  borderRadius: '32px',
+  background: `
+    linear-gradient(
+      145deg,
+      ${alpha(theme.palette.background.paper, 0.98)} 0%,
+      ${alpha(theme.palette.background.default, 0.98)} 100%
+    )`,
   textAlign: 'center',
+  position: 'relative',
+  overflow: 'hidden',
+  backdropFilter: 'blur(24px)',
+  transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+  border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+  boxShadow: `0 8px 32px ${alpha(techcolor, 0.05)}`,
+
+  '&:hover': {
+    transform: 'translateY(-8px)',
+    boxShadow: `
+      0 32px 64px -12px ${alpha(techcolor, 0.2)},
+      inset 0 0 24px ${alpha(techcolor, 0.05)}
+    `,
+    '&::before': {
+      opacity: 0.3
+    }
+  },
+
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: `
+      radial-gradient(
+        400px circle at var(--mouse-x) var(--mouse-y),
+        ${alpha(techcolor, 0.1)} 0%,
+        transparent 60%
+      )`,
+    opacity: 0,
+    transition: 'opacity 0.4s ease',
+    pointerEvents: 'none',
+    zIndex: 0
+  }
 }));
 
-const TechnologyCards = () => {
+const TechnologyShowcase = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const handleMouseMove = (index: number) => (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+  };
 
   return (
     <Box sx={{ 
       py: 10,
-      background: `radial-gradient(ellipse at top left, ${alpha(theme.palette.primary.light, 0.05)}, transparent 80%),
-                  linear-gradient(150deg, ${PAGE_BG} 0%, ${alpha(SECONDARY_DARK, 0.03)} 100%)`
+      background: `
+        radial-gradient(ellipse at top left, ${alpha(theme.palette.primary.light, 0.05)}, transparent 80%),
+        radial-gradient(ellipse at bottom right, ${alpha(theme.palette.secondary.light, 0.05)}, transparent 80%)
+      `,
+      position: 'relative'
     }}>
       <Container maxWidth="xl">
         <Typography variant="h2" sx={{ 
           textAlign: 'center', 
           mb: 8, 
           fontWeight: 900,
-          background: `linear-gradient(90deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
+          position: 'relative',
+          '&::after': {
+            content: '""',
+            display: 'block',
+            width: '80px',
+            height: '4px',
+            background: `linear-gradient(90deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
+            borderRadius: '2px',
+            margin: '2rem auto 0'
+          }
         }}>
           Core Technologies
         </Typography>
@@ -332,109 +485,93 @@ const TechnologyCards = () => {
             <Grid item xs={12} sm={6} md={4} lg={3} key={tech.id}>
               <TechCard
                 techcolor={tech.color}
-                initial={{ opacity: 0, y: 40, rotateZ: -2 }}
-                whileInView={{ opacity: 1, y: 0, rotateZ: 0 }}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-20%" }}
-                transition={{ 
-                  type: 'spring',
-                  delay: index * 0.05,
-                  stiffness: 80,
-                  damping: 12
+                transition={{ delay: index * 0.05 }}
+                onMouseMove={handleMouseMove(index)}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': {
+                    '& .tech-icon': {
+                      transform: 'scale(1.1)',
+                      filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2))'
+                    }
+                  }
                 }}
-                whileHover={{ scale: 1.02 }}
               >
-                <TechIconContainer whileHover={{ scale: 1.05 }}>
-                  <Box className="icon-gradient" />
-                  <Box 
-                    component={motion.div}
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                    sx={{ color: tech.color }}
-                  >
-                    {tech.icon}
-                  </Box>
-                </TechIconContainer>
-                
-                <CardTitle variant="h5" techcolor={tech.color}>
-                  {tech.title}
-                </CardTitle>
-                
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <Typography variant="body2" sx={{
-                    color: 'text.secondary',
-                    textAlign: 'center',
-                    fontWeight: 500,
-                    lineHeight: 1.6
+                <Box sx={{ position: 'relative', zIndex: 1 }}>
+                  <TechIconWrapper>
+                    <motion.div
+                      className="tech-icon"
+                      style={{ display: 'inline-block' }}
+                      animate={{
+                        y: hoveredIndex === index ? [-2, 2, -2] : 0,
+                        rotate: hoveredIndex === index ? [0, 5, -5, 0] : 0
+                      }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <Box sx={{ 
+                        fontSize: '5rem',
+                        color: tech.color,
+                        mb: 2,
+                        position: 'relative',
+                        zIndex: 1,
+                        transition: 'all 0.4s ease'
+                      }}>
+                        {tech.icon}
+                      </Box>
+                    </motion.div>
+                  </TechIconWrapper>
+                  <Typography variant="h5" sx={{ 
+                    fontWeight: 800,
+                    mb: 1,
+                    position: 'relative',
+                    zIndex: 1,
+                    '&::after': {
+                      content: '""',
+                      display: 'block',
+                      width: '40px',
+                      height: '2px',
+                      background: tech.color,
+                      margin: '1rem auto',
+                      borderRadius: '2px',
+                      opacity: 0.5
+                    }
                   }}>
-                    Enterprise-grade solutions with {tech.title.toLowerCase()} integration
+                    {tech.title}
                   </Typography>
-                </motion.div>
-
-                <Box
-                  component={motion.div}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: `radial-gradient(circle at var(--x) var(--y), ${alpha(tech.color, 0.1)} 0%, transparent 70%)`,
-                    pointerEvents: 'none',
-                  }}
-                />
+                  <Typography variant="body2" sx={{ 
+                    color: 'text.secondary', 
+                    lineHeight: 1.6,
+                    position: 'relative',
+                    zIndex: 1,
+                    minHeight: '4.5em'
+                  }}>
+                    Enterprise-grade {tech.title.toLowerCase()} solutions with full integration
+                  </Typography>
+                </Box>
+                
+                {/* Animated border */}
+                <Box sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '32px',
+                  padding: '2px',
+                  background: `conic-gradient(from 90deg at 50% 50%, ${alpha(tech.color, 0.4)}, ${alpha(tech.color, 0.1)}, ${alpha(tech.color, 0.4)})`,
+                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
+                  animation: 'swirlConic 8s linear infinite',
+                  opacity: 0.5,
+                  pointerEvents: 'none'
+                }} />
               </TechCard>
             </Grid>
           ))}
-        </Grid>
-      </Container>
-    </Box>
-  );
-};
-
-/* -----------------------------------------------------------------------------
- * Why Partner Section
- ----------------------------------------------------------------------------- */
-const WhyPartnerSection = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  return (
-    <Box sx={{
-      background: `linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.98)}, ${alpha(SECONDARY_DARK, 0.95)})`,
-      color: 'white',
-      py: 8
-    }}>
-      <Container maxWidth="lg">
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
-            <Typography variant="h3" sx={{ mb: 3, fontWeight: 800 }}>
-              Why Choose Us
-            </Typography>
-            <Typography variant="body1" sx={{ opacity: 0.9 }}>
-              Combining enterprise robustness with agile innovation for digital excellence
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            {[
-              'Military-grade Security & Compliance',
-              '24/7 Production Support (99.99% Uptime)',
-              'Full Development Lifecycle Management',
-              'Scalable Cloud Architectures',
-              'AI-Driven Analytics & Optimization',
-              'Cross-Platform Integration Expertise'
-            ].map((item, idx) => (
-              <Box key={item} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CheckCircleOutline sx={{ mr: 2, color: theme.palette.success.main }} />
-                <Typography variant="body1">{item}</Typography>
-              </Box>
-            ))}
-          </Grid>
         </Grid>
       </Container>
     </Box>
@@ -453,8 +590,7 @@ export default function HomePage() {
       </Head>
 
       <HeroSection />
-      <TechnologyCards />
-      <WhyPartnerSection />
+      <TechnologyShowcase />
     </Box>
   );
 }

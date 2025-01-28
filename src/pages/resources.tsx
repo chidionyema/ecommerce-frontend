@@ -15,10 +15,16 @@ import BlogCard from '../components/BlogCard';
 import { Cloud, VpnKey, Code } from '@mui/icons-material';
 import NextLink from 'next/link';
 
+// Unified purple color scheme
+const PRIMARY_DARK = '#0A1A2F';
+const SECONDARY_DARK = '#532F73';
+const LIGHT_ACCENT = '#F2E7FE';
+const BACKDROP_BLUR = 'blur(28px)';
+
 const Resources: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const primaryGradient = theme.palette.gradients.primary;
+  const primaryGradient = `linear-gradient(135deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`;
 
   const resources = [
     {
@@ -47,7 +53,7 @@ const Resources: React.FC = () => {
   return (
     <Box
       sx={{
-        backgroundColor: 'background.default',
+        backgroundColor: '#F9FAFD',
         minHeight: '150vh',
         pt: 8,
         pb: 12,
@@ -61,15 +67,14 @@ const Resources: React.FC = () => {
           width: '100%',
           height: '100%',
           background: `
-            linear-gradient(45deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, 
-            ${alpha(theme.palette.secondary.light, 0.1)} 100%),
+            linear-gradient(45deg, ${alpha(PRIMARY_DARK, 0.1)} 0%, 
+            ${alpha(SECONDARY_DARK, 0.1)} 100%),
             url(/noise-texture.png)
           `,
           opacity: 0.15,
         },
       }}
     >
-      {/* SEO */}
       <SEO
         title="Technical Resources - Expert Insights"
         description="Cutting-edge technical resources on cloud architecture, DevOps, and modern software development."
@@ -90,14 +95,13 @@ const Resources: React.FC = () => {
               '&:after': {
                 content: '""',
                 position: 'absolute',
-                bottom: -20, // Spacing below the underline
+                bottom: -32,
                 left: '50%',
                 transform: 'translateX(-50%)',
-                width: '120px', // Length of the underline
-                height: '3px', // Thickness of the underline
-                background: `linear-gradient(90deg, transparent 0%, ${theme.palette.primary.main} 50%, transparent 100%)`,
-                borderRadius: '2px',
-                opacity: 0.8,
+                width: '120px',
+                height: '3px',
+                background: `linear-gradient(90deg, transparent, ${PRIMARY_DARK}, transparent)`,
+                opacity: 0.8
               },
             }}
           >
@@ -111,7 +115,7 @@ const Resources: React.FC = () => {
                 background: primaryGradient,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
+                lineHeight: 1.1
               }}
             >
               Resources
@@ -123,8 +127,7 @@ const Resources: React.FC = () => {
                 maxWidth: 680,
                 mx: 'auto',
                 fontSize: isMobile ? '1rem' : '1.1rem',
-                lineHeight: 1.6,
-                fontWeight: 400,
+                lineHeight: 1.6
               }}
             >
               Cutting-edge insights distilled from years of enterprise-grade implementations.
@@ -137,10 +140,10 @@ const Resources: React.FC = () => {
           {resources.map((resource, index) => (
             <Grid item xs={12} md={4} key={resource.id}>
               <motion.div
-                initial={{ opacity: 0, y: 60, rotateX: 90 }}
-                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  delay: index * 0.15,
+                  delay: index * 0.1,
                   duration: 0.8,
                   ease: [0.16, 1, 0.3, 1],
                 }}
@@ -152,25 +155,20 @@ const Resources: React.FC = () => {
                 <BlogCard
                   {...resource}
                   sx={{
-                    backdropFilter: 'blur(12px)',
+                    backdropFilter: BACKDROP_BLUR,
                     background: `
                       linear-gradient(145deg, 
                         ${alpha(theme.palette.background.paper, 0.8)}, 
                         ${alpha(theme.palette.background.default, 0.9)}),
-                      ${alpha(theme.palette.primary.light, 0.05)}
+                      ${alpha(SECONDARY_DARK, 0.05)}
                     `,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
-                    boxShadow: `
-                      0 32px 64px -16px ${alpha(theme.palette.primary.dark, 0.1)},
-                      0 16px 32px -16px ${alpha(theme.palette.secondary.dark, 0.1)}
-                    `,
-                    transition: 'all 0.3s ease',
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    boxShadow: `0 32px 64px -12px ${alpha(PRIMARY_DARK, 0.2)}`,
+                    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                     '&:hover': {
-                      borderColor: alpha(theme.palette.primary.main, 0.4),
-                      boxShadow: `
-                        0 40px 80px -24px ${alpha(theme.palette.primary.dark, 0.2)},
-                        0 24px 48px -24px ${alpha(theme.palette.secondary.dark, 0.2)}
-                      `,
+                      transform: 'translateY(-8px)',
+                      borderColor: alpha(SECONDARY_DARK, 0.3),
+                      boxShadow: `0 40px 80px -24px ${alpha(SECONDARY_DARK, 0.2)}`,
                     },
                   }}
                 />
@@ -208,11 +206,10 @@ const Resources: React.FC = () => {
                   fontWeight: 700,
                   fontSize: '1.1rem',
                   color: 'common.white',
-                  position: 'relative',
-                  overflow: 'hidden',
+                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                   '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: theme.shadows[6],
+                    transform: 'translateY(-4px)',
+                    boxShadow: `0 8px 24px ${alpha(PRIMARY_DARK, 0.3)}`
                   },
                 }}
               >

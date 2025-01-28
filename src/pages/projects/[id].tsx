@@ -1,7 +1,9 @@
+"use client";
+
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { cvProjects } from '../../data/cvProjects';
-import { 
+import {
   Box,
   Typography,
   Chip,
@@ -21,15 +23,22 @@ import {
   alpha
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
 import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Brand color constants
+const PRIMARY_DARK = '#0A1A2F';
+const SECONDARY_DARK = '#532F73';
+const GOLD_ACCENT = '#C5A46D';
+const LIGHT_ACCENT = '#F2E7FE';
+const PAGE_BG = '#F9FAFD';
 
 const FloatingParticle = styled(motion.div)(({ theme }) => ({
   position: 'absolute',
@@ -39,7 +48,7 @@ const FloatingParticle = styled(motion.div)(({ theme }) => ({
 }));
 
 const CaseStudyHeader = styled(Box)(({ theme }) => ({
-  background: theme.palette.gradients?.primary || 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%)',
+  background: `linear-gradient(135deg, ${PRIMARY_DARK} 0%, ${SECONDARY_DARK} 100%)`,
   color: theme.palette.common.white,
   padding: theme.spacing(15, 4),
   textAlign: 'center',
@@ -77,7 +86,7 @@ const ImpactMetric = styled(motion.div)(({ theme }) => ({
   cursor: 'pointer',
   transformStyle: 'preserve-3d',
   '&:hover': {
-    transform: 'translateY(-8px) rotateX(10deg) rotateY(5deg)',
+    transform: 'translateY(-8px)',
     boxShadow: `0 24px 64px ${alpha(theme.palette.primary.main, 0.3)}`,
     '&:after': { opacity: 0.2 }
   },
@@ -89,7 +98,7 @@ const ImpactMetric = styled(motion.div)(({ theme }) => ({
     right: 0,
     bottom: 0,
     borderRadius: '24px',
-    background: `linear-gradient(45deg, ${alpha(theme.palette.primary.main, 0.1)}, transparent)`,
+    background: `linear-gradient(45deg, ${alpha(GOLD_ACCENT, 0.1)}, transparent)`,
     opacity: 0,
     transition: 'opacity 0.3s ease'
   }
@@ -97,7 +106,7 @@ const ImpactMetric = styled(motion.div)(({ theme }) => ({
 
 const SectionHeader = styled(Typography)(({ theme }) => ({
   fontWeight: 800,
-  background: `linear-gradient(45deg, ${theme.palette.text.primary} 30%, ${theme.palette.primary.main} 100%)`,
+  background: `linear-gradient(45deg, ${theme.palette.text.primary} 30%, ${GOLD_ACCENT} 100%)`,
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
   position: 'relative',
@@ -109,7 +118,7 @@ const SectionHeader = styled(Typography)(({ theme }) => ({
     left: 0,
     width: '64px',
     height: '4px',
-    background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    background: `linear-gradient(90deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
     borderRadius: '2px',
     transformOrigin: 'left center',
     transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -144,13 +153,17 @@ const Section: React.FC<{
           {title}
         </SectionHeader>
         {toggleable && (
-          <IconButton sx={{ 
-            background: alpha(theme.palette.background.paper, 0.1),
-            '&:hover': { background: alpha(theme.palette.background.paper, 0.2) }
-          }}>
-            {open ? 
-              <ExpandLessIcon sx={{ color: 'primary.main' }} /> : 
-              <ExpandMoreIcon sx={{ color: 'primary.main' }} />}
+          <IconButton
+            sx={{
+              background: alpha('#ffffff', 0.05),
+              '&:hover': { background: alpha('#ffffff', 0.1) }
+            }}
+          >
+            {open ? (
+              <ExpandLessIcon sx={{ color: GOLD_ACCENT }} />
+            ) : (
+              <ExpandMoreIcon sx={{ color: GOLD_ACCENT }} />
+            )}
           </IconButton>
         )}
       </Box>
@@ -166,7 +179,6 @@ const ProjectDetails: React.FC = () => {
   const { id } = router.query;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   const project = cvProjects.find((p) => p.id === id);
 
@@ -181,14 +193,14 @@ const ProjectDetails: React.FC = () => {
   }
 
   return (
-    <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
+    <Box sx={{ backgroundColor: PAGE_BG, minHeight: '100vh' }}>
       <CaseStudyHeader>
         <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
           <FloatingParticle
             animate={{
               x: ['10%', '-10%', '10%'],
               y: ['30%', '50%', '30%'],
-              scale: [0.8, 1.2, 0.8]
+              scale: [1, 1.2, 1]
             }}
             transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
             style={{ width: '200px', height: '200px' }}
@@ -220,8 +232,11 @@ const ProjectDetails: React.FC = () => {
               py: 1.5,
               px: 3,
               boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-              transformStyle: 'preserve-3d',
-              '&:hover': { background: alpha('#ffffff', 0.2) }
+              border: `1px solid ${alpha(GOLD_ACCENT, 0.2)}`,
+              '&:hover': { 
+                background: alpha('#ffffff', 0.2),
+                boxShadow: `0 12px 40px ${alpha(GOLD_ACCENT, 0.2)}`
+              }
             }}
           >
             <Typography variant="button" sx={{ fontWeight: 600 }}>
@@ -231,14 +246,14 @@ const ProjectDetails: React.FC = () => {
         </motion.div>
 
         <Container maxWidth="lg">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <Typography variant="h1" sx={{ 
-              fontWeight: 800, 
-              mb: 3, 
+            <Typography variant="h1" sx={{
+              fontWeight: 800,
+              mb: 3,
               fontSize: isMobile ? '2.5rem' : '4rem',
               lineHeight: 1.2,
               textShadow: '0 4px 12px rgba(0,0,0,0.2)',
@@ -252,7 +267,7 @@ const ProjectDetails: React.FC = () => {
                   left: -20,
                   width: 12,
                   height: 12,
-                  background: `radial-gradient(${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.3)})`,
+                  background: `radial-gradient(${PRIMARY_DARK}, ${alpha(PRIMARY_DARK, 0.3)})`,
                   borderRadius: '50%',
                   filter: 'blur(2px)'
                 }}
@@ -266,7 +281,7 @@ const ProjectDetails: React.FC = () => {
                   right: -20,
                   width: 12,
                   height: 12,
-                  background: `radial-gradient(${theme.palette.secondary.main}, ${alpha(theme.palette.secondary.main, 0.3)})`,
+                  background: `radial-gradient(${SECONDARY_DARK}, ${alpha(SECONDARY_DARK, 0.3)})`,
                   borderRadius: '50%',
                   filter: 'blur(2px)'
                 }}
@@ -274,9 +289,9 @@ const ProjectDetails: React.FC = () => {
                 transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
               />
             </Typography>
-            <Typography variant="h5" sx={{ 
-              maxWidth: '800px', 
-              margin: '0 auto', 
+            <Typography variant="h5" sx={{
+              maxWidth: '800px',
+              margin: '0 auto',
               opacity: 0.9,
               fontWeight: 400,
               letterSpacing: '0.5px'
@@ -306,16 +321,16 @@ const ProjectDetails: React.FC = () => {
                 transition={{ type: 'spring', stiffness: 300 }}
               >
                 <motion.div variants={{ hover: { translateZ: 20 } }}>
-                  <Typography variant="h2" sx={{ 
-                    fontWeight: 800, 
+                  <Typography variant="h2" sx={{
+                    fontWeight: 800,
                     mb: 1,
-                    background: `linear-gradient(45deg, ${theme.palette.text.primary}, ${theme.palette.primary.main})`,
+                    background: `linear-gradient(45deg, ${theme.palette.text.primary}, ${GOLD_ACCENT})`,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent'
                   }}>
                     {metric.value}
                   </Typography>
-                  <Typography variant="body1" sx={{ 
+                  <Typography variant="body1" sx={{
                     color: 'text.secondary',
                     fontWeight: 500
                   }}>
@@ -336,8 +351,8 @@ const ProjectDetails: React.FC = () => {
                 transition={{ delay: 0.2 }}
               >
                 <Section title="The Challenge" defaultOpen>
-                  <Typography variant="body1" sx={{ 
-                    lineHeight: 1.8, 
+                  <Typography variant="body1" sx={{
+                    lineHeight: 1.8,
                     color: 'text.secondary',
                     fontSize: '1.1rem'
                   }}>
@@ -361,14 +376,14 @@ const ProjectDetails: React.FC = () => {
                             animate={{ scale: 1 }}
                             transition={{ delay: index * 0.2 }}
                           >
-                            <TimelineDot sx={{ 
-                              background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                              boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`
+                            <TimelineDot sx={{
+                              background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
+                              boxShadow: `0 4px 12px ${alpha(PRIMARY_DARK, 0.3)}`
                             }} />
                           </motion.div>
                           {index < 2 && (
-                            <TimelineConnector sx={{ 
-                              background: `linear-gradient(to bottom, ${alpha(theme.palette.primary.main, 0.3)}, ${alpha(theme.palette.secondary.main, 0.3)})`,
+                            <TimelineConnector sx={{
+                              background: `linear-gradient(to bottom, ${alpha(PRIMARY_DARK, 0.3)}, ${alpha(SECONDARY_DARK, 0.3)})`,
                               position: 'relative'
                             }} />
                           )}
@@ -409,7 +424,7 @@ const ProjectDetails: React.FC = () => {
                             <Box sx={{
                               width: 8,
                               height: 8,
-                              background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                              background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
                               borderRadius: '50%',
                               mt: 1.5,
                               mr: 2
@@ -470,23 +485,32 @@ const ProjectDetails: React.FC = () => {
                 position: 'relative',
                 overflow: 'hidden'
               }}>
-                <motion.div
+                               <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                 >
-                  <Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>
+                  <Typography variant="h5" sx={{ mb: 2, color: 'error.main' }}>
                     Before Implementation
                   </Typography>
-                  <List>
-                    {['Legacy system limitations', 'Manual processes', 'Frequent downtime'].map((item, index) => (
-                      <ListItem key={index} sx={{ color: 'error.main', py: 0.5 }}>
-                        <ListItemText primary={item} />
-                      </ListItem>
-                    ))}
-                  </List>
+                  <Typography variant="h2" sx={{ 
+                    fontWeight: 800,
+                    background: `linear-gradient(45deg, ${theme.palette.error.main} 30%, ${theme.palette.warning.main} 100%)`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
+                  }}>
+                    {project.measurableOutcomes?.before.percentage}
+                  </Typography>
+                  <Typography variant="body1" sx={{ 
+                    color: 'text.secondary', 
+                    mt: 1,
+                    lineHeight: 1.6
+                  }}>
+                    {project.measurableOutcomes?.before.description}
+                  </Typography>
                 </motion.div>
               </Box>
             </Grid>
+
             <Grid item xs={12} md={6}>
               <Box sx={{
                 p: 4,
@@ -500,20 +524,64 @@ const ProjectDetails: React.FC = () => {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                 >
-                  <Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>
+                  <Typography variant="h5" sx={{ mb: 2, color: 'success.main' }}>
                     After Implementation
                   </Typography>
-                  <List>
-                    {['Automated CI/CD pipelines', 'Scalable infrastructure', '99.9% availability'].map((item, index) => (
-                      <ListItem key={index} sx={{ color: 'success.main', py: 0.5 }}>
-                        <ListItemText primary={item} />
-                      </ListItem>
-                    ))}
-                  </List>
+                  <Typography variant="h2" sx={{ 
+                    fontWeight: 800,
+                    background: `linear-gradient(45deg, ${theme.palette.success.main} 30%, ${theme.palette.info.main} 100%)`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
+                  }}>
+                    {project.measurableOutcomes?.after.percentage}
+                  </Typography>
+                  <Typography variant="body1" sx={{ 
+                    color: 'text.secondary', 
+                    mt: 1,
+                    lineHeight: 1.6
+                  }}>
+                    {project.measurableOutcomes?.after.description}
+                  </Typography>
                 </motion.div>
               </Box>
             </Grid>
           </Grid>
+
+          {project.metrics && (
+            <Grid container spacing={4} sx={{ mt: 2 }}>
+              {project.metrics.map((metric, index) => (
+                <Grid item xs={12} sm={6} key={index}>
+                  <Box sx={{
+                    p: 3,
+                    borderRadius: '16px',
+                    background: alpha(theme.palette.background.paper, 0.6),
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    backdropFilter: 'blur(12px)'
+                  }}>
+                    <Typography variant="body1" sx={{ 
+                      fontWeight: 600,
+                      color: 'text.primary',
+                      mb: 1
+                    }}>
+                      {metric.label}
+                    </Typography>
+                    <Typography variant="h4" sx={{
+                      fontWeight: 800,
+                      color: GOLD_ACCENT
+                    }}>
+                      {metric.value}
+                    </Typography>
+                    <Typography variant="body2" sx={{ 
+                      color: 'text.secondary',
+                      mt: 0.5
+                    }}>
+                      {metric.description}
+                    </Typography>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </Section>
       </Container>
     </Box>
@@ -521,73 +589,91 @@ const ProjectDetails: React.FC = () => {
 };
 
 const QuickFacts: React.FC<{
-  teamSize: number;
+  teamSize: string;
   timeline: string;
   technologies: string[];
   stakeholders: string[];
-}> = ({ teamSize, timeline, technologies, stakeholders }) => (
-  <Box sx={{
-    background: alpha('#ffffff', 0.02),
-    borderRadius: '24px',
-    p: 3,
-    boxShadow: '0 8px 32px rgba(26, 35, 126, 0.1)',
-    backdropFilter: 'blur(16px)',
-    border: `1px solid ${alpha('#ffffff', 0.1)}`,
-    '&:before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: `linear-gradient(45deg, ${alpha('#ffffff', 0.02)} 0%, transparent 100%)`,
-      zIndex: -1
-    }
-  }}>
-    <Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>
-      Project Quick Facts
-    </Typography>
-    <Stack spacing={3}>
-      {[
-        { label: 'Team Size', value: `${teamSize} members` },
-        { label: 'Timeline', value: timeline },
-        { label: 'Technologies', value: technologies },
-        { label: 'Stakeholders', value: stakeholders },
-      ].map((fact, index) => (
-        <div key={index}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-            {fact.label}
+}> = ({ teamSize, timeline, technologies, stakeholders }) => {
+  const theme = useTheme();
+  
+  return (
+    <Box sx={{
+      p: 4,
+      borderRadius: '24px',
+      background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.8)}, ${alpha(theme.palette.background.default, 0.2)})`,
+      boxShadow: `0 12px 48px ${alpha(theme.palette.primary.main, 0.1)}`,
+      backdropFilter: 'blur(12px)',
+      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`
+    }}>
+      <Typography variant="h6" sx={{ 
+        mb: 3,
+        fontWeight: 700,
+        color: GOLD_ACCENT
+      }}>
+        Project Snapshot
+      </Typography>
+      
+      <Stack spacing={3}>
+        <Box>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            Team Size
           </Typography>
-          {Array.isArray(fact.value) ? (
-            <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
-              {fact.value.map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Chip
-                    label={item}
-                    size="small"
-                    sx={{ 
-                      mb: 1, 
-                      background: alpha('#ffffff', 0.05),
-                      color: 'text.primary',
-                      border: `1px solid ${alpha('#ffffff', 0.1)}`,
-                    }}
-                  />
-                </motion.div>
-              ))}
-            </Stack>
-          ) : (
-            <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-              {fact.value}
-            </Typography>
-          )}
-        </div>
-      ))}
-    </Stack>
-  </Box>
-);
+          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+            {teamSize}
+          </Typography>
+        </Box>
+        
+        <Box>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            Timeline
+          </Typography>
+          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+            {timeline}
+          </Typography>
+        </Box>
+        
+        <Box>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            Technologies
+          </Typography>
+          <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap' }}>
+            {technologies.map((tech, index) => (
+              <Chip
+                key={index}
+                label={tech}
+                size="small"
+                sx={{
+                  background: alpha(PRIMARY_DARK, 0.1),
+                  color: PRIMARY_DARK,
+                  fontWeight: 600,
+                  mb: 1
+                }}
+              />
+            ))}
+          </Stack>
+        </Box>
+        
+        <Box>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            Key Stakeholders
+          </Typography>
+          <List dense>
+            {stakeholders.map((stakeholder, index) => (
+              <ListItem key={index} sx={{ px: 0 }}>
+                <ListItemText
+                  primary={stakeholder}
+                  primaryTypographyProps={{ 
+                    variant: 'body1',
+                    sx: { fontWeight: 500 } 
+                  }}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Stack>
+    </Box>
+  );
+};
 
 export default ProjectDetails;

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo, useEffect } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { useRouter } from 'next/router';
 import {
   AppBar,
@@ -8,194 +8,170 @@ import {
   Box,
   Container,
   alpha,
-  Slide,
   IconButton,
-  Grow,
-  GlobalStyles,
   useMediaQuery,
+  Divider,
 } from '@mui/material';
+import { styled, keyframes, useTheme } from '@mui/material/styles';
+import CodeIcon from '@mui/icons-material/Code';
+
 import {
   Menu as MenuIcon,
   Close as CloseIcon,
   Home as HomeIcon,
-  Code as CodeIcon,
   Book as BookIcon,
   LocalAtm as LocalAtmIcon,
   ContactMail as ContactMailIcon,
 } from '@mui/icons-material';
-import { styled, keyframes, useTheme } from '@mui/material/styles';
 
 /* --------------------------------------------------------------------------
- *  Brand Colors & Tokens
+ *  Design Tokens
  * -------------------------------------------------------------------------- */
-const DEEP_NAVY = '#0A1A2F';
-const PLATINUM = '#E5E4E2';
-const GOLD_ACCENT = '#C5A46D';
-const BACKDROP_BLUR = 'blur(24px)';
-const BORDER_RADIUS = 24;
+const PRIMARY_DARK = '#0A1A2F';
+const SECONDARY_DARK = '#532F73';
+const LIGHT_ACCENT = '#F2E7FE';
+const TECH_GRADIENT = 'linear-gradient(135deg, #4361EE 0%, #3A0CA3 100%)';
+const BACKDROP_BLUR = 'blur(32px)';
+const BORDER_RADIUS = '20px';
+const TRANSITION_TIMING = 'cubic-bezier(0.23, 1, 0.32, 1)';
 
 /* --------------------------------------------------------------------------
- *  Keyframe Animations
+ *  Animations
  * -------------------------------------------------------------------------- */
-/** Subtle shimmering gradient for the header background. */
-const headerGradient = keyframes`
-  0% {
-    background-position: 0 50%;
-  }
-  100% {
-    background-position: 100% 50%;
-  }
+const microShine = keyframes`
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 `;
-
-/** Fade + slide in the full-screen mobile nav overlay. */
-const overlaySlideIn = keyframes`
-  0% {
-    opacity: 0; 
-    transform: translateX(100%);
-  }
-  100% {
-    opacity: 1; 
-    transform: translateX(0);
-  }
-`;
-
-const overlaySlideOut = keyframes`
-  0% {
-    opacity: 1; 
-    transform: translateX(0);
-  }
-  100% {
-    opacity: 0; 
-    transform: translateX(100%);
-  }
-`;
-
-/* --------------------------------------------------------------------------
- *  Minimal Brand Icon (inline SVG)
- * -------------------------------------------------------------------------- */
-const BrandIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    width="40"
-    height="40"
-    viewBox="0 0 64 64"
-    fill="none"
-    {...props}
-    style={{ display: 'block' }}
-  >
-    {/* A simpler “stacked” shape than before */}
-    <path fill={GOLD_ACCENT} d="M32 2 L14 12 L14 32 L32 42 L50 32 L50 12 Z" />
-    <path fill={alpha(GOLD_ACCENT, 0.7)} d="M14 32 L32 42 L32 62 L14 52 Z" />
-    <path fill={alpha(GOLD_ACCENT, 0.5)} d="M50 32 L32 42 L32 62 L50 52 Z" />
-  </svg>
-);
 
 /* --------------------------------------------------------------------------
  *  Styled Components
  * -------------------------------------------------------------------------- */
-const PremiumAppBar = styled(AppBar)(({ theme }) => ({
-  position: 'sticky',
-  background: `linear-gradient(120deg,
-    ${alpha(DEEP_NAVY, 0.95)},
-    ${alpha(DEEP_NAVY, 0.9)}
-  )`,
-  backgroundSize: '200% 200%',
-  animation: `${headerGradient} 10s ease infinite`,
-  backdropFilter: BACKDROP_BLUR,
-  boxShadow: `0 8px 24px rgba(0, 0, 0, 0.3)`,
-  transition: 'all 0.4s ease',
-}));
-
-/** Large brand text with a subtle shimmer. */
-const BrandText = styled(Typography)(({ theme }) => ({
-  fontFamily: "'Bebas Neue', sans-serif",
-  fontSize: '2rem',
-  letterSpacing: '2px',
-  fontWeight: 800,
-  background: `linear-gradient(45deg, ${alpha(PLATINUM, 0.8)}, ${GOLD_ACCENT})`,
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-}));
-
-/** Desktop Nav button styling. */
-const DesktopNavButton = styled(Button)<{ active?: boolean }>(({
-  theme, active
-}) => ({
-  color: active ? PLATINUM : alpha(PLATINUM, 0.8),
-  fontWeight: 600,
-  letterSpacing: '1px',
-  borderRadius: BORDER_RADIUS,
-  padding: theme.spacing(1, 2.5),
-  textTransform: 'none',
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    backgroundColor: alpha(PLATINUM, 0.1),
-    color: PLATINUM,
-    transform: 'translateY(-1px)',
-  },
-}));
-
-/** CTA button with a gradient fill. */
-const CTAButton = styled(Button)(({ theme }) => ({
-  color: DEEP_NAVY,
-  background: `linear-gradient(to right, ${GOLD_ACCENT}, ${alpha(PLATINUM, 0.6)})`,
-  fontWeight: 700,
-  padding: theme.spacing(1.2, 3),
-  borderRadius: BORDER_RADIUS,
-  textTransform: 'none',
-  boxShadow: `0 4px 12px ${alpha(GOLD_ACCENT, 0.3)}`,
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    background: `linear-gradient(to right, ${alpha(GOLD_ACCENT, 0.9)}, ${alpha(PLATINUM, 0.7)})`,
-    transform: 'translateY(-1px)',
-  },
-}));
-
-/** Fullscreen overlay for mobile nav. */
-const MobileNavOverlay = styled('div')<{ open?: boolean }>(({
-  theme, open
-}) => ({
+const LuxAppBar = styled(AppBar)(({ theme }) => ({
   position: 'fixed',
-  top: 0,
-  right: 0,
-  bottom: 0,
-  left: 0,
-  background: `linear-gradient(120deg, 
-    ${alpha(DEEP_NAVY, 0.9)}, 
-    ${alpha(DEEP_NAVY, 0.85)}
-  )`,
-  display: open ? 'flex' : 'none',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  zIndex: 2000,
-  animation: `${open ? overlaySlideIn : overlaySlideOut} 0.4s forwards`,
+  background: `linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.98)}, ${alpha(SECONDARY_DARK, 0.95)})`,
+  backdropFilter: `${BACKDROP_BLUR} saturate(200%)`,
+  borderBottom: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
+  boxShadow: `0 12px 48px ${alpha(PRIMARY_DARK, 0.3)}`,
+  transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+  zIndex: theme.zIndex.drawer + 1,
 }));
 
-/** Mobile nav items in the overlay. */
-const MobileNavItem = styled(Button)(({ theme }) => ({
-  fontSize: '1.4rem',
-  fontWeight: 600,
-  color: alpha(PLATINUM, 0.9),
-  textTransform: 'none',
-  marginBottom: theme.spacing(3),
+const BrandContainer = styled(Box)({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing(1),
+  gap: '12px',
+  cursor: 'pointer',
+  transition: 'transform 0.3s ease',
   '&:hover': {
-    color: PLATINUM,
-    background: 'none',
-    transform: 'translateY(-2px)',
+    transform: 'translateX(4px)',
+    '& svg': {
+      transform: 'rotate(180deg)'
+    }
   },
+  '& svg': {
+    transition: 'transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55)'
+  }
+});
+
+const LuxBadge = styled(Box)({
+  position: 'relative',
+  padding: '6px 14px',
+  background: alpha(LIGHT_ACCENT, 0.1),
+  borderRadius: '8px',
+  border: `1px solid ${alpha(LIGHT_ACCENT, 0.2)}`,
+  fontSize: '0.75rem',
+  fontWeight: 700,
+  letterSpacing: '1px',
+  textTransform: 'uppercase',
+  color: LIGHT_ACCENT,
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    background: `linear-gradient(90deg, transparent, ${alpha(LIGHT_ACCENT, 0.1)}, transparent)`,
+    animation: `${microShine} 6s infinite linear`,
+  }
+});
+
+const NavButton = styled(Button)<{ active?: boolean }>(({ theme, active }) => ({
+  position: 'relative',
+  color: active ? LIGHT_ACCENT : alpha(LIGHT_ACCENT, 0.8),
+  fontWeight: 500,
+  letterSpacing: '0.5px',
+  padding: '12px 24px',
+  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+  '&:after': {
+    content: '""',
+    position: 'absolute',
+    bottom: '6px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: active ? '24px' : '0px',
+    height: '2px',
+    background: TECH_GRADIENT,
+    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+  },
+  '&:hover': {
+    color: LIGHT_ACCENT,
+    '&:after': {
+      width: '60%',
+    }
+  }
 }));
 
+const CTALuxButton = styled(Button)(({ theme }) => ({
+  background: TECH_GRADIENT,
+  color: LIGHT_ACCENT,
+  padding: '14px 36px',
+  borderRadius: BORDER_RADIUS,
+  fontWeight: 600,
+  letterSpacing: '0.8px',
+  position: 'relative',
+  overflow: 'hidden',
+  border: `1px solid ${alpha(LIGHT_ACCENT, 0.3)}`,
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    background: `linear-gradient(90deg, transparent, ${alpha(LIGHT_ACCENT, 0.1)}, transparent)`,
+    animation: `${microShine} 6s infinite linear`,
+  },
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: `0 12px 32px ${alpha('#4361EE', 0.3)}`,
+  }
+}));
+
+const MobileNavPanel = styled(Box)<{ open?: boolean }>(({ theme, open }) => ({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  background: `linear-gradient(135deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
+  backdropFilter: BACKDROP_BLUR,
+  borderLeft: `1px solid ${alpha(LIGHT_ACCENT, 0.1)}`,
+  zIndex: 2000,
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '32px',
+  opacity: open ? 1 : 0,
+  visibility: open ? 'visible' : 'hidden',
+  transition: `all 0.6s cubic-bezier(0.16, 1, 0.3, 1)`,
+}));
+
+const NavDivider = styled(Divider)({
+  background: alpha(LIGHT_ACCENT, 0.1),
+  margin: '24px 0',
+});
+
 /* --------------------------------------------------------------------------
- *  NavBar Component
+ *  Component Implementation
  * -------------------------------------------------------------------------- */
 const NavBar: React.FC = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navItems = [
@@ -206,183 +182,120 @@ const NavBar: React.FC = () => {
     { label: 'Contact', path: '/contact', icon: <ContactMailIcon /> },
   ];
 
-  useEffect(() => {
-    // Track scroll for shrinking header
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    // Pre-fetch routes
-    navItems.forEach(({ path }) => router.prefetch(path));
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [router, navItems]);
-
-  const handleNavToggle = useCallback(() => {
-    setMobileOpen((prev) => !prev);
-  }, []);
-
-  const handleNavigate = useCallback(
-    (path: string) => {
-      setMobileOpen(false);
-      document.documentElement.classList.add('page-transition');
-      router.push(path).then(() => {
-        setTimeout(() => {
-          document.documentElement.classList.remove('page-transition');
-        }, 300);
-      });
-    },
-    [router]
-  );
+  const handleNavToggle = useCallback(() => setMobileOpen((prev) => !prev), []);
+  const handleNavigate = useCallback((path: string) => {
+    setMobileOpen(false);
+    router.push(path);
+  }, [router]);
 
   return (
     <>
-      <GlobalStyles
-        styles={{
-          '@keyframes fadeIn': {
-            from: { opacity: 0, transform: 'translateY(10px)' },
-            to: { opacity: 1, transform: 'translateY(0)' },
-          },
-          '.page-transition': {
-            animation: 'fadeIn 300ms ease-out',
-          },
-        }}
-      />
+      <LuxAppBar>
+        <Container maxWidth="xl">
+          <Toolbar sx={{ 
+            minHeight: 88, 
+            justifyContent: 'space-between',
+            py: { xs: 1, md: 0 }
+          }}>
+            <BrandContainer onClick={() => handleNavigate('/')}>
+              <CodeIcon sx={{ 
+                fontSize: 36,
+                color: LIGHT_ACCENT,
+                transform: 'rotate(45deg)'
+              }} />
+              <Box>
+                <Typography variant="h1" sx={{
+                  fontFamily: "'Bai Jamjuree', sans-serif",
+                  fontSize: '1.8rem',
+                  color: LIGHT_ACCENT,
+                  lineHeight: 1.2,
+                  fontWeight: 700,
+                  letterSpacing: '0.5px'
+                }}>
+                  GLU
+                  <Box component="span" sx={{ 
+                    background: TECH_GRADIENT,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}>Stack</Box>
+                </Typography>
+                <LuxBadge sx={{ mt: 0.5 }}>
+                  <CodeIcon sx={{ fontSize: 14, mr: 1 }} />
+                  ENGINEERED PRECISION
+                </LuxBadge>
+              </Box>
+            </BrandContainer>
 
-      {/* Main AppBar */}
-      <Slide in={!scrolled} direction="down" appear={false}>
-        <PremiumAppBar>
-          <Container maxWidth="xl">
-            <Toolbar
-              sx={{
-                display: 'flex',
-                justifyContent: isMobile ? 'space-between' : 'space-between',
-                alignItems: 'center',
-                minHeight: isMobile ? 56 : 80,
-                transition: 'min-height 0.3s ease',
-              }}
-            >
-              {/* Mobile: Brand & hamburger on the same line, brand centered if you prefer */}
-              {isMobile ? (
-                <>
-                  <IconButton onClick={handleNavToggle} sx={{ color: PLATINUM }}>
-                    <MenuIcon />
-                  </IconButton>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      flex: 1,
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => handleNavigate('/')}
+            {!isMobile && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                {navItems.map((item) => (
+                  <NavButton
+                    key={item.path}
+                    active={router.pathname === item.path}
+                    onClick={() => handleNavigate(item.path)}
                   >
-                    <BrandIcon />
-                    <BrandText>GLUSTACK</BrandText>
-                  </Box>
-                </>
-              ) : (
-                /* Desktop: Brand left, nav items + CTA right */
-                <>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      cursor: 'pointer',
-                      gap: 1.5,
-                    }}
-                    onClick={() => handleNavigate('/')}
-                  >
-                    <BrandIcon />
-                    <BrandText>GLUSTACK</BrandText>
-                  </Box>
-                  <Box flex={1} />
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    {navItems.map(({ label, path, icon }) => (
-                      <DesktopNavButton
-                        key={label}
-                        startIcon={icon}
-                        active={router.pathname === path}
-                        onClick={() => handleNavigate(path)}
-                      >
-                        {label}
-                      </DesktopNavButton>
-                    ))}
-                    <CTAButton onClick={() => alert('CTA clicked!')}>
-                      Free Architecture Review
-                    </CTAButton>
-                  </Box>
-                </>
-              )}
-            </Toolbar>
-          </Container>
-        </PremiumAppBar>
-      </Slide>
+                    {item.label}
+                  </NavButton>
+                ))}
+                <CTALuxButton onClick={() => router.push('/contact')}>
+                  Schedule Consultation
+                </CTALuxButton>
+              </Box>
+            )}
 
-      {/* Fullscreen Mobile Nav Overlay */}
-      <MobileNavOverlay open={mobileOpen}>
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 20,
-            right: 20,
-          }}
-        >
+            {isMobile && (
+              <IconButton
+                onClick={handleNavToggle}
+                sx={{ color: LIGHT_ACCENT, ml: 'auto' }}
+              >
+                <MenuIcon fontSize="large" />
+              </IconButton>
+            )}
+          </Toolbar>
+        </Container>
+      </LuxAppBar>
+
+      {/* Spacer for content separation */}
+      <Box sx={{ 
+        height: { xs: '88px', md: '88px' },
+        background: `linear-gradient(${PRIMARY_DARK} 20%, transparent)`,
+        opacity: 0.6
+      }} />
+
+      <MobileNavPanel open={mobileOpen}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <IconButton
             onClick={handleNavToggle}
-            sx={{
-              color: PLATINUM,
-              backgroundColor: alpha(PLATINUM, 0.05),
-              '&:hover': {
-                backgroundColor: alpha(PLATINUM, 0.15),
-              },
-            }}
+            sx={{ color: LIGHT_ACCENT }}
           >
-            <CloseIcon />
+            <CloseIcon fontSize="large" />
           </IconButton>
         </Box>
-
-        {/* Mobile Nav Items */}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            mt: 4,
-            gap: 3,
-          }}
-        >
-          {navItems.map(({ label, path, icon }) => (
-            <MobileNavItem
-              key={label}
-              onClick={() => handleNavigate(path)}
-              startIcon={icon}
+        
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          {navItems.map((item) => (
+            <Button
+              key={item.path}
+              onClick={() => handleNavigate(item.path)}
+              sx={{
+                fontSize: '2rem',
+                color: LIGHT_ACCENT,
+                py: 2,
+                textAlign: 'left',
+                '&:hover': {
+                  background: alpha(LIGHT_ACCENT, 0.05)
+                }
+              }}
             >
-              {label}
-            </MobileNavItem>
+              {item.label}
+            </Button>
           ))}
-
-          <Button
-            variant="contained"
-            sx={{
-              mt: 3,
-              background: `linear-gradient(to right, ${GOLD_ACCENT}, ${alpha(PLATINUM, 0.6)})`,
-              color: DEEP_NAVY,
-              textTransform: 'none',
-              fontWeight: 700,
-              borderRadius: BORDER_RADIUS,
-              px: 3,
-              py: 1.2,
-              boxShadow: `0 4px 12px ${alpha(GOLD_ACCENT, 0.3)}`,
-              '&:hover': {
-                background: `linear-gradient(to right, ${alpha(GOLD_ACCENT, 0.9)}, ${alpha(PLATINUM, 0.7)})`,
-              },
-            }}
-            onClick={() => alert('CTA clicked!')}
-          >
-            Free Architecture Review
-          </Button>
+          <NavDivider />
+          <CTALuxButton sx={{ alignSelf: 'flex-start' }}>
+            Contact Us
+          </CTALuxButton>
         </Box>
-      </MobileNavOverlay>
+      </MobileNavPanel>
     </>
   );
 };
