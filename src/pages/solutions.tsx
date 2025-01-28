@@ -25,7 +25,8 @@ import NextLink from 'next/link';
 import {
   PRIMARY_DARK,
   SECONDARY_DARK,
-  BACKDROP_BLUR
+  BACKDROP_BLUR,
+  noiseSVG
 } from '../theme/branding';
 
 const Tilt = dynamic(
@@ -37,7 +38,7 @@ const Tilt = dynamic(
 );
 
 const PAGE_SIZE        = 9;
-const primaryGradient = 'linear-gradient(135deg, #4361EE 0%, #3A0CA3 100%)'
+const primaryGradient = 'linear-gradient(45deg, #4361EE 0%, #3A0CA3 100%)';
 
 const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
   position: 'relative',
@@ -291,7 +292,9 @@ const Solutions = () => {
         display: '-webkit-box',
         WebkitBoxOrient: 'vertical',
         overflow: 'hidden',
-        color: SECONDARY_DARK
+        color: SECONDARY_DARK,
+        background: `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
+        WebkitBackgroundClip: 'text',
       }}
     >
       {project.name}
@@ -330,15 +333,20 @@ const Solutions = () => {
       }}
     >
       {project.technologies.map((tech) => (
-        <Chip
-          key={tech}
-          label={tech}
-          size="small"
-          sx={{
-            background: alpha(PRIMARY_DARK, 0.15),
-            color: PRIMARY_DARK,
-          }}
-        />
+   <Chip
+   sx={{
+ background: `
+    linear-gradient(145deg, 
+      ${alpha(theme.palette.background.paper, 0.9)}, 
+      ${alpha(theme.palette.background.default, 0.95)}),
+    url("data:image/svg+xml;utf8,${noiseSVG}")
+  `,
+  '&:hover': {
+    borderColor: alpha(SECONDARY_DARK, 0.3),
+    boxShadow: `0 40px 80px -24px ${alpha(SECONDARY_DARK, 0.2)}`,
+  },
+   }}
+ />
       ))}
     </Box>
 
@@ -386,9 +394,9 @@ const Solutions = () => {
                   color: 'common.white',
                   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                   '&:hover': {
-                    transform: 'translateY(-4px)',
                     boxShadow: `0 8px 24px ${alpha(PRIMARY_DARK, 0.3)}`
-                  },
+                  }
+              
                 }}
               >
                 Request Solution Demo

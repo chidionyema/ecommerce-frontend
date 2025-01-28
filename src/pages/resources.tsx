@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import { 
   Box, 
   Typography, 
@@ -209,11 +209,11 @@ const Resources: React.FC = () => {
 
         <LazyMotion features={domAnimation}>
           <Grid container spacing={4}>
-            {resources.map((resource, index) => {
+          {resources.map((resource, index) => {
               const rotateX = useMotionValue(0);
               const rotateY = useMotionValue(0);
-              const zIndex = useMotionValue(1);
-              
+              const [cardZIndex, setCardZIndex] = useState(1);
+
               const handleCardMouseMove = (e: React.MouseEvent) => {
                 handleMouseMove(e);
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -223,9 +223,8 @@ const Resources: React.FC = () => {
                 const centerY = rect.height / 2;
                 rotateX.set((y - centerY) / 24);
                 rotateY.set(-(x - centerX) / 24);
-                zIndex.set(2);
+                setCardZIndex(2);
               };
-
               return (
                 <Grid item xs={12} md={4} key={resource.id}>
                   <LazyResourceCard
@@ -236,9 +235,9 @@ const Resources: React.FC = () => {
                     onMouseLeave={() => {
                       rotateX.set(0);
                       rotateY.set(0);
-                      zIndex.set(1);
+                      setCardZIndex(1);
                     }}
-                    style={{ rotateX, rotateY, zIndex }}
+                    style={{ rotateX, rotateY, zIndex: cardZIndex }}
                   >
                     <Box sx={{ 
                       mb: 4, 

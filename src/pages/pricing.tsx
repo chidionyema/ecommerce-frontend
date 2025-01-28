@@ -91,6 +91,7 @@ const LazyPricingCard = styled(motion(Box))(({ theme }) => ({
   }
 }));
 
+const primaryGradient = 'linear-gradient(45deg, #4361EE 0%, #3A0CA3 100%)';
 const PricingGrid = () => {
   const theme = useTheme();
   const router = useRouter();
@@ -100,7 +101,9 @@ const PricingGrid = () => {
     { 
       type: 'hourly',
       title: 'Expert Consultation',
-      gradient: `linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.1)}, ${alpha(SECONDARY_DARK, 0.08)})`,
+      gradient: `linear-gradient(135deg, 
+      ${alpha(PRIMARY_DARK, 0.08)}, 
+      ${alpha(SECONDARY_DARK, 0.05)})`,
       features: [
         { icon: Clock, text: 'Flexible hourly consulting' },
         { icon: Award, text: 'Expert technical guidance' },
@@ -111,7 +114,9 @@ const PricingGrid = () => {
     { 
       type: 'project',
       title: 'Managed Solutions',
-      gradient: `linear-gradient(135deg, ${alpha(SECONDARY_DARK, 0.1)}, ${alpha(PRIMARY_DARK, 0.08)})`,
+      gradient: `linear-gradient(135deg, 
+      ${alpha(SECONDARY_DARK, 0.08)}, 
+      ${alpha(PRIMARY_DARK, 0.05)})`,
       features: [
         { icon: Briefcase, text: 'End-to-end project management' },
         { icon: Users, text: 'Dedicated engineering team' },
@@ -122,7 +127,9 @@ const PricingGrid = () => {
     { 
       type: 'retainer',
       title: 'Strategic Partnership',
-      gradient: `linear-gradient(135deg, ${alpha(LIGHT_ACCENT, 0.1)}, ${alpha(SECONDARY_DARK, 0.08)})`,
+      gradient: `linear-gradient(135deg, 
+      ${alpha(PRIMARY_DARK, 0.08)}, 
+      ${alpha(SECONDARY_DARK, 0.05)})`, 
       features: [
         { icon: Users, text: '24/7 technical support' },
         { icon: Award, text: 'Strategic technology roadmap' },
@@ -305,22 +312,15 @@ const PricingGrid = () => {
                         height: 56,
                         position: 'relative',
                         overflow: 'hidden',
-                        background: `
-                          linear-gradient(90deg, 
-                            ${PRIMARY_DARK}, 
-                            ${SECONDARY_DARK})`,
+                        background: primaryGradient,
                         borderRadius: '14px',
                         fontWeight: 800,
                         fontSize: '1.1rem',
                         letterSpacing: '-0.01em',
                         transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                        '&:hover': {
-                          transform: 'translateY(-3px)',
-                          boxShadow: `0 12px 24px ${alpha(SECONDARY_DARK, 0.3)}`,
-                          '&::after': {
-                            animation: `${shine} 1.2s ease`,
+                      '&:hover': {
+                      boxShadow: `0 8px 24px ${alpha(PRIMARY_DARK, 0.3)}`
                           }
-                        }
                       }}
                     >
                       <Box sx={{
