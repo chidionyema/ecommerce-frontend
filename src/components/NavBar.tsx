@@ -1,11 +1,14 @@
 import React, { useState, useCallback, memo, useEffect } from "react";
 import { useRouter } from "next/router";
+import Link from 'next/link';
 import {
   AppBar,
   Toolbar,
   Typography,
   Button,
+  ButtonProps,
   Box,
+  BoxProps,
   Container,
   alpha,
   IconButton,
@@ -14,7 +17,7 @@ import {
   useTheme,
   Stack,
 } from "@mui/material";
-import { styled, keyframes } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import CodeIcon from "@mui/icons-material/Code";
 import {
   Menu as MenuIcon,
@@ -27,6 +30,7 @@ import {
   Whatshot as WhatshotIcon,
 } from "@mui/icons-material";
 
+// *** IMPORTANT: Replace these with your actual paths and branding ***
 import {
   PRIMARY_DARK,
   SECONDARY_DARK,
@@ -35,19 +39,18 @@ import {
   BACKDROP_BLUR,
   BORDER_RADIUS,
   microShine,
-} from "../theme/branding";
+} from "../theme/branding"; // Your actual path
 
 const useSeatsLeft = (initialSeats = 5) => {
   const [seatsLeft, setSeatsLeft] = useState(initialSeats);
   useEffect(() => {
     const interval = setInterval(() => {
-      setSeatsLeft((prev) => Math.max(1, prev - 1));
+      setSeatsLeft(prev => Math.max(1, prev - 1));
     }, 70000);
     return () => clearInterval(interval);
-  },);
+  },); // <-- Empty dependency array here
   return seatsLeft;
 };
-
 const LuxAppBar = styled(AppBar)(({ theme }) => ({
   position: "fixed",
   background: alpha(PRIMARY_DARK, 0.92),
@@ -59,7 +62,7 @@ const LuxAppBar = styled(AppBar)(({ theme }) => ({
   minHeight: 120,
   borderRadius: BORDER_RADIUS,
   margin: "12px",
-  padding: theme.spacing(2, 3), // Add padding
+  padding: theme.spacing(2, 3),
   marginBottom: theme.spacing(4),
   width: "calc(100% - 24px)",
   [theme.breakpoints.down("sm")]: {
@@ -113,33 +116,37 @@ const LuxBadge = styled(Box)({
   },
 });
 
-const NavButton = styled(Button)<{ active?: boolean }>(
-  ({ theme, active }) => ({
-    position: "relative",
-    color: active? LIGHT_ACCENT: alpha(LIGHT_ACCENT, 0.8),
-    fontWeight: 600,
-    fontSize: "0.875rem",
-    letterSpacing: "0.8px",
-    padding: "8px 16px",
-    transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-    "&:after": {
-      content: '""',
-      position: "absolute",
-      bottom: "12px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: active? "32px": "0px",
-      height: "2px",
-      background: TECH_GRADIENT,
-      transition: "width 0.4s ease",
-    },
-    "&:hover": {
-      color: LIGHT_ACCENT,
-      transform: "translateY(-2px)",
-      "&:after": { width: "60%" },
-    },
-  }),
-);
+interface NavButtonProps extends ButtonProps {
+  active?: boolean; 
+}
+
+const NavButton = styled(Button)<NavButtonProps>(({ theme, active }) => ({
+
+  color: active? LIGHT_ACCENT: alpha(LIGHT_ACCENT, 0.8),
+  position: "relative",
+
+  fontWeight: 600,
+  fontSize: "0.875rem",
+  letterSpacing: "0.8px",
+  padding: "8px 16px",
+  transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+  "&:after": {
+    content: '""',
+    position: "absolute",
+    bottom: "12px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: active? "32px": "0px",
+    height: "2px",
+    background: TECH_GRADIENT,
+    transition: "width 0.4s ease",
+  },
+  "&:hover": {
+    color: LIGHT_ACCENT,
+    transform: "translateY(-2px)",
+    "&:after": { width: "60%" },
+  },
+}));
 
 const CTALuxButton = styled(Button)(({ theme }) => ({
   background: TECH_GRADIENT,
@@ -170,25 +177,25 @@ const CTALuxButton = styled(Button)(({ theme }) => ({
     boxShadow: `0 12px 48px ${alpha("#4361EE", 0.4)}`,
   },
 }));
-
-const MobileNavPanel = styled(Box)<{ open?: boolean }>(
-  ({ theme, open }) => ({
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: alpha(PRIMARY_DARK, 0.96),
-    backdropFilter: BACKDROP_BLUR,
-    zIndex: 2000,
-    display: "flex",
-    flexDirection: "column",
-    padding: theme.spacing(4),
-    opacity: open? 1: 0,
-    visibility: open? "visible": "hidden",
-    transition: "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
-  }),
-);
+interface MobileNavPanelProps extends BoxProps {
+  open?: boolean; 
+}
+const MobileNavPanel = styled(Box)<MobileNavPanelProps>(({ theme, open }) => ({
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  background: alpha(PRIMARY_DARK, 0.96),
+  backdropFilter: BACKDROP_BLUR,
+  zIndex: 2000,
+  display: "flex",
+  flexDirection: "column",
+  padding: theme.spacing(4),
+  opacity: open? 1: 0,
+  visibility: open? "visible": "hidden",
+  transition: "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+}));
 
 const PremiumBadge = styled(Box)(({ theme }) => ({
   display: "inline-flex",
@@ -237,7 +244,7 @@ const ScarcityBadge = styled(Box)(({ theme }) => ({
   },
 }));
 
-const NavBar: React.FC = () => {
+const NavBar = memo(() => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -252,14 +259,7 @@ const NavBar: React.FC = () => {
     { label: "Contact", path: "/contact", icon: <ContactMailIcon /> },
   ];
 
-  const handleNavToggle = useCallback(() => setMobileOpen((prev) =>!prev),);
-  const handleNavigate = useCallback(
-    (path: string) => {
-      setMobileOpen(false);
-      router.push(path);
-    },
-    [router],
-  );
+  const handleNavToggle = useCallback(() => setMobileOpen(prev =>!prev),);
 
   return (
     <>
@@ -268,41 +268,37 @@ const NavBar: React.FC = () => {
           <Toolbar
             sx={{
               minHeight: 100,
-              justifyContent: "space-around", // Distribute space around
-              gap: 1, // Reduced gap for a tighter layout
+              justifyContent: "space-around",
+              gap: 1,
               flexWrap: "nowrap",
               position: "relative",
             }}
           >
-            <BrandContainer onClick={() => handleNavigate("/")}>
-              <CodeIcon
-                sx={{
-                  fontSize: 40,
-                  color: LIGHT_ACCENT,
-                  transform: "rotate(45deg)",
-                }}
-              />
-              <Box>
-                <Typography
-                  variant="h1"
-                  sx={{
-                    fontFamily: "'Barlow', sans-serif",
-                    fontSize: { xs: "1.8rem", sm: "2rem", md: "2.2rem" },
-                    fontWeight: 800,
-                    letterSpacing: "-0.5px",
-                    background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`,
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  GLUStack
-                </Typography>
-                <LuxBadge>
-                  <CodeIcon sx={{ fontSize: 14, mr: 1 }} />
-                  ENGINEERING
-                </LuxBadge>
-              </Box>
-            </BrandContainer>
+            <Link href="/" passHref legacyBehavior>
+              <BrandContainer as="a">
+                <CodeIcon sx={{ fontSize: 40, color: LIGHT_ACCENT, transform: "rotate(45deg)" }} />
+                <Box>
+                  <Typography
+                    variant="h1"
+                    sx={{
+                      fontFamily: "'Barlow', sans-serif",
+                      fontSize: { xs: "1.8rem", sm: "2rem", md: "2.2rem" },
+                      fontWeight: 800,
+                      letterSpacing: "-0.5px",
+                      background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`,
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                  >
+                    GLUStack
+                  </Typography>
+                  <LuxBadge>
+                    <CodeIcon sx={{ fontSize: 14, mr: 1 }} />
+                    ENGINEERING
+                  </LuxBadge>
+                </Box>
+              </BrandContainer>
+            </Link>
 
             {!isMobile && (
               <Box
@@ -318,13 +314,11 @@ const NavBar: React.FC = () => {
                 }}
               >
                 {navItems.map((item) => (
-                  <NavButton
-                    key={item.path}
-                    active={router.pathname === item.path}
-                    onClick={() => handleNavigate(item.path)}
-                  >
-                    {item.label}
-                  </NavButton>
+                  <Link href={item.path} key={item.path} passHref legacyBehavior>
+                    <NavButton as="a" active={router.pathname === item.path}>
+                      {item.label}
+                    </NavButton>
+                  </Link>
                 ))}
               </Box>
             )}
@@ -342,28 +336,17 @@ const NavBar: React.FC = () => {
                   background: alpha(PRIMARY_DARK, 0.3),
                 }}
               >
-                <CTALuxButton
-                  onClick={() => router.push("/contact")}
-                  sx={{
-                    px: 2,
-                    flexShrink: 0,
-                    height: "36px", //Match the other badges height
-                    fontSize: "0.875rem", // Match the other badges fontSize
-                    padding: "8px 16px",
-                    width: "160px", // Match the other badges padding
-                  }}
-                >
-                  Book Now
-                </CTALuxButton>
-                <PremiumBadge
-                  onClick={() =>
-                    router.push("/contact?offer=cloudAssess")
-                  }
-                >
-                  <AssessmentIcon sx={{ fontSize: 14 }} />
-                  Free Stack Review
-                </PremiumBadge>
-
+                <Link href="/contact" passHref legacyBehavior>
+                  <CTALuxButton as="a" sx={{ px: 2, flexShrink: 0, height: "36px", fontSize: "0.875rem", padding: "8px 16px", width: "160px" }}>
+                    Book Now
+                  </CTALuxButton>
+                </Link>
+                <Link href="/contact?offer=cloudAssess" passHref legacyBehavior>
+                  <PremiumBadge as="a">
+                    <AssessmentIcon sx={{ fontSize: 14 }} />
+                    Free Stack Review
+                  </PremiumBadge>
+                </Link>
                 <ScarcityBadge>
                   <WhatshotIcon sx={{ fontSize: 14 }} />
                   {seatsLeft} SLOTS LEFT
@@ -372,10 +355,7 @@ const NavBar: React.FC = () => {
             )}
 
             {isMobile && (
-              <IconButton
-                onClick={handleNavToggle}
-                sx={{ color: LIGHT_ACCENT }}
-              >
+              <IconButton onClick={handleNavToggle} sx={{ color: LIGHT_ACCENT }}>
                 <MenuIcon fontSize="large" />
               </IconButton>
             )}
@@ -395,10 +375,7 @@ const NavBar: React.FC = () => {
 
       <MobileNavPanel open={mobileOpen}>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <IconButton
-            onClick={handleNavToggle}
-            sx={{ color: LIGHT_ACCENT }}
-          >
+          <IconButton onClick={handleNavToggle} sx={{ color: LIGHT_ACCENT }}>
             <CloseIcon fontSize="large" />
           </IconButton>
         </Box>
@@ -415,34 +392,32 @@ const NavBar: React.FC = () => {
           }}
         >
           <Stack direction="column" spacing={1} sx={{ width: "100%", mb: 2 }}>
-            <PremiumBadge
-              sx={{ justifyContent: "center", width: "100%" }}
-            >
+            <PremiumBadge sx={{ justifyContent: "center", width: "100%" }}>
               <AssessmentIcon sx={{ fontSize: 14 }} />
               Free Cloud Assessment
             </PremiumBadge>
 
-            <ScarcityBadge
-              sx={{ justifyContent: "center", width: "100%" }}
-            >
+            <ScarcityBadge sx={{ justifyContent: "center", width: "100%" }}>
               <WhatshotIcon sx={{ fontSize: 14 }} />
               {seatsLeft} SLOTS LEFT
             </ScarcityBadge>
           </Stack>
 
           {navItems.map((item) => (
-            <Button
-              key={item.path}
-              onClick={() => handleNavigate(item.path)}
-              sx={{
-                fontSize: "1.6rem",
-                color: LIGHT_ACCENT,
-                py: 3,
-                "&:hover": { background: alpha(LIGHT_ACCENT, 0.05) },
-              }}
-            >
-              {item.label}
-            </Button>
+            <Link href={item.path} key={item.path} passHref legacyBehavior>
+              <Button
+                as="a"
+                onClick={handleNavToggle}
+                sx={{
+                  fontSize: "1.6rem",
+                  color: LIGHT_ACCENT,
+                  py: 3,
+                  "&:hover": { background: alpha(LIGHT_ACCENT, 0.05) },
+                }}
+              >
+                {item.label}
+              </Button>
+            </Link>
           ))}
 
           <Divider sx={{ borderColor: alpha(LIGHT_ACCENT, 0.1), my: 3 }} />
@@ -450,6 +425,6 @@ const NavBar: React.FC = () => {
       </MobileNavPanel>
     </>
   );
-};
+});
 
-export default memo(NavBar);
+export default NavBar;

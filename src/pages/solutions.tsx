@@ -324,7 +324,7 @@ const Solutions = () => {
                           justifyContent: 'flex-end', 
                           position: 'relative' // Add relative positioning to the Box
                         }}>
-                      <IconButton sx={{ 
+                    <IconButton sx={{ 
                         position: 'relative', 
                         '&::before': {  
                           content: '""',
@@ -333,11 +333,15 @@ const Solutions = () => {
                           left: 0,
                           width: '100%',
                           height: '100%',
-                          background: TITLE_GRADIENT,
-                          WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
-                          mask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
-                          WebkitMaskComposite: 'source-over', // Change to source-over
-                          maskComposite: 'source-over', // Change to source-over
+                          // The key change is to apply the gradient as the mask-image
+                          WebkitMaskImage: TITLE_GRADIENT, // Use gradient as mask
+                          maskImage: TITLE_GRADIENT,       // Use gradient as mask
+                          WebkitMaskSize: '100% 100%',
+                          maskSize: '100% 100%',
+                          WebkitMaskRepeat: 'no-repeat',
+                          maskRepeat: 'no-repeat',
+                           backgroundColor: 'transparent'
+                 
                         }
                       }}> 
                         <ArrowForwardIcon />
