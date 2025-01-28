@@ -33,12 +33,13 @@ import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Brand color constants
-const PRIMARY_DARK = '#0A1A2F';
-const SECONDARY_DARK = '#532F73';
-const GOLD_ACCENT = '#C5A46D';
-const LIGHT_ACCENT = '#F2E7FE';
-const PAGE_BG = '#F9FAFD';
+
+import {
+  PRIMARY_DARK,
+  SECONDARY_DARK,
+  PAGE_BG,
+  GOLD_ACCENT
+} from '../../theme/branding';
 
 const FloatingParticle = styled(motion.div)(({ theme }) => ({
   position: 'absolute',

@@ -22,6 +22,12 @@ import { cvProjects, type CVProject } from '../data/cvProjects';
 import SEO from '../components/SEO';
 import NextLink from 'next/link';
 
+import {
+  PRIMARY_DARK,
+  SECONDARY_DARK,
+  BACKDROP_BLUR
+} from '../theme/branding';
+
 const Tilt = dynamic(
   () => import('react-parallax-tilt').then((mod) => mod.default),
   {
@@ -30,14 +36,7 @@ const Tilt = dynamic(
   }
 );
 
-// Use the same brand colors as NavBar:
-const PRIMARY_DARK     = '#0A1A2F';
-const SECONDARY_DARK   = '#1A2F4B';           // replaced #532F73
-          // replaced #F2E7FE
-const BACKDROP_BLUR    = 'blur(28px)';
 const PAGE_SIZE        = 9;
-
-
 const primaryGradient = 'linear-gradient(135deg, #4361EE 0%, #3A0CA3 100%)'
 
 const PremiumCardContainer = styled(motion.div)(({ theme }) => ({

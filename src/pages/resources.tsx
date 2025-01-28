@@ -12,34 +12,22 @@ import {
 import { motion, LazyMotion, domAnimation, useMotionValue, useTransform } from 'framer-motion';
 import { Cloud, VpnKey, Code } from '@mui/icons-material';
 import NextLink from 'next/link';
-import { keyframes } from '@emotion/react';
 import { styled } from '@mui/material/styles'; 
 import SEO from '../components/SEO';
 
 // NEW (aligned with NavBar)
-const PRIMARY_DARK    = '#0A1A2F';
-const SECONDARY_DARK  = '#1A2F4B';
-const LIGHT_ACCENT    = '#F5F9FF';
-const BACKDROP_BLUR   = 'blur(28px)';
+import {
+  PRIMARY_DARK,
+  SECONDARY_DARK,
+  BACKDROP_BLUR,
+  gradientShift,
+  noiseSVG,
+} from '../theme/branding';
+
 
 // You can keep a “title gradient” but use the same brand colors:
 const TITLE_GRADIENT  = 'linear-gradient(45deg, #4361EE 0%, #3A0CA3 100%)';
 
-
-const noiseSVG = encodeURIComponent(`
-  <svg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'>
-    <filter id='n'>
-      <feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/>
-    </filter>
-    <rect width='100%' height='100%' filter='url(#n)'/>
-  </svg>
-`);
-
-const gradientShift = keyframes`
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-`;
 
 const LazyResourceCard = styled(motion(Box))(({ theme }) => ({
   position: 'relative',

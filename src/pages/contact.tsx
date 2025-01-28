@@ -17,13 +17,15 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { Code, Send, AccountCircle, Email, Phone, Description, FlashOn, WorkspacePremium, CorporateFare } from '@mui/icons-material';
 
-// Shared brand tokens from navigation
-const PRIMARY_DARK = '#0A1A2F';
-const SECONDARY_DARK = '#1A2F4B';
-const LIGHT_ACCENT = '#F5F9FF';
-const TECH_GRADIENT = 'linear-gradient(135deg, #4361EE 0%, #3A0CA3 100%)';
-const BACKDROP_BLUR = 'blur(32px)';
-const BORDER_RADIUS = '16px';
+import {
+  PRIMARY_DARK,
+  SECONDARY_DARK,
+  LIGHT_ACCENT,
+  TECH_GRADIENT,
+  BACKDROP_BLUR,
+  BORDER_RADIUS,
+} from '../theme/branding';
+
 
 const planTitles: Record<string, string> = {
   hourly: 'Priority Hourly Consult',

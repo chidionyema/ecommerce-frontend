@@ -26,6 +26,17 @@ import {
   Whatshot as WhatshotIcon,
 } from '@mui/icons-material';
 
+import {
+  PRIMARY_DARK,
+  SECONDARY_DARK,
+  LIGHT_ACCENT,
+  TECH_GRADIENT,
+  BACKDROP_BLUR,
+  BORDER_RADIUS,
+  microShine,
+} from '../theme/branding';
+
+
 /* --------------------------------------------------------------------------
  *  HOOKS: "SLOTS LEFT" logic
  * -------------------------------------------------------------------------- */
@@ -40,23 +51,7 @@ const useSeatsLeft = (initialSeats = 5) => {
   return seatsLeft;
 };
 
-/* --------------------------------------------------------------------------
- *  COLOR/THEME TOKENS
- * -------------------------------------------------------------------------- */
-const PRIMARY_DARK = '#0A1A2F';
-const SECONDARY_DARK = '#1A2F4B';
-const LIGHT_ACCENT = '#F5F9FF';
-const TECH_GRADIENT = 'linear-gradient(135deg, #4361EE 0%, #3A0CA3 100%)';
-const BACKDROP_BLUR = 'blur(32px)';
-const BORDER_RADIUS = '16px';
 
-/* --------------------------------------------------------------------------
- *  ANIMATIONS
- * -------------------------------------------------------------------------- */
-const microShine = keyframes`
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-`;
 
 /* --------------------------------------------------------------------------
  *  STYLED COMPONENTS

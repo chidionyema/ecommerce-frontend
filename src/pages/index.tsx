@@ -28,6 +28,14 @@ import {
   FaLinux,
 } from 'react-icons/fa';
 
+
+import {
+  PRIMARY_DARK,
+  SECONDARY_DARK,
+  LIGHT_ACCENT,
+  PAGE_BG,
+} from '../theme/branding';
+
 /* -----------------------------------------------------------------------------
  * Global Styles & Animations
  ----------------------------------------------------------------------------- */
@@ -49,13 +57,7 @@ const globalStyles = `
   }
 `;
 
-/* -----------------------------------------------------------------------------
- * Color Variables
- ----------------------------------------------------------------------------- */
-const PAGE_BG = '#F9FAFD';
-const PRIMARY_DARK = '#0A1A2F';
-const SECONDARY_DARK = '#532F73';
-const LIGHT_ACCENT = '#F2E7FE';
+
 
 /* -----------------------------------------------------------------------------
  * Tech Icons
@@ -113,6 +115,7 @@ const PersuasiveButton = styled(motion(Button))(({ theme }) => ({
     boxShadow: `0 12px 24px ${alpha(theme.palette.primary.main, 0.2)}`,
   },
 }));
+
 
 /* -----------------------------------------------------------------------------
  * Hero Section
