@@ -17,16 +17,6 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { Code, Send, AccountCircle, Email, Phone, Description, FlashOn, WorkspacePremium, CorporateFare } from '@mui/icons-material';
 
-import {
-  PRIMARY_DARK,
-  SECONDARY_DARK,
-  LIGHT_ACCENT,
-  TECH_GRADIENT,
-  BACKDROP_BLUR,
-  BORDER_RADIUS,
-} from '../theme/branding';
-
-
 const planTitles: Record<string, string> = {
   hourly: 'Priority Hourly Consult',
   project: 'Tailored Project Partnership',
@@ -76,7 +66,7 @@ const Contact: React.FC = () => {
     setLoading(true);
     setError('');
     setSuccess(false);
-  
+
     try {
       // Submission logic remains same
     } catch (err) {
@@ -88,15 +78,21 @@ const Contact: React.FC = () => {
 
   return (
     <Container
-      maxWidth="lg"
+      maxWidth="lg" // Changed from md to lg for wider container
       sx={{
-        py: 10,
+        py: { xs: 8, md: 12 }, // Increased padding
         position: 'relative',
         overflow: 'hidden',
-        background: '#f8fafc', // Light background color
+        background: '#f8fafc',
       }}
     >
-      <Grid container spacing={6} component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <Grid 
+        container 
+        spacing={{ xs: 4, md: 8 }} // Increased spacing
+        component={motion.div} 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }}
+      >
         <Grid item xs={12} md={6}>
           <motion.div
             initial={{ y: 100, opacity: 0 }}
@@ -106,24 +102,24 @@ const Contact: React.FC = () => {
             <Box sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 3,
-              mb: 6,
-              padding: 3,
+              gap: 4, // Increased gap
+              mb: { xs: 6, md: 8 }, // Increased margin
+              padding: { xs: 3, md: 4 }, // Increased padding
               background: 'white',
-              borderRadius: BORDER_RADIUS,
+              borderRadius: theme.shape.borderRadius,
               border: '1px solid #e2e8f0',
               boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
             }}>
-              {planIcons[router.query.plan as string] || <Code sx={{ fontSize: 40, color: PRIMARY_DARK }} />}
+              {planIcons[router.query.plan as string] || <Code sx={{ fontSize: 48, color: theme.palette.primary.dark }} />} {/* Larger icon */}
               <Typography
                 variant="h2"
                 sx={{
                   fontWeight: 800,
-                  fontSize: isMobile ? '2rem' : '3rem',
+                  fontSize: { xs: '2rem', md: '3rem' }, // Larger font size
                   lineHeight: 1.1,
                   color: '#1e293b',
                   fontFamily: "'Barlow', sans-serif",
-                  letterSpacing: '-0.5px',
+                  letterSpacing: '-1px', // Increased letter spacing
                 }}
               >
                 {planTitles[router.query.plan as string] || "Architecting Digital Excellence"}
@@ -133,13 +129,13 @@ const Contact: React.FC = () => {
             <Typography
               variant="body1"
               sx={{
-                mb: 4,
-                fontSize: '1.1rem',
+                mb: 6, // Increased margin
+                fontSize: { xs: '1.1rem', md: '1.25rem' }, // Larger font size
                 color: '#475569',
                 lineHeight: 1.8,
-                padding: 3,
+                padding: { xs: 3, md: 4 }, // Increased padding
                 background: 'white',
-                borderRadius: BORDER_RADIUS,
+                borderRadius: theme.shape.borderRadius,
                 border: '1px solid #e2e8f0',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
               }}
@@ -161,21 +157,35 @@ const Contact: React.FC = () => {
             <motion.div
               style={{
                 background: 'white',
-                borderRadius: BORDER_RADIUS,
-                padding: '2.5rem',
+                borderRadius: theme.shape.borderRadius,
+                padding: theme.spacing(4), // Increased padding
                 border: '1px solid #e2e8f0',
                 boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)',
               }}
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ scale: isMobile ? 1 : 1.02 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
-              <Grid container spacing={3}>
-                {/* Error and Success alerts remain the same */}
+              <Grid container spacing={3}> {/* Increased spacing */}
+                {error && (
+                  <Grid item xs={12}>
+                    <Alert severity="error" sx={{ mb: 3, fontSize: '1rem' }}> {/* Larger alert */}
+                      {error}
+                    </Alert>
+                  </Grid>
+                )}
+
+                {success && (
+                  <Grid item xs={12}>
+                    <Alert severity="success" sx={{ mb: 3, fontSize: '1rem' }}> {/* Larger alert */}
+                      Message sent successfully!
+                    </Alert>
+                  </Grid>
+                )}
 
                 {[
-                  { field: 'name', icon: <AccountCircle /> },
-                  { field: 'email', icon: <Email /> },
-                  { field: 'phone', icon: <Phone /> },
+                  { field: 'name', icon: <AccountCircle fontSize="medium" /> }, // Larger icon
+                  { field: 'email', icon: <Email fontSize="medium" /> },
+                  { field: 'phone', icon: <Phone fontSize="medium" /> },
                 ].map(({ field, icon }) => (
                   <Grid item xs={12} key={field}>
                     <TextField
@@ -188,21 +198,26 @@ const Contact: React.FC = () => {
                       disabled={loading}
                       InputProps={{
                         startAdornment: (
-                          <InputAdornment position="start" sx={{ color: PRIMARY_DARK }}>
+                          <InputAdornment position="start" sx={{ color: theme.palette.primary.dark }}>
                             {icon}
                           </InputAdornment>
                         ),
                         sx: {
-                          borderRadius: BORDER_RADIUS,
+                          borderRadius: theme.shape.borderRadius,
                           color: '#1e293b',
+                          '& .MuiOutlinedInput-input': {
+                            fontSize: '1.1rem', // Larger input text
+                            padding: '16px 20px' // Increased padding
+                          },
+                          '& .MuiInputLabel-root': {
+                            fontSize: '1.1rem', // Larger label
+                            transform: 'translate(14px, 18px) scale(1)', // Adjusted label position
+                          },
                           '& .MuiOutlinedInput-notchedOutline': {
                             borderColor: '#cbd5e1',
                           },
                           '&:hover .MuiOutlinedInput-notchedOutline': {
-                            borderColor: PRIMARY_DARK,
-                          },
-                          '& .MuiInputLabel-root': {
-                            color: '#64748b',
+                            borderColor: theme.palette.primary.dark,
                           },
                           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         },
@@ -215,7 +230,7 @@ const Contact: React.FC = () => {
                   <TextField
                     fullWidth
                     multiline
-                    rows={5}
+                    rows={isMobile ? 4 : 6} // More rows
                     variant="outlined"
                     label="Strategic Vision"
                     name="message"
@@ -224,46 +239,63 @@ const Contact: React.FC = () => {
                     disabled={loading}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start" sx={{ color: PRIMARY_DARK, mt: 1.5 }}>
-                          <Description />
+                        <InputAdornment 
+                          position="start" 
+                          sx={{ 
+                            color: theme.palette.primary.dark,
+                            alignItems: 'flex-start',
+                            mt: isMobile ? 1 : 2
+                          }}
+                        >
+                          <Description fontSize="medium" /> {/* Larger icon */}
                         </InputAdornment>
                       ),
                       sx: {
-                        borderRadius: BORDER_RADIUS,
+                        borderRadius: theme.shape.borderRadius,
                         color: '#1e293b',
+                        '& .MuiOutlinedInput-input': {
+                          fontSize: '1.1rem', // Larger text
+                          padding: '16px 20px' // Increased padding
+                        },
+                        '& .MuiInputLabel-root': {
+                          fontSize: '1.1rem', // Larger label
+                          transform: 'translate(14px, 18px) scale(1)',
+                        },
                         '& .MuiOutlinedInput-notchedOutline': {
                           borderColor: '#cbd5e1',
                         },
                         '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: PRIMARY_DARK,
+                          borderColor: theme.palette.primary.dark,
                         },
                       },
                     }}
                   />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid item xs={12} sx={{ mt: 2 }}>
                   <Button
                     type="submit"
                     variant="contained"
                     fullWidth
                     disabled={loading}
-                    endIcon={!loading && <Send />}
+                    endIcon={!loading && <Send fontSize="medium" />} // Larger icon
                     sx={{
-                      py: 2,
-                      borderRadius: BORDER_RADIUS,
-                      background: TECH_GRADIENT,
+                      py: { xs: 2, md: 2.5 }, // Taller button
+                      borderRadius: theme.shape.borderRadius,
+                      background: theme.palette.primary.main,
                       fontWeight: 700,
                       letterSpacing: '1px',
+                      fontSize: { xs: '1.1rem', md: '1.2rem' }, // Larger text
                       color: 'white',
                       '&:hover': {
                         transform: 'translateY(-2px)',
-                        boxShadow: `0 8px 32px ${alpha(PRIMARY_DARK, 0.3)}`,
+                        boxShadow: `0 8px 32px ${alpha(theme.palette.primary.dark, 0.3)}`,
+                        background: theme.palette.primary.dark,
                       },
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
                   >
-                    {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Initiate Collaboration'}
+                    {loading ? <CircularProgress size={28} sx={{ color: 'white' }} /> : 'Initiate Collaboration'}
                   </Button>
                 </Grid>
               </Grid>

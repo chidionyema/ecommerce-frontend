@@ -12,9 +12,19 @@ import {
   Divider,
   Avatar,
   useTheme,
-  styled
+  styled,
+  alpha
 } from '@mui/material';
 import { motion } from 'framer-motion';
+import {
+  PRIMARY_DARK,
+  SECONDARY_DARK,
+  LIGHT_ACCENT,
+  TECH_GRADIENT,
+  BACKDROP_BLUR,
+  BORDER_RADIUS,
+  microShine,
+} from '../theme/branding';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -22,12 +32,14 @@ const HeroSection = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   textAlign: 'center',
-  color: theme.palette.common.white,
+  color: LIGHT_ACCENT,
   padding: theme.spacing(8),
-  minHeight: '60vh',
-  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+  minHeight: '80vh',
+  background: `linear-gradient(135deg, ${PRIMARY_DARK} 0%, ${SECONDARY_DARK} 100%)`,
   position: 'relative',
   overflow: 'hidden',
+  borderRadius: BORDER_RADIUS,
+  margin: theme.spacing(3),
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -36,40 +48,55 @@ const HeroSection = styled(Box)(({ theme }) => ({
     width: '100%',
     height: '100%',
     background: 'url(/grid-pattern.svg) repeat',
-    opacity: 0.1,
+    opacity: 0.05,
   },
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  padding: theme.spacing(1.5, 4),
-  borderRadius: '50px',
+  padding: theme.spacing(2, 6),
+  borderRadius: BORDER_RADIUS,
   fontWeight: 700,
-  transition: 'all 0.3s ease',
-  background: `linear-gradient(45deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
-  color: theme.palette.common.white,
+  letterSpacing: '1px',
+  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+  background: TECH_GRADIENT,
+  color: LIGHT_ACCENT,
+  position: 'relative',
+  overflow: 'hidden',
+  border: `1px solid ${alpha(LIGHT_ACCENT, 0.3)}`,
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    background: `linear-gradient(90deg, transparent, ${alpha(LIGHT_ACCENT, 0.1)}, transparent)`,
+    animation: `${microShine} 6s infinite linear`,
+  },
   '&:hover': {
     transform: 'translateY(-2px)',
-    boxShadow: theme.shadows[4],
+    boxShadow: `0 12px 48px ${alpha('#4361EE', 0.4)}`,
   },
 }));
 
 const SectionCard = styled(Card)(({ theme }) => ({
-  borderRadius: '16px',
-  transition: 'all 0.3s ease',
-  background: `linear-gradient(145deg, ${theme.palette.background.paper}, #f8f9fc)`,
+  borderRadius: BORDER_RADIUS,
+  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+  background: alpha(PRIMARY_DARK, 0.6),
+  backdropFilter: BACKDROP_BLUR,
+  border: `1px solid ${alpha(LIGHT_ACCENT, 0.1)}`,
   '&:hover': {
     transform: 'translateY(-8px)',
-    boxShadow: theme.shadows[6],
+    boxShadow: `0 24px 48px ${alpha(PRIMARY_DARK, 0.4)}`,
   },
 }));
 
 const TestimonialCard = styled(Card)(({ theme }) => ({
-  borderRadius: '16px',
-  background: `linear-gradient(145deg, ${theme.palette.background.paper}, #f8f9fc)`,
-  transition: 'all 0.3s ease',
+  borderRadius: BORDER_RADIUS,
+  background: alpha(PRIMARY_DARK, 0.6),
+  backdropFilter: BACKDROP_BLUR,
+  border: `1px solid ${alpha(LIGHT_ACCENT, 0.1)}`,
+  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
   '&:hover': {
     transform: 'translateY(-4px)',
-    boxShadow: theme.shadows[4],
+    boxShadow: `0 16px 32px ${alpha(PRIMARY_DARK, 0.3)}`,
   },
 }));
 
@@ -77,11 +104,10 @@ interface LayoutProps {
   children: React.ReactNode;
   showHeroSection?: boolean;
 }
-
 const Layout: React.FC<LayoutProps> = ({ children, showHeroSection = false }) => {
   const theme = useTheme();
   const [showAllTestimonials, setShowAllTestimonials] = useState(false);
-  
+
   const testimonials = [
     {
       id: 1,
@@ -156,11 +182,21 @@ const Layout: React.FC<LayoutProps> = ({ children, showHeroSection = false }) =>
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {showHeroSection && (
         <HeroSection>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Typography variant="h2" sx={{ fontWeight: 800, mb: 2 }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <Typography variant="h1" sx={{ 
+              fontWeight: 800, 
+              mb: 2,
+              background: TECH_GRADIENT,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
               Transform Your Business
             </Typography>
-            <Typography variant="h5" sx={{ mb: 4 }}>
+            <Typography variant="h5" sx={{ 
+              mb: 4,
+              color: alpha(LIGHT_ACCENT, 0.9),
+              fontWeight: 500
+            }}>
               Expert-led solutions for digital transformation
             </Typography>
             <StyledButton href="/consultation">
@@ -170,7 +206,7 @@ const Layout: React.FC<LayoutProps> = ({ children, showHeroSection = false }) =>
         </HeroSection>
       )}
 
-      <Container maxWidth="lg" component="main" sx={{ py: 8 }}>
+      <Container maxWidth="xl" component="main" sx={{ py: 8 }}>
         <Box sx={{ mb: 8 }}>{children}</Box>
 
         <Grid container spacing={4} sx={{ mb: 8 }}>
@@ -183,10 +219,17 @@ const Layout: React.FC<LayoutProps> = ({ children, showHeroSection = false }) =>
               >
                 <SectionCard>
                   <CardContent sx={{ textAlign: 'center', p: 4 }}>
-                    <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
+                    <Typography variant="h5" gutterBottom sx={{ 
+                      fontWeight: 700,
+                      color: LIGHT_ACCENT,
+                      mb: 3
+                    }}>
                       {service.title}
                     </Typography>
-                    <Typography variant="body1" sx={{ mb: 3 }}>
+                    <Typography variant="body1" sx={{ 
+                      mb: 3,
+                      color: alpha(LIGHT_ACCENT, 0.8)
+                    }}>
                       {service.content}
                     </Typography>
                     <Button
@@ -194,7 +237,12 @@ const Layout: React.FC<LayoutProps> = ({ children, showHeroSection = false }) =>
                       href={service.link}
                       sx={{
                         borderWidth: 2,
-                        '&:hover': { borderWidth: 2 }
+                        borderColor: alpha(LIGHT_ACCENT, 0.2),
+                        color: LIGHT_ACCENT,
+                        '&:hover': { 
+                          borderWidth: 2,
+                          borderColor: alpha(LIGHT_ACCENT, 0.4),
+                        }
                       }}
                     >
                       Learn More
@@ -206,8 +254,13 @@ const Layout: React.FC<LayoutProps> = ({ children, showHeroSection = false }) =>
           ))}
         </Grid>
 
+        {/* Testimonials section updated with brand styling */}
         <Box sx={{ textAlign: 'center', mb: 8 }}>
-          <Typography variant="h3" sx={{ fontWeight: 800, mb: 6 }}>
+          <Typography variant="h2" sx={{ 
+            fontWeight: 800, 
+            mb: 6,
+            color: LIGHT_ACCENT
+          }}>
             Client Success Stories
           </Typography>
           <Grid container spacing={4}>
@@ -223,16 +276,26 @@ const Layout: React.FC<LayoutProps> = ({ children, showHeroSection = false }) =>
                           height: 80,
                           mb: 3,
                           mx: 'auto',
-                          border: `2px solid ${theme.palette.primary.main}`
+                          border: `2px solid ${alpha(LIGHT_ACCENT, 0.3)}`,
+                          boxShadow: `0 0 24px ${alpha(LIGHT_ACCENT, 0.1)}`
                         }}
                       />
-                      <Typography variant="body1" sx={{ mb: 3, fontStyle: 'italic' }}>
+                      <Typography variant="body1" sx={{ 
+                        mb: 3, 
+                        fontStyle: 'italic',
+                        color: alpha(LIGHT_ACCENT, 0.9)
+                      }}>
                         "{testimonial.testimonial}"
                       </Typography>
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                      <Typography variant="h6" sx={{ 
+                        fontWeight: 700,
+                        color: LIGHT_ACCENT
+                      }}>
                         {testimonial.name}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{
+                        color: alpha(LIGHT_ACCENT, 0.7)
+                      }}>
                         {testimonial.role}
                       </Typography>
                     </CardContent>

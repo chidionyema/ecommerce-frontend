@@ -36,10 +36,6 @@ import {
   microShine,
 } from '../theme/branding';
 
-
-/* --------------------------------------------------------------------------
- *  HOOKS: "SLOTS LEFT" logic
- * -------------------------------------------------------------------------- */
 const useSeatsLeft = (initialSeats = 5) => {
   const [seatsLeft, setSeatsLeft] = useState(initialSeats);
   useEffect(() => {
@@ -51,11 +47,6 @@ const useSeatsLeft = (initialSeats = 5) => {
   return seatsLeft;
 };
 
-
-
-/* --------------------------------------------------------------------------
- *  STYLED COMPONENTS
- * -------------------------------------------------------------------------- */
 const LuxAppBar = styled(AppBar)(({ theme }) => ({
   position: 'fixed',
   background: alpha(PRIMARY_DARK, 0.92),
@@ -64,13 +55,13 @@ const LuxAppBar = styled(AppBar)(({ theme }) => ({
   boxShadow: `0 16px 64px ${alpha(PRIMARY_DARK, 0.4)}`,
   transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
   zIndex: theme.zIndex.drawer + 1,
-  minHeight: 96,
+  minHeight: 120,
   borderRadius: BORDER_RADIUS,
-  margin: '16px',
-  width: 'calc(100% - 32px)',
+  margin: '12px',
+  width: 'calc(100% - 24px)',
   [theme.breakpoints.down('sm')]: {
-    margin: '8px',
-    width: 'calc(100% - 16px)',
+    margin: '6px',
+    width: 'calc(100% - 12px)',
   },
 }));
 
@@ -110,14 +101,15 @@ const LuxBadge = styled(Box)({
 const NavButton = styled(Button)<{ active?: boolean }>(({ theme, active }) => ({
   position: 'relative',
   color: active ? LIGHT_ACCENT : alpha(LIGHT_ACCENT, 0.8),
-  fontWeight: 500,
+  fontWeight: 600,
+  fontSize: '0.875rem',
   letterSpacing: '0.8px',
-  padding: '12px 28px',
+  padding: '8px 16px',
   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
   '&:after': {
     content: '""',
     position: 'absolute',
-    bottom: '8px',
+    bottom: '12px',
     left: '50%',
     transform: 'translateX(-50%)',
     width: active ? '32px' : '0px',
@@ -135,9 +127,10 @@ const NavButton = styled(Button)<{ active?: boolean }>(({ theme, active }) => ({
 const CTALuxButton = styled(Button)(({ theme }) => ({
   background: TECH_GRADIENT,
   color: LIGHT_ACCENT,
-  padding: '14px 32px',
+  padding: '12px 24px',
   borderRadius: BORDER_RADIUS,
   fontWeight: 700,
+  fontSize: '0.875rem',
   letterSpacing: '1px',
   position: 'relative',
   overflow: 'hidden',
@@ -175,18 +168,18 @@ const MobileNavPanel = styled(Box)<{ open?: boolean }>(({ theme, open }) => ({
 const PremiumBadge = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
-  gap: theme.spacing(1.5),
-  background: alpha(LIGHT_ACCENT, 0.1),
-  color: LIGHT_ACCENT,
-  padding: theme.spacing(1.5, 3),
-  borderRadius: '50px',
-  border: `1px solid ${alpha(LIGHT_ACCENT, 0.2)}`,
-  fontWeight: 700,
-  fontSize: '0.9rem',
+  gap: theme.spacing(1),
+  background: '#2E7D32',
+  color: alpha(LIGHT_ACCENT, 0.9),
+  padding: theme.spacing(1, 2),
+  borderRadius: '8px',
+  border: `1px solid ${alpha('#1B5E20', 0.3)}`,
+  fontWeight: 600,
+  fontSize: '0.75rem',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
   '&:hover': {
-    background: alpha(LIGHT_ACCENT, 0.15),
+    background: '#1B5E20',
     transform: 'translateY(-2px)',
   },
 }));
@@ -197,20 +190,17 @@ const ScarcityBadge = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1),
   background: `linear-gradient(45deg, ${theme.palette.error.main}, #FF4D4D)`,
   color: LIGHT_ACCENT,
-  padding: theme.spacing(1, 2.5),
-  borderRadius: '50px',
+  padding: theme.spacing(0.75, 2),
+  borderRadius: '8px',
   boxShadow: `0 8px 32px ${alpha(theme.palette.error.main, 0.3)}`,
-  fontWeight: 700,
-  fontSize: '0.8rem',
+  fontWeight: 600,
+  fontSize: '0.7rem',
 }));
 
-/* --------------------------------------------------------------------------
- *  NavBar COMPONENT
- * -------------------------------------------------------------------------- */
 const NavBar: React.FC = () => {
   const router = useRouter();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const seatsLeft = useSeatsLeft(5);
 
@@ -232,17 +222,22 @@ const NavBar: React.FC = () => {
     <>
       <LuxAppBar>
         <Container maxWidth="xl">
-          <Toolbar sx={{ minHeight: 96, justifyContent: 'space-between' }}>
+          <Toolbar sx={{ 
+            minHeight: 100,
+            justifyContent: 'space-between',
+            gap: 4,
+            flexWrap: 'nowrap'
+          }}>
             <BrandContainer onClick={() => handleNavigate('/')}>
               <CodeIcon sx={{
-                fontSize: 36,
+                fontSize: 40,
                 color: LIGHT_ACCENT,
                 transform: 'rotate(45deg)',
               }} />
               <Box>
                 <Typography variant="h1" sx={{
                   fontFamily: "'Barlow', sans-serif",
-                  fontSize: '1.8rem',
+                  fontSize: { xs: '1.8rem', sm: '2rem', md: '2.2rem' },
                   fontWeight: 800,
                   letterSpacing: '-0.5px',
                   background: TECH_GRADIENT,
@@ -259,14 +254,19 @@ const NavBar: React.FC = () => {
             </BrandContainer>
 
             {!isMobile && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 3,
+                flexShrink: 0
+              }}>
                 <PremiumBadge onClick={() => router.push('/contact?offer=cloudAssess')}>
-                  <AssessmentIcon sx={{ fontSize: 20 }} />
+                  <AssessmentIcon sx={{ fontSize: 18 }} />
                   Free Cloud Assessment
                 </PremiumBadge>
 
                 <ScarcityBadge>
-                  <WhatshotIcon sx={{ fontSize: 18 }} />
+                  <WhatshotIcon sx={{ fontSize: 16 }} />
                   {seatsLeft} SLOTS LEFT
                 </ScarcityBadge>
 
@@ -295,7 +295,7 @@ const NavBar: React.FC = () => {
         </Container>
       </LuxAppBar>
 
-      <Box sx={{ height: { xs: 96, md: 96 } }} />
+      <Box sx={{ height: { xs: 80, md: 80 } }} />
 
       <MobileNavPanel open={mobileOpen}>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -327,9 +327,9 @@ const NavBar: React.FC = () => {
               key={item.path}
               onClick={() => handleNavigate(item.path)}
               sx={{
-                fontSize: '1.4rem',
+                fontSize: '1.6rem',
                 color: LIGHT_ACCENT,
-                py: 2,
+                py: 3,
                 '&:hover': { background: alpha(LIGHT_ACCENT, 0.05) },
               }}
             >
