@@ -194,6 +194,7 @@ const HeroSection = () => {
             backdropFilter: 'blur(12px)',
             position: 'relative',
             overflow: 'hidden',
+            minWidth: 260,
             '&:before': {
               content: '""',
               position: 'absolute',
@@ -300,7 +301,7 @@ const HeroSection = () => {
             sx={{
               background: `linear-gradient(135deg, ${alpha('#4361EE', 0.9)}, ${alpha('#3A0CA3', 0.9)})`,
               minWidth: 260,
-              '&:hover': { background: `linear-gradient(135deg, ${alpha('#4361EE', 1)}, ${alpha('#3A0CA3', 1)})` }
+              '&:hover': { background: `linear-gradient(135deg, ${alpha('#4361EE', 1)}, ${alpha('#3A0CA3', 0.5)})` }
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

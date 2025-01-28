@@ -15,16 +15,15 @@ import BlogCard from '../components/BlogCard';
 import { Cloud, VpnKey, Code } from '@mui/icons-material';
 import NextLink from 'next/link';
 
-// Unified purple color scheme
+// Unified design constants
 const PRIMARY_DARK = '#0A1A2F';
 const SECONDARY_DARK = '#532F73';
-const LIGHT_ACCENT = '#F2E7FE';
 const BACKDROP_BLUR = 'blur(28px)';
+const TITLE_GRADIENT = `linear-gradient(45deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`;
 
 const Resources: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const primaryGradient = `linear-gradient(135deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`;
 
   const resources = [
     {
@@ -54,7 +53,7 @@ const Resources: React.FC = () => {
     <Box
       sx={{
         backgroundColor: '#F9FAFD',
-        minHeight: '150vh',
+        minHeight: '100vh',
         pt: 8,
         pb: 12,
         position: 'relative',
@@ -80,31 +79,29 @@ const Resources: React.FC = () => {
         description="Cutting-edge technical resources on cloud architecture, DevOps, and modern software development."
       />
 
-      <Container maxWidth="xl" sx={{ position: 'relative' }}>
-        {/* Header Section */}
+      <Container maxWidth="lg" sx={{ position: 'relative' }}>
+        {/* Unified Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Box
-            sx={{
-              textAlign: 'center',
-              mb: 8,
-              position: 'relative',
-              '&:after': {
-                content: '""',
-                position: 'absolute',
-                bottom: -32,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '120px',
-                height: '3px',
-                background: `linear-gradient(90deg, transparent, ${PRIMARY_DARK}, transparent)`,
-                opacity: 0.8
-              },
-            }}
-          >
+          <Box sx={{ 
+            textAlign: 'center', 
+            mb: 6,
+            position: 'relative',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              bottom: -32,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '120px',
+              height: '3px',
+              background: `linear-gradient(90deg, transparent, ${PRIMARY_DARK}, transparent)`,
+              opacity: 0.8
+            }
+          }}>
             <Typography
               variant="h1"
               sx={{
@@ -112,7 +109,7 @@ const Resources: React.FC = () => {
                 letterSpacing: '-0.03em',
                 mb: 2,
                 fontSize: isMobile ? '2.5rem' : '3.5rem',
-                background: primaryGradient,
+                background: TITLE_GRADIENT,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 lineHeight: 1.1
@@ -124,10 +121,10 @@ const Resources: React.FC = () => {
               variant="subtitle1"
               sx={{
                 color: 'text.secondary',
-                maxWidth: 680,
+                maxWidth: 800,
                 mx: 'auto',
                 fontSize: isMobile ? '1rem' : '1.1rem',
-                lineHeight: 1.6
+                lineHeight: 1.5
               }}
             >
               Cutting-edge insights distilled from years of enterprise-grade implementations.
@@ -135,8 +132,8 @@ const Resources: React.FC = () => {
           </Box>
         </motion.div>
 
-        {/* Blog Cards */}
-        <Grid container spacing={isMobile ? 4 : 6}>
+        {/* Consolidated Card Grid */}
+        <Grid container spacing={4}>
           {resources.map((resource, index) => (
             <Grid item xs={12} md={4} key={resource.id}>
               <motion.div
@@ -167,7 +164,6 @@ const Resources: React.FC = () => {
                     transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                     '&:hover': {
                       transform: 'translateY(-8px)',
-                      borderColor: alpha(SECONDARY_DARK, 0.3),
                       boxShadow: `0 40px 80px -24px ${alpha(SECONDARY_DARK, 0.2)}`,
                     },
                   }}
@@ -177,7 +173,7 @@ const Resources: React.FC = () => {
           ))}
         </Grid>
 
-        {/* Call to Action */}
+        {/* Standardized CTA Section */}
         <Box sx={{ textAlign: 'center', mt: 10 }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -191,6 +187,7 @@ const Resources: React.FC = () => {
                 fontWeight: 700,
                 color: 'text.primary',
                 letterSpacing: '-0.01em',
+                fontSize: isMobile ? '1.5rem' : '2rem'
               }}
             >
               Tailored Technology Solutions
@@ -199,16 +196,17 @@ const Resources: React.FC = () => {
               <Button
                 variant="contained"
                 sx={{
-                  background: primaryGradient,
+                  height: 56,
+                  background: TITLE_GRADIENT,
                   borderRadius: '16px',
-                  px: 8,
-                  py: 2.5,
+                  px: 6,
+                  py: 2,
                   fontWeight: 700,
                   fontSize: '1.1rem',
                   color: 'common.white',
                   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                   '&:hover': {
-                    transform: 'translateY(-4px)',
+                    transform: 'translateY(-2px)',
                     boxShadow: `0 8px 24px ${alpha(PRIMARY_DARK, 0.3)}`
                   },
                 }}

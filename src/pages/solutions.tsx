@@ -14,10 +14,13 @@ import {
   alpha,
   styled,
   useMediaQuery,
+  Button,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { cvProjects, type CVProject } from '../data/cvProjects';
+import SEO from '../components/SEO';
+import NextLink from 'next/link';
 
 const Tilt = dynamic(
   () => import('react-parallax-tilt').then((mod) => mod.default),
@@ -27,50 +30,37 @@ const Tilt = dynamic(
   }
 );
 
-const DEEP_NAVY = '#0A1A2F';
-const PLATINUM = '#E5E4E2';
-const GOLD_ACCENT = '#C5A46D';
-const LIGHT_SKY = '#F8FAFF';
+// Unified purple color scheme
+const PRIMARY_DARK = '#0A1A2F';
+const SECONDARY_DARK = '#532F73';
+const LIGHT_ACCENT = '#F2E7FE';
 const BACKDROP_BLUR = 'blur(28px)';
 const PAGE_SIZE = 9;
+const primaryGradient = `linear-gradient(135deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`;
 
 const PremiumCardContainer = styled(motion.div)(({ theme }) => ({
   position: 'relative',
   borderRadius: 24,
   overflow: 'hidden',
   cursor: 'pointer',
-  background: `linear-gradient(145deg,
-    ${alpha(GOLD_ACCENT, 0.6)},
-    ${alpha(PLATINUM, 0.3)},
-    ${alpha(DEEP_NAVY, 0.5)}
-  )`,
-  boxShadow: `
-    0 20px 50px ${alpha(theme.palette.primary.dark, 0.3)},
-    inset 0 0 10px ${alpha(theme.palette.common.white, 0.1)}
+  background: `
+    linear-gradient(145deg, 
+      ${alpha(theme.palette.background.paper, 0.8)}, 
+      ${alpha(theme.palette.background.default, 0.9)}),
+    ${alpha(SECONDARY_DARK, 0.05)}
   `,
-  border: `2px solid transparent`,
-  backgroundClip: 'padding-box',
-  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-  height: '100%', // Add full height
+  boxShadow: `0 32px 64px -12px ${alpha(PRIMARY_DARK, 0.2)}`,
+  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+  height: '100%',
+  backdropFilter: BACKDROP_BLUR,
 
   '&:hover': {
-    transform: 'translateY(-8px) scale(1.05)',
-    boxShadow: `
-      0 30px 60px ${alpha(theme.palette.primary.dark, 0.4)},
-      inset 0 0 15px ${alpha(theme.palette.common.white, 0.15)}
-    `,
+    transform: 'translateY(-8px)',
+    borderColor: alpha(SECONDARY_DARK, 0.3),
+    boxShadow: `0 40px 80px -24px ${alpha(SECONDARY_DARK, 0.2)}`,
   },
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    inset: '-2px',
-    borderRadius: 24,
-    background: `linear-gradient(145deg,
-      rgba(255, 255, 255, 0.3),
-      rgba(255, 255, 255, 0.15)
-    )`,
-    zIndex: 0,
-  },
+
   '.content-overlay': {
     position: 'absolute',
     inset: 0,
@@ -134,7 +124,34 @@ const Solutions = () => {
   );
 
   return (
-    <Box sx={{ backgroundColor: LIGHT_SKY, minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <Box
+      sx={{
+        minHeight: '150vh',
+        pt: 8,
+        pb: 12,
+        position: 'relative',
+        overflow: 'hidden',
+        '&:before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: `
+            linear-gradient(45deg, ${alpha(PRIMARY_DARK, 0.1)} 0%, 
+            ${alpha(SECONDARY_DARK, 0.1)} 100%),
+            url(/noise-texture.png)
+          `,
+          opacity: 0.15,
+        },
+      }}
+    >
+      <SEO
+        title="Client Solutions - Enterprise Solutions"
+        description="Explore our portfolio of enterprise-grade technical solutions and client success stories."
+      />
+
       <AppBar
         position="sticky"
         sx={{
@@ -159,158 +176,225 @@ const Solutions = () => {
                 transform: 'translateX(-50%)',
                 width: '120px',
                 height: '3px',
-                background: `linear-gradient(90deg, transparent 0%, ${theme.palette.primary.main} 50%, transparent 100%)`,
+                background: `linear-gradient(90deg, transparent, ${PRIMARY_DARK}, transparent)`,
                 opacity: 0.8,
               },
             }}
           >
-            <Typography
-              variant="h1"
-              sx={{
-                fontWeight: 900,
-                letterSpacing: '-0.03em',
-                mb: 2,
-                fontSize: isMobile ? '2.5rem' : '3.5rem',
-                background: theme.palette.gradients?.primary || 'linear-gradient(to right, #0A1A2F, #C5A46D)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
-              }}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              Client Solutions
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                color: 'text.secondary',
-                maxWidth: 680,
-                mx: 'auto',
-                fontSize: isMobile ? '1rem' : '1.1rem',
-                lineHeight: 1.6,
-              }}
-            >
-              Explore tailored solutions designed to drive business transformation and innovation.
-            </Typography>
+              <Typography
+                variant="h1"
+                sx={{
+                  fontWeight: 900,
+                  letterSpacing: '-0.03em',
+                  mb: 2,
+                  fontSize: isMobile ? '2.5rem' : '3.5rem',
+                  background: primaryGradient,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  lineHeight: 1.1
+                }}
+              >
+                Client Solutions
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  color: 'text.secondary',
+                  maxWidth: 680,
+                  mx: 'auto',
+                  fontSize: isMobile ? '1rem' : '1.1rem',
+                  lineHeight: 1.6
+                }}
+              >
+                Enterprise-grade technical solutions driving digital transformation.
+              </Typography>
+            </motion.div>
           </Box>
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="xl" sx={{ py: isMobile ? 4 : 8 }}>
-        <Grid container spacing={4}>
-          {displayedProjects.map((project) => (
+      <Container maxWidth="xl" sx={{ py: isMobile ? 4 : 8, position: 'relative' }}>
+        <Grid container spacing={isMobile ? 4 : 6}>
+          {displayedProjects.map((project, index) => (
             <Grid 
               item 
               xs={12} 
               sm={6} 
               md={4} 
               key={project.id}
-              sx={{ height: { xs: 'auto', sm: '500px' } }} // Fixed height on desktop
+              sx={{ 
+                height: { xs: 'auto', sm: '500px' },
+                display: 'flex',
+              }}
             >
-              <Tilt 
-                tiltReverse 
-                scale={1.02} 
-                glareEnable 
-                glareBorderRadius="24px"
-                style={{ height: '100%' }} // Add full height to tilt
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: index * 0.1,
+                  duration: 0.8,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                whileHover={{
+                  scale: 1.03,
+                  transition: { duration: 0.3 },
+                }}
+                style={{ height: '100%', width: '100%' }}
               >
-                <PremiumCardContainer
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleViewDetails(project.id)}
+                <Tilt 
+                  tiltReverse 
+                  scale={1.02} 
+                  glareEnable 
+                  glareBorderRadius="24px"
+                  style={{ height: '100%', width: '100%' }}
                 >
-                  <Box className="content-overlay" />
-                  <Box sx={{ 
-                    p: 3, 
-                    position: 'relative', 
-                    zIndex: 4,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%',
-                  }}>
-                    <Box sx={{ 
-                      flexShrink: 0, 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 2, 
-                      mb: 2 
-                    }}>
-                      <project.icon style={{ fontSize: '2rem' }} />
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {project.clientName}
-                      </Typography>
-                    </Box>
+                 <PremiumCardContainer
+  whileTap={{ scale: 0.98 }}
+  onClick={() => handleViewDetails(project.id)}
+>
+  <Box className="content-overlay" />
+  <Box sx={{ 
+    p: 3, 
+    position: 'relative', 
+    zIndex: 4,
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+  }}>
+    {/* Restored Card Content */}
+    <Box sx={{ 
+      flexShrink: 0, 
+      display: 'flex', 
+      alignItems: 'center', 
+      gap: 2, 
+      mb: 2 
+    }}>
+      <project.icon style={{ fontSize: '2rem', color: PRIMARY_DARK }} />
+      <Typography variant="h6" sx={{ fontWeight: 600, color: PRIMARY_DARK }}>
+        {project.clientName}
+      </Typography>
+    </Box>
 
-                    <Typography 
-                      variant="h5" 
-                      sx={{ 
-                        mb: 1, 
-                        fontWeight: 700,
-                        flexShrink: 0,
-                        WebkitLineClamp: 1,
-                        display: '-webkit-box',
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      {project.name}
-                    </Typography>
+    <Typography 
+      variant="h5" 
+      sx={{ 
+        mb: 1, 
+        fontWeight: 700,
+        flexShrink: 0,
+        WebkitLineClamp: 1,
+        display: '-webkit-box',
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        color: SECONDARY_DARK
+      }}
+    >
+      {project.name}
+    </Typography>
 
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        mb: 2, 
-                        color: 'text.secondary',
-                        flex: 1,
-                        WebkitLineClamp: 3,
-                        display: '-webkit-box',
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      {project.description}
-                    </Typography>
+    <Typography 
+      variant="body2" 
+      sx={{ 
+        mb: 2, 
+        color: 'text.secondary',
+        flex: 1,
+        WebkitLineClamp: 3,
+        display: '-webkit-box',
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden'
+      }}
+    >
+      {project.description}
+    </Typography>
 
-                    <Box 
-                      sx={{ 
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: 1,
-                        mb: 2,
-                        maxHeight: '120px',
-                        overflowY: 'auto',
-                        '&::-webkit-scrollbar': {
-                          width: '6px',
-                        },
-                        '&::-webkit-scrollbar-thumb': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.3),
-                          borderRadius: '4px',
-                        }
-                      }}
-                    >
-                      {project.technologies.map((tech) => (
-                        <Chip
-                          key={tech}
-                          label={tech}
-                          size="small"
-                          sx={{
-                            background: alpha(theme.palette.primary.light, 0.15),
-                            color: theme.palette.primary.main,
-                          }}
-                        />
-                      ))}
-                    </Box>
+    <Box 
+      sx={{ 
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 1,
+        mb: 2,
+        maxHeight: '120px',
+        overflowY: 'auto',
+        '&::-webkit-scrollbar': {
+          width: '6px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: alpha(PRIMARY_DARK, 0.3),
+          borderRadius: '4px',
+        }
+      }}
+    >
+      {project.technologies.map((tech) => (
+        <Chip
+          key={tech}
+          label={tech}
+          size="small"
+          sx={{
+            background: alpha(PRIMARY_DARK, 0.15),
+            color: PRIMARY_DARK,
+          }}
+        />
+      ))}
+    </Box>
 
-                    <Box sx={{ flexShrink: 0, display: 'flex', justifyContent: 'flex-end' }}>
-                      <IconButton sx={{ color: theme.palette.primary.main }}>
-                        <ArrowForwardIcon />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                </PremiumCardContainer>
-              </Tilt>
+    <Box sx={{ flexShrink: 0, display: 'flex', justifyContent: 'flex-end' }}>
+      <IconButton sx={{ color: PRIMARY_DARK }}>
+        <ArrowForwardIcon />
+      </IconButton>
+    </Box>
+  </Box>
+</PremiumCardContainer>
+                </Tilt>
+              </motion.div>
             </Grid>
           ))}
         </Grid>
+
+        {/* Call to Action */}
+        <Box sx={{ textAlign: 'center', mt: 10 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Typography
+              variant="h4"
+              sx={{
+                mb: 5,
+                fontWeight: 700,
+                color: 'text.primary',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Custom Enterprise Solutions
+            </Typography>
+            <NextLink href="/contact" passHref>
+              <Button
+                variant="contained"
+                sx={{
+                  background: primaryGradient,
+                  borderRadius: '16px',
+                  px: 8,
+                  py: 2.5,
+                  fontWeight: 700,
+                  fontSize: '1.1rem',
+                  color: 'common.white',
+                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: `0 8px 24px ${alpha(PRIMARY_DARK, 0.3)}`
+                  },
+                }}
+              >
+                Request Solution Demo
+              </Button>
+            </NextLink>
+          </motion.div>
+        </Box>
       </Container>
     </Box>
   );
