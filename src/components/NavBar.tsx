@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { styled, keyframes } from '@mui/material/styles';
 import CodeIcon from '@mui/icons-material/Code';
+
 import {
   Menu as MenuIcon,
   Close as CloseIcon,
@@ -34,6 +35,7 @@ import {
   TECH_GRADIENT,
   BACKDROP_BLUR,
   BORDER_RADIUS,
+  TECH_GRADIENT_SHADOW,
   microShine,
 } from '../theme/branding';
 
@@ -44,7 +46,7 @@ const useSeatsLeft = (initialSeats = 5) => {
       setSeatsLeft((prev) => Math.max(1, prev - 1));
     }, 70000);
     return () => clearInterval(interval);
-  }, []);
+  },);
   return seatsLeft;
 };
 
@@ -53,7 +55,7 @@ const LuxAppBar = styled(AppBar)(({ theme }) => ({
   background: alpha(PRIMARY_DARK, 0.92),
   backdropFilter: `${BACKDROP_BLUR} saturate(180%)`,
   borderBottom: `1px solid ${alpha(LIGHT_ACCENT, 0.1)}`,
-  boxShadow: `0 16px 64px ${alpha(PRIMARY_DARK, 0.4)}`,
+  boxShadow: `0 2px 12px ${alpha(PRIMARY_DARK, 0.2)}`, // Added shadow
   transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
   zIndex: theme.zIndex.drawer + 1,
   minHeight: 120,
@@ -81,9 +83,10 @@ const BrandContainer = styled(Box)(({ theme }) => ({
   border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
   background: alpha(PRIMARY_DARK, 0.3),
   margin: theme.spacing(1.5),
+  boxShadow: `0 2px 8px ${alpha(LIGHT_ACCENT, 0.1)}`, // Added shadow
   
   '&:hover': {
-    transform: 'translateX(4px)',
+    transform: 'translateX(4px) scale(1.02)', // Added scale
     '& svg': { transform: 'rotate(180deg)' },
   },
 }));
@@ -112,19 +115,19 @@ const LuxBadge = styled(Box)({
 
 const NavButton = styled(Button)<{ active?: boolean }>(({ theme, active }) => ({
   position: 'relative',
-  color: active ? LIGHT_ACCENT : alpha(LIGHT_ACCENT, 0.8),
+  color: active? LIGHT_ACCENT: alpha(LIGHT_ACCENT, 0.8),
   fontWeight: 600,
   fontSize: '0.875rem',
   letterSpacing: '0.8px',
   padding: '8px 16px',
-  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+  transition: 'all 0.3s ease', // Added transition for smoother hover effect
   '&:after': {
     content: '""',
     position: 'absolute',
     bottom: '12px',
     left: '50%',
     transform: 'translateX(-50%)',
-    width: active ? '32px' : '0px',
+    width: active? '32px': '0px',
     height: '2px',
     background: TECH_GRADIENT,
     transition: 'width 0.4s ease',
@@ -132,6 +135,7 @@ const NavButton = styled(Button)<{ active?: boolean }>(({ theme, active }) => ({
   '&:hover': {
     color: LIGHT_ACCENT,
     transform: 'translateY(-2px)',
+    boxShadow: `0 2px 8px ${alpha(TECH_GRADIENT_SHADOW, 0.3)}`,
     '&:after': { width: '60%' },
   },
 }));
@@ -150,6 +154,7 @@ const CTALuxButton = styled(Button)(({ theme }) => ({
   overflow: 'hidden',
   whiteSpace: 'nowrap', 
   border: `1px solid ${alpha(LIGHT_ACCENT, 0.3)}`,
+  transition: 'all 0.3s ease', // Added transition for boxShadow
   '&:before': {
     content: '""',
     position: 'absolute',
@@ -159,7 +164,7 @@ const CTALuxButton = styled(Button)(({ theme }) => ({
   },
   '&:hover': {
     transform: 'translateY(-2px)',
-    boxShadow: `0 12px 48px ${alpha('#4361EE', 0.4)}`,
+    boxShadow: `0 4px 16px ${alpha('#4361EE', 0.4)}`,
   },
 }));
 
@@ -175,8 +180,8 @@ const MobileNavPanel = styled(Box)<{ open?: boolean }>(({ theme, open }) => ({
   display: 'flex',
   flexDirection: 'column',
   padding: theme.spacing(4),
-  opacity: open ? 1 : 0,
-  visibility: open ? 'visible' : 'hidden',
+  opacity: open? 1: 0,
+  visibility: open? 'visible': 'hidden',
   transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
 }));
 
@@ -184,16 +189,18 @@ const PremiumBadge = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: theme.spacing(0.5),
-  background: `linear-gradient(135deg, #4CAF50, #66BB6A)`,
+  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`, 
   color: alpha(LIGHT_ACCENT, 0.9),
-  padding: theme.spacing(0.5, 1.5),
-  borderRadius: '6px',
+  padding: '8px 16px',
+  borderRadius: BORDER_RADIUS,
   border: `1px solid ${alpha('#1B5E20', 0.3)}`,
   width: '160px',
-  fontWeight: 600,
-  fontSize: '0.65rem',
+  fontWeight: 700,
+  fontSize: '0.875rem',
+  whiteSpace: 'nowrap', 
+  height: '36px',
+  transition: 'all 0.3s ease', // Added transition for boxShadow
   cursor: 'pointer',
-  transition: 'all 0.3s ease',
   '&:hover': {
     background: '#1B5E20',
     transform: 'translateY(-2px)',
@@ -208,13 +215,15 @@ const ScarcityBadge = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, #E53935, #FF6F61)`,
   color: LIGHT_ACCENT,
   width: '160px',
-  padding: theme.spacing(0.5, 1.5),
-  borderRadius: '6px',
+  padding: '8px 16px',
+  borderRadius: BORDER_RADIUS, 
   boxShadow: `0 8px 32px ${alpha(theme.palette.error.main, 0.3)}`,
-  fontWeight: 600,
-  fontSize: '0.65rem',
+  fontWeight: 700,
+  fontSize: '0.875rem',
+  whiteSpace: 'nowrap', 
+  height: '36px',
+  transition: 'all 0.3s ease', // Added transition for boxShadow
   cursor: 'pointer',
-  transition: 'all 0.3s ease',
   '&:hover': {
     transform: 'translateY(-2px)',
     boxShadow: `0 4px 16px ${alpha(theme.palette.error.main, 0.3)}`,
@@ -236,7 +245,7 @@ const NavBar: React.FC = () => {
     { label: 'Contact', path: '/contact', icon: <ContactMailIcon /> },
   ];
 
-  const handleNavToggle = useCallback(() => setMobileOpen((prev) => !prev), []);
+  const handleNavToggle = useCallback(() => setMobileOpen((prev) =>!prev),);
   const handleNavigate = useCallback((path: string) => {
     setMobileOpen(false);
     router.push(path);
@@ -248,8 +257,8 @@ const NavBar: React.FC = () => {
         <Container maxWidth="xl">
           <Toolbar sx={{ 
             minHeight: 100,
-            justifyContent: 'space-between',
-            gap: 4,
+            justifyContent: 'space-around', // Distribute space around
+            gap: 1, // Reduced gap for a tighter layout
             flexWrap: 'nowrap',
             position: 'relative'
           }}>
@@ -282,12 +291,13 @@ const NavBar: React.FC = () => {
               <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: 3,
+                gap: 1,
                 flexShrink: 0,
                 border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
                 borderRadius: BORDER_RADIUS,
                 padding: theme.spacing(1),
-                background: alpha(PRIMARY_DARK, 0.3),
+                background: `linear-gradient(to right, ${alpha(PRIMARY_DARK, 0.4)}, ${alpha(SECONDARY_DARK, 0.4)})`, // Added gradient
+                boxShadow: `0 2px 8px ${alpha(LIGHT_ACCENT, 0.1)}`, // Added shadow
               }}>
                 {navItems.map((item) => (
                   <NavButton
@@ -298,17 +308,6 @@ const NavBar: React.FC = () => {
                     {item.label}
                   </NavButton>
                 ))}
-
-          <CTALuxButton 
-                onClick={() => router.push('/contact')}
-                sx={{
-                  width: 'auto', // Allow button to size to content
-                  px: 2, // Add horizontal padding
-                  flexShrink: 0, // Prevent button from shrinking
-                }}
-              >
-                  Book Consultation
-                </CTALuxButton>
               </Box>
             )}
 
@@ -318,14 +317,27 @@ const NavBar: React.FC = () => {
                 sx={{
                   display: 'flex',
                   flexDirection: 'column',
-                  marginLeft: theme.spacing(1.5), // Space between consultation button and multistack
                   alignItems: 'flex-start',
                   border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
                   borderRadius: BORDER_RADIUS,
                   padding: theme.spacing(1),
                   background: alpha(PRIMARY_DARK, 0.3),
+                  boxShadow: `0 2px 8px ${alpha(LIGHT_ACCENT, 0.1)}`, // Added shadow
                 }}
               >
+                <CTALuxButton 
+                  onClick={() => router.push('/contact')}
+                  sx={{
+                    px: 2,
+                    flexShrink: 0,
+                    height: '36px', 
+                    fontSize: '0.875rem', 
+                    padding: '8px 16px',
+                    width: '160px', 
+                  }}
+                >
+                  Book Now
+                </CTALuxButton>
                 <PremiumBadge onClick={() => router.push('/contact?offer=cloudAssess')}>
                   <AssessmentIcon sx={{ fontSize: 14 }} />
                   Free Stack Review
@@ -358,28 +370,37 @@ const NavBar: React.FC = () => {
       />
 
       <MobileNavPanel open={mobileOpen}>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <IconButton onClick={handleNavToggle} sx={{ color: LIGHT_ACCENT }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <IconButton
+            onClick={handleNavToggle}
+            sx={{ color: LIGHT_ACCENT }}
+          >
             <CloseIcon fontSize="large" />
           </IconButton>
         </Box>
 
-        <Box sx={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          gap: 3,
-          mt: -4,
-          marginTop: theme.spacing(2),
-        }}>
-          <Stack direction="column" spacing={1} sx={{ width: '100%', mb: 2 }}>
-            <PremiumBadge sx={{ justifyContent: 'center', width: '100%' }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: 3,
+            mt: -4,
+            marginTop: theme.spacing(2),
+          }}
+        >
+          <Stack direction="column" spacing={1} sx={{ width: "100%", mb: 2 }}>
+            <PremiumBadge
+              sx={{ justifyContent: "center", width: "100%" }}
+            >
               <AssessmentIcon sx={{ fontSize: 14 }} />
               Free Cloud Assessment
             </PremiumBadge>
 
-            <ScarcityBadge sx={{ justifyContent: 'center', width: '100%' }}>
+            <ScarcityBadge
+              sx={{ justifyContent: "center", width: "100%" }}
+            >
               <WhatshotIcon sx={{ fontSize: 14 }} />
               {seatsLeft} SLOTS LEFT
             </ScarcityBadge>
@@ -390,10 +411,10 @@ const NavBar: React.FC = () => {
               key={item.path}
               onClick={() => handleNavigate(item.path)}
               sx={{
-                fontSize: '1.6rem',
+                fontSize: "1.6rem",
                 color: LIGHT_ACCENT,
                 py: 3,
-                '&:hover': { background: alpha(LIGHT_ACCENT, 0.05) },
+                "&:hover": { background: alpha(LIGHT_ACCENT, 0.05) },
               }}
             >
               {item.label}
@@ -401,14 +422,6 @@ const NavBar: React.FC = () => {
           ))}
 
           <Divider sx={{ borderColor: alpha(LIGHT_ACCENT, 0.1), my: 3 }} />
-
-          <CTALuxButton
-            fullWidth
-            onClick={() => handleNavigate('/contact')}
-            sx={{ py: 2, fontSize: '1.1rem' }}
-          >
-            Schedule Consultation
-          </CTALuxButton>
         </Box>
       </MobileNavPanel>
     </>

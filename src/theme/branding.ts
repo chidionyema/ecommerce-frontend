@@ -54,3 +54,6 @@ export const TITLE_GRADIENT = `linear-gradient(
   ${SECONDARY_DARK} 50%,
   ${RED_ACCENT} 100%
 )`;
+
+
+export const TECH_GRADIENT_SHADOW = '#4361EE'; // Or another color that matches the gradient
