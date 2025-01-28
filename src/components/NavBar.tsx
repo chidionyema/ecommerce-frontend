@@ -402,22 +402,21 @@ const NavBar = memo(() => {
             </ScarcityBadge>
           </Stack>
 
-          {navItems.map((item) => (
-            <Link href={item.path} key={item.path} passHref legacyBehavior>
-              <Button
-                as="a"
-                onClick={handleNavToggle}
-                sx={{
-                  fontSize: "1.6rem",
-                  color: LIGHT_ACCENT,
-                  py: 3,
-                  "&:hover": { background: alpha(LIGHT_ACCENT, 0.05) },
-                }}
-              >
-                {item.label}
-              </Button>
-            </Link>
-          ))}
+                {navItems.map((item) => (
+              <Link href={item.path} key={item.path} passHref legacyBehavior>
+            <Button
+              onClick={handleNavToggle} // Remove as="a"
+              sx={{
+                fontSize: "1.6rem",
+                color: LIGHT_ACCENT,
+                py: 3,
+                "&:hover": { background: alpha(LIGHT_ACCENT, 0.05) },
+              }}
+            >
+              {item.label}
+            </Button>
+          </Link>
+        ))}
 
           <Divider sx={{ borderColor: alpha(LIGHT_ACCENT, 0.1), my: 3 }} />
         </Box>
