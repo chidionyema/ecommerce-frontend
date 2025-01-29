@@ -26,6 +26,7 @@ import {
   FaDatabase,
   FaGoogle,
   FaLinux,
+
 } from 'react-icons/fa';
 
 
@@ -34,7 +35,8 @@ import {
   SECONDARY_DARK,
   LIGHT_ACCENT,
   PAGE_BG,
-  animatedGradient
+  animatedGradient,
+  BACKDROP_BLUR
 } from '../theme/branding';
 
 /* -----------------------------------------------------------------------------
@@ -138,11 +140,33 @@ const HeroSection = () => {
           md: 8     // 32px on desktop
         },
         pb: isMobile ? 12 : 20,
-        background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`, // Use the same animated gradient as LuxAppBar
-        animation: `${animatedGradient} 10s ease infinite`, // Apply the animation
-        color: '#fff',
-        textAlign: 'center',
-        borderBottom: `1px solid ${alpha('#fff', 0.1)}`,
+        background: `
+        linear-gradient(145deg, 
+          ${PRIMARY_DARK}, 
+          ${SECONDARY_DARK})
+      `,
+      '&:after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: `
+        repeating-linear-gradient(
+          45deg,
+          ${alpha('#FFFFFF', 0.02)} 0px,
+          ${alpha('#FFFFFF', 0.02)} 2px,
+          transparent 2px,
+          transparent 8px
+        )`,
+      pointerEvents: 'none',
+    },
+      color: '#FFFFFF',
+      borderBottom: `1px solid ${alpha(LIGHT_ACCENT, 0.2)}`,
+      boxShadow: `0 24px 48px ${alpha(PRIMARY_DARK, 0.4)}`,
+      textAlign: 'center',
+       
         mt: { 
           xs: 4,   // Negative margin to offset padding on mobile
           sm: 6,   // Negative margin to offset padding on tablet
@@ -177,20 +201,15 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.9] }}
           >
-            <Typography
-              variant="h1"
-              sx={{
-                fontWeight: 900,
-                fontSize: isMobile ? '2.5rem' : '4rem',
-                lineHeight: 1.1,
-                letterSpacing: '-0.03em',
-                mb: 2,
-                textShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-                background: `linear-gradient(45deg, #fff 30%, ${alpha(LIGHT_ACCENT, 0.9)})`,
+             <Typography variant="h1" sx={{
+                background: `
+                  linear-gradient(45deg, 
+                    ${LIGHT_ACCENT} 20%, 
+                    ${alpha('#FFFFFF', 0.9)} 80%)
+                `,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-              }}
-            >
+        }}>
               <Box component="span" sx={{ display: 'block' }}>
                 Enterprise-Grade
               </Box>
@@ -265,39 +284,28 @@ const HeroSection = () => {
             mt: 6,
           }}
         >
-          <PersuasiveButton
-            variant="contained"
-            onClick={() => router.push('/contact?offer=cloudAssess')}
-            sx={{
-              background: `linear-gradient(135deg, ${alpha('#4361EE', 0.9)}, ${alpha('#3A0CA3', 0.9)})`,
-              minWidth: 260,
-              '&:hover': {
-                background: `linear-gradient(135deg, ${alpha('#4361EE', 1)}, ${alpha('#3A0CA3', 0.5)})`,
-              },
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <motion.div
-                animate={{ y: [-2, 2, -2] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                🚀
-              </motion.div>
-              Start Free Assessment
-            </Box>
-          </PersuasiveButton>
-
+        <PersuasiveButton sx={{
+      background: `
+       linear-gradient(45deg, 
+          ${LIGHT_ACCENT} 20%, 
+          ${alpha('#FFFFFF', 0.9)} 80%)
+      `,
+      border: `1px solid ${alpha(LIGHT_ACCENT, 0.3)}`,
+    }}>
+      Start Free Assessment
+    </PersuasiveButton>
           <PersuasiveButton
             variant="outlined"
             onClick={() => router.push('/pricing')}
             sx={{
               color: '#fff',
-              borderColor: alpha('#fff', 0.3),
+             
               minWidth: 260,
               background: alpha('#fff', 0.1),
               '&:hover': {
-                background: alpha('#fff', 0.2),
-                borderColor: alpha('#fff', 0.5),
+                border: `1px solid ${alpha(LIGHT_ACCENT, 0.2)}`,
+                background: alpha(PRIMARY_DARK, 0.4),
+                backdropFilter: BACKDROP_BLUR,
               },
             }}
           >
@@ -641,8 +649,6 @@ export default function HomePage() {
           content="Enterprise-grade technology solutions with precision engineering and proven results"
         />
       </Head>
-
-      {/* NavBar is imported at a higher layout level, or you can place <NavBar /> above. */}
       <HeroSection />
       <TechnologyShowcase />
  <WhyPartnerSection />

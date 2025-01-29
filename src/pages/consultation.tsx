@@ -1,25 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  MessageCircle, 
-  ChevronRight, 
-  ChevronUp, 
-  Star,
-  User,
-  Rocket,
-  BarChart,
-  ShieldCheck,
-  CloudLightning,
-  Code,
-  Server
+import React, { useState } from 'react';
+import {
+  Calendar, Clock, MessageCircle, ChevronRight, ChevronUp, Star,
+  User, Rocket, BarChart, ShieldCheck, CloudLightning, Code, Server
 } from 'lucide-react';
-import { Container, Box, Typography, Grid } from '@mui/material';
+import { Container, Box, Typography, Grid, alpha } from '@mui/material';
+import { colors } from '../theme/branding';
 
 interface TimelineStepProps {
   title: string;
   content: string;
-  details: string[];
+  details: string; // details is an array of strings
   icon: any;
 }
 
@@ -102,7 +92,7 @@ const ConsultationPage = () => {
   ];
 
   return (
-    <Box sx={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+    <Box sx={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}> {/* Added minHeight */}
       {/* Hero Section */}
       <Box sx={{ py: 8, textAlign: 'center', bgcolor: 'white' }}>
         <Container maxWidth="lg">
@@ -159,7 +149,7 @@ const ConsultationPage = () => {
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
             Ready for Digital Transformation?
           </Typography>
-          <button 
+          <button
             onClick={() => setShowCalendly(true)}
             className="bg-white text-blue-800 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
           >

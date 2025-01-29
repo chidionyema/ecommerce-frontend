@@ -1,36 +1,26 @@
-import React, { useState, useCallback, memo, useEffect } from "react";
+import { useState, useCallback, memo } from "react";
 import { useRouter } from "next/router";
-import Link from 'next/link';
+import Link from "next/link";
 import {
   AppBar,
   Toolbar,
   Typography,
   Button,
-  ButtonProps,
   Box,
-  BoxProps,
+  ButtonProps,
   Container,
   alpha,
   IconButton,
   useMediaQuery,
-  Divider,
-  useTheme,
   Stack,
+  useTheme
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { motion, AnimatePresence } from "framer-motion";
 import CodeIcon from "@mui/icons-material/Code";
-import {
-  Menu as MenuIcon,
-  Close as CloseIcon,
-  Home as HomeIcon,
-  Book as BookIcon,
-  LocalAtm as LocalAtmIcon,
-  ContactMail as ContactMailIcon,
-  Assessment as AssessmentIcon,
-  Whatshot as WhatshotIcon,
-} from "@mui/icons-material";
+import { Menu, Close, Home, Book, Whatshot, ContactMail } from "@mui/icons-material";
 
-// *** IMPORTANT: Replace these with your actual paths and branding ***
+// Theme imports
 import {
   PRIMARY_DARK,
   SECONDARY_DARK,
@@ -38,389 +28,200 @@ import {
   TECH_GRADIENT,
   BACKDROP_BLUR,
   BORDER_RADIUS,
-  microShine,
-} from "../theme/branding"; // Your actual path
+  METALLIC_GRADIENT
+} from "../theme/branding";
 
-const useSeatsLeft = (initialSeats = 5) => {
-  const [seatsLeft, setSeatsLeft] = useState(initialSeats);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSeatsLeft(prev => Math.max(1, prev - 1));
-    }, 70000);
-    return () => clearInterval(interval);
-  }, []); // Added empty dependency array
-  return seatsLeft;
-};
-
+// Styled Components
 const LuxAppBar = styled(AppBar)(({ theme }) => ({
-  position: "fixed",
-  background: alpha(PRIMARY_DARK, 0.92),
-  backdropFilter: `${BACKDROP_BLUR} saturate(180%)`,
-  borderBottom: `1px solid ${alpha(LIGHT_ACCENT, 0.1)}`,
-  boxShadow: `0 16px 64px ${alpha(PRIMARY_DARK, 0.4)}`,
-  transition: "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
-  zIndex: theme.zIndex.drawer + 1,
-  minHeight: 120,
+  background: `
+    linear-gradient(145deg, 
+      ${alpha(PRIMARY_DARK, 0.96)}, 
+      ${alpha(SECONDARY_DARK, 0.96)})
+    padding-box,
+    ${METALLIC_GRADIENT}
+    border-box`,
+  backdropFilter: `${BACKDROP_BLUR} saturate(200%)`,
+  border: `1.5px solid transparent`,
+  boxShadow: `0 24px 48px ${alpha(PRIMARY_DARK, 0.4)}`,
   borderRadius: BORDER_RADIUS,
-  margin: "12px",
-  padding: theme.spacing(2, 3),
-  marginBottom: theme.spacing(4),
-  width: "calc(100% - 24px)",
+  margin: "16px auto",
+  maxWidth: "1536px",
+  position: "fixed",
+  left: 0,
+  right: 0,
+  transform: "none",
+  transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+  "&:hover": {
+    boxShadow: `0 32px 64px ${alpha(PRIMARY_DARK, 0.6)}`,
+  },
   [theme.breakpoints.down("sm")]: {
-    margin: "6px",
-    width: "calc(100% - 12px)",
-    padding: theme.spacing(1, 2),
-    marginBottom: theme.spacing(1.5),
+    margin: "8px auto",
+    width: "calc(100% - 16px)",
   },
 }));
 
-const BrandContainer = styled(Box)(({ theme }) => ({
+const BrandMark = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  gap: theme.spacing(1.5),
-  cursor: "pointer",
-  transition: "transform 0.3s ease",
-  padding: theme.spacing(1, 2),
+  gap: theme.spacing(2),
+  padding: theme.spacing(1.5),
   borderRadius: BORDER_RADIUS,
-  border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
-  background: alpha(PRIMARY_DARK, 0.3),
-  margin: theme.spacing(1.5),
-
+  background: `
+    linear-gradient(145deg, 
+      ${alpha(PRIMARY_DARK, 0.8)}, 
+      ${alpha(SECONDARY_DARK, 0.6)})
+    padding-box,
+    ${METALLIC_GRADIENT}
+    border-box`,
+  border: `1.5px solid transparent`,
+  transition: "all 0.3s ease",
   "&:hover": {
-    transform: "translateX(4px)",
-    "& svg": { transform: "rotate(180deg)" },
+    transform: "translateY(-2px)",
+    boxShadow: `0 8px 32px ${alpha(LIGHT_ACCENT, 0.2)}`,
   },
 }));
 
-const LuxBadge = styled(Box)({
+const NavItem = styled(motion(Button))<ButtonProps & { active: boolean }>(({ active }) => ({
   position: "relative",
-  padding: "4px 12px",
-  background: alpha(LIGHT_ACCENT, 0.08),
-  borderRadius: "8px",
-  border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
-  fontSize: "0.7rem",
-  fontWeight: 700,
-  letterSpacing: "1.2px",
-  textTransform: "uppercase",
-  color: LIGHT_ACCENT,
-  marginTop: "8px",
-  marginBottom: "5px",
+  color: active ? LIGHT_ACCENT : alpha("#FFFFFF", 0.85),
+  fontWeight: 600,
+  fontSize: "1rem",
+  letterSpacing: "1px",
+  padding: "8px 16px",
+  borderRadius: BORDER_RADIUS,
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   "&:before": {
     content: '""',
     position: "absolute",
-    inset: 0,
-    background: `linear-gradient(90deg, transparent, ${alpha(
-      LIGHT_ACCENT,
-      0.1,
-    )}, transparent)`,
-    animation: `${microShine} 6s infinite linear`,
-  },
-});
-
-interface NavButtonProps extends ButtonProps {
-  active?: boolean; 
-}
-
-const NavButton = styled(Button)<NavButtonProps>(({ theme, active }) => ({
-
-  color: active? LIGHT_ACCENT: alpha(LIGHT_ACCENT, 0.8),
-  position: "relative",
-
-  fontWeight: 600,
-  fontSize: "0.875rem",
-  letterSpacing: "0.8px",
-  padding: "8px 16px",
-  transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-  "&:after": {
-    content: '""',
-    position: "absolute",
-    bottom: "12px",
+    bottom: 0,
     left: "50%",
-    transform: "translateX(-50%)",
-    width: active? "32px": "0px",
+    width: active ? "80%" : "0%",
     height: "2px",
-    background: TECH_GRADIENT,
-    transition: "width 0.4s ease",
+    background: METALLIC_GRADIENT,
+    transform: "translateX(-50%)",
+    transition: "width 0.3s ease",
   },
   "&:hover": {
     color: LIGHT_ACCENT,
-    transform: "translateY(-2px)",
-    "&:after": { width: "60%" },
+    background: alpha(LIGHT_ACCENT, 0.1),
+    "&:before": {
+      width: "60%",
+    },
   },
 }));
 
-const CTALuxButton = styled(Button)(({ theme }) => ({
-  background: TECH_GRADIENT,
-  color: LIGHT_ACCENT,
-  padding: "8px 16px",
-  minWidth: "100px",
-  maxWidth: "180px",
-  borderRadius: BORDER_RADIUS,
-  fontWeight: 700,
+const CTAButton = styled(motion(Button))<ButtonProps>(() => ({
+  padding: "12px 24px",
   fontSize: "0.875rem",
+  fontWeight: 700,
   letterSpacing: "1px",
+  borderRadius: BORDER_RADIUS,
   position: "relative",
-  overflow: "hidden",
-  whiteSpace: "nowrap",
-  border: `1px solid ${alpha(LIGHT_ACCENT, 0.3)}`,
-  "&:before": {
-    content: '""',
-    position: "absolute",
-    inset: 0,
-    background: `linear-gradient(90deg, transparent, ${alpha(
-      LIGHT_ACCENT,
-      0.1,
-    )}, transparent)`,
-    animation: `${microShine} 6s infinite linear`,
-  },
   "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: `0 12px 48px ${alpha("#4361EE", 0.4)}`,
+    transform: "scale(1.05)",
   },
 }));
-interface MobileNavPanelProps extends BoxProps {
-  open?: boolean; 
-}
-const MobileNavPanel = styled(Box)<MobileNavPanelProps>(({ theme, open }) => ({
+
+const MobileMenu = styled(motion(Box))(({ theme }) => ({
   position: "fixed",
   top: 0,
   left: 0,
   right: 0,
   bottom: 0,
-  background: alpha(PRIMARY_DARK, 0.96),
-  backdropFilter: BACKDROP_BLUR,
+  backdropFilter: `${BACKDROP_BLUR} saturate(180%)`,
+  background: alpha(PRIMARY_DARK, 0.97),
   zIndex: 2000,
+  padding: theme.spacing(4),
   display: "flex",
   flexDirection: "column",
-  padding: theme.spacing(4),
-  opacity: open? 1: 0,
-  visibility: open? "visible": "hidden",
-  transition: "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
-}));
-
-const PremiumBadge = styled(Box)(({ theme }) => ({
-  display: "inline-flex",
-  alignItems: "center",
-  gap: theme.spacing(0.5),
-  background: `linear-gradient(135deg, #4CAF50, #66BB6A)`,
-  color: alpha(LIGHT_ACCENT, 0.9),
-  padding: "8px 16px",
-  borderRadius: BORDER_RADIUS,
-  border: `1px solid ${alpha("#1B5E20", 0.3)}`,
-  width: "160px",
-  fontWeight: 700,
-  fontSize: "0.875rem",
-  whiteSpace: "nowrap",
-  height: "36px",
-
-  cursor: "pointer",
-  transition: "all 0.3s ease",
-  "&:hover": {
-    background: "#1B5E20",
-    transform: "translateY(-2px)",
-    boxShadow: `0 4px 16px ${alpha("#1B5E20", 0.3)}`,
-  },
-}));
-
-const ScarcityBadge = styled(Box)(({ theme }) => ({
-  display: "inline-flex",
-  alignItems: "center",
-  gap: theme.spacing(0.5),
-  background: `linear-gradient(135deg, #E53935, #FF6F61)`,
-  color: LIGHT_ACCENT,
-  width: "160px",
-  padding: "8px 16px",
-  borderRadius: BORDER_RADIUS,
-  boxShadow: `0 8px 32px ${alpha(theme.palette.error.main, 0.3)}`,
-  fontWeight: 700,
-  fontSize: "0.875rem",
-  whiteSpace: "nowrap",
-  height: "36px",
-
-  cursor: "pointer",
-  transition: "all 0.3s ease",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: `0 4px 16px ${alpha(theme.palette.error.main, 0.3)}`,
-  },
+  justifyContent: "center",
 }));
 
 const NavBar = memo(() => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const seatsLeft = useSeatsLeft(5);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navItems = [
-    { label: "Home", path: "/", icon: <HomeIcon /> },
+    { label: "Home", path: "/", icon: <Home /> },
     { label: "Solutions", path: "/solutions", icon: <CodeIcon /> },
-    { label: "Resources", path: "/resources", icon: <BookIcon /> },
-    { label: "Pricing", path: "/pricing", icon: <LocalAtmIcon /> },
-    { label: "Contact", path: "/contact", icon: <ContactMailIcon /> },
+    { label: "Resources", path: "/resources", icon: <Book /> },
+    { label: "Pricing", path: "/pricing", icon: <Whatshot /> },
+    { label: "Contact", path: "/contact", icon: <ContactMail /> },
   ];
-  const handleNavToggle = useCallback(() => setMobileOpen(prev => !prev), []);// Add the dependency array
+
+  const toggleMenu = useCallback(() => {
+    setMenuOpen((prev) => !prev);
+    document.body.style.overflow = menuOpen ? "auto" : "hidden";
+  }, [menuOpen]);
+
   return (
     <>
       <LuxAppBar>
         <Container maxWidth="xl">
-          <Toolbar
-            sx={{
-              minHeight: 100,
-              justifyContent: "space-around",
-              gap: 1,
-              flexWrap: "nowrap",
-              position: "relative",
-            }}
-          >
+          <Toolbar sx={{ justifyContent: "space-between" }}>
             <Link href="/" passHref legacyBehavior>
-              <BrandContainer as="a">
-                <CodeIcon sx={{ fontSize: 40, color: LIGHT_ACCENT, transform: "rotate(45deg)" }} />
+              <BrandMark component="a">
+                <CodeIcon sx={{ fontSize: 42, color: LIGHT_ACCENT }} />
                 <Box>
-                  <Typography
-                    variant="h1"
-                    sx={{
-                      fontFamily: "'Barlow', sans-serif",
-                      fontSize: { xs: "1.8rem", sm: "2rem", md: "2.2rem" },
-                      fontWeight: 800,
-                      letterSpacing: "-0.5px",
-                      background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`,
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                    }}
-                  >
+                  <Typography variant="h1" sx={{ fontSize: "2.2rem", fontWeight: 800 }}>
                     GLUStack
+                    <Box component="span" sx={{ fontSize: "0.6em", ml: 1, fontWeight: 700, color: LIGHT_ACCENT }}>
+                      PRO
+                    </Box>
                   </Typography>
-                  <LuxBadge>
-                    <CodeIcon sx={{ fontSize: 14, mr: 1 }} />
-                    ENGINEERING
-                  </LuxBadge>
                 </Box>
-              </BrandContainer>
+              </BrandMark>
             </Link>
 
             {!isMobile && (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  flexShrink: 0,
-                  border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
-                  borderRadius: BORDER_RADIUS,
-                  padding: theme.spacing(1),
-                  background: alpha(PRIMARY_DARK, 0.3),
-                }}
-              >
-              {navItems.map((item) => (
-                <Link href={item.path} key={item.path} passHref legacyBehavior>
-                    <NavButton active={router.pathname === item.path}> {/* Remove as="a" */}
-                        {item.label}
-                    </NavButton>
-                </Link>
-            ))}
-              </Box>
-            )}
-
-            {!isMobile && (
-              <Stack
-                spacing={1}
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  border: `1px solid ${alpha(LIGHT_ACCENT, 0.15)}`,
-                  borderRadius: BORDER_RADIUS,
-                  padding: theme.spacing(1),
-                  background: alpha(PRIMARY_DARK, 0.3),
-                }}
-              >
-                <Link href="/contact" passHref legacyBehavior>
-                  <CTALuxButton as="a" sx={{ px: 2, flexShrink: 0, height: "36px", fontSize: "0.875rem", padding: "8px 16px", width: "160px" }}>
-                    Book Now
-                  </CTALuxButton>
-                </Link>
-                <Link href="/contact?offer=cloudAssess" passHref legacyBehavior>
-                  <PremiumBadge as="a">
-                    <AssessmentIcon sx={{ fontSize: 14 }} />
-                    Free Stack Review
-                  </PremiumBadge>
-                </Link>
-                <ScarcityBadge>
-                  <WhatshotIcon sx={{ fontSize: 14 }} />
-                  {seatsLeft} SLOTS LEFT
-                </ScarcityBadge>
+              <Stack direction="row" spacing={3}>
+                {navItems.map((item) => (
+                  <Link href={item.path} key={item.path} passHref legacyBehavior>
+                    <NavItem component="a" active={router.pathname === item.path}>
+                      {item.icon}
+                      {item.label}
+                    </NavItem>
+                  </Link>
+                ))}
               </Stack>
             )}
 
             {isMobile && (
-              <IconButton onClick={handleNavToggle} sx={{ color: LIGHT_ACCENT }}>
-                <MenuIcon fontSize="large" />
+              <IconButton onClick={toggleMenu} sx={{ color: LIGHT_ACCENT }}>
+                <Menu fontSize="large" />
               </IconButton>
             )}
           </Toolbar>
         </Container>
       </LuxAppBar>
 
-      <Box
-        sx={{
-          height: {
-            xs: "140px",
-            sm: "160px",
-            md: "180px",
-          },
-        }}
-      />
-
-      <MobileNavPanel open={mobileOpen}>
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <IconButton onClick={handleNavToggle} sx={{ color: LIGHT_ACCENT }}>
-            <CloseIcon fontSize="large" />
-          </IconButton>
-        </Box>
-
-        <Box
-          sx={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            gap: 3,
-            mt: -4,
-            marginTop: theme.spacing(2),
-          }}
-        >
-          <Stack direction="column" spacing={1} sx={{ width: "100%", mb: 2 }}>
-            <PremiumBadge sx={{ justifyContent: "center", width: "100%" }}>
-              <AssessmentIcon sx={{ fontSize: 14 }} />
-              Free Cloud Assessment
-            </PremiumBadge>
-
-            <ScarcityBadge sx={{ justifyContent: "center", width: "100%" }}>
-              <WhatshotIcon sx={{ fontSize: 14 }} />
-              {seatsLeft} SLOTS LEFT
-            </ScarcityBadge>
-          </Stack>
-
-                {navItems.map((item) => (
-              <Link href={item.path} key={item.path} passHref legacyBehavior>
-            <Button
-              onClick={handleNavToggle} // Remove as="a"
-              sx={{
-                fontSize: "1.6rem",
-                color: LIGHT_ACCENT,
-                py: 3,
-                "&:hover": { background: alpha(LIGHT_ACCENT, 0.05) },
-              }}
-            >
-              {item.label}
-            </Button>
-          </Link>
-        ))}
-
-          <Divider sx={{ borderColor: alpha(LIGHT_ACCENT, 0.1), my: 3 }} />
-        </Box>
-      </MobileNavPanel>
+      <AnimatePresence>
+        {menuOpen && (
+          <MobileMenu initial={{ opacity: 0, x: "100%" }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: "100%" }}>
+            <IconButton onClick={toggleMenu} sx={{ position: "absolute", top: 24, right: 24, color: LIGHT_ACCENT }}>
+              <Close fontSize="large" />
+            </IconButton>
+            <Stack spacing={3}>
+            // In the MobileMenu section, update the NavItem usage:
+                  {navItems.map((item) => (
+                    <Link href={item.path} key={item.path} passHref legacyBehavior>
+                      <NavItem 
+                        component="a" 
+                        onClick={toggleMenu}
+                        active={router.pathname === item.path} // Add this line
+                      >
+                        {item.icon}
+                        {item.label}
+                      </NavItem>
+                    </Link>
+                
+              ))}
+            </Stack>
+          </MobileMenu>
+        )}
+      </AnimatePresence>
     </>
   );
 });

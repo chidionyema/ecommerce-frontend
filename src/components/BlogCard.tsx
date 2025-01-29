@@ -32,11 +32,12 @@ const PremiumCard = styled(Card)(({ theme }) => ({
   overflow: 'hidden',
   height: 520,
   transition: 'all 0.3s ease-in-out',
+  background: 'transparent', // Card background is transparent
+  boxShadow: `0 8px 16px ${alpha(theme.palette.grey[900], 0.1)}`,
   '&:hover': {
-    '& .glow-layer': {
-      opacity: 0.8
-    }
-  }
+    transform: 'translateY(-8px)',
+    boxShadow: `0 12px 24px ${alpha(theme.palette.grey[900], 0.15)}`,
+  },
 }));
 
 const GlowLayer = styled('div')(({ theme }) => ({
@@ -45,10 +46,11 @@ const GlowLayer = styled('div')(({ theme }) => ({
   left: 0,
   right: 0,
   bottom: 0,
-  background: `radial-gradient(circle at 50% 0%, ${alpha(theme.palette.primary.main, 0.2)}, transparent 60%)`,
+  background: `radial-gradient(circle at 50% 0%, ${alpha(theme.palette.primary.main, 0.15)}, transparent 60%)`,
   opacity: 0,
   transition: 'opacity 0.3s ease-in-out',
-  zIndex: 0
+  zIndex: 0,
+  pointerEvents: 'none',
 }));
 
 const BlogCard: React.FC<BlogCardProps> = ({ title, summary, path, icon, sx = [] }) => {
@@ -57,20 +59,12 @@ const BlogCard: React.FC<BlogCardProps> = ({ title, summary, path, icon, sx = []
 
   return (
     <Box sx={{ 
-      position: 'relative',
+      position: 'relative', 
       height: 520,
-      '&:hover': {
-        '& .glow-layer': {
-          opacity: 0.6
-        }
-      }
+      backgroundColor: theme.palette.background.paper, // Background set on the outer Box
     }}>
       <GlowLayer className="glow-layer" />
-      <motion.div
-        whileHover={!isMobile ? { y: -8 } : {}}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        style={{ height: '100%' }}
-      >
+      <motion.div style={{ height: '100%' }}>
         <PremiumCard sx={[
           { height: '100%' },
           ...(Array.isArray(sx) ? sx : [sx])
@@ -81,7 +75,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ title, summary, path, icon, sx = []
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            height: 'calc(100% - 72px)', // Account for button area
+            height: 'calc(100% - 72px)',
             [theme.breakpoints.down('sm')]: { p: 3 }
           }}>
             <Box display="flex" alignItems="center" mb={3}>
@@ -115,7 +109,6 @@ const BlogCard: React.FC<BlogCardProps> = ({ title, summary, path, icon, sx = []
                 mb: 3,
                 fontWeight: 700,
                 lineHeight: 1.3,
-                // Example gradient usage:
                 background: theme.palette.gradients?.primary,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent'
@@ -133,7 +126,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ title, summary, path, icon, sx = []
                 display: '-webkit-box',
                 WebkitLineClamp: 3,
                 WebkitBoxOrient: 'vertical',
-                color: 'text.secondary',
+                color: theme.palette.text.secondary,
                 lineHeight: 1.6
               }}
             >

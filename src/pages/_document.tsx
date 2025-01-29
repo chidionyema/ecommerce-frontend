@@ -35,9 +35,7 @@ export default function Document() {
           type="font/woff2"
           crossOrigin="anonymous"
         />
-        <link href="https://fonts.cdnfonts.com/css/clash-display" rel="stylesheet" />
-        <link href="https://fonts.cdnfonts.com/css/neue-haas-grotesk" rel="stylesheet" />
-        
+      
         {/* Security headers */}
         <meta httpEquiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval';" />
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
