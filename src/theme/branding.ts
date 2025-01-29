@@ -1,4 +1,4 @@
-import { keyframes } from '@mui/material/styles';
+import { keyframes, alpha } from '@mui/material/styles';
 import { getContrast } from 'polished'; // Import contrast function
 
 export const PRIMARY_DARK = '#0A1A2F';
@@ -20,6 +20,7 @@ export const PRIMARY_LIGHT = '#4a5568'
 export const ACCENT_COLOR = "#007bff"; // Example: A bright blue
 export const HIGHLIGHT_COLOR = "#f0ad4e";
 
+
 export const COLORS = {
   PRIMARY_DARK: '#0A2463',
   SECONDARY_DARK: '#3E5C76',
@@ -33,17 +34,28 @@ export const COLORS = {
   PAGE_BG: '#FFFFFF',
   GRADIENT_PRIMARY: 'linear-gradient(135deg, #0A2463 0%, #3E5C76 100%)',
   GRADIENT_ACCENT: 'linear-gradient(45deg, #7D93E2 0%, #5BC0EB 100%)',
+    HIGHLIGHT_COLOR: '#F59E0B',
+    ACCENT_SECONDARY: '#2DD4BF',
+    TITLE_GRADIENT: 'linear-gradient(45deg, #F59E0B 0%, #2DD4BF 100%)',
+    GLASS_BACKGROUND: `linear-gradient(145deg, ${alpha('#0F172A', 0.96)} 0%, ${alpha('#1E293B', 0.92)} 100%)`,
+    SECTION_SPACING: 8,
+    BORDER_RADIUS: '16px',
 };
+
+export const GLASS_BACKGROUND = `linear-gradient(145deg, ${alpha(PRIMARY_DARK, 0.98)}, ${alpha(SECONDARY_DARK, 0.97)})`;
 
 export const ACCENT_GRADIENT = 'linear-gradient(90deg, #6A11CB 0%, #2575FC 100%)';
 export const NEUTRAL_LIGHT = '#F8F9FA';
 export const SUCCESS_COLOR = '#28A745';
-
+// In your theme branding constants
+export const ACCENT_SECONDARY = '#2dd4bf'; // A modern teal-400 color
 export const colors = {
   PRIMARY_DARK,
   PRIMARY_LIGHT,
   SECONDARY_DARK,
+  ACCENT_SECONDARY,
   LIGHT_ACCENT,
+  HIGHLIGHT_COLOR,
   PAGE_BG,
   METALLIC_GRADIENT,
   TECH_GRADIENT,
@@ -55,7 +67,8 @@ export const colors = {
   BACKDROP_BLUR,
   ACCENT_GRADIENT,
   NEUTRAL_LIGHT,
-  SUCCESS_COLOR
+  SUCCESS_COLOR,
+  TEXT_SHADOW: '0 2px 4px rgba(0,0,0,0.3)'
 };
  
 
