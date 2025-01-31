@@ -48,8 +48,7 @@ interface Project {
   id: string;
   name: string;
   description: string;
- technologies: string[]; 
-
+  technologies: string [];
   clientName: string;
   image?: string;
   metrics: Array<{
@@ -100,7 +99,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
               sx={{
                 width: '100%',
                 height: imageSize,
-                position: 'relative', // Required for Image component
+                position: 'relative',
               }}
             >
               <Image
@@ -119,7 +118,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                mb: 2, // Increased margin
+                mb: 2,
               }}
             >
               <Icon
@@ -148,7 +147,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
               variant="body2"
               align="center"
               color="text.secondary"
-              sx={{ mb: 2 }} // Increased margin
+              sx={{ mb: 2 }}
             >
               {project.clientName}
             </Typography>
@@ -160,13 +159,13 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 gap: 1,
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                mb: 2, // Increased margin
+                mb: 2,
               }}
             >
               {project.technologies.map((tech) => {
                 const TechIcon =
                   technologyIconMap[tech as keyof typeof technologyIconMap];
-                return TechIcon? (
+                return (
                   <Chip
                     key={tech}
                     icon={<TechIcon size={16} />}
@@ -184,7 +183,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
                       },
                     }}
                   />
-                ): null;
+                );
               })}
             </Box>
 
