@@ -28,6 +28,7 @@ import {
   Layers,
   Server,
   Terminal,
+  BoxIcon,
 
   LucideIcon,
 } from 'lucide-react'
@@ -57,7 +58,7 @@ const technologyIconMap = {
   MQTT: Layers,
   Docker: Server,
   Kubernetes: Cloud,
-  Terraform: Cloud,
+  Terraform: BoxIcon,
   AWS: Cloud,
   Azure: Cloud,
   'C#': Cpu,
@@ -236,7 +237,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
             </Box>
 
             {/* Metrics Section (Progressive Disclosure) */}
-            <Collapse in={expanded} collapsedSize={40}>
+            <Collapse in={expanded} collapsedSize={70}>
               <Box
                 sx={{
                   display: 'grid',
