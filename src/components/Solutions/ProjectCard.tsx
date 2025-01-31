@@ -35,7 +35,7 @@ interface Project {
   id: string;
   name: string;
   description: string;
-  technologies: string;
+  technologies: string [];
   clientName: string;
   image?: string;
   metrics: Array<{
@@ -138,7 +138,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
             transform: 'translateY(-8px)',
             boxShadow: `0 32px 64px ${alpha(theme.palette.primary.main, 0.2)}`,
           },
-          height: 400, // Fixed height for the card
+          height: 450, // Increased card height for better spacing
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -151,11 +151,11 @@ const ProjectCard = ({ project }: { project: Project }) => {
           component={NextLink}
           href={`/projects/${project.id}`}
           sx={{
-            p: 4, // Increased padding
+            p: 5, // Increased padding
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            minHeight: 400,
+            minHeight: 450, // Increased min height to match card height
           }}
         >
           {/* Project Icon */}
@@ -182,6 +182,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 )} 100%)`,
                 borderRadius: '50%',
                 overflow: 'visible',
+                zIndex: 2, // Ensure icon is on top
               }}
             >
               <project.icon
@@ -211,7 +212,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
             </Box>
           )}
 
-          <CardContent sx={{ textAlign: 'center', px: 0, width: '100%', flexGrow: 1 }}> {/* Allow content to grow */}
+          <CardContent sx={{ textAlign: 'center', px: 0, width: '100%', flexGrow: 1 }}>
             {/* Project Name */}
             <Typography
               variant="h5"
@@ -246,7 +247,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
             </Typography>
 
             {/* Technology Icons Section */}
-            <Box sx={{ mb: 4, overflow: 'hidden' }}> {/* Increased margin bottom */}
+            <Box sx={{ mb: 5, overflow: 'hidden' }}> {/* Increased margin bottom */}
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
                 Main Technologies
               </Typography>
@@ -254,8 +255,8 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 sx={{
                   display: 'flex',
                   justifyContent: 'center',
-                  gap: 3, // Increased gap
-                  mb: 3, // Increased margin bottom
+                  gap: 4, // Increased gap
+                  mb: 4, // Increased margin bottom
                 }}
               >
                 {project.technologies.map((tech, index) => {
@@ -283,7 +284,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 sx={{
                   display: 'flex',
                   flexWrap: 'wrap',
-                  gap: 2, // Increased gap
+                  gap: 3, // Increased gap
                   justifyContent: 'center',
                   overflow: 'hidden',
                 }}
@@ -324,8 +325,8 @@ const ProjectCard = ({ project }: { project: Project }) => {
               sx={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 2,
-                mb: 3,
+                gap: 3, // Increased gap
+                mb: 4, // Increased margin bottom
               }}
             >
               {project.metrics.map((metric, index) => (
@@ -336,7 +337,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 >
                   <Box
                     sx={{
-                      p: 1.5,
+                      p: 2, // Increased padding
                       borderRadius: 2,
                       bgcolor: alpha(theme.palette.primary.main, 0.03),
                       border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
@@ -356,7 +357,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
         </CardActionArea>
 
         {/* Explore Button */}
-        <Box sx={{ p: 2, textAlign: 'center' }}>
+        <Box sx={{ p: 3, textAlign: 'center' }}> {/* Increased padding */}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               component={NextLink}
