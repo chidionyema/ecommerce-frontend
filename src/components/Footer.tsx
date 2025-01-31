@@ -1,123 +1,106 @@
 import React from 'react';
-import { Box, Typography, Link, Stack, IconButton } from '@mui/material';
-import { LinkedIn, Twitter, GitHub } from '@mui/icons-material';
+import { Box, Typography, Link, Container, Grid } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { NEON_ACCENT } from '../theme/palette';
+
+// Styled component for social media icons
+const SocialIconLink = styled(Link)(({ theme }) => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 40,
+  height: 40,
+  borderRadius: '50%',
+  backgroundColor: theme.palette.grey[200],
+  color: theme.palette.text.primary,
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    backgroundColor: NEON_ACCENT,
+    color: theme.palette.getContrastText(NEON_ACCENT),
+  },
+  margin: theme.spacing(0, 1),
+}));
 
 const Footer: React.FC = () => {
   return (
-    <Box sx={{ 
-      borderTop: '1px solid',
-      borderColor: 'divider',
-      background: 'linear-gradient(195deg, rgba(18, 18, 18, 0.98) 0%, rgba(28, 28, 28, 0.98) 100%)',
-      backdropFilter: 'blur(12px)',
-      pt: 8,
-      pb: 6,
-      px: 2,
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '2px',
-        background: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%)',
-      }
-    }}>
-      <Box sx={{ 
-        maxWidth: 1200,
-        mx: 'auto',
-        textAlign: { xs: 'center', md: 'left' }
-      }}>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={4} justifyContent="space-between" alignItems="center">
-          {/* Branding Section */}
-          <Box sx={{ mb: { xs: 2, md: 0 } }}>
-            <Typography variant="h6" component="div" sx={{ 
-              fontWeight: 700,
-              background: 'linear-gradient(45deg, #FFF 30%, #AAA 90%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              letterSpacing: '-0.5px'
-            }}>
-              GluStack
+    <Box
+      component="footer"
+      sx={{
+        py: 6,
+        px: 2,
+        mt: 'auto',
+        backgroundColor: (theme) =>
+          theme.palette.mode === 'light'
+            ? theme.palette.grey[200]
+            : theme.palette.grey[800],
+      }}
+    >
+      <Container maxWidth="lg">
+        <Grid container spacing={3} justifyContent="center">
+          <Grid item xs={12} sm={4} md={3} textAlign="center">
+            <Typography variant="h6" color="text.primary" gutterBottom>
+              About Us
             </Typography>
-            <Typography variant="body2" sx={{ 
-              mt: 1,
-              color: 'rgba(255,255,255,0.7)',
-              fontSize: '0.875rem',
-              maxWidth: 300
-            }}>
-              Innovating the future of web experiences
+            <Typography variant="body2" color="text.secondary">
+              We are a team of experienced consultants dedicated to helping
+              businesses thrive.
             </Typography>
-          </Box>
-
-          {/* Legal Links */}
-          <Stack direction="row" spacing={4} sx={{ mb: { xs: 4, md: 0 } }}>
-            <Stack spacing={1}>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.5px' }}>
-                LEGAL
-              </Typography>
-              <Link href="/privacy-policy" color="inherit" sx={{ 
-                transition: 'color 0.2s',
-                '&:hover': { color: 'primary.main' },
-                color: 'rgba(255,255,255,0.8)'
-              }}>
-                Privacy Policy
-              </Link>
-              <Link href="/terms-of-service" color="inherit" sx={{ 
-                transition: 'color 0.2s',
-                '&:hover': { color: 'primary.main' },
-                color: 'rgba(255,255,255,0.8)'
-              }}>
-                Terms of Service
-              </Link>
-            </Stack>
-          </Stack>
-
-          {/* Social Links */}
-          <Stack direction="row" spacing={2}>
-            <IconButton href="https://linkedin.com" target="_blank" rel="noopener" sx={{
-              color: 'rgba(255,255,255,0.8)',
-              transition: 'all 0.3s',
-              '&:hover': { 
-                color: 'primary.main',
-                transform: 'translateY(-2px)'
-              }
-            }}>
-              <LinkedIn fontSize="small" />
-            </IconButton>
-            <IconButton href="https://twitter.com" target="_blank" rel="noopener" sx={{
-              color: 'rgba(255,255,255,0.8)',
-              transition: 'all 0.3s',
-              '&:hover': { 
-                color: 'primary.main',
-                transform: 'translateY(-2px)'
-              }
-            }}>
-              <Twitter fontSize="small" />
-            </IconButton>
-            <IconButton href="https://github.com" target="_blank" rel="noopener" sx={{
-              color: 'rgba(255,255,255,0.8)',
-              transition: 'all 0.3s',
-              '&:hover': { 
-                color: 'primary.main',
-                transform: 'translateY(-2px)'
-              }
-            }}>
-              <GitHub fontSize="small" />
-            </IconButton>
-          </Stack>
-        </Stack>
-
-        {/* Copyright */}
-        <Typography variant="body2" sx={{ 
-          mt: 6,
-          color: 'rgba(255,255,255,0.5)',
-          textAlign: 'center',
-          fontSize: '0.75rem'
-        }}>
-          &copy; {new Date().getFullYear()} GluStack. All rights reserved.
-        </Typography>
-      </Box>
+          </Grid>
+          <Grid item xs={12} sm={4} md={3} textAlign="center">
+            <Typography variant="h6" color="text.primary" gutterBottom>
+              Contact
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              123 Tech Street, Innovation City
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Email: info@glustack.com
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Phone: +1 (555) 123-4567
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={4} md={3} textAlign="center">
+            <Typography variant="h6" color="text.primary" gutterBottom>
+              Follow Us
+            </Typography>
+            <Box sx={{ mt: 1 }}>
+              <SocialIconLink href="#">
+                {/* Replace with actual social media icons */}
+                <i className="fab fa-facebook-f"></i>
+              </SocialIconLink>
+              <SocialIconLink href="#">
+                <i className="fab fa-twitter"></i>
+              </SocialIconLink>
+              <SocialIconLink href="#">
+                <i className="fab fa-linkedin-in"></i>
+              </SocialIconLink>
+              <SocialIconLink href="#">
+                <i className="fab fa-instagram"></i>
+              </SocialIconLink>
+            </Box>
+          </Grid>
+        </Grid>
+        <Box mt={5}>
+          <Typography variant="body2" color="text.secondary" align="center">
+            {'Copyright © '}
+            <Link color="inherit" href="/">
+              GLUStack
+            </Link>{' '}
+            {new Date().getFullYear()}
+            {'.'}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" align="center">
+            <Link color="inherit" href="/privacy-policy">
+              Privacy Policy
+            </Link>
+            {' | '}
+            <Link color="inherit" href="/terms-of-service">
+              Terms of Service
+            </Link>
+          </Typography>
+        </Box>
+      </Container>
     </Box>
   );
 };

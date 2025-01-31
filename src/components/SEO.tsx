@@ -4,9 +4,10 @@ import Head from 'next/head';
 interface SEOProps {
   title: string;
   description: string;
+  keywords?: string;
 }
 
-const SEO: React.FC<SEOProps> = ({ title, description }) => {
+const SEO: React.FC<SEOProps> = ({ title, description, keywords }) => {
   return (
     <Head>
       <meta name="description" content={description} />
@@ -20,6 +21,7 @@ const SEO: React.FC<SEOProps> = ({ title, description }) => {
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
+      {keywords && <meta name="keywords" content={keywords} />}
       <title>{title}</title>
     </Head>
   );

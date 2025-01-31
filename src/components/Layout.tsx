@@ -1,270 +1,292 @@
+'use client';
+
 import React, { useState } from 'react';
-import Footer from './Footer';
+import Footer from './Footer'; // Adjust path if needed
 import {
   Box,
   Container,
   Typography,
+  Grid,
   Button,
   Card,
-  useTheme,
-  Grid,
-  Chip,
-  styled,
-  alpha,
+  CardContent,
   Avatar,
-  Divider
+  useTheme,
+  styled,
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import {
-  PRIMARY_DARK,
-  SECONDARY_DARK,
-  LIGHT_ACCENT,
-  TECH_GRADIENT,
-  BACKDROP_BLUR,
-  BORDER_RADIUS
+  HOLO_GRADIENT,
+} from '../theme/palette';
 
-} from '../theme/branding';
+const SectionCard = styled(Card)(({ theme }) => ({
+  borderRadius: '16px',
+  transition: 'all 0.3s ease',
+  background: `linear-gradient(145deg, ${theme.palette.background.paper}, #f8f9fc)`,
+  '&:hover': {
+    transform: 'translateY(-8px)',
+    boxShadow: theme.shadows[6],
+  },
+}));
 
-const HeroSection = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  textAlign: 'center',
-  color: LIGHT_ACCENT,
-  padding: theme.spacing(8),
-  minHeight: '80vh',
-  background: `linear-gradient(135deg, ${PRIMARY_DARK} 0%, ${SECONDARY_DARK} 100%)`,
-  position: 'relative',
-  overflow: 'hidden',
-  borderRadius: BORDER_RADIUS,
-  margin: theme.spacing(3),
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    background: 'url(/grid-pattern.svg) repeat',
-    opacity: 0.05,
+const TestimonialCard = styled(Card)(({ theme }) => ({
+  borderRadius: '16px',
+  background: `linear-gradient(145deg, ${theme.palette.background.paper}, #f8f9fc)`,
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    boxShadow: theme.shadows[4],
   },
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  padding: theme.spacing(2, 6),
-  borderRadius: BORDER_RADIUS,
+  padding: theme.spacing(1.5, 4),
+  borderRadius: '50px',
   fontWeight: 700,
-  letterSpacing: '1px',
-  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-  background: TECH_GRADIENT,
-  color: LIGHT_ACCENT,
-  border: `1px solid ${alpha(LIGHT_ACCENT, 0.3)}`,
+  transition: 'all 0.3s ease',
+  background: `linear-gradient(45deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
+  color: theme.palette.common.white,
   '&:hover': {
     transform: 'translateY(-2px)',
-    boxShadow: `0 12px 48px ${alpha('#4361EE', 0.4)}`,
+    boxShadow: theme.shadows[4],
   },
 }));
 
-const SectionCard = styled(Card)(({ theme }) => ({
-  borderRadius: BORDER_RADIUS,
-  background: alpha(PRIMARY_DARK, 0.6),
-  backdropFilter: BACKDROP_BLUR,
-  border: `1px solid ${alpha(LIGHT_ACCENT, 0.1)}`,
-  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: `0 24px 48px ${alpha(PRIMARY_DARK, 0.4)}`,
-  },
-}));
-const TestimonialSection = styled(Box)(({ theme }) => ({
-  position: 'relative',
-  padding: theme.spacing(8, 0),
-  background: `linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.98)} 0%, ${alpha(SECONDARY_DARK, 0.98)} 100%)`,
-  borderRadius: BORDER_RADIUS,
-  border: `1px solid ${alpha(LIGHT_ACCENT, 0.1)}`,
-  margin: theme.spacing(4, 0),
-  overflow: 'hidden',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: `url(/circuit-pattern.svg) repeat`,
-    opacity: 0.03,
-  },
-}));
+interface LayoutProps {
+  children: React.ReactNode;
+  showHeroSection?: boolean;
+}
 
-const TestimonialCard = styled(motion.div)(({ theme }) => ({
-  position: 'relative',
-  padding: theme.spacing(4),
-  borderRadius: BORDER_RADIUS,
-  background: alpha(PRIMARY_DARK, 0.6),
-  backdropFilter: BACKDROP_BLUR,
-  border: `1px solid ${alpha(LIGHT_ACCENT, 0.1)}`,
-  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: `0 24px 48px ${alpha(PRIMARY_DARK, 0.4)}`,
-  },
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: BORDER_RADIUS,
-    border: `1px solid transparent`,
-    background: TECH_GRADIENT,
-    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-    maskComposite: 'exclude',
-    opacity: 0.3,
-  },
-}));
-
-const testimonials = [
-  {
-    name: "Alex Rivera",
-    role: "CTO @TechNova",
-    text: "GLUStack's solutions transformed our infrastructure. The technical depth and execution speed were unparalleled.",
-    logo: "/tech-nova-logo.svg",
-    results: "300% Performance Boost"
-  },
-  {
-    name: "Sarah Chen",
-    role: "Lead Engineer @QuantumCore",
-    text: "The most developer-friendly stack we've implemented. Reduced deployment time by 60% while improving scalability.",
-    logo: "/quantum-core-logo.svg",
-    results: "5x Faster Deployment"
-  },
-  {
-    name: "Michael Donoghue",
-    role: "VP Engineering @NeuroForge",
-    text: "A game-changer for cloud-native development. Their API-first approach saved us thousands of engineering hours.",
-    logo: "/neuroforge-logo.svg",
-    results: "80% Cost Reduction"
-  }
-];
-
-const Testimonials = () => {
-  const [selected, setSelected] = useState(0);
+const Layout: React.FC<LayoutProps> = ({
+  children,
+  showHeroSection = false,
+}) => {
   const theme = useTheme();
+  const [showAllTestimonials, setShowAllTestimonials] = useState(false);
+
+  const testimonials = [
+    {
+      id: 1,
+      name: 'John Doe',
+      role: 'CEO, TechCorp',
+      testimonial:
+        'The consulting services provided were exceptional. They helped us streamline our operations and achieve our goals faster.',
+      avatar: '/avatar1.jpg',
+    },
+    {
+      id: 2,
+      name: 'Jane Smith',
+      role: 'CTO, InnovateX',
+      testimonial:
+        'Their expertise and insights were invaluable. We highly recommend their services to any business looking to grow.',
+      avatar: '/avatar2.jpg',
+    },
+    {
+      id: 3,
+      name: 'Michael Johnson',
+      role: 'Founder, StartupHub',
+      testimonial:
+        'The team was professional and knowledgeable. They delivered results beyond our expectations.',
+      avatar: '/avatar3.jpg',
+    },
+    {
+      id: 4,
+      name: 'Sarah Lee',
+      role: 'Manager, TechSolutions',
+      testimonial:
+        'Amazing team! They helped us solve complex problems with ease.',
+      avatar: '/avatar4.jpg',
+    },
+    {
+      id: 5,
+      name: 'David Brown',
+      role: 'Director, InnovateNow',
+      testimonial:
+        'Very professional and efficient. We are extremely satisfied with their services.',
+      avatar: '/avatar5.jpg',
+    },
+    {
+      id: 6,
+      name: 'Emily Davis',
+      role: 'CEO, FutureTech',
+      testimonial:
+        'Outstanding results! Their strategic guidance has been a game-changer for our business.',
+      avatar: '/avatar6.jpg',
+    },
+  ];
+
+  const visibleTestimonials = showAllTestimonials
+    ? testimonials
+    : testimonials.slice(0, 3);
+
+  const services = [
+    {
+      title: 'Strategic Consulting',
+      content: 'Tailored strategies to help your business achieve its goals',
+      link: '/solutions',
+    },
+    {
+      title: 'Expert Guidance',
+      content: 'Leverage our deep expertise for informed decisions',
+      link: '/solutions',
+    },
+    {
+      title: 'Custom Solutions',
+      content: 'Bespoke solutions for unique business needs',
+      link: '/solutions',
+    },
+    {
+      title: 'Industry Insights',
+      content: 'Actionable insights to stay ahead in your industry',
+      link: '/solutions',
+    },
+  ];
 
   return (
-    <TestimonialSection>
-      <Container maxWidth="xl">
-        <Box textAlign="center" mb={8}>
-          <Chip
-            label="Industry Validation"
-            variant="outlined"
-            sx={{ 
-              mb: 2,
-              color: LIGHT_ACCENT,
-              borderColor: alpha(LIGHT_ACCENT, 0.3),
-              backdropFilter: BACKDROP_BLUR
-            }}
-          />
-          <Typography variant="h3" gutterBottom sx={{ ...theme.typography.h3, mb: 2 }}>
-            Trusted by Innovators
-          </Typography>
-          <Typography variant="body1" sx={{ color: alpha(LIGHT_ACCENT, 0.8) }}>
-            Join thousands of technical leaders transforming their stack
-          </Typography>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {/* Hero Section (Conditional) */}
+      {showHeroSection && (
+        <Box
+          sx={{
+            background: HOLO_GRADIENT,
+            py: 10,
+            textAlign: 'center',
+            // Responsive design
+            '@media (max-width:600px)': {
+              py: 6, // Reduce padding on smaller screens
+            },
+          }}
+        >
+          <Container maxWidth="lg">
+            <Typography
+              variant="h1"
+              sx={{
+                fontWeight: 800,
+                mb: 4,
+                color: 'white',
+                // Responsive design
+                '@media (max-width:600px)': {
+                  fontSize: '2.5rem', // Reduce font size on smaller screens
+                },
+              }}
+            >
+              Accelerate Your Business Growth
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                mb: 6,
+                color: 'rgba(255, 255, 255, 0.8)',
+                // Responsive design
+                '@media (max-width:600px)': {
+                  fontSize: '1rem', // Reduce font size on smaller screens
+                },
+              }}
+            >
+              Strategic Consulting, Expert Guidance, and Custom Solutions to
+              Propel Your Business Forward
+            </Typography>
+            <StyledButton href="/contact" size="large">
+              Get Started
+            </StyledButton>
+          </Container>
         </Box>
+      )}
 
-        <Grid container spacing={4}>
-          {testimonials.map((testimonial, index) => (
-            <Grid item xs={12} md={4} key={index}>
-              <TestimonialCard
+      <Container maxWidth="lg" component="main" sx={{ py: 8 }}>
+        <Box sx={{ mb: 8 }}>{children}</Box>
+
+        {/* Services Section (Grid) */}
+        <Grid container spacing={4} sx={{ mb: 8 }}>
+          {services.map((service, index) => (
+            <Grid item xs={12} md={6} key={index}>
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2 }}
-                onHoverStart={() => setSelected(index)}
+                transition={{ delay: index * 0.1 }}
               >
-                
-                <Typography variant="body1" sx={{ 
-                  mb: 3, 
-                  lineHeight: 1.7,
-                  color: alpha(LIGHT_ACCENT, 0.9)
-                }}>
-                  {testimonial.text}
-                </Typography>
-
-                <Divider sx={{ 
-                  borderColor: alpha(LIGHT_ACCENT, 0.1), 
-                  my: 3 
-                }} />
-
-                <Box display="flex" alignItems="center" gap={3}>
-                  <Avatar
-                    src={testimonial.logo}
-                    sx={{ 
-                      width: 56, 
-                      height: 56,
-                      background: alpha(LIGHT_ACCENT, 0.1),
-                      border: `1px solid ${alpha(LIGHT_ACCENT, 0.2)}`
-                    }}
-                  />
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {testimonial.name}
+                <SectionCard>
+                  <CardContent sx={{ textAlign: 'center', p: 4 }}>
+                    <Typography
+                      variant="h5"
+                      gutterBottom
+                      sx={{ fontWeight: 700 }}
+                    >
+                      {service.title}
                     </Typography>
-                    <Typography variant="body2" sx={{ 
-                      color: alpha(LIGHT_ACCENT, 0.7),
-                      fontSize: '0.9rem'
-                    }}>
-                      {testimonial.role}
+                    <Typography variant="body1" sx={{ mb: 3 }}>
+                      {service.content}
                     </Typography>
-                  </Box>
-                </Box>
-
-                <Chip
-                  label={testimonial.results}
-                  sx={{
-                    mt: 3,
-                    background: TECH_GRADIENT,
-                    color: PRIMARY_DARK,
-                    fontWeight: 700,
-                    fontSize: '0.85rem'
-                  }}
-                />
-              </TestimonialCard>
+                    <Button
+                      variant="outlined"
+                      href={service.link}
+                      sx={{
+                        borderWidth: 2,
+                        '&:hover': { borderWidth: 2 },
+                      }}
+                    >
+                      Learn More
+                    </Button>
+                  </CardContent>
+                </SectionCard>
+              </motion.div>
             </Grid>
           ))}
         </Grid>
-      </Container>
-    </TestimonialSection>
-  );
-};
 
-const Layout = ({ children, showHeroSection = false }) => {
-  const theme = useTheme();
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      {showHeroSection && (
-        <HeroSection>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <Typography variant="h1" sx={theme.typography.h1}>
-              Transform Your Business
-            </Typography>
-            <Typography variant="h5" sx={theme.typography.h5}>
-              Expert-led solutions for digital transformation
-            </Typography>
-            <StyledButton href="/consultation">Start Your Journey</StyledButton>
-          </motion.div>
-        </HeroSection>
-      )}
+        {/* Testimonials Section (Slider/Carousel - using Grid for now) */}
+        <Box sx={{ textAlign: 'center', mb: 8 }}>
+          <Typography variant="h3" sx={{ fontWeight: 800, mb: 6 }}>
+            Client Success Stories
+          </Typography>
+          <Grid container spacing={4}>
+            {visibleTestimonials.map((testimonial) => (
+              <Grid item xs={12} md={4} key={testimonial.id}>
+                <motion.div whileHover={{ scale: 1.02 }}>
+                  <TestimonialCard>
+                    <CardContent sx={{ p: 4 }}>
+                      <Avatar
+                        src={testimonial.avatar}
+                        sx={{
+                          width: 80,
+                          height: 80,
+                          mb: 3,
+                          mx: 'auto',
+                          border: `2px solid ${theme.palette.primary.main}`,
+                        }}
+                      />
+                      <Typography
+                        variant="body1"
+                        sx={{ mb: 3, fontStyle: 'italic' }}
+                      >
+                        "{testimonial.testimonial}"
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                        {testimonial.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {testimonial.role}
+                      </Typography>
+                    </CardContent>
+                  </TestimonialCard>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
+          {!showAllTestimonials && testimonials.length > 3 && (
+            <Button
+              variant="contained"
+              onClick={() => setShowAllTestimonials(true)}
+              sx={{ mt: 6, px: 6 }}
+            >
+              View More Testimonials
+            </Button>
+          )}
+        </Box>
 
-      <Container maxWidth="xl" component="main" sx={{ py: 8 }}>
-        <Box sx={{ mb: 8 }}>{children}</Box>
-        <Testimonials />
-
+        {/* Call to Action Section */}
         <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Typography variant="h4" sx={theme.typography.h4}>
+          <Typography variant="h4" sx={{ fontWeight: 800, mb: 4 }}>
             Ready to Accelerate Growth?
           </Typography>
           <StyledButton href="/contact" size="large">
@@ -272,6 +294,8 @@ const Layout = ({ children, showHeroSection = false }) => {
           </StyledButton>
         </Box>
       </Container>
+
+      {/* Footer */}
       <Footer />
     </Box>
   );

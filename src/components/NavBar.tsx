@@ -1,360 +1,387 @@
-import { useState, useCallback, memo, useMemo } from "react";
-import { useRouter } from "next/router";
-import Link from "next/link";
+'use client';
+
+import { useState, useCallback, memo, useMemo, useEffect, useRef } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   AppBar,
   Toolbar,
   Typography,
   Button,
   Box,
-  ButtonProps,
+  IconButton,
   Container,
   alpha,
-  IconButton,
-  useMediaQuery,
   Stack,
-  useTheme
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import CodeIcon from "@mui/icons-material/Code";
-import { Menu, Close, Home, Book, Whatshot, ContactMail } from "@mui/icons-material";
-
-// Theme imports
+  useTheme,
+  useMediaQuery,
+  CircularProgress,
+  Skeleton,
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import {
-  PRIMARY_DARK,
-  SECONDARY_DARK,
-  LIGHT_ACCENT,
-  TECH_GRADIENT,
-  BACKDROP_BLUR,
-  BORDER_RADIUS,
-  METALLIC_GRADIENT
-} from "../theme/branding";
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  animate,
+  useTransform,
+  useScroll,
+  useMotionTemplate,
+} from 'framer-motion';
+import {
+  Menu,
+  Close,
+  Home,
+  Code,
+  Book,
+  Whatshot,
+  ContactMail,
+} from '@mui/icons-material';
 
-// Styled Components
-const LuxAppBar = styled(AppBar)(({ theme }) => ({
-  background: `
-    linear-gradient(145deg, 
-      ${alpha(PRIMARY_DARK, 0.98)}, 
-      ${alpha(SECONDARY_DARK, 0.98)})
-    padding-box,
-    ${METALLIC_GRADIENT}
-    border-box`,
-  backdropFilter: `${BACKDROP_BLUR} saturate(300%)`, // Increased saturation
-  border: `1.5px solid ${alpha(LIGHT_ACCENT, 0.2)}`, // Added border
-  boxShadow: `0 24px 48px ${alpha(PRIMARY_DARK, 0.6)}`, // Darker shadow
-  borderRadius: BORDER_RADIUS,
-  margin: "16px auto",
-  maxWidth: "1536px",
-  position: "fixed",
+// Performance Constants
+const DEBOUNCE_DELAY = 150;
+const SCROLL_THRESHOLD = 100;
+const LOADING_DURATION = 0.5;
+
+// Cyberpunk Theme Constants
+const NEON_ACCENT = '#64FFDA';
+const CYBER_GRADIENT = `linear-gradient(135deg, ${NEON_ACCENT} 0%, #4361EE 100%)`;
+
+const MotionAppBar = motion(AppBar);
+
+const CyberAppBar = styled(MotionAppBar)(({ theme }) => ({
+  backgroundColor: alpha(theme.palette.primary.dark, 0.98),
+  backdropFilter: 'blur(24px)',
+  borderBottom: `1px solid ${alpha(theme.palette.secondary.main, 0.1)}`,
+  boxShadow: `0 0 24px ${alpha(theme.palette.secondary.main, 0.1)}`,
+  transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s linear',
+  willChange: 'transform, opacity',
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    bottom: 0,
+    left: '50%',
+    width: '0%',
+    height: '2px',
+    background: CYBER_GRADIENT,
+    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+  },
+  '&[data-scrolled="true"]::after': {
+    left: 0,
+    width: '100%',
+  },
+}));
+
+const LoadingBar = styled(motion.div)(({ theme }) => ({
+  position: 'fixed',
+  top: 0,
   left: 0,
   right: 0,
-  transform: "none",
-  transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-  "&:hover": {
-    transform: "scale(1.005)",
-    boxShadow: `0 32px 64px ${alpha(PRIMARY_DARK, 0.6)}`,
-  },
-  [theme.breakpoints.down("sm")]: {
-    margin: "8px auto",
-    width: "calc(100% - 16px)",
-    borderRadius: `calc(${BORDER_RADIUS} * 0.75)`,
-  },
+  height: '3px',
+  background: CYBER_GRADIENT,
+  zIndex: 9999,
+  transformOrigin: 'left',
+  boxShadow: `0 0 16px ${alpha(NEON_ACCENT, 0.3)}`,
 }));
 
-const BrandMark = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  gap: theme.spacing(2),
-  padding: theme.spacing(1.5),
-  borderRadius: BORDER_RADIUS,
-  background: `
-    linear-gradient(145deg, 
-      ${alpha(PRIMARY_DARK, 0.8)}, 
-      ${alpha(SECONDARY_DARK, 0.6)})
-    padding-box,
-    ${METALLIC_GRADIENT}
-    border-box`,
-  border: `1.5px solid transparent`,
-  transition: "all 0.3s ease",
-  cursor: "pointer",
-  "&:hover": {
-    transform: "scale(1.02)",
-    boxShadow: `0 8px 32px ${alpha(LIGHT_ACCENT, 0.3)}`,
-    "& svg": {
-      filter: "drop-shadow(0 2px 8px rgba(255,255,255,0.4))",
-    }
-  },
-}));
+interface HolographicButtonProps {
+  $active?: boolean;
+}
 
-const NavItem = styled(motion(Button))<ButtonProps & { active: boolean }>(({ active, theme }) => ({
-  position: "relative",
-  color: active ? LIGHT_ACCENT : alpha("#FFFFFF", 0.85),
-  fontWeight: 600,
-  fontSize: "1rem",
-  letterSpacing: "1px",
-  padding: "8px 20px",
-  borderRadius: BORDER_RADIUS,
-  overflow: "hidden",
-  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: active ? alpha(LIGHT_ACCENT, 0.1) : "transparent",
-    borderRadius: BORDER_RADIUS,
-    zIndex: 0,
-  },
-  "&::after": {
-    content: '""',
-    position: "absolute",
-    bottom: 0,
-    left: "50%",
-    width: active ? "80%" : "0%",
-    height: "2px",
-    background: TECH_GRADIENT,
-    transform: "translateX(-50%)",
-    transition: "width 0.3s ease",
-  },
-  "&:hover": {
-    color: LIGHT_ACCENT,
-    "&::before": {
-      background: alpha(LIGHT_ACCENT, 0.1),
+const HolographicButton = styled(motion.button)<HolographicButtonProps>(
+  ({ theme, $active }) => ({
+    position: 'relative',
+    padding: theme.spacing(1.5, 3),
+    fontWeight: 600,
+    letterSpacing: '1px',
+    background: 'transparent',
+    border: 'none',
+    borderRadius: theme.shape.borderRadius,
+    overflow: 'hidden',
+    cursor: 'pointer',
+    color: $active ? NEON_ACCENT : alpha(theme.palette.text.primary, 0.9),
+    transition: 'color 0.3s ease',
+
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      inset: 0,
+      background: CYBER_GRADIENT,
+      opacity: $active ? 0.15 : 0,
+      transition: 'opacity 0.3s ease',
     },
-    "&::after": {
-      width: "60%",
+
+    '&:hover::before': {
+      opacity: 0.1,
     },
-  },
-  "& .MuiButton-startIcon": {
-    transition: "transform 0.3s ease",
-  },
-  "&:hover .MuiButton-startIcon": {
-    transform: "rotate(-15deg)",
-  },
-}));
 
-const MobileMenu = styled(motion(Box))(({ theme }) => ({
-  position: "fixed",
-  top: 0,
-  right: 0,
-  bottom: 0,
-  width: "min(100vw, 400px)",
-  backdropFilter: `${BACKDROP_BLUR} saturate(180%)`,
-  background: alpha(PRIMARY_DARK, 0.98),
-  zIndex: 2000,
-  padding: theme.spacing(4),
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  boxShadow: `-16px 0 48px ${alpha(PRIMARY_DARK, 0.8)}`,
-}));
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: '2px',
+      background: CYBER_GRADIENT,
+      transform: `scaleX(${$active ? 1 : 0})`,
+      transformOrigin: 'right',
+      transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+    },
+  })
+);
 
-const NavBar = memo(() => {
-  const router = useRouter();
+const CyberLogo = memo(() => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const glow = useMotionTemplate`radial-gradient(300px circle at ${mouseX}px ${mouseY}px, ${alpha(
+    NEON_ACCENT,
+    0.2
+  )} 0%, transparent 80%)`;
+
+  return (
+    <Link href="/" passHref legacyBehavior>
+      <motion.a
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '12px 24px',
+          borderRadius: theme.shape.borderRadius,
+          position: 'relative',
+        }}
+        whileHover="hover"
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          mouseX.set(e.clientX - rect.left);
+          mouseY.set(e.clientY - rect.top);
+        }}
+      >
+        <motion.div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: glow,
+          }}
+        />
+
+        <Code
+          sx={{
+            fontSize: '2.5rem',
+            color: NEON_ACCENT,
+            filter: 'drop-shadow(0 0 8px rgba(100, 255, 218, 0.5))',
+          }}
+        />
+
+        <Typography
+          variant="h1"
+          sx={{
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '2rem',
+            fontWeight: 700,
+            background: CYBER_GRADIENT,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          GLUStack
+        </Typography>
+      </motion.a>
+    </Link>
+  );
+});
+
+const NavBar = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const progress = useMotionValue(0);
+  const scrollTimeout = useRef<NodeJS.Timeout>();
+  const [scrolled, setScrolled] = useState(false);
+
+  // Scroll-driven animations
   const { scrollY } = useScroll();
-  const elevation = useTransform(scrollY, [0, 100], [0, 1], { clamp: true });
+  const yTransform = useTransform(scrollY, [0, 100], [0, -20]);
+  const opacityTransform = useTransform(scrollY, [0, 100], [1, 0.9]);
 
-  const navItems = useMemo(() => [
-    { label: "Home", path: "/", icon: <Home /> },
-    { label: "Solutions", path: "/solutions", icon: <CodeIcon /> },
-    { label: "Resources", path: "/resources", icon: <Book /> },
-    { label: "Pricing", path: "/pricing", icon: <Whatshot /> },
-    { label: "Contact", path: "/contact", icon: <ContactMail /> },
-  ], []);
+  const navItems = useMemo(
+    () => [
+      { label: 'Home', path: '/', icon: <Home /> },
+      { label: 'Solutions', path: '/solutions', icon: <Code /> },
+      { label: 'Resources', path: '/resources', icon: <Book /> },
+      { label: 'Pricing', path: '/pricing', icon: <Whatshot /> },
+      { label: 'Contact', path: '/contact', icon: <ContactMail /> },
+    ],
+    []
+  );
 
-  const isActive = (path: string) => {
-    return router.asPath === path || router.asPath.startsWith(`${path}/`);
-  };
+  // Scroll debounce handler
+  useEffect(() => {
+    const unsubscribe = scrollY.on('change', (y) => {
+      clearTimeout(scrollTimeout.current);
+      scrollTimeout.current = setTimeout(() => {
+        setScrolled(y > SCROLL_THRESHOLD);
+      }, DEBOUNCE_DELAY);
+    });
 
-  const toggleMenu = useCallback(() => {
-    setMenuOpen((prev) => !prev);
-    document.body.style.overflow = menuOpen ? "auto" : "hidden";
-  }, [menuOpen]);
+    return () => {
+      unsubscribe();
+      clearTimeout(scrollTimeout.current);
+    };
+  }, [scrollY]);
+
+  // Navigation handler
+  const handleNavigation = useCallback(
+    async (href: string) => {
+      if (pathname === href) return;
+
+      try {
+        setIsNavigating(true);
+        animate(progress, 1, { duration: LOADING_DURATION, ease: 'easeOut' });
+        await router.push(href);
+      } catch (error) {
+        console.error('Navigation error:', error);
+      } finally {
+        animate(progress, 0, { duration: LOADING_DURATION * 0.6 }).then(() => {
+          setIsNavigating(false);
+        });
+      }
+    },
+    [router, pathname, progress]
+  );
+
+  // Optimized CyberLink component
+  const CyberLink = useMemo(
+    () =>
+      memo(({ item }: { item: (typeof navItems)[number] }) => {
+        const isActive = pathname === item.path;
+
+        return (
+          <HolographicButton
+            $active={isActive}
+            onClick={() => handleNavigation(item.path)}
+            disabled={isNavigating}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              {isNavigating && isActive ? (
+                <CircularProgress size={20} sx={{ color: NEON_ACCENT }} />
+              ) : (
+                <motion.div
+                  animate={{ rotate: isActive ? 15 : 0 }}
+                  transition={{ type: 'spring' }}
+                >
+                  {item.icon}
+                </motion.div>
+              )}
+              <span>{item.label}</span>
+            </Box>
+          </HolographicButton>
+        );
+      }),
+    [pathname, isNavigating, handleNavigation]
+  );
 
   return (
     <>
-      <LuxAppBar style={{ scale: elevation }}>
-        <Container maxWidth="xl">
-          <Toolbar sx={{ justifyContent: "space-between", py: 1 }}>
-            <Link href="/" passHref legacyBehavior>
-              <BrandMark component="a">
-                <motion.div whileHover={{ rotate: 15 }} transition={{ type: "spring" }}>
-                  <CodeIcon sx={{ 
-                    fontSize: 42, 
-                    color: LIGHT_ACCENT,
-                    filter: "drop-shadow(0 2px 4px rgba(255,255,255,0.2))"
-                  }} />
-                </motion.div>
-                <Box>
-                  <Typography variant="h1" sx={{ 
-                    fontSize: "2.2rem", 
-                    fontWeight: 800,
-                    background: TECH_GRADIENT,
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    letterSpacing: "-0.5px",
-                  }}>
-                    GLUStack
-                    <Box component="span" sx={{ 
-                      fontSize: "0.6em", 
-                      ml: 1, 
-                      fontWeight: 700, 
-                      color: LIGHT_ACCENT,
-                      textShadow: `0 2px 8px ${alpha(LIGHT_ACCENT, 0.4)}`
-                    }}>
-                      PRO
-                    </Box>
-                  </Typography>
-                </Box>
-              </BrandMark>
-            </Link>
+      <CyberAppBar
+        style={{
+          y: yTransform,
+          opacity: opacityTransform,
+        }}
+        data-scrolled={scrolled}
+      >
+        <LoadingBar style={{ scaleX: progress }} />
+
+        <Container maxWidth="xl" component="nav">
+          <Toolbar
+            sx={{
+              justifyContent: 'space-between',
+              py: 1,
+              minHeight: { xs: '64px', md: '80px' },
+              gap: 4,
+            }}
+          >
+            <CyberLogo />
 
             {!isMobile && (
-              <Stack direction="row" spacing={2} alignItems="center">
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 3,
+                  alignItems: 'center',
+                }}
+              >
                 {navItems.map((item) => (
-                  <Link href={item.path} key={item.path} passHref legacyBehavior>
-                    <NavItem 
-                      component="a" 
-                      active={isActive(item.path)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      startIcon={<motion.span>{item.icon}</motion.span>}
-                    >
-                      {item.label}
-                    </NavItem>
-                  </Link>
+                  <CyberLink key={item.path} item={item} />
                 ))}
-                <Button
-                  variant="contained"
-                  sx={{
-                    ml: 2,
-                    background: TECH_GRADIENT,
-                    fontWeight: 700,
-                    letterSpacing: "1px",
-                    borderRadius: BORDER_RADIUS,
-                    position: "relative",
-                    overflow: "hidden",
-                    "&:hover": {
-                      transform: "scale(1.05)",
-                      boxShadow: `0 8px 24px ${alpha(LIGHT_ACCENT, 0.2)}`,
-                      "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        inset: 0,
-                        background: alpha("#fff", 0.1),
-                      }
-                    }
-                  }}
-                >
-                  Get Started
-                </Button>
-              </Stack>
+              </Box>
             )}
 
             {isMobile && (
-              <IconButton 
-                onClick={toggleMenu} 
-                sx={{ color: LIGHT_ACCENT }}
-                aria-label={menuOpen ? "Close menu" : "Open menu"}
+              <IconButton
+                onClick={() => setMenuOpen(!menuOpen)}
+                sx={{ color: NEON_ACCENT }}
+                aria-label="Open navigation menu"
               >
-                <motion.div
-                  animate={menuOpen ? "open" : "closed"}
-                  variants={{
-                    open: { rotate: 90 },
-                    closed: { rotate: 0 },
-                  }}
-                >
-                  <Menu fontSize="large" />
-                </motion.div>
+                <Menu fontSize="large" />
               </IconButton>
             )}
           </Toolbar>
         </Container>
-      </LuxAppBar>
+      </CyberAppBar>
 
       <AnimatePresence>
         {menuOpen && (
-          <MobileMenu 
-            initial={{ x: "100%" }} 
+          <motion.nav
+            initial={{ x: '100%' }}
             animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            exit={{ x: '100%' }}
+            transition={{
+              type: 'spring',
+              stiffness: 300,
+              damping: 30,
+            }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              width: 'min(100vw, 400px)',
+              background: alpha(theme.palette.background.default, 0.98),
+              backdropFilter: 'blur(16px)',
+              zIndex: 9998,
+              padding: theme.spacing(4),
+              borderLeft: `1px solid ${alpha(NEON_ACCENT, 0.2)}`,
+            }}
+            aria-label="Mobile navigation"
           >
-            <IconButton 
-              onClick={toggleMenu} 
-              sx={{ 
-                position: "absolute", 
-                top: 24, 
-                right: 24, 
-                color: LIGHT_ACCENT,
+            <IconButton
+              onClick={() => setMenuOpen(false)}
+              sx={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                color: NEON_ACCENT,
               }}
-              aria-label="Close menu"
+              aria-label="Close navigation menu"
             >
-              <motion.div whileHover={{ rotate: 90 }}>
-                <Close fontSize="large" />
-              </motion.div>
+              <Close fontSize="large" />
             </IconButton>
-            <Stack spacing={4} sx={{ width: "100%", textAlign: "center" }}>
-              {navItems.map((item, index) => (
-                <motion.div
-                  key={item.path}
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 50 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Link href={item.path} passHref legacyBehavior>
-                    <NavItem 
-                      component="a" 
-                      onClick={toggleMenu}
-                      active={isActive(item.path)}
-                      sx={{ 
-                        fontSize: "1.5rem", 
-                        py: 2,
-                        width: "100%",
-                      }}
-                    >
-                      {item.icon}
-                      {item.label}
-                    </NavItem>
-                  </Link>
-                </motion.div>
+            <Stack spacing={3} sx={{ mt: 8 }}>
+              {navItems.map((item) => (
+                <CyberLink key={item.path} item={item} />
               ))}
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: navItems.length * 0.1 }}
-              >
-                <Button
-                  variant="contained"
-                  fullWidth
-                  sx={{
-                    background: TECH_GRADIENT,
-                    fontSize: "1.2rem",
-                    fontWeight: 700,
-                    py: 2,
-                    borderRadius: BORDER_RADIUS,
-                    "&:hover": {
-                      transform: "scale(1.02)",
-                    }
-                  }}
-                >
-                  Get Started
-                </Button>
-              </motion.div>
             </Stack>
-          </MobileMenu>
+          </motion.nav>
         )}
       </AnimatePresence>
     </>
   );
-});
+};
 
-export default NavBar;
+export default memo(NavBar);

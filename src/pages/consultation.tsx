@@ -4,7 +4,7 @@ import {
   User, Rocket, BarChart, ShieldCheck, CloudLightning, Code, Server
 } from 'lucide-react';
 import { Container, Box, Typography, Grid, alpha } from '@mui/material';
-import { colors } from '../theme/branding';
+
 
 interface TimelineStepProps {
   title: string;

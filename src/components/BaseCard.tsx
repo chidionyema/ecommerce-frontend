@@ -5,7 +5,7 @@ import {
   SECONDARY_DARK,
   BACKDROP_BLUR,
   TITLE_GRADIENT,
-} from "../theme/branding";
+} from "../theme/palette";
 
 const BaseCard = styled(motion(Box))(({ theme }) => ({
   position: "relative",

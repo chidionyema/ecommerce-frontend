@@ -1,4 +1,6 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+'use client';
+
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import {
   useTheme,
   Container,
@@ -12,9 +14,9 @@ import {
   Alert,
   InputAdornment,
   Box,
-} from "@mui/material";
-import { motion } from "framer-motion";
-import { useRouter } from "next/router";
+} from '@mui/material';
+import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import {
   Code,
   Send,
@@ -25,164 +27,408 @@ import {
   FlashOn,
   WorkspacePremium,
   CorporateFare,
-} from "@mui/icons-material";
-import { colors, typography } from "../theme/branding";
+} from '@mui/icons-material';
+import { z } from 'zod';
+import emailjs from '@emailjs/browser';
 
-type PlanType = "hourly" | "project" | "retainer" | "consultation";
+// EmailJS Configuration (replace with your actual values)
+const EMAILJS_CONFIG = {
+  SERVICE_ID: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+  TEMPLATE_ID: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+  USER_ID: process.env.NEXT_PUBLIC_EMAILJS_USER_ID!,
+};
 
-const PLAN_DETAILS: Record<PlanType, { title: string; icon: JSX.Element }> = {
+// Plan Type Definitions
+type PlanType = 'hourly' | 'project' | 'retainer' | 'consultation';
+
+const PLAN_DETAILS: Record<
+  PlanType,
+  { title: string; icon: JSX.Element }
+> = {
   hourly: {
-    title: "Accelerate Success – On Demand Expertise",
+    title: 'Accelerate Success – On Demand Expertise',
     icon: <FlashOn fontSize="large" />,
   },
   project: {
-    title: "Bespoke Digital Mastery – Crafted for Impact",
+    title: 'Bespoke Digital Mastery – Crafted for Impact',
     icon: <WorkspacePremium fontSize="large" />,
   },
   retainer: {
-    title: "Your Strategic Advantage – Elite Retainer Program",
+    title: 'Your Strategic Advantage – Elite Retainer Program',
     icon: <CorporateFare fontSize="large" />,
   },
   consultation: {
-    title: "Visionary Strategy – Unleash Your Potential",
+    title: 'Visionary Strategy – Unleash Your Potential',
     icon: <Code fontSize="large" />,
   },
 };
 
-interface FormData {
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-}
+// Zod Validation Schema
+const formSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  phone: z
+    .string()
+    .regex(
+      /^$|^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/,
+      'Invalid phone number'
+    ),
+  message: z.string().min(10, 'Message must be at least 10 characters'),
+});
 
+type FormData = z.infer<typeof formSchema>;
+type FormErrors = Partial<Record<keyof FormData, string>> & { form?: string };
+
+// Initial States
 const INITIAL_FORM_DATA: FormData = {
-  name: "",
-  email: "",
-  phone: "",
-  message: "",
+  name: '',
+  email: '',
+  phone: '',
+  message: '',
 };
+
+// Reusable Form Input Component
+interface FormInputProps {
+  label: string;
+  name: keyof FormData;
+  value: string;
+  error?: string;
+  disabled: boolean;
+  icon: JSX.Element;
+  multiline?: boolean;
+  onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+}
 
 const FormInput = ({
   label,
   name,
   value,
-  onChange,
+  error,
   disabled,
   icon,
   multiline = false,
-}: {
-  label: string;
-  name: keyof FormData;
-  value: string;
-  onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  disabled: boolean;
-  icon: JSX.Element;
-  multiline?: boolean;
-}) => (
-  <Grid item xs={12}>
-    <TextField
-      fullWidth
-      variant="outlined"
-      label={label}
-      name={name}
-      value={value}
-      onChange={onChange}
-      disabled={disabled}
-      multiline={multiline}
-      rows={multiline ? 4 : 1}
-      InputProps={{ startAdornment: <InputAdornment position="start">{icon}</InputAdornment> }}
-    />
-  </Grid>
-);
+  onChange
+}: FormInputProps) => {
+  const theme = useTheme();
+  return (
+    <Grid item xs={12}>
+      <TextField
+        fullWidth
+        variant="outlined"
+        label={label}
+        name={name}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        multiline={multiline}
+        rows={multiline ? 4 : 1}
+        error={!!error}
+        helperText={error}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              {icon}
+            </InputAdornment>
+          ),
+          style: { color: theme.palette.text.primary },
+        }}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: alpha(theme.palette.primary.main, 0.5),
+            },
+            '&:hover fieldset': {
+              borderColor: theme.palette.primary.main,
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: theme.palette.primary.main,
+            },
+          },
+          '& .MuiInputLabel-root': {
+            color: theme.palette.text.secondary,
+          },
+          '& .MuiFormHelperText-root': {
+            color: theme.palette.error.main,
+          },
+          '& input:-webkit-autofill': {
+            WebkitBoxShadow: `0 0 0 100px ${theme.palette.background.paper} inset`,
+            WebkitTextFillColor: theme.palette.text.primary,
+          },
+        }}
+      />
+    </Grid>
+  );
+};
 
-const FormAlert = ({ message, severity }: { message: string; severity: "error" | "success" }) => (
-  <Grid item xs={12}>
-    <Alert severity={severity}>{message}</Alert>
-  </Grid>
-);
-
+// Main Contact Component
 const Contact = () => {
   const theme = useTheme();
   const router = useRouter();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [isReady, setIsReady] = useState(false);
 
-  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  // Check if router is ready
+  useEffect(() => {
+    if (router.isReady) {
+      setIsReady(true);
+    }
+  }, [router.isReady]);
+
+  const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const selectedPlan = router.query.plan as PlanType | undefined;
-  const planTitle = selectedPlan ? PLAN_DETAILS[selectedPlan].title : "Your Inquiry";
-  const planIcon = selectedPlan ? PLAN_DETAILS[selectedPlan].icon : <Code fontSize="large" sx={{ color: colors.PRIMARY_DARK }} />;
+  const selectedPlan = isReady
+    ? (router.query.plan as PlanType | undefined)
+    : undefined;
+  const { title: planTitle, icon: planIcon } = selectedPlan
+    ? PLAN_DETAILS[selectedPlan]
+    : {
+        title: 'Your Inquiry',
+        icon: (
+          <Code
+            fontSize="large"
+            sx={{ color: theme.palette.text.primary }}
+          />
+        ),
+      };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  // Field Validation Handler
+  const validateField = (name: keyof FormData, value: string) => {
+    try {
+      formSchema.parse({ ...formData, [name]: value });
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldError = error.errors.find((e) => e.path[0] === name);
+        setErrors((prev) => ({ ...prev, [name]: fieldError?.message }));
+      }
+    }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    setLoading(true);
+  // Form Change Handler
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target as { name: keyof FormData; value: string };
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    validateField(name, value);
+  };
 
-    setTimeout(() => {
-      setLoading(false);
+  // Form Submission Handler
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrors({});
+    setSuccess(false);
+
+    try {
+      setLoading(true);
+      const validatedData = formSchema.parse(formData);
+
+      await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        {
+          ...validatedData,
+          plan: selectedPlan || 'General Inquiry',
+        },
+        EMAILJS_CONFIG.USER_ID
+      );
+
       setSuccess(true);
       setFormData(INITIAL_FORM_DATA);
-    }, 2000);
+    } catch (error) {
+      console.error('Submission error:', error);
+      setErrors({
+        form: 'Failed to send message. Please try again or contact us directly.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: { xs: 8, md: 12 }, background: colors.PAGE_BG, position: "relative" }}>
-      <Grid container spacing={{ xs: 6, md: 16 }} component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}>
-        
-        {/* Left Section */}
+    <Container
+      maxWidth="lg"
+      component="main"
+      sx={{
+        py: { xs: 8, md: 12 },
+        background: theme.palette.background.default,
+      }}
+    >
+      <Grid
+        container
+        spacing={{ xs: 6, md: 16 }}
+        component={motion.div}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        {/* Left Section - Plan Details */}
         <Grid item xs={12} md={6}>
-          <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}>
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            aria-labelledby="plan-title"
+          >
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-                mb: { xs: 6, md: 8 },
-                padding: { xs: 3, md: 4 },
-                background: alpha(colors.PRIMARY_DARK, 0.05),
-                borderRadius: theme.shape.borderRadius,
-                border: `1px solid ${alpha(colors.PRIMARY_DARK, 0.1)}`,
-                boxShadow: `0 4px 12px ${alpha(colors.SECONDARY_DARK, 0.1)}`,
+                background: alpha(theme.palette.primary.main, 0.05),
+                borderRadius: 4,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                boxShadow: 3,
+                p: 4,
               }}
             >
-              {planIcon}
-              <Typography variant="h2" sx={{ fontWeight: 700, color: colors.PRIMARY_DARK, fontSize: { xs: "2rem", md: "3rem" }, fontFamily: typography.fontFamily }}>
-                {planTitle}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  mb: { xs: 6, md: 8 },
+                }}
+              >
+                {planIcon}
+                <Typography
+                  variant="h2"
+                  id="plan-title"
+                  sx={{
+                    fontWeight: 700,
+                    color: theme.palette.text.primary,
+                    fontSize: { xs: '2rem', md: '3rem' },
+                  }}
+                >
+                  {planTitle}
+                </Typography>
+              </Box>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: theme.palette.text.secondary,
+                  mb: 6,
+                  lineHeight: 1.8,
+                }}
+              >
+                {selectedPlan
+                  ? "Every breakthrough starts with a conversation. Let's strategize, refine, and execute a bold vision that propels your business forward."
+                  : "Your future success is waiting. Let's craft a digital experience that transforms your business and captivates your audience."}
               </Typography>
             </Box>
-
-            <Typography variant="body1" sx={{ color: colors.PRIMARY_DARK, mb: 6, lineHeight: 1.8, fontFamily: typography.fontFamily }}>
-              {selectedPlan
-                ? "Every breakthrough starts with a conversation. Let's strategize, refine, and execute a bold vision that propels your business forward."
-                : "Your future success is waiting. Let's craft a digital experience that transforms your business and captivates your audience."}
-            </Typography>
           </motion.div>
         </Grid>
 
-        {/* Right Section - Form */}
+        {/* Right Section - Contact Form */}
         <Grid item xs={12} md={6}>
-          <motion.form onSubmit={handleSubmit} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
-            <Box sx={{ background: alpha(colors.PRIMARY_DARK, 0.05), p: 4, borderRadius: theme.shape.borderRadius, boxShadow: `0 16px 32px ${alpha(colors.SECONDARY_DARK, 0.2)}` }}>
+          <motion.form
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            aria-label="Contact form"
+          >
+            <Box
+              sx={{
+                background: alpha(theme.palette.primary.main, 0.05),
+                borderRadius: 4,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                boxShadow: 3,
+                p: 4,
+              }}
+            >
               <Grid container spacing={4}>
-                
-                {error && <FormAlert message={error} severity="error" />}
-                {success && <FormAlert message="Your request has been received. Expect an insightful response soon!" severity="success" />}
+                {/* Form Status Messages */}
+                {errors.form && (
+                  <Grid item xs={12}>
+                    <Alert severity="error" role="alert">
+                      {errors.form}
+                    </Alert>
+                  </Grid>
+                )}
 
-                <FormInput label="Your Full Name" name="name" value={formData.name} onChange={handleChange} disabled={loading} icon={<AccountCircle sx={{ color: colors.PRIMARY_DARK }} />} />
-                <FormInput label="you@yourcompany.com" name="email" value={formData.email} onChange={handleChange} disabled={loading} icon={<Email sx={{ color: colors.PRIMARY_DARK }} />} />
-                <FormInput label="Your Phone Number (Optional)" name="phone" value={formData.phone} onChange={handleChange} disabled={loading} icon={<Phone sx={{ color: colors.PRIMARY_DARK }} />} />
-                <FormInput label="Your Message" name="message" value={formData.message} onChange={handleChange} disabled={loading} icon={<Description sx={{ color: colors.PRIMARY_DARK }} />} multiline />
+                {success && (
+                  <Grid item xs={12}>
+                    <Alert severity="success" role="status">
+                      Message sent! We'll respond within 24 hours.
+                    </Alert>
+                  </Grid>
+                )}
 
+                {/* Form Inputs */}
+                <FormInput
+                  label="Full Name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  error={errors.name}
+                  disabled={loading}
+                  icon={<AccountCircle sx={{ color: theme.palette.text.primary }} />}
+                />
+
+                <FormInput
+                  label="Work Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  error={errors.email}
+                  disabled={loading}
+                  icon={<Email sx={{ color: theme.palette.text.primary }} />}
+                />
+
+                <FormInput
+                  label="Phone (Optional)"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  error={errors.phone}
+                  disabled={loading}
+                  icon={<Phone sx={{ color: theme.palette.text.primary }} />}
+                />
+
+                <FormInput
+                  label="Project Details"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  error={errors.message}
+                  disabled={loading}
+                  icon={<Description sx={{ color: theme.palette.text.primary }} />}
+                  multiline
+                />
+
+                {/* Submit Button */}
                 <Grid item xs={12}>
-                  <Button fullWidth type="submit" variant="contained" sx={{ background: colors.PRIMARY_DARK, color: "#FFF", fontSize: "1.1rem", fontWeight: 700, padding: "12px 20px", "&:hover": { background: alpha(colors.PRIMARY_DARK, 0.8) } }} disabled={loading}>
-                    {loading ? <CircularProgress size={24} sx={{ color: "#FFF" }} /> : <><Send sx={{ mr: 1 }} /> Send Message</>}
+                  <Button
+                    fullWidth
+                    type="submit"
+                    variant="contained"
+                    disabled={loading || Object.keys(errors).length > 0}
+                    sx={{
+                      background: theme.palette.primary.main,
+                      color: theme.palette.common.white,
+                      fontSize: '1.1rem',
+                      fontWeight: 700,
+                      py: 2,
+                      '&:disabled': {
+                        opacity: 0.7,
+                        background: theme.palette.primary.main,
+                      },
+                      '&:hover': {
+                        background: alpha(theme.palette.primary.main, 0.9),
+                      },
+                    }}
+                    aria-live="polite"
+                  >
+                    {loading ? (
+                      <CircularProgress
+                        size={24}
+                        sx={{ color: theme.palette.common.white }}
+                        aria-label="Submitting form"
+                      />
+                    ) : (
+                      <>
+                        <Send sx={{ mr: 1 }} aria-hidden="true" />
+                        Send Message
+                      </>
+                    )}
                   </Button>
                 </Grid>
               </Grid>

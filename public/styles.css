@@ -4,17 +4,36 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Custom CSS Variables */
+/* styles.css */
 :root {
-  --deep-space: #080D19;
+  --deep-space: #050813; /* Updated from #080D19 */
   --crystal-white: #F5F7FA;
 }
 
-/* Base styles */
+@supports (backdrop-filter: blur(24px)) {
+  .cyber-glass {
+    backdrop-filter: blur(24px);
+  }
+}
+
+@keyframes hologram-pulse {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+  100% { opacity: 0.3; }
+}
+
 body {
   background-color: var(--deep-space);
-  color: var(--crystal-white);
-  font-family: 'Inter', sans-serif; /* Default to Inter */
+  /* Add subtle gradient texture */
+  background-image: 
+    radial-gradient(circle at 50% 50%, 
+   
+      transparent 20%),
+    linear-gradient(
+      15deg,
+      transparent 60%,
+   
+    );
 }
 
 /* Scoped button styles - only affect buttons outside the NavBar */
@@ -27,19 +46,13 @@ button:not(.MuiButton-root) {
   cursor: pointer;
 }
 
-/* Type scaling */
-h1 {
-  font-size: 40px;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-  font-family: 'Bai Jamjuree', sans-serif; /* Use Bai Jamjuree for h1 */
+
+/* Focus styles (consider moving these to theme.ts) */
+.js-focus-visible :focus:not(.focus-visible) {
+  outline: none;
 }
 
-/* NavBar-specific overrides */
-.MuiButton-root {
-  font-family: 'Bai Jamjuree', sans-serif !important;
-}
-
-.PremiumAppBar {
-  z-index: 50 !important;
+.focus-visible {
+  outline: 2px solid #7d93e2;
+  outline-offset: 2px;
 }

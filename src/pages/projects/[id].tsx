@@ -1,9 +1,19 @@
+'use client';
+
 import { useParams, useRouter } from 'next/navigation';
+import { memo, useCallback, useMemo } from 'react';
 import { cvProjects } from '../../data/cvProjects';
-import { 
-  Box, Typography, Container, Button, Grid, Chip, Stack, useTheme 
+import {
+  Box,
+  Typography,
+  Container,
+  Button,
+  Grid,
+  Chip,
+  Stack,
+  useTheme,
 } from '@mui/material';
-import { styled, alpha } from '@mui/material/styles';
+import { alpha, styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
@@ -11,293 +21,541 @@ import TimelineSeparator from '@mui/lab/TimelineSeparator';
 import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
-import { motion } from 'framer-motion';
+import { motion, useMotionTemplate } from 'framer-motion';
 import { Code2 } from 'lucide-react';
-import { 
-  PRIMARY_DARK, SECONDARY_DARK, NEUTRAL_LIGHT, GLASS_BACKGROUND,
-  TITLE_GRADIENT, HIGHLIGHT_COLOR, ACCENT_SECONDARY, colors
-} from '../../theme/branding';
-import { ComparisonCard, MetricTiles, IconList } from '../../components/DataVisualization';
+import dynamic from 'next/dynamic';
+import {
+  PersonOutline,
+  BusinessCenter,
+  PeopleAlt,
+  Schedule,
+  Code as CodeIcon,
+} from '@mui/icons-material';
 
-const GlassCard = styled(motion.div)(({ theme }) => ({
-  background: `linear-gradient(145deg, 
-    ${alpha(PRIMARY_DARK, 0.7)} 0%, 
-    ${alpha(SECONDARY_DARK, 0.5)} 100%)`, // Adjusted opacities
-  boxShadow: `0 12px 24px ${alpha(PRIMARY_DARK, 0.5)},
-    inset 0 0 0 1px ${alpha(NEUTRAL_LIGHT, 0.2)}`, // Brighter inset border
-  borderRadius: theme.shape.borderRadius,
-  padding: theme.spacing(4),
-  transition: 'all 0.3s ease-in-out',
-  '&:hover': {
-    transform: "translateY(-8px)",
-    boxShadow: `0 16px 32px ${alpha(PRIMARY_DARK, 0.4)},
-      inset 0 0 0 1px ${alpha(NEUTRAL_LIGHT, 0.2)}`
-  },
-}));
+// Type definitions
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  role: string;
+  clientName: string;
+  challenges: string;
+  measurableOutcomes?: {
+    before: any;
+    after: any;
+  };
+  approach: ApproachStep[];
+  metrics?: any;
+  achievements?: any[];
+  lessonsLearned?: string;
+  teamSize: string;
+  timeline: string;
+  technologies: string[];
+  technologyIcons: React.ElementType[];
+  icon: React.ElementType;
+}
 
-const AnimatedConnector = () => (
-  <motion.div
-    initial={{ scaleY: 0 }}
-    animate={{ scaleY: 1 }}
-    transition={{ duration: 0.5 }}
-  >
-    <TimelineConnector sx={{ 
-      bgcolor: HIGHLIGHT_COLOR, 
-      height: 40,
-      boxShadow: `0 2px 4px ${alpha(HIGHLIGHT_COLOR, 0.2)}`
-    }} />
-  </motion.div>
+interface ApproachStep {
+  title: string;
+  description: string;
+}
+
+interface ComparisonCardProps {
+  before: any;
+  after: any;
+}
+
+interface MetricTilesProps {
+  metrics: any;
+}
+
+interface IconListProps {
+  items: any[];
+}
+
+interface QuickFactsProps {
+  teamSize: string;
+  timeline: string;
+  technologies: string[];
+  technologyIcons: React.ElementType[];
+  role: string;
+  client: string;
+}
+
+interface InfoItemProps {
+  label: string;
+  value: string | number;
+  icon?: React.ReactNode;
+  progressValue?: number;
+}
+
+// Dynamic imports with theme-aware styling
+const ComparisonCard = dynamic<ComparisonCardProps>(
+  () =>
+    import('../../components/DataVisualization').then((mod) => {
+      const ThemedComparisonCard = styled(mod.ComparisonCard)(({ theme }) => ({
+        // Add theme-aware styles here
+      }));
+      return { default: ThemedComparisonCard };
+    }),
+  { ssr: false }
 );
 
-const ProjectDetails = () => {
-  const params = useParams();
-  const id = params?.id;
-  const router = useRouter();
-  const theme = useTheme();
-  const project = cvProjects.find((p) => p.id === id);
+const MetricTiles = dynamic<MetricTilesProps>(
+  () =>
+    import('../../components/DataVisualization').then((mod) => {
+      const ThemedMetricTiles = styled(mod.MetricTiles)(({ theme }) => ({
+        // Add theme-aware styles here
+      }));
+      return { default: ThemedMetricTiles };
+    }),
+  { ssr: false }
+);
 
-  if (!project) return (
-    <Container>
-      <Typography variant="h4">Project not found</Typography>
-    </Container>
-  );
+const IconList = dynamic<IconListProps>(
+  () =>
+    import('../../components/DataVisualization').then((mod) => {
+      const ThemedIconList = styled(mod.IconList)(({ theme }) => ({
+        // Add theme-aware styles here
+      }));
+      return { default: ThemedIconList };
+    }),
+  { ssr: false }
+);
 
-  const ProjectIcon = project.icon;
-  const TechnologyIcons = project.technologyIcons;
-
-  return (
-   // Replace the existing Box sx prop with this:
-<Box sx={{
-  background: `linear-gradient(45deg, 
-    ${colors.PRIMARY_DARK} 0%, 
-    ${alpha(colors.SECONDARY_DARK, 0.3)} 100%)`, // Reduced secondary dark opacity
-  minHeight: '100vh',
-  padding: '7rem 0 4rem',
-  position: 'relative',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundImage: 'url("/noise.png")',
-    opacity: 0.15, // Increased noise opacity
-    mixBlendMode: 'soft-light',
-    zIndex: 0
+// Styled components
+const GlassCard = memo(styled(motion.div)(({ theme }) => ({
+  background: `linear-gradient(145deg, ${alpha(
+    theme.palette.primary.dark,
+    0.82
+  )} 0%, ${alpha(theme.palette.secondary.dark, 0.78)} 100%)`,
+  backdropFilter: 'blur(24px) saturate(180%)',
+  boxShadow: `0 12px 24px ${alpha(
+    theme.palette.primary.dark,
+    0.5
+  )}, inset 0 0 0 1px ${alpha(theme.palette.secondary.main, 0.3)}`,
+  borderRadius: theme.shape.borderRadius,
+  padding: theme.spacing(4),
+  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+  '&:hover': {
+    transform: 'translateY(-8px)',
+    boxShadow: `0 24px 48px ${alpha(
+      theme.palette.primary.dark,
+      0.6
+    )}, inset 0 0 0 1px ${alpha(theme.palette.secondary.main, 0.4)}`,
   },
+})));
+
+const AnimatedConnector = memo(styled(TimelineConnector)(({ theme }) => ({
+  height: 40,
+  background: `linear-gradient(to bottom, ${alpha(
+    theme.palette.secondary.main,
+    0.8
+  )}, ${alpha(theme.palette.primary.main, 0.6)})`,
+  boxShadow: `0 2px 8px ${alpha(theme.palette.secondary.main, 0.3)}`,
+  position: 'relative',
   '&::after': {
     content: '""',
     position: 'absolute',
     top: 0,
     left: 0,
-    width: '100%',
-    height: '100%',
-    background: `linear-gradient(45deg, 
-      ${alpha(colors.PRIMARY_DARK, 0.7)} 30%, 
-      transparent 100%)`,
-    zIndex: 0
-  }
-}}>
+    right: 0,
+    bottom: 0,
+    background: `linear-gradient(to bottom, ${alpha(
+      theme.palette.secondary.main,
+      0.4
+    )}, transparent)`,
+    animation: 'flow 2s linear infinite',
+    '@keyframes flow': {
+      '0%': { transform: 'translateY(-100%)' },
+      '100%': { transform: 'translateY(100%)' },
+    },
+  },
+})));
+
+const ProjectDetails = () => {
+  const theme = useTheme();
+  const params = useParams();
+  const router = useRouter();
+  const id = params?.id as string;
+
+  const project = useMemo(
+    () => cvProjects.find((p: Project) => p.id === id),
+    [id]
+  );
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const cards = document.querySelectorAll('.glass-card');
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+
+    cards.forEach((card: Element) => {
+      const rect = (card as HTMLElement).getBoundingClientRect();
+      (card as HTMLElement).style.setProperty(
+        '--mouse-x',
+        `${mouseX - rect.left}px`
+      );
+      (card as HTMLElement).style.setProperty(
+        '--mouse-y',
+        `${mouseY - rect.top}px`
+      );
+    });
+  }, []);
+
+  const mouseTemplate = useMotionTemplate`radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), ${alpha(
+    theme.palette.secondary.main,
+    0.15
+  )} 0%, transparent 60%)`;
+
+  if (!project)
+    return (
+      <Container>
+        <Typography variant="h4">Project not found</Typography>
+      </Container>
+    );
+
+  return (
+    <Box
+      component="main"
+      sx={{
+        background: `linear-gradient(45deg, ${
+          theme.palette.primary.dark
+        } 0%, ${alpha(theme.palette.secondary.dark, 0.3)} 100%)`,
+        minHeight: '100vh',
+        padding: '7rem 0 4rem',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundImage: 'url("/noise.webp")',
+          opacity: 0.15,
+          mixBlendMode: 'soft-light',
+        },
+      }}
+      onMouseMove={handleMouseMove}
+    >
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-        <GlassCard
-          sx={{
-            mb: 8,
-            background: GLASS_BACKGROUND,
-            position: 'relative',
-            overflow: 'visible',
-            textAlign: 'center'
-          }}
-        >
-          <Box sx={{
-            position: 'absolute',
-            top: -64,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 112,
-            height: 112,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: `linear-gradient(45deg, 
-              ${alpha(colors.HIGHLIGHT_COLOR, 0.2)}, 
-              ${alpha(colors.ACCENT_SECONDARY, 0.1)})`,
-            borderRadius: '50%',
-            boxShadow: `0 8px 32px ${alpha(colors.HIGHLIGHT_COLOR, 0.2)}`,
-            border: `2px solid ${alpha(colors.NEUTRAL_LIGHT, 0.1)}`
-          }}>
-            <ProjectIcon style={{ 
-              fontSize: '3.5rem',
-              color: colors.HIGHLIGHT_COLOR,
-              filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
-            }} />
-          </Box>
-
-            <Typography variant="h2" sx={{
-            background: colors.TITLE_GRADIENT,
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            mb: 4,
-            lineHeight: 1.1,
-            textShadow: colors.TEXT_SHADOW
-          }}>
-            {project.name}
-        </Typography>
-
-          <Typography variant="lead" sx={{ 
-            color: colors.NEUTRAL_LIGHT,
-            fontWeight: 400,
-            lineHeight: 1.7,
-            maxWidth: '800px',
-            mx: 'auto',
-            fontSize: '1.25rem'
-          }}>
-            {project.description}
-          </Typography>
-
-          <Stack direction="row" spacing={2} justifyContent="center" sx={{ 
-            mt: 6,
-            flexWrap: 'wrap',
-            gap: 2
-          }}>
-            <Chip 
-              label={project.role}
-              sx={{ 
-                background: alpha(colors.HIGHLIGHT_COLOR, 0.15),
-                color: colors.HIGHLIGHT_COLOR,
-                border: `1px solid ${alpha(colors.HIGHLIGHT_COLOR, 0.3)}`,
-                fontWeight: 600,
-                '&:hover': { background: alpha(colors.HIGHLIGHT_COLOR, 0.25) }
-              }}
-            />
-            <Chip 
-              label={project.clientName}
-              sx={{ 
-                background: alpha(colors.ACCENT_SECONDARY, 0.15),
-                color: colors.ACCENT_SECONDARY,
-                border: `1px solid ${alpha(colors.ACCENT_SECONDARY, 0.3)}`,
-                fontWeight: 600,
-                '&:hover': { background: alpha(colors.ACCENT_SECONDARY, 0.25) }
-              }}
-            />
-          </Stack>
-
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => router.back()}
-            sx={{ 
-              mt: 6,
-              px: 6,
-              py: 1.8,
-              background: colors.TITLE_GRADIENT,
-              color: colors.PRIMARY_DARK,
-              fontWeight: 700,
-              borderRadius: colors.BORDER_RADIUS,
-              '&:hover': {
-                boxShadow: `0 8px 32px ${alpha(colors.HIGHLIGHT_COLOR, 0.3)}`,
-                transform: "scale(1.02)",
-              }
+        <GlassCard className="glass-card">
+          <motion.div
+            className="project-icon"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 120 }}
+            style={{
+              position: 'absolute',
+              top: -92,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 144,
+              height: 144,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: `linear-gradient(45deg, ${alpha(
+                theme.palette.secondary.main,
+                0.3
+              )}, ${alpha(theme.palette.primary.main, 0.2)})`,
+              borderRadius: '50%',
+              boxShadow: `0 12px 48px ${alpha(
+                theme.palette.secondary.main,
+                0.3
+              )}`,
+              border: `2px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
             }}
           >
-            Return to Portfolio
-          </Button>
+            <project.icon
+              style={{ fontSize: '4rem', color: theme.palette.secondary.main }}
+            />
+          </motion.div>
+
+          <Box position="relative">
+            <motion.div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: mouseTemplate,
+                opacity: 0,
+                transition: 'opacity 0.4s ease',
+                pointerEvents: 'none',
+              }}
+              whileHover={{ opacity: 0.2 }}
+            />
+
+            <Typography
+              variant="h2"
+              sx={{
+                background: theme.palette.secondary.main,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 4,
+                lineHeight: 1.1,
+                textShadow: `0 2px 4px ${alpha(theme.palette.primary.dark, 0.3)}`,
+                fontSize: 'clamp(2.2rem, 5vw, 3.2rem)',
+                fontWeight: 800,
+                letterSpacing: '-0.03em',
+              }}
+            >
+              {project.name}
+            </Typography>
+
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: theme.palette.secondary.main,
+                fontWeight: 400,
+                lineHeight: 1.8,
+                maxWidth: '800px',
+                mx: 'auto',
+                fontSize: '1.25rem',
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  display: 'block',
+                  width: '60%',
+                  height: '2px',
+                  background: `linear-gradient(90deg, 
+                    ${alpha(theme.palette.secondary.main, 0.4)}, 
+                    transparent)`,
+                  margin: '2.5rem auto 0',
+                },
+              }}
+            >
+              {project.description}
+            </Typography>
+
+            <Stack
+              direction="row"
+              spacing={2}
+              justifyContent="center"
+              sx={{
+                mt: 6,
+                flexWrap: 'wrap',
+                gap: 2,
+                position: 'relative',
+                zIndex: 1,
+              }}
+            >
+              <Chip
+                label={project.role}
+                sx={{
+                  background: alpha(theme.palette.secondary.main, 0.15),
+                  color: theme.palette.secondary.main,
+                  border: `1px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
+                  fontWeight: 600,
+                  '&:hover': {
+                    background: alpha(theme.palette.secondary.main, 0.25),
+                  },
+                }}
+              />
+              <Chip
+                label={project.clientName}
+                sx={{
+                  background: alpha(theme.palette.primary.main, 0.15),
+                  color: theme.palette.primary.main,
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+                  fontWeight: 600,
+                  '&:hover': {
+                    background: alpha(theme.palette.primary.main, 0.25),
+                  },
+                }}
+              />
+            </Stack>
+
+            <Button
+              startIcon={<ArrowBackIcon sx={{ transition: 'transform 0.3s' }} />}
+              onClick={() => router.back()}
+              sx={{
+                mt: 6,
+                px: 6,
+                py: 1.8,
+                background: theme.palette.secondary.main,
+                color: theme.palette.primary.dark,
+                fontWeight: 700,
+                borderRadius: '12px',
+                '&:hover': {
+                  boxShadow: `0 12px 40px ${alpha(
+                    theme.palette.secondary.main,
+                    0.4
+                  )}`,
+                  '& svg': { transform: 'translateX(-4px)' },
+                },
+              }}
+            >
+              Return to Portfolio
+            </Button>
+          </Box>
         </GlassCard>
 
         <Grid container spacing={4}>
           <Grid item xs={12} md={8} sx={{ pr: { md: 4 } }}>
-            {/* Challenge Section */}
-            <GlassCard sx={{ mb: 4 }}>
-              <Typography variant="h3" sx={{
-                mb: 3,
-                display: 'flex',
-                alignItems: 'center',
-                '&::after': {
-                  content: '""',
-                  flex: 1,
-                  ml: 3,
-                  height: '2px',
-                  background: `linear-gradient(90deg, 
-                    ${alpha(colors.HIGHLIGHT_COLOR, 0.4)}, 
+            <GlassCard className="glass-card" sx={{ mb: 4 }}>
+              <Typography
+                variant="h3"
+                sx={{
+                  mb: 3,
+                  display: 'flex',
+                  alignItems: 'center',
+                  '&::after': {
+                    content: '""',
+                    flex: 1,
+                    ml: 3,
+                    height: '2px',
+                    background: `linear-gradient(90deg, 
+                    ${alpha(theme.palette.secondary.main, 0.4)}, 
                     transparent)`,
-                }
-              }}>
-                <Box component="span" sx={{ 
-                  background: colors.TITLE_GRADIENT,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent"
-                }}>
+                  },
+                }}
+              >
+                <Box
+                  component="span"
+                  sx={{
+                    background: theme.palette.secondary.main,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
                   The Challenge
                 </Box>
               </Typography>
-              <Typography variant="body1" sx={{ 
-                color: colors.NEUTRAL_LIGHT,
-                lineHeight: 1.8,
-                fontSize: '1.1rem',
-                '&::first-letter': {
-                  initialLetter: '2.5 1',
-                  color: colors.HIGHLIGHT_COLOR,
-                  fontWeight: 600,
-                  mr: 0.5
-                }
-              }}>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: theme.palette.secondary.main,
+                  lineHeight: 1.8,
+                  fontSize: '1.1rem',
+                  '&::first-letter': {
+                    initialLetter: '2.5 1',
+                    color: theme.palette.secondary.main,
+                    fontWeight: 600,
+                    mr: 0.5,
+                  },
+                }}
+              >
                 {project.challenges}
               </Typography>
             </GlassCard>
 
             {project.measurableOutcomes && (
-              <GlassCard
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-                sx={{ mb: 6 }}
-              >
-                <ComparisonCard 
+              <GlassCard className="glass-card" sx={{ mb: 6 }}>
+                <ComparisonCard
                   before={project.measurableOutcomes.before}
                   after={project.measurableOutcomes.after}
                 />
               </GlassCard>
             )}
 
-            <GlassCard
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              sx={{ mb: 6 }}
-            >
-              <Typography variant="h4" sx={{ 
-                mb: 3, 
-                background: TITLE_GRADIENT,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent"
-              }}>
+            <GlassCard className="glass-card" sx={{ mb: 6 }}>
+              <Typography
+                variant="h4"
+                sx={{
+                  mb: 3,
+                  background: theme.palette.secondary.main,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
                 Our Approach
               </Typography>
-              <Timeline position="alternate" sx={{ my: 4 }}>
-                {project.approach.map((step, index) => (
+              <Timeline
+                position="alternate"
+                sx={{
+                  my: 4,
+                  '&.MuiTimelineItem-root:before': { flex: 0, padding: 0 },
+                }}
+              >
+                {project.approach.map((step: ApproachStep, index: number) => (
                   <TimelineItem key={index}>
                     <TimelineSeparator>
-                      <motion.div whileHover={{ scale: 1.1 }}>
-                        <TimelineDot sx={{ 
-                          background: 'transparent',
-                          border: `2px solid ${HIGHLIGHT_COLOR}`,
-                          boxShadow: `0 0 16px ${alpha(HIGHLIGHT_COLOR, 0.3)}`,
-                          width: 40,
-                          height: 40,
-                          '&:hover': {
-                            background: alpha(HIGHLIGHT_COLOR, 0.1),
-                          }
-                        }}/>
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <TimelineDot
+                          sx={{
+                            background: 'transparent',
+                            border: `2px solid ${theme.palette.secondary.main}`,
+                            boxShadow: `0 0 24px ${alpha(
+                              theme.palette.secondary.main,
+                              0.4
+                            )}`,
+                            width: 48,
+                            height: 48,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            '&:hover': {
+                              background: alpha(theme.palette.secondary.main, 0.1),
+                            },
+                          }}
+                        >
+                          <Box
+                            component="span"
+                            sx={{
+                              fontSize: '1.4rem',
+                              color: theme.palette.secondary.main,
+                            }}
+                          >
+                            {index + 1}
+                          </Box>
+                        </TimelineDot>
                       </motion.div>
-                      {index < project.approach.length - 1 && <AnimatedConnector />}
-                    </TimelineSeparator>
-                    <TimelineContent>
-                      <motion.div whileHover={{ x: 5 }}>
-                        <Typography variant="h6" sx={{ mb: 1, color: 'rgba(255,255,255,0.9)' }}>
-                          {step.title}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                          {step.description}
-                        </Typography>
+                      {index < project.approach.length - 1 && (
+                        <AnimatedConnector />
+                      )}
+                    </TimelineSeparator><TimelineContent>
+                      <motion.div
+                        whileHover={{ x: 8 }}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <GlassCard
+                          sx={{
+                            p: 3,
+                            mb: 4,
+                            background: alpha(theme.palette.primary.dark, 0.6),
+                            '&:hover': {
+                              background: alpha(theme.palette.primary.dark, 0.7),
+                            },
+                          }}
+                        >
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              mb: 1,
+                              color: theme.palette.text.primary,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1.5,
+                            }}
+                          >
+                            <Box
+                              component="span"
+                              sx={{
+                                width: 8,
+                                height: 8,
+                                background: theme.palette.secondary.main,
+                                borderRadius: '50%',
+                              }}
+                            />
+                            {step.title}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: theme.palette.text.secondary,
+                              lineHeight: 1.7,
+                              pl: 3.5,
+                            }}
+                          >
+                            {step.description}
+                          </Typography>
+                        </GlassCard>
                       </motion.div>
                     </TimelineContent>
                   </TimelineItem>
@@ -306,18 +564,16 @@ const ProjectDetails = () => {
             </GlassCard>
 
             {project.metrics && (
-              <GlassCard
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                sx={{ mb: 6 }}
-              >
-                <Typography variant="h4" sx={{ 
-                  mb: 3, 
-                  background: TITLE_GRADIENT,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent"
-                }}>
+              <GlassCard className="glass-card" sx={{ mb: 6 }}>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    mb: 3,
+                    background: theme.palette.secondary.main,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
                   Key Metrics
                 </Typography>
                 <MetricTiles metrics={project.metrics} />
@@ -325,18 +581,16 @@ const ProjectDetails = () => {
             )}
 
             {project.achievements && (
-              <GlassCard
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                sx={{ mb: 6 }}
-              >
-                <Typography variant="h4" sx={{ 
-                  mb: 3, 
-                  background: TITLE_GRADIENT,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent"
-                }}>
+              <GlassCard className="glass-card" sx={{ mb: 6 }}>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    mb: 3,
+                    background: theme.palette.secondary.main,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
                   Major Achievements
                 </Typography>
                 <IconList items={project.achievements} />
@@ -344,24 +598,26 @@ const ProjectDetails = () => {
             )}
 
             {project.lessonsLearned && (
-              <GlassCard
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Typography variant="h4" sx={{ 
-                  mb: 3, 
-                  background: TITLE_GRADIENT,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent"
-                }}>
+              <GlassCard className="glass-card">
+                <Typography
+                  variant="h4"
+                  sx={{
+                    mb: 3,
+                    background: theme.palette.secondary.main,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
                   Lessons Learned
                 </Typography>
-                <Typography variant="body1" sx={{ 
-                  color: 'rgba(255,255,255,0.8)', 
-                  fontStyle: 'italic',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: theme.palette.text.primary,
+                    fontStyle: 'italic',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                  }}
+                >
                   "{project.lessonsLearned}"
                 </Typography>
               </GlassCard>
@@ -369,75 +625,14 @@ const ProjectDetails = () => {
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <QuickFacts 
+            <QuickFacts
               teamSize={project.teamSize}
               timeline={project.timeline}
               technologies={project.technologies}
-              stakeholders={project.stakeholders}
-              technologyIcons={TechnologyIcons}
+              technologyIcons={project.technologyIcons}
               role={project.role}
               client={project.clientName}
-              
             />
-
-            {project.impact && (
-              <GlassCard
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-                sx={{ mt: 6 }}
-              >
-                <Typography variant="h6" sx={{ 
-                  mb: 2, 
-                  background: TITLE_GRADIENT,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent"
-                }}>
-                  Project Impact
-                </Typography>
-                <Typography variant="body2" sx={{ 
-                  color: 'rgba(255,255,255,0.8)',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                }}>
-                  {project.impact}
-                </Typography>
-              </GlassCard>
-            )}
-
-            {project.stakeholders && project.stakeholders.length > 0 && (
-              <GlassCard
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-                sx={{ mt: 6 }}
-              >
-                <Typography variant="h6" sx={{ 
-                  mb: 2, 
-                  background: TITLE_GRADIENT,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent"
-                }}>
-                  Key Stakeholders
-                </Typography>
-                <Stack spacing={1}>
-                  {project.stakeholders.map((stakeholder, index) => (
-                    <Chip 
-                      key={index}
-                      label={stakeholder}
-                      sx={{ 
-                        background: alpha(HIGHLIGHT_COLOR, 0.1),
-                        color: HIGHLIGHT_COLOR,
-                        border: `1px solid ${alpha(HIGHLIGHT_COLOR, 0.3)}`,
-                        borderRadius: '8px',
-                        '&:hover': {
-                          background: alpha(HIGHLIGHT_COLOR, 0.2),
-                        }
-                      }} 
-                    />
-                  ))}
-                </Stack>
-              </GlassCard>
-            )}
           </Grid>
         </Grid>
       </Container>
@@ -445,85 +640,176 @@ const ProjectDetails = () => {
   );
 };
 
-interface QuickFactsProps {
-  teamSize: number;
-  timeline: string;
-  technologies: string[];
-  stakeholders?: string[];
-  technologyIcons: any[];
-  role: string;
-  client: string;
-}
+const QuickFacts = memo(
+  ({
+    teamSize,
+    timeline,
+    technologies,
+    technologyIcons,
+    role,
+    client,
+  }: QuickFactsProps) => {
+    const theme = useTheme();
+    return (
+      <GlassCard className="glass-card" sx={{ position: 'sticky', top: 120 }}>
+        <Typography
+          variant="h5"
+          sx={{
+            mb: 4,
+            pb: 2,
+            background: theme.palette.secondary.main,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            borderBottom: `2px solid ${alpha(theme.palette.secondary.main, 0.2)}`,
+          }}
+        >
+          Project Snapshot
+        </Typography>
 
-const QuickFacts: React.FC<QuickFactsProps> = ({ 
-  teamSize, 
-  timeline, 
-  technologies, 
-  technologyIcons,
-  role,
-  client
-}) => (
-  <GlassCard
-    initial={{ opacity: 0, x: 20 }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.3 }}
-  >
-    <Typography variant="h6" sx={{ 
-      mb: 3, 
-      background: TITLE_GRADIENT,
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent"
-    }}>
-      Project Snapshot
-    </Typography>
-    <Stack spacing={3}>
-      <Box>
-        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>Role</Typography>
-        <Typography variant="body1" sx={{ fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{role}</Typography>
-      </Box>
-      <Box>
-        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>Client</Typography>
-        <Typography variant="body1" sx={{ fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{client}</Typography>
-      </Box>
-      <Box>
-        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>Team Size</Typography>
-        <Typography variant="body1" sx={{ fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{teamSize}</Typography>
-      </Box>
-      <Box>
-        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>Timeline</Typography>
-        <Typography variant="body1" sx={{ fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{timeline}</Typography>
-      </Box>
-      <Box>
-        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>Tech Stack</Typography>
-        <Stack spacing={1} sx={{ mt: 1 }}>
-          {technologies.map((tech, index) => {
-            const Icon = technologyIcons[index] || Code2;
-            return (
-              <Chip 
-                key={tech}
-                label={tech}
-                icon={<Icon style={{ 
-                  color: HIGHLIGHT_COLOR,
-                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
-                  fontSize: '1.6rem'
-                }} />}
-                sx={{ 
-                  background: alpha(HIGHLIGHT_COLOR, 0.15),
-                  color: HIGHLIGHT_COLOR,
-                  border: `1px solid ${alpha(HIGHLIGHT_COLOR, 0.3)}`,
-                  '&:hover': {
-                    background: alpha(HIGHLIGHT_COLOR, 0.25),
-                    transform: "scale(1.05)"
-                  },
-                  transition: "all 0.2s ease",
-                }}
-              />
-            );
-          })}
+        <Stack spacing={3}>
+          <InfoItem
+            label="Role"
+            value={role}
+            icon={<PersonOutline sx={{ color: theme.palette.secondary.main, fontSize: 20 }} />}
+          />
+          <InfoItem
+            label="Client"
+            value={client}
+            icon={<BusinessCenter sx={{ color: theme.palette.secondary.main, fontSize: 20 }} />}
+          />
+          <InfoItem
+            label="Team Size"
+            value={teamSize}
+            progressValue={Math.min((Number(teamSize) / 10) * 100, 100)}
+            icon={<PeopleAlt sx={{ color: theme.palette.secondary.main, fontSize: 20 }} />}
+          />
+          <InfoItem
+            label="Timeline"
+            value={timeline}
+            icon={<Schedule sx={{ color: theme.palette.secondary.main, fontSize: 20 }} />}
+          />
+
+          <Box>
+            <Typography
+              variant="caption"
+              sx={{
+                color: theme.palette.text.secondary,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                mb: 1.5,
+              }}
+            >
+              <CodeIcon sx={{ fontSize: 20 }} />
+              Tech Stack
+            </Typography>
+            <Grid container spacing={1} sx={{ mt: 1 }}>
+              {technologies.map((tech: string, index: number) => {
+                const Icon = technologyIcons[index] || Code2;
+                return (
+                  <Grid item xs={6} key={tech}>
+                    <motion.div whileHover={{ scale: 1.03 }}>
+                      <Chip
+                        label={tech}
+                        icon={
+                          <Icon
+                            style={{
+                              color: theme.palette.secondary.main,
+                              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+                              fontSize: '1.6rem',
+                            }}
+                          />
+                        }
+                        sx={{
+                          width: '100%',
+                          justifyContent: 'flex-start',
+                          background: alpha(theme.palette.secondary.main, 0.1),
+                          color: theme.palette.secondary.main,
+                          border: `1px solid ${alpha(
+                            theme.palette.secondary.main,
+                            0.2
+                          )}`,
+                          '&:hover': {
+                            background: alpha(theme.palette.secondary.main, 0.2),
+                          },
+                        }}
+                      />
+                    </motion.div>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Box>
         </Stack>
-      </Box>
-    </Stack>
-  </GlassCard>
+      </GlassCard>
+    );
+  }
 );
+
+const InfoItem = ({
+  label,
+  value,
+  icon,
+  progressValue,
+}: InfoItemProps) => {
+  const theme = useTheme();
+  return (
+    <Box
+      sx={{
+        background: alpha(theme.palette.secondary.main, 0.08),
+        borderRadius: 2,
+        p: 2,
+        position: 'relative',
+        overflow: 'hidden',
+        '&:hover': { background: alpha(theme.palette.secondary.main, 0.12) },
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+        {icon}
+        <Typography
+          variant="caption"
+          sx={{
+            color: theme.palette.text.secondary,
+            fontWeight: 500,
+          }}
+        >
+          {label}
+        </Typography>
+      </Box>
+      <Typography
+        variant="body1"
+        sx={{
+          fontWeight: 700,
+          color: theme.palette.text.primary,
+          pl: label === 'Role' || label === 'Client' ? 4.5 : label === 'Team Size' ? 4.5 : label === 'Timeline' ? 4.5 : 0,
+        }}
+      >
+        {value}
+      </Typography>
+      {progressValue && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '2px',
+            background: alpha(theme.palette.secondary.main, 0.2),
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              height: '100%',
+              width: `${progressValue}%`,
+              background: theme.palette.secondary.main,
+              transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+            },
+          }}
+        />
+      )}
+    </Box>
+  );
+};
 
 export default ProjectDetails;
