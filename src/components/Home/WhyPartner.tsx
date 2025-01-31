@@ -16,19 +16,16 @@ export const WhyPartner = () => {
       "AI-Driven Analytics & Optimization",
       "Cross-Platform Integration Expertise",
     ],
-   
+    [] // ✅ Fix: Provide an empty dependency array
   );
 
   return (
     <Box
       sx={{
-        background: `linear-gradient(135deg, ${alpha(
-          PRIMARY_DARK,
-          0.98
-        )}, ${alpha(SECONDARY_DARK, 0.95)})`,
+        background: `linear-gradient(135deg, ${alpha(PRIMARY_DARK, 0.98)}, ${alpha(SECONDARY_DARK, 0.95)})`,
         color: "white",
         py: 10,
-        position: "relative", // Add relative positioning for the pseudo-element
+        position: "relative",
         "&::before": {
           content: '""',
           position: "absolute",
@@ -44,7 +41,7 @@ export const WhyPartner = () => {
             transparent 8px
           )`,
           pointerEvents: "none",
-          zIndex: -1, // Ensure the pseudo-element is behind the content
+          zIndex: -1,
         },
       }}
     >
@@ -60,8 +57,7 @@ export const WhyPartner = () => {
                 Why Choose Us
               </Typography>
               <Typography variant="body1" sx={{ opacity: 0.9 }}>
-                Combining enterprise robustness with agile innovation for
-                digital excellence.
+                Combining enterprise robustness with agile innovation for digital excellence.
               </Typography>
             </motion.div>
           </Grid>
@@ -75,9 +71,7 @@ export const WhyPartner = () => {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <CheckCircleOutline
-                    sx={{ mr: 2, color: theme.palette.success.main }}
-                  />
+                  <CheckCircleOutline sx={{ mr: 2, color: theme.palette.success.main }} />
                   <Typography variant="body1">{reason}</Typography>
                 </Box>
               </motion.div>

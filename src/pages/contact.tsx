@@ -1,23 +1,22 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  useTheme, Container, Grid, TextField, Button, Typography, useMediaQuery, alpha, CircularProgress, InputAdornment, Box
+import { 
+  useTheme, Container, Grid, TextField, Button, Typography, useMediaQuery, 
+  alpha, CircularProgress, InputAdornment, Box, Alert, IconButton, Collapse
 } from '@mui/material';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
-import { Send, AccountCircle, Email, Phone, Description } from '@mui/icons-material';
+import { Send, AccountCircle, Email, Phone, Description, Close } from '@mui/icons-material';
 import { z } from 'zod';
 import emailjs from '@emailjs/browser';
 
-// ✅ EmailJS Configuration
 const EMAILJS_CONFIG = {
   SERVICE_ID: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
   TEMPLATE_ID: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
   USER_ID: process.env.NEXT_PUBLIC_EMAILJS_USER_ID!,
 };
 
-// ✅ Validation Schema using Zod
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
@@ -45,26 +44,24 @@ const Contact = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    if (router.isReady) {
-      setSelectedPlan(router.query.plan as string | undefined);
-    }
+    if (router.isReady) setSelectedPlan(router.query.plan as string | undefined);
   }, [router.isReady, router.query]);
 
   const validateField = useCallback((name: keyof FormData, value: string) => {
     try {
       formSchema.pick({ [name]: formSchema.shape[name] }).parse({ [name]: value });
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
+      setErrors(prev => ({ ...prev, [name]: undefined }));
     } catch (error) {
       if (error instanceof z.ZodError) {
-        setErrors((prev) => ({ ...prev, [name]: error.errors[0].message }));
+        setErrors(prev => ({ ...prev, [name]: error.errors[0].message }));
       }
     }
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target as { name: keyof FormData; value: string };
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    validateField(name, value);
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    validateField(name as keyof FormData, value);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -84,7 +81,6 @@ const Contact = () => {
       setSuccess(true);
       setFormData(INITIAL_FORM_DATA);
     } catch (error) {
-      console.error('Error:', error);
       setErrors({ form: 'Failed to send message. Please try again later.' });
     } finally {
       setLoading(false);
@@ -92,150 +88,191 @@ const Contact = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: { xs: 6, md: 10 } }}>
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        sx={{ textAlign: 'center', pb: 4 }}
-      >
-        <Typography
-          variant="h3"
-          fontWeight={800}
-          sx={{
-            mb: 2,
-            background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.main})`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            textShadow: `0 4px 10px ${alpha(theme.palette.primary.dark, 0.2)}`,
-          }}
-        >
-          Let's Connect 🚀
-        </Typography>
-        <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
-          {selectedPlan ? `Interested in our ${selectedPlan} plan? Let's talk!` : 'We’d love to hear from you!'}
-        </Typography>
-      </motion.div>
+    <Container maxWidth="md" sx={{ py: { xs: 4, md: 8 }, minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
+      <Box sx={{ width: '100%' }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <Typography
+            variant="h2"
+            sx={{
+              mb: 3,
+              textAlign: 'center',
+              fontWeight: 800,
+              background: `linear-gradient(150deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontSize: isMobile ? '2.5rem' : '3.5rem',
+              lineHeight: 1.2,
+            }}
+          >
+            {selectedPlan ? `Get Started with ${selectedPlan}` : "Let's Work Together"}
+          </Typography>
 
-      <motion.form
-        onSubmit={handleSubmit}
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <Box
-          sx={{
-            p: 4,
-            borderRadius: 3,
-            boxShadow: `0 8px 20px ${alpha(theme.palette.primary.dark, 0.2)}`,
-            background: theme.palette.background.paper,
-            transition: 'all 0.3s ease-in-out',
-            '&:hover': {
-              transform: 'scale(1.02)',
-              boxShadow: `0 12px 30px ${alpha(theme.palette.primary.main, 0.3)}`,
-            },
-          }}
-        >
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <TextField
-                label="Full Name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                error={!!errors.name}
-                helperText={errors.name}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <AccountCircle />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
+          <Typography variant="h6" sx={{ 
+            textAlign: 'center', 
+            color: 'text.secondary',
+            mb: 6,
+            px: 2,
+            fontSize: isMobile ? '1rem' : '1.25rem'
+          }}>
+            {selectedPlan ? `Share details about your project to get started with our ${selectedPlan} plan` : 'Fill out the form below and we’ll get back to you within 24 hours'}
+          </Typography>
+        </motion.div>
 
-            <Grid item xs={12}>
-              <TextField
-                label="Email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                error={!!errors.email}
-                helperText={errors.email}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Email />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
+        <motion.form onSubmit={handleSubmit} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <Box sx={{
+            p: { xs: 3, md: 5 },
+            borderRadius: 4,
+            background: alpha(theme.palette.background.paper, 0.9),
+            boxShadow: `0 24px 48px ${alpha(theme.palette.primary.main, 0.05)}`,
+            backdropFilter: 'blur(12px)',
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`
+          }}>
+            <Collapse in={!!errors.form}>
+              <Alert
+                severity="error"
+                action={
+                  <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => setErrors(prev => ({ ...prev, form: undefined }))}
+                  >
+                    <Close fontSize="inherit" />
+                  </IconButton>
+                }
+                sx={{ mb: 3 }}
+              >
+                {errors.form}
+              </Alert>
+            </Collapse>
 
-            <Grid item xs={12}>
-              <TextField
-                label="Phone (Optional)"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                error={!!errors.phone}
-                helperText={errors.phone}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Phone />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
+            <Grid container spacing={3}>
+              {['name', 'email', 'phone'].map((field, index) => (
+                <Grid item xs={12} md={field === 'phone' ? 12 : 6} key={field}>
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label={field.charAt(0).toUpperCase() + field.slice(1)}
+                    name={field}
+                    value={formData[field as keyof FormData]}
+                    onChange={handleChange}
+                    error={!!errors[field]}
+                    helperText={errors[field]}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          {field === 'name' ? <AccountCircle /> : 
+                           field === 'email' ? <Email /> : <Phone />}
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      '& .MuiFilledInput-root': {
+                        borderRadius: 2,
+                        background: alpha(theme.palette.background.default, 0.4),
+                        '&:hover, &.Mui-focused': {
+                          background: alpha(theme.palette.primary.main, 0.05),
+                        }
+                      }
+                    }}
+                  />
+                </Grid>
+              ))}
 
-            <Grid item xs={12}>
-              <TextField
-                label="Project Details"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                error={!!errors.message}
-                helperText={errors.message}
-                fullWidth
-                multiline
-                rows={4}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Description />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} textAlign="center">
-              <motion.div whileHover={{ scale: 1.05 }}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  disabled={loading}
-                  startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
-                  sx={{
-                    background: theme.palette.primary.main,
-                    '&:hover': {
-                      background: theme.palette.primary.dark,
-                    },
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  label="Project Details"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  error={!!errors.message}
+                  helperText={errors.message}
+                  multiline
+                  rows={5}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Description />
+                      </InputAdornment>
+                    ),
                   }}
-                >
-                  {loading ? 'Sending...' : 'Send Message'}
-                </Button>
-              </motion.div>
+                  sx={{
+                    '& .MuiFilledInput-root': {
+                      borderRadius: 2,
+                      background: alpha(theme.palette.background.default, 0.4),
+                      '&:hover, &.Mui-focused': {
+                        background: alpha(theme.palette.primary.main, 0.05),
+                      }
+                    }
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    size="large"
+                    variant="contained"
+                    disabled={loading}
+                    sx={{
+                      height: 56,
+                      borderRadius: 2,
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                      '&:disabled': {
+                        background: theme.palette.action.disabledBackground
+                      }
+                    }}
+                  >
+                    {loading ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Send sx={{ fontSize: 20 }} />
+                        Send Message
+                      </Box>
+                    )}
+                  </Button>
+                </motion.div>
+              </Grid>
             </Grid>
-          </Grid>
-        </Box>
-      </motion.form>
+
+            <AnimatePresence>
+              {success && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  style={{ marginTop: 16 }}
+                >
+                  <Alert
+                    severity="success"
+                    icon={<CheckCircle sx={{ color: 'success.main' }} />}
+                    sx={{ 
+                      border: `1px solid ${theme.palette.success.main}`,
+                      background: alpha(theme.palette.success.main, 0.1)
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="body1" fontWeight={600}>
+                        Message sent successfully! 🎉
+                      </Typography>
+                      <Typography variant="body2" sx={{ mt: 0.5 }}>
+                        We'll get back to you within 24 hours
+                      </Typography>
+                    </Box>
+                  </Alert>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Box>
+        </motion.form>
+      </Box>
     </Container>
   );
 };

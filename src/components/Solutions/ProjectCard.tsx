@@ -11,10 +11,10 @@ import {
   Icon,
   alpha,
   Button,
-  LinearProgress,
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
+import Image from 'next/image';
 import { ArrowRightAlt } from '@mui/icons-material';
 import {
   Cloud,
@@ -26,7 +26,6 @@ import {
   Server,
   Terminal,
   Box as BoxIcon,
-  Shield,
 } from 'lucide-react';
 
 const technologyIconMap = {
@@ -49,7 +48,7 @@ interface Project {
   id: string;
   name: string;
   description: string;
-  technologies: string[]; // Array of strings
+  technologies: string;
   clientName: string;
   image?: string;
   metrics: Array<{
@@ -62,50 +61,54 @@ interface Project {
 
 const ProjectCard = ({ project }: { project: Project }) => {
   const theme = useTheme();
+  const imageSize = 200;
 
   return (
     <motion.div
-      whileHover={{
-        scale: 1.02,
-        transition: { duration: 0.2 },
-      }}
-      whileTap={{
-        scale: 0.98,
-        transition: { duration: 0.1 },
-      }}
-      style={{ height: '100%' }} // Ensure motion.div takes full height
+      whileHover="hover"
+      whileTap="tap"
+      initial={false}
+      style={{ height: '100%', position: 'relative' }}
     >
       <Card
         sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: 4,
           overflow: 'hidden',
-          position: 'relative',
-          borderRadius: 3,
-          transition: 'box-shadow 0.2s ease',
-          width: '100%',
-          height: '100%', // Ensure consistent height
-          display: 'flex', // Use flexbox for layout
-          flexDirection: 'column', // Stack content vertically
+          transition: 'transform 0.3s ease, box-shadow 0.3s ease',
           '&:hover': {
-            boxShadow: theme.shadows[6],
+            transform: 'translateY(-4px)',
+            boxShadow: `0 24px 48px ${alpha(theme.palette.primary.main, 0.1)}`,
           },
         }}
       >
         <CardActionArea
           component={NextLink}
           href={`/projects/${project.id}`}
-          sx={{ textDecoration: 'none', flexGrow: 1 }} // Allow content to grow
+          sx={{
+            textDecoration: 'none',
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
         >
           {project.image && (
             <Box
-              component="img"
-              src={project.image}
-              alt={project.name}
               sx={{
                 width: '100%',
-                height: 200, // Fixed height for images
-                objectFit: 'cover',
+                height: imageSize,
+                position: 'relative', // Required for Image component
               }}
-            />
+            >
+              <Image
+                src={project.image}
+                alt={project.name}
+                layout="fill"
+                objectFit="cover"
+              />
+            </Box>
           )}
 
           <CardContent sx={{ pb: 2, px: 3, py: 3, flexGrow: 1 }}>
@@ -115,7 +118,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                mb: 1,
+                mb: 2, // Increased margin
               }}
             >
               <Icon
@@ -136,9 +139,6 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 color: theme.palette.primary.main,
                 lineHeight: 1.2,
                 '&:hover': { textDecoration: 'underline' },
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap', // Prevent text from wrapping
               }}
             >
               {project.name}
@@ -147,58 +147,55 @@ const ProjectCard = ({ project }: { project: Project }) => {
               variant="body2"
               align="center"
               color="text.secondary"
-              sx={{ mb: 1 }}
+              sx={{ mb: 2 }} // Increased margin
             >
               {project.clientName}
             </Typography>
+
+            {/* Technologies - Updated to use icon map */}
             <Box
               sx={{
                 display: 'flex',
                 gap: 1,
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                my: 1,
+                mb: 2, // Increased margin
               }}
             >
               {project.technologies.map((tech) => {
-                const TechIcon = technologyIconMap[tech];
-                return TechIcon ? (
+                const TechIcon =
+                  technologyIconMap[tech as keyof typeof technologyIconMap];
+                return TechIcon? (
                   <Chip
                     key={tech}
-                    icon={
-                      <Icon
-                        sx={{
-                          color: theme.palette.grey[500],
-                          '&:hover': { color: theme.palette.primary.main },
-                        }}
-                      >
-                        <TechIcon size={16} />
-                      </Icon>
-                    }
+                    icon={<TechIcon size={16} />}
                     label={tech}
+                    variant="outlined"
                     sx={{
-                      background: theme.palette.background.default,
-                      color: theme.palette.text.primary,
-                      transition: 'transform 0.2s ease-in-out',
+                      borderRadius: 1,
+                      borderColor: alpha(theme.palette.primary.main, 0.1),
+                      background: alpha(theme.palette.primary.main, 0.02),
+                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        transform: 'scale(1.05)',
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        background: alpha(theme.palette.primary.main, 0.15),
+                        transform: 'translateY(-1px)',
+                        boxShadow: theme.shadows,
                       },
                     }}
                   />
-                ) : null;
+                ): null;
               })}
             </Box>
+
             <Box
               sx={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                mt: 2,
               }}
             >
               {project.metrics.map((metric, index) => (
-                <Box key={index}>
+                <Box key={index} sx={{ textAlign: 'center' }}>
                   <Typography
                     variant="body2"
                     sx={{
@@ -208,11 +205,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
                   >
                     {metric.value}
                   </Typography>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ textAlign: 'center' }}
-                  >
+                  <Typography variant="caption" color="text.secondary">
                     {metric.label}
                   </Typography>
                 </Box>
@@ -220,59 +213,22 @@ const ProjectCard = ({ project }: { project: Project }) => {
             </Box>
           </CardContent>
         </CardActionArea>
-        <LinearProgress
+
+        <Button
+          component={NextLink}
+          href={`/projects/${project.id}`}
+          endIcon={<ArrowRightAlt />}
           sx={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            width: '0%',
-            height: 4,
-            background: 'transparent',
-            transition: 'width 0.3s ease',
-            '&.MuiLinearProgress-bar': {
-              background: theme.palette.primary.main,
-            },
+            color: theme.palette.primary.main,
+            fontWeight: 600,
+            py: 2,
             '&:hover': {
-              width: '100%',
+              background: alpha(theme.palette.primary.main, 0.1),
             },
-          }}
-        />
-        <Box
-          className="overlay"
-          sx={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: `linear-gradient(to top, ${alpha(
-              theme.palette.primary.main,
-              0.8,
-            )}, ${alpha(theme.palette.primary.main, 0)})`,
-            opacity: 0,
-            transition: 'opacity 0.3s ease',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '&:hover': { opacity: 1 },
           }}
         >
-          <Button
-            component={NextLink}
-            href={`/projects/${project.id}`}
-            endIcon={<ArrowRightAlt />}
-            sx={{
-              color: 'common.white',
-              fontWeight: 600,
-              '&:hover': {
-                textDecoration: 'underline',
-                backgroundColor: alpha(theme.palette.primary.main, 0.2),
-              },
-            }}
-          >
-            View Details
-          </Button>
-        </Box>
+          View Details
+        </Button>
       </Card>
     </motion.div>
   );
