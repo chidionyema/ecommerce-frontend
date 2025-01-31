@@ -45,6 +45,25 @@ export interface CVProject {
   }>;
 }
 
+// ✅ Map Technologies to Icons
+const technologyIconMap: Record<string, any> = {
+  ".NET Core": Code2,
+  "Java": Terminal,
+  "WebSockets": GitBranch,
+  "RabbitMQ": Database,
+  "MQTT": Layers,
+  "Docker": Server,
+  "Kubernetes": Cloud,
+  "Terraform": BoxIcon,
+  "AWS": Cloud,
+  "Azure": Landmark,
+  "C#": Cpu,
+  "EF Core": Database,
+  "SQL": Database,
+  "Brighter CQRS": Key,
+};
+
+
 export const cvProjects: CVProject[] = [
   {
     id: '1',
