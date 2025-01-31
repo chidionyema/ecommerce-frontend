@@ -26,31 +26,27 @@ import {
   Layers,
   Server,
   Terminal,
-  
   Box as BoxIcon,
-  Shield,
-  Building2,
-  LucideIcon
+  LucideIcon,
 } from 'lucide-react';
+import Image from 'next/image';
 
 interface Project {
   id: string;
   name: string;
   description: string;
-  technologies: string[];
-  technologyIcons: LucideIcon[];
-  role: string;
-  bannerText: string;
-  icon: LucideIcon;
-  iconColor: string;
+  technologies: string;
   clientName: string;
+  image?: string;
   metrics: Array<{
     label: string;
     value: string;
-    description: string;
   }>;
+  icon: LucideIcon;
+  iconColor: string;
 }
 
+// Moved technologyIconMap inside the component
 const technologyIconMap = {
   '.NET Core': Code2,
   Java: Terminal,
@@ -62,8 +58,9 @@ const technologyIconMap = {
   Terraform: BoxIcon,
   AWS: Cloud,
   Azure: Cloud,
-  'Node.js': Terminal,
-  Helm: BoxIcon
+  'C#': Cpu,
+  'EF Core': Database,
+  SQL: Database,
 };
 
 // Convert Tailwind color classes to hex values
@@ -71,8 +68,14 @@ const colorMap: Record<string, string> = {
   'text-blue-600': '#2563eb',
   'text-purple-600': '#9333ea',
   'text-green-600': '#16a34a',
+  'text-indigo-600': '#4f46e5',
+  'text-sky-500': '#0ea5e9',
   'text-red-600': '#dc2626',
-  'text-orange-600': '#ea580c'
+  'text-orange-600': '#ea580c',
+  'text-emerald-600': '#059669',
+  'text-teal-500': '#14b8a6',
+  'text-rose-600': '#e11d48',
+  'text-amber-600': '#d97706',
 };
 
 const glintAnimation = keyframes`
@@ -110,6 +113,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
   const theme = useTheme();
   const [hovered, setHovered] = useState(false);
 
+  // Convert iconColor to hex using colorMap or default to primary main
   const iconColor = colorMap[project.iconColor] || theme.palette.primary.main;
 
   return (
@@ -128,21 +132,26 @@ const ProjectCard = ({ project }: { project: Project }) => {
           bgcolor: 'background.paper',
           border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
           borderRadius: 4,
-          boxShadow: theme.shadows[1],
+          boxShadow: theme.shadows, // Corrected boxShadow
           transition: 'all 0.3s cubic-bezier(0.17, 0.55, 0.55, 1)',
           '&:hover': {
             transform: 'translateY(-8px)',
             boxShadow: `0 32px 64px ${alpha(theme.palette.primary.main, 0.2)}`,
           },
+          height: 400, // Fixed height for the card
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         <HoverEffectLayer sx={{ '&:hover': { opacity: 0.2 } }} />
+        {/* Optional Glint Effect */}
+        {hovered && <GlintEffect />}
 
         <CardActionArea
           component={NextLink}
           href={`/projects/${project.id}`}
           sx={{
-            p: 3,
+            p: 4, // Increased padding
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -151,7 +160,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
         >
           {/* Project Icon */}
           <motion.div
-            animate={hovered ? { scale: 1.1 } : { scale: 1 }}
+            animate={hovered? { scale: 1.1 }: { scale: 1 }}
             transition={{ type: 'spring', stiffness: 300 }}
             style={{
               position: 'relative',
@@ -167,7 +176,10 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: `linear-gradient(45deg, ${iconColor} 0%, ${alpha(iconColor, 0.3)} 100%)`,
+                background: `linear-gradient(45deg, ${iconColor} 0%, ${alpha(
+                  iconColor,
+                  0.3
+                )} 100%)`,
                 borderRadius: '50%',
                 overflow: 'visible',
               }}
@@ -181,12 +193,30 @@ const ProjectCard = ({ project }: { project: Project }) => {
             </Box>
           </motion.div>
 
-          <CardContent sx={{ textAlign: 'center', px: 0, width: '100%' }}>
+          {project.image && (
+            <Box
+              sx={{
+                width: 200, // Fixed width for the image
+                height: 150, // Fixed height for the image
+                position: 'relative',
+                marginBottom: theme.spacing(2),
+              }}
+            >
+              <Image
+                src={project.image}
+                alt={project.name}
+                layout="fill"
+                objectFit="cover"
+              />
+            </Box>
+          )}
+
+          <CardContent sx={{ textAlign: 'center', px: 0, width: '100%', flexGrow: 1 }}> {/* Allow content to grow */}
             {/* Project Name */}
             <Typography
               variant="h5"
               component={motion.div}
-              animate={hovered ? { y: -5 } : { y: 0 }}
+              animate={hovered? { y: -5 }: { y: 0 }}
               sx={{
                 fontWeight: 800,
                 background: `linear-gradient(45deg, ${theme.palette.text.primary} 30%, ${alpha(
@@ -216,44 +246,75 @@ const ProjectCard = ({ project }: { project: Project }) => {
             </Typography>
 
             {/* Technology Icons Section */}
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>Main Technologies</Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
-                {project.technologyIcons.map((Icon, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <Icon size={24} color={iconColor} />
-                  </motion.div>
-                ))}
+            <Box sx={{ mb: 4, overflow: 'hidden' }}> {/* Increased margin bottom */}
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Main Technologies
+              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: 3, // Increased gap
+                  mb: 3, // Increased margin bottom
+                }}
+              >
+                {project.technologies.map((tech, index) => {
+                  const TechIcon = technologyIconMap[tech as keyof typeof technologyIconMap];
+                  // Only show the first 3 icons initially
+                  if (index < 3) {
+                    return TechIcon? (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <TechIcon size={24} color={iconColor} />
+                      </motion.div>
+                    ): null;
+                  } else {
+                    return null; // Hide the rest of the icons
+                  }
+                })}
               </Box>
 
               {/* Technology Chips */}
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 2, // Increased gap
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                }}
+              >
                 {project.technologies.map((tech, index) => {
-                  const TechIcon = technologyIconMap[tech as keyof typeof technologyIconMap];
-                  return (
-                    <motion.div
-                      key={tech}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <Chip
-                        icon={TechIcon ? <TechIcon size={16} /> : undefined}
-                        label={tech}
-                        size="small"
-                        sx={{
-                          borderRadius: 2,
-                          bgcolor: alpha(iconColor, 0.1),
-                          '&:hover': { bgcolor: alpha(iconColor, 0.2) },
-                        }}
-                      />
-                    </motion.div>
-                  );
+                  const TechIcon =
+                    technologyIconMap[tech as keyof typeof technologyIconMap];
+                  // Only show the first 3 chips initially
+                  if (index < 3) {
+                    return TechIcon? (
+                      <motion.div
+                        key={tech}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <Chip
+                          icon={<TechIcon size={16} />}
+                          label={tech}
+                          size="small"
+                          sx={{
+                            borderRadius: 2,
+                            bgcolor: alpha(iconColor, 0.1),
+                            '&:hover': { bgcolor: alpha(iconColor, 0.2) },
+                          }}
+                        />
+                      </motion.div>
+                    ): null;
+                  } else {
+                    return null; // Hide the rest of the chips
+                  }
                 })}
               </Box>
             </Box>
@@ -302,7 +363,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
               href={`/projects/${project.id}`}
               endIcon={
                 <motion.div
-                  animate={hovered ? { x: 5 } : { x: 0 }}
+                  animate={hovered? { x: 5 }: { x: 0 }}
                   transition={{ repeat: Infinity, repeatType: 'mirror', duration: 1.2 }}
                 >
                   <ArrowRightAlt />
