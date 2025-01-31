@@ -52,22 +52,28 @@ const Contact = () => {
       const fieldSchema = z.object({ [name]: formSchema.shape[name] });
       fieldSchema.parse({ [name]: value });
   
-      // FIX: Remove the key if validation passes
       setErrors(prev => {
         const newErrors = { ...prev };
-        delete newErrors[name]; // ✅ Removes the key instead of setting undefined
+        delete newErrors[name];
         return newErrors;
       });
   
-    } catch (error) {
-      if (error instanceof z.ZodError) {
+    } catch (error: unknown) {  // Type the error as unknown
+      if (error instanceof z.ZodError) { // Check if it's a ZodError
         setErrors(prev => ({
           ...prev,
           [name]: error.errors[0].message,
         }));
+      } else {
+        // Handle other potential errors if needed.  For example:
+        console.error("An unexpected error occurred during validation:", error);
+        setErrors(prev => ({
+          ...prev,
+          [name]: "An unexpected error occurred.", // Or a more generic message
+        }));
       }
     }
-  }, []);
+  }, [formSchema]); // Add formSchema to the dependency array
   
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

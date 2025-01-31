@@ -1,52 +1,23 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Box,
   Typography,
   Chip,
-  Card,
-  CardContent,
-  CardActionArea,
+  Button,
   useTheme,
   alpha,
-  Button,
-  styled,
-  keyframes,
+  Tooltip,
+  Grid,
+  Container,
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import NextLink from 'next/link';
-import { useState } from 'react';
 import { ArrowRightAlt } from '@mui/icons-material';
-import {
-  Cloud,
-  Code2,
-  Cpu,
-  Database,
-  GitBranch,
-  Layers,
-  Server,
-  Terminal,
-  Box as BoxIcon,
-  LucideIcon,
-} from 'lucide-react';
-import Image from 'next/image';
+import { Cloud, Code2, Cpu, Database, GitBranch, Layers, Server, Terminal, BoxIcon } from 'lucide-react';
+import NextLink from 'next/link';
+import { RadialBarChart, RadialBar } from 'recharts';
 
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  technologies: string [];
-  clientName: string;
-  image?: string;
-  metrics: Array<{
-    label: string;
-    value: string;
-  }>;
-  icon: LucideIcon;
-  iconColor: string;
-}
-
-// Moved technologyIconMap inside the component
 const technologyIconMap = {
   '.NET Core': Code2,
   Java: Terminal,
@@ -63,337 +34,245 @@ const technologyIconMap = {
   SQL: Database,
 };
 
-// Convert Tailwind color classes to hex values
-const colorMap: Record<string, string> = {
-  'text-blue-600': '#2563eb',
-  'text-purple-600': '#9333ea',
-  'text-green-600': '#16a34a',
-  'text-indigo-600': '#4f46e5',
-  'text-sky-500': '#0ea5e9',
-  'text-red-600': '#dc2626',
-  'text-orange-600': '#ea580c',
-  'text-emerald-600': '#059669',
-  'text-teal-500': '#14b8a6',
-  'text-rose-600': '#e11d48',
-  'text-amber-600': '#d97706',
-};
+const projects = [
+  {
+    id: '1',
+    name: 'Airspace Security & Drone Defense',
+    description:
+      'Real-time threat detection and situational intelligence platform for critical infrastructures.',
+    technologies: ['.NET Core', 'Java', 'WebSockets', 'RabbitMQ', 'Docker', 'Kubernetes'],
+    metrics: [
+      { label: 'Latency', value: '<500ms' },
+      { label: 'Threat Detection', value: '40% faster' },
+    ],
+    iconColor: '#2563eb',
+  },
+  {
+    id: '2',
+    name: 'Digital Justice Platform',
+    description:
+      'GDS-compliant digital services modernizing legal proceedings, including online pleas and certification applications.',
+    technologies: ['Terraform', 'Kubernetes', 'AWS', 'Azure', 'Java'],
+    metrics: [
+      { label: 'Form Completion Time', value: '-50%' },
+      { label: 'Accessibility Score', value: 'WCAG 2.1 AA' },
+    ],
+    iconColor: '#9333ea',
+  },
+  {
+    id: '3',
+    name: 'High-Performance Cash Optimization',
+    description:
+      'A cutting-edge cash deposit platform enabling real-time rate adjustments and compliance tracking.',
+    technologies: ['.NET Core', 'C#', 'EF Core', 'Azure', 'SQL'],
+    metrics: [
+      { label: 'Daily Transaction Volume', value: '£1B+' },
+      { label: 'Build Times', value: '-50%' },
+    ],
+    iconColor: '#16a34a',
+  },
+];
 
-const glintAnimation = keyframes`
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-`;
-
-const GlintEffect = styled('div')(({ theme }) => ({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  zIndex: 1,
-  backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%)`,
-  animation: `${glintAnimation} 2s linear infinite`,
-  pointerEvents: 'none',
-}));
-
-const HoverEffectLayer = styled('div')(({ theme }) => ({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  background: `linear-gradient(45deg, ${alpha(theme.palette.primary.main, 0.3)} 0%, ${alpha(
-    theme.palette.secondary.main,
-    0.1
-  )} 100%)`,
-  opacity: 0,
-  transition: 'opacity 0.3s ease',
-}));
-
-const ProjectCard = ({ project }: { project: Project }) => {
+const ProjectOverviewCard = ({ project, isSelected, onClick }) => {
   const theme = useTheme();
-  const [hovered, setHovered] = useState(false);
-
-  // Convert iconColor to hex using colorMap or default to primary main
-  const iconColor = colorMap[project.iconColor] || theme.palette.primary.main;
 
   return (
     <motion.div
-      whileHover="hover"
-      whileTap="tap"
-      initial="initial"
-      style={{ position: 'relative', overflow: 'visible' }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+      style={{
+        flex: '0 0 280px',
+        borderRadius: 8,
+        background: alpha(theme.palette.background.paper, 0.9),
+        padding: theme.spacing(3),
+        boxShadow: theme.shadows[2],
+        cursor: 'pointer',
+        border: `2px solid ${isSelected ? project.iconColor : 'transparent'}`,
+        opacity: isSelected ? 1 : 0.8,
+      }}
+      onClick={onClick}
     >
-     <Card sx={{
-            position: 'relative',
-            overflow: 'visible',
-            bgcolor: 'background.paper',
-            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-            borderRadius: 4,
-            boxShadow: theme.shadows, // Corrected boxShadow
-            transition: 'all 0.3s cubic-bezier(0.17, 0.55, 0.55, 1)',
-            '&:hover': {
-              transform: 'translateY(-8px)',
-              boxShadow: `0 32px 64px ${alpha(theme.palette.primary.main, 0.2)}`,
-            },
-            height: 450, // Fixed height for the card
-            display: 'flex',
-            flexDirection: 'column',
-
-            // Added margin and padding
-            margin: theme.spacing(2), // Adjust margin size as needed
-            padding: theme.spacing(3), // Adjust padding size as needed
-          }}
-        >
-
-        <HoverEffectLayer sx={{ '&:hover': { opacity: 0.2 } }} />
-        {/* Optional Glint Effect */}
-        {hovered && <GlintEffect />}
-
-        <CardActionArea
-          component={NextLink}
-          href={`/projects/${project.id}`}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <Box
           sx={{
-            p: 5, // Increased padding
+            width: 40,
+            height: 40,
+            background: alpha(project.iconColor, 0.1),
+            borderRadius: '50%',
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
-            minHeight: 450, // Increased min height to match card height
+            justifyContent: 'center',
           }}
         >
-          {/* Project Icon */}
-          <motion.div
-            animate={hovered? { scale: 1.1 }: { scale: 1 }}
-            transition={{ type: 'spring', stiffness: 300 }}
-            style={{
-              position: 'relative',
-          
-              marginBottom: theme.spacing(3),
-            }}
-          >
-            <Box
-              sx={{
-                position: 'relative',
-                width: 80,
-                height: 80,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: `linear-gradient(45deg, ${iconColor} 0%, ${alpha(
-                  iconColor,
-                  0.3
-                )} 100%)`,
-                borderRadius: '50%',
-                overflow: 'visible',
-                zIndex: 2, // Ensure icon is on top
-              }}
-            >
-              <project.icon
-                size={40}
-                style={{
-                  color: theme.palette.getContrastText(iconColor),
-                }}
-              />
-            </Box>
-          </motion.div>
-
-          {project.image && (
-            <Box
-              sx={{
-                width: 200, // Fixed width for the image
-                height: 150, // Fixed height for the image
-                position: 'relative',
-                marginBottom: theme.spacing(2),
-              }}
-            >
-              <Image
-                src={project.image}
-                alt={project.name}
-                layout="fill"
-                objectFit="cover"
-              />
-            </Box>
-          )}
-
-          <CardContent sx={{ textAlign: 'center', px: 0, width: '100%', flexGrow: 1 }}>
-            {/* Project Name */}
-            <Typography
-              variant="h5"
-              component={motion.div}
-              animate={hovered? { y: -5 }: { y: 0 }}
-              sx={{
-                fontWeight: 800,
-                background: `linear-gradient(45deg, ${theme.palette.text.primary} 30%, ${alpha(
-                  theme.palette.text.primary,
-                  0.7
-                )} 90%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                mb: 1,
-              }}
-            >
-              {project.name}
-            </Typography>
-
-            {/* Description */}
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{
-                fontSize: '0.9rem',
-                minHeight: 60,
-                mb: 2,
-                px: 2,
-              }}
-            >
-              {project.description}
-            </Typography>
-
-            {/* Technology Icons Section */}
-            <Box sx={{ mb: 5, overflow: 'hidden' }}> {/* Increased margin bottom */}
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                Main Technologies
-              </Typography>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: 4, // Increased gap
-                  mb: 4, // Increased margin bottom
-                  '& > *': { // Target direct children for animation
-                    opacity: 0, // Initially hide icons
-                  },
-                  '& > *[data-animated]': { // Style animated icons
-                    opacity: 1,
-                  },
-                }}
-              >
-                {project.technologies.map((tech, index) => {
-                  const TechIcon = technologyIconMap[tech as keyof typeof technologyIconMap];
-                  return TechIcon? (
-                    <motion.div
-                      key={index}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: index * 0.1 }}
-                      data-animated // Add data attribute for animated icons
-                    >
-                      <TechIcon size={24} color={iconColor} />
-                    </motion.div>
-                  ): null;
-                })}
-              </Box>
-
-              {/* Technology Chips */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 3, // Increased gap
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                  '& > *': { // Target direct children for animation
-                    opacity: 0, // Initially hide chips
-                  },
-                  '& > *[data-animated]': { // Style animated chips
-                    opacity: 1,
-                  },
-                }}
-              >
-                {project.technologies.map((tech, index) => {
-                  const TechIcon =
-                    technologyIconMap[tech as keyof typeof technologyIconMap];
-                  return TechIcon? (
-                    <motion.div
-                      key={tech}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      data-animated // Add data attribute for animated chips
-                    >
-                      <Chip
-                        icon={<TechIcon size={16} />}
-                        label={tech}
-                        size="small"
-                        sx={{
-                          borderRadius: 2,
-                          bgcolor: alpha(iconColor, 0.1),
-                          '&:hover': { bgcolor: alpha(iconColor, 0.2) },
-                        }}
-                      />
-                    </motion.div>
-                  ): null;
-                })}
-              </Box>
-            </Box>
-
-            {/* Metrics Grid */}
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 3, // Increased gap
-                mb: 4, // Increased margin bottom
-              }}
-            >
-              {project.metrics.map((metric, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ scale: 1.05 }}
-                  style={{ originX: 0.5, originY: 0.5 }}
-                >
-                  <Box
-                    sx={{
-                      p: 2, // Increased padding
-                      borderRadius: 2,
-                      bgcolor: alpha(theme.palette.primary.main, 0.03),
-                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                    }}
-                  >
-                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                      {metric.value}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {metric.label}
-                    </Typography>
-                  </Box>
-                </motion.div>
-              ))}
-            </Box>
-          </CardContent>
-        </CardActionArea>
-
-        {/* Explore Button */}
-        <Box sx={{ p: 3, textAlign: 'center' }}> {/* Increased padding */}
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              component={NextLink}
-              href={`/projects/${project.id}`}
-              endIcon={
-                <motion.div
-                  animate={hovered? { x: 5 }: { x: 0 }}
-                  transition={{ repeat: Infinity, repeatType: 'mirror', duration: 1.2 }}
-                >
-                  <ArrowRightAlt />
-                </motion.div>
-              }
-              sx={{
-                width: '100%',
-                bgcolor: alpha(iconColor, 0.9),
-                color: theme.palette.getContrastText(iconColor),
-                '&:hover': {
-                  bgcolor: alpha(iconColor, 1),
-                },
-              }}
-            >
-              Explore Project
-            </Button>
-          </motion.div>
+          <BoxIcon size={24} color={project.iconColor} />
         </Box>
-      </Card>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          {project.name}
+        </Typography>
+      </Box>
+      <Typography variant="body2" color="text.secondary">
+        {project.description}
+      </Typography>
     </motion.div>
   );
 };
 
-export default ProjectCard;
+const MetricRadialBar = ({ value, label, color }) => {
+  const numericValue = parseInt(value.replace(/\D/g, ''), 10);
+
+  return (
+    <Box sx={{ textAlign: 'center' }}>
+      <RadialBarChart width={120} height={120} innerRadius="70%" outerRadius="100%" data={[{ value: numericValue, fill: color }]}>
+        <RadialBar background dataKey="value" cornerRadius={10} />
+      </RadialBarChart>
+      <Typography variant="h6" sx={{ mt: -8, fontWeight: 700, color }}>
+        {value}
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        {label}
+      </Typography>
+    </Box>
+  );
+};
+
+const FeatureSet = () => {
+  const theme = useTheme();
+  const [selectedProjectId, setSelectedProjectId] = useState(projects[0].id);
+  const selectedProject = projects.find((p) => p.id === selectedProjectId);
+
+  return (
+    <Container sx={{ py: 10, px: { xs: 2, sm: 4 } }}>
+      <Typography
+        variant="h3"
+        align="center"
+        sx={{
+          fontWeight: 900,
+          mb: 6,
+          background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+        }}
+      >
+        Enterprise-Grade Solutions
+      </Typography>
+
+      <Grid container spacing={4}>
+        {/* Column 1: Overview Carousel */}
+        <Grid item xs={12} md={4}>
+          <Box
+            sx={{
+              display: 'flex',
+              overflowX: 'auto',
+              gap: 3,
+              pb: 2,
+              '&::-webkit-scrollbar': { height: 8 },
+              '&::-webkit-scrollbar-thumb': { background: theme.palette.primary.main },
+            }}
+          >
+            {projects.map((project) => (
+              <ProjectOverviewCard
+                key={project.id}
+                project={project}
+                isSelected={selectedProjectId === project.id}
+                onClick={() => setSelectedProjectId(project.id)}
+              />
+            ))}
+          </Box>
+        </Grid>
+
+        {/* Column 2: Details Panel */}
+        <Grid item xs={12} md={4}>
+          <motion.div
+            key={selectedProjectId}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Box
+              sx={{
+                background: alpha(theme.palette.background.paper, 0.9),
+                borderRadius: 4,
+                p: 4,
+                boxShadow: theme.shadows[4],
+                height: '100%',
+              }}
+            >
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
+                Technical Details
+              </Typography>
+              <Grid container spacing={1} sx={{ mb: 4 }}>
+                {selectedProject.technologies.map((tech) => {
+                  const TechIcon = technologyIconMap[tech];
+                  return (
+                    <Grid item key={tech}>
+                      <Tooltip title={tech}>
+                        <Chip
+                          icon={<TechIcon size={16} />}
+                          label={tech}
+                          size="small"
+                          sx={{
+                            background: alpha(selectedProject.iconColor, 0.1),
+                            '&:hover': { background: alpha(selectedProject.iconColor, 0.2) },
+                          }}
+                        />
+                      </Tooltip>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+              <Button
+                component={NextLink}
+                href={`/projects/${selectedProjectId}`}
+                variant="contained"
+                endIcon={<ArrowRightAlt />}
+                sx={{
+                  background: selectedProject.iconColor,
+                  color: theme.palette.getContrastText(selectedProject.iconColor),
+                  '&:hover': { background: alpha(selectedProject.iconColor, 0.8) },
+                }}
+              >
+                Case Study
+              </Button>
+            </Box>
+          </motion.div>
+        </Grid>
+
+        {/* Column 3: Metrics Panel */}
+        <Grid item xs={12} md={4}>
+          <motion.div
+            key={selectedProjectId}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Box
+              sx={{
+                background: alpha(theme.palette.background.paper, 0.9),
+                borderRadius: 4,
+                p: 4,
+                boxShadow: theme.shadows[4],
+                height: '100%',
+              }}
+            >
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 4 }}>
+                Performance Metrics
+              </Typography>
+              <Grid container spacing={4}>
+                {selectedProject.metrics.map((metric, index) => (
+                  <Grid item xs={12} sm={6} md={12} key={index}>
+                    <MetricRadialBar value={metric.value} label={metric.label} color={selectedProject.iconColor} />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          </motion.div>
+        </Grid>
+      </Grid>
+    </Container>
+  );
+};
+
+export default FeatureSet;
