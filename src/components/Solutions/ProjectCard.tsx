@@ -48,7 +48,8 @@ interface Project {
   id: string;
   name: string;
   description: string;
-  technologies: string;
+ technologies: string[]; 
+
   clientName: string;
   image?: string;
   metrics: Array<{
