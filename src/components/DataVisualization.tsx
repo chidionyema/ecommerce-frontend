@@ -63,179 +63,183 @@ export const ComparisonCard = ({ before, after }: ComparisonCardProps) => {
   const controls = useAnimation();
 
   return (
-    <GlassCard
-      component={motion.div}
+    <motion.div
       whileHover="hover"
       onHoverStart={() => controls.start('hover')}
-      sx={{ cursor: 'pointer' }}
     >
-      <Typography 
-        variant="h5" 
-        sx={{ 
-          mb: 3, 
-          background: colors.TITLE_GRADIENT,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          fontWeight: 700,
-          textShadow: colors.TEXT_SHADOW,
-          position: 'relative',
-          display: 'inline-block',
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            bottom: -4,
-            left: 0,
-            width: '100%',
-            height: '2px',
-            background: colors.TITLE_GRADIENT
-          }
-        }}
+      <GlassCard
+        component={motion.div}
+        sx={{ cursor: 'pointer' }}
       >
-        Transformation Journey
-      </Typography>
-      
-      <Box position="relative" height={160} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          <CircularProgress
-            variant="determinate"
-            value={before.percentage}
-            size={120}
-            thickness={3}
-            sx={{
-              color: '#EF4444',
-              filter: 'drop-shadow(0 4px 12px rgba(239,68,68,0.3))',
-              position: 'absolute',
-              left: 0,
-              transform: 'rotate(-90deg)'
-            }}
-          />
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <CircularProgress
-            variant="determinate"
-            value={after.percentage}
-            size={120}
-            thickness={3}
-            sx={{
-              color: colors.ACCENT_SECONDARY,
-              filter: 'drop-shadow(0 4px 12px rgba(45,212,191,0.3))',
-              position: 'absolute',
-              right: 0,
-              transform: 'rotate(90deg)'
-            }}
-          />
-        </motion.div>
-
-        <Box 
-          component={motion.div}
-          animate={controls}
-          variants={{
-            hover: { rotate: 360, scale: 1.1 }
-          }}
+        <Typography 
+          variant="h5" 
           sx={{ 
-            position: 'relative', 
-            zIndex: 1, 
-            textAlign: 'center',
-            background: alpha(colors.NEUTRAL_LIGHT, 0.05),
-            borderRadius: '50%',
-            p: 2,
-            backdropFilter: 'blur(8px)'
+            mb: 3, 
+            background: colors.TITLE_GRADIENT,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontWeight: 700,
+            textShadow: colors.TEXT_SHADOW,
+            position: 'relative',
+            display: 'inline-block',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              bottom: -4,
+              left: 0,
+              width: '100%',
+              height: '2px',
+              background: colors.TITLE_GRADIENT
+            }
           }}
         >
-          <ArrowRight size={48} color={colors.HIGHLIGHT_COLOR} />
-        </Box>
-      </Box>
+          Transformation Journey
+        </Typography>
+        
+        <Box position="relative" height={160} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+          >
+            <CircularProgress
+              variant="determinate"
+              value={before.percentage}
+              size={120}
+              thickness={3}
+              sx={{
+                color: '#EF4444',
+                filter: 'drop-shadow(0 4px 12px rgba(239,68,68,0.3))',
+                position: 'absolute',
+                left: 0,
+                transform: 'rotate(-90deg)'
+              }}
+            />
+          </motion.div>
 
-      <Grid container spacing={3} sx={{ mt: 2 }}>
-        <Grid item xs={6}>
-          <Box sx={{ pr: 2 }}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Box
-                component="span"
-                sx={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <CircularProgress
+              variant="determinate"
+              value={after.percentage}
+              size={120}
+              thickness={3}
+              sx={{
+                color: colors.ACCENT_SECONDARY,
+                filter: 'drop-shadow(0 4px 12px rgba(45,212,191,0.3))',
+                position: 'absolute',
+                right: 0,
+                transform: 'rotate(90deg)'
+              }}
+            />
+          </motion.div>
+
+          <Box 
+            component={motion.div}
+            animate={controls}
+            variants={{
+              hover: { rotate: 360, scale: 1.1 }
+            }}
+            sx={{ 
+              position: 'relative', 
+              zIndex: 1, 
+              textAlign: 'center',
+              background: alpha(colors.NEUTRAL_LIGHT, 0.05),
+              borderRadius: '50%',
+              p: 2,
+              backdropFilter: 'blur(8px)'
+            }}
+          >
+            <ArrowRight size={48} color={colors.HIGHLIGHT_COLOR} />
+          </Box>
+        </Box>
+
+        <Grid container spacing={3} sx={{ mt: 2 }}>
+          <Grid item xs={6}>
+            <Box sx={{ pr: 2 }}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Box
+                  component="span"
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    background: '#EF4444',
+                    boxShadow: '0 0 8px rgba(239,68,68,0.5)'
+                  }}
+                />
+                <Typography variant="subtitle2" sx={{ color: '#EF4444', mb: 1, fontWeight: 700 }}>
+                  Before
+                </Typography>
+              </Stack>
+              <Typography variant="body2" sx={{ 
+                color: colors.NEUTRAL_LIGHT,
+                opacity: 0.9,
+                lineHeight: 1.6,
+                position: 'relative',
+                pl: 2,
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  left: 0,
+                  top: 4,
+                  bottom: 4,
+                  width: '2px',
                   background: '#EF4444',
-                  boxShadow: '0 0 8px rgba(239,68,68,0.5)'
-                }}
-              />
-              <Typography variant="subtitle2" sx={{ color: '#EF4444', mb: 1, fontWeight: 700 }}>
-                Before
+                  borderRadius: 2
+                }
+              }}>
+                {before.description}
               </Typography>
-            </Stack>
-            <Typography variant="body2" sx={{ 
-              color: colors.NEUTRAL_LIGHT,
-              opacity: 0.9,
-              lineHeight: 1.6,
-              position: 'relative',
-              pl: 2,
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                left: 0,
-                top: 4,
-                bottom: 4,
-                width: '2px',
-                background: '#EF4444',
-                borderRadius: 2
-              }
-            }}>
-              {before.description}
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item xs={6}>
-          <Box sx={{ pl: 2 }}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Box
-                component="span"
-                sx={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
+            </Box>
+          </Grid>
+          <Grid item xs={6}>
+            <Box sx={{ pl: 2 }}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Box
+                  component="span"
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    background: colors.ACCENT_SECONDARY,
+                    boxShadow: `0 0 8px ${alpha(colors.ACCENT_SECONDARY, 0.5)}`
+                  }}
+                />
+                <Typography variant="subtitle2" sx={{ color: colors.ACCENT_SECONDARY, mb: 1, fontWeight: 700 }}>
+                  After
+                </Typography>
+              </Stack>
+              <Typography variant="body2" sx={{ 
+                color: colors.NEUTRAL_LIGHT,
+                opacity: 0.9,
+                lineHeight: 1.6,
+                position: 'relative',
+                pl: 2,
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  left: 0,
+                  top: 4,
+                  bottom: 4,
+                  width: '2px',
                   background: colors.ACCENT_SECONDARY,
-                  boxShadow: `0 0 8px ${alpha(colors.ACCENT_SECONDARY, 0.5)}`
-                }}
-              />
-              <Typography variant="subtitle2" sx={{ color: colors.ACCENT_SECONDARY, mb: 1, fontWeight: 700 }}>
-                After
+                  borderRadius: 2
+                }
+              }}>
+                {after.description}
               </Typography>
-            </Stack>
-            <Typography variant="body2" sx={{ 
-              color: colors.NEUTRAL_LIGHT,
-              opacity: 0.9,
-              lineHeight: 1.6,
-              position: 'relative',
-              pl: 2,
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                left: 0,
-                top: 4,
-                bottom: 4,
-                width: '2px',
-                background: colors.ACCENT_SECONDARY,
-                borderRadius: 2
-              }
-            }}>
-              {after.description}
-            </Typography>
-          </Box>
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
-    </GlassCard>
+      </GlassCard>
+    </motion.div>
   );
 };
+
 
 interface Metric {
   value: number;

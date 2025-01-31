@@ -102,6 +102,12 @@ const HolographicButton = styled(motion.button)<HolographicButtonProps>(
     color: $active ? NEON_ACCENT : alpha(theme.palette.text.primary, 0.9),
     transition: 'color 0.3s ease',
 
+    '&:disabled': {
+      cursor: 'not-allowed',
+      opacity: 0.6,
+      background: alpha(theme.palette.action.disabled, 0.1),
+    },
+
     '&::before': {
       content: '""',
       position: 'absolute',
@@ -197,6 +203,7 @@ const NavBar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navigatingToPath, setNavigatingToPath] = useState<string | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
   const progress = useMotionValue(0);
   const scrollTimeout = useRef<NodeJS.Timeout>();
@@ -239,14 +246,14 @@ const NavBar = () => {
       if (pathname === href) return;
 
       try {
-        setIsNavigating(true);
+        setNavigatingToPath(href);
         animate(progress, 1, { duration: LOADING_DURATION, ease: 'easeOut' });
         await router.push(href);
       } catch (error) {
         console.error('Navigation error:', error);
       } finally {
         animate(progress, 0, { duration: LOADING_DURATION * 0.6 }).then(() => {
-          setIsNavigating(false);
+          setNavigatingToPath(null);
         });
       }
     },
@@ -258,6 +265,7 @@ const NavBar = () => {
     () =>
       memo(({ item }: { item: (typeof navItems)[number] }) => {
         const isActive = pathname === item.path;
+        const isNavigating = navigatingToPath === item.path;
 
         return (
           <HolographicButton
@@ -268,7 +276,7 @@ const NavBar = () => {
             whileTap={{ scale: 0.98 }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              {isNavigating && isActive ? (
+              {isNavigating ? (
                 <CircularProgress size={20} sx={{ color: NEON_ACCENT }} />
               ) : (
                 <motion.div
@@ -283,7 +291,7 @@ const NavBar = () => {
           </HolographicButton>
         );
       }),
-    [pathname, isNavigating, handleNavigation]
+    [pathname, navigatingToPath, handleNavigation]
   );
 
   return (

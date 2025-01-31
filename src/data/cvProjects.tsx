@@ -46,23 +46,22 @@ export interface CVProject {
 }
 
 // ✅ Map Technologies to Icons
-const technologyIconMap: Record<string, any> = {
-  ".NET Core": Code2,
-  "Java": Terminal,
-  "WebSockets": GitBranch,
-  "RabbitMQ": Database,
-  "MQTT": Layers,
-  "Docker": Server,
-  "Kubernetes": Cloud,
-  "Terraform": BoxIcon,
-  "AWS": Cloud,
-  "Azure": Landmark,
-  "C#": Cpu,
-  "EF Core": Database,
-  "SQL": Database,
-  "Brighter CQRS": Key,
+const technologyIconMap = {
+  ".NET Core": Code2,        // Good match - general code icon
+  "Java": Terminal,          // Could be more specific (e.g., a coffee cup icon)
+  "WebSockets": GitBranch,    // Not a strong connection - maybe a network icon?
+  "RabbitMQ": Database,      // RabbitMQ is a message queue, not a database
+  "MQTT": Layers,            // Okay, but could be more specific (e.g., a message icon)
+  "Docker": Server,          // Good match - containerization
+  "Kubernetes": Cloud,       // Good match - orchestration
+  "Terraform": BoxIcon,      // Okay, but could be more infrastructure-focused
+  "AWS": Cloud,              // Good match
+  "Azure": Landmark,         // Not a strong connection - maybe a cloud with an 'A'?
+  "C#": Cpu,                // Good match
+  "EF Core": Database,      // EF Core is an ORM, not a database
+  "SQL": Database,          // Good match
+  "Brighter CQRS": Key,     // Okay, but could be more specific to CQRS
 };
-
 
 export const cvProjects: CVProject[] = [
   {
