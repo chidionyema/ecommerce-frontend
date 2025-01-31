@@ -37,10 +37,13 @@ export default function Document() {
         />
       
         {/* Security headers */}
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval';" />
+
+
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
         <meta httpEquiv="X-Frame-Options" content="DENY" />
         <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.googletagmanager.com;"></meta>
       </Head>
       <body>
         <Main />
