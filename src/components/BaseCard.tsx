@@ -4,7 +4,7 @@ import {
   PRIMARY_DARK,
   SECONDARY_DARK,
   BACKDROP_BLUR,
-  TITLE_GRADIENT,
+  TECH_GRADIENT,
 } from "../theme/palette";
 
 const BaseCard = styled(motion(Box))(({ theme }) => ({
@@ -28,7 +28,7 @@ const BaseCard = styled(motion(Box))(({ theme }) => ({
   "&:hover": {
     transform: "translateY(-8px)",
     boxShadow: `0 40px 80px -24px ${alpha(SECONDARY_DARK, 0.2)}`,
-    borderColor: TITLE_GRADIENT, // Customize or remove as needed
+    borderColor: TECH_GRADIENT, // Customize or remove as needed
   },
 }));
 

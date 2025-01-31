@@ -291,7 +291,7 @@ const NavBar = () => {
       <CyberAppBar
         style={{
           y: yTransform,
-          opacity: opacityTransform,
+          opacity: opacityTransform.get(),
         }}
         data-scrolled={scrolled}
       >

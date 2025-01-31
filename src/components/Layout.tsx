@@ -1,7 +1,5 @@
-'use client';
-
-import React, { useState } from 'react';
-import Footer from './Footer'; // Adjust path if needed
+import React, { useState, useEffect } from 'react';
+import Footer from './Footer';
 import {
   Box,
   Container,
@@ -12,293 +10,335 @@ import {
   CardContent,
   Avatar,
   useTheme,
-  styled,
+  IconButton,
+  Chip,
 } from '@mui/material';
-import { motion } from 'framer-motion';
+import { motion, useAnimation, AnimatePresence } from 'framer-motion';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import {
   HOLO_GRADIENT,
+  HOLO_GRADIENT_ANIMATED,
 } from '../theme/palette';
 
-const SectionCard = styled(Card)(({ theme }) => ({
-  borderRadius: '16px',
-  transition: 'all 0.3s ease',
-  background: `linear-gradient(145deg, ${theme.palette.background.paper}, #f8f9fc)`,
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: theme.shadows[6],
-  },
-}));
+import StrategyIcon from '../icons/strategy.svg';
+import GrowthIcon from '../icons/growth.svg';
+import SolutionIcon from '../icons/solution.svg';
+import InsightIcon from '../icons/insight.svg';
 
-const TestimonialCard = styled(Card)(({ theme }) => ({
-  borderRadius: '16px',
-  background: `linear-gradient(145deg, ${theme.palette.background.paper}, #f8f9fc)`,
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: theme.shadows[4],
-  },
-}));
+// Improved styled components with better hover effects
+const SectionCard = motion(Card);
+const TestimonialCard = motion(Card);
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  padding: theme.spacing(1.5, 4),
-  borderRadius: '50px',
-  fontWeight: 700,
-  transition: 'all 0.3s ease',
-  background: `linear-gradient(45deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
-  color: theme.palette.common.white,
-  '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: theme.shadows[4],
-  },
-}));
+const StyledButton = motion(Button);
 
-interface LayoutProps {
-  children: React.ReactNode;
-  showHeroSection?: boolean;
-}
-
-const Layout: React.FC<LayoutProps> = ({
-  children,
-  showHeroSection = false,
-}) => {
-  const theme = useTheme();
-  const [showAllTestimonials, setShowAllTestimonials] = useState(false);
-
-  const testimonials = [
-    {
-      id: 1,
-      name: 'John Doe',
-      role: 'CEO, TechCorp',
-      testimonial:
-        'The consulting services provided were exceptional. They helped us streamline our operations and achieve our goals faster.',
-      avatar: '/avatar1.jpg',
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      role: 'CTO, InnovateX',
-      testimonial:
-        'Their expertise and insights were invaluable. We highly recommend their services to any business looking to grow.',
-      avatar: '/avatar2.jpg',
-    },
-    {
-      id: 3,
-      name: 'Michael Johnson',
-      role: 'Founder, StartupHub',
-      testimonial:
-        'The team was professional and knowledgeable. They delivered results beyond our expectations.',
-      avatar: '/avatar3.jpg',
-    },
-    {
-      id: 4,
-      name: 'Sarah Lee',
-      role: 'Manager, TechSolutions',
-      testimonial:
-        'Amazing team! They helped us solve complex problems with ease.',
-      avatar: '/avatar4.jpg',
-    },
-    {
-      id: 5,
-      name: 'David Brown',
-      role: 'Director, InnovateNow',
-      testimonial:
-        'Very professional and efficient. We are extremely satisfied with their services.',
-      avatar: '/avatar5.jpg',
-    },
-    {
-      id: 6,
-      name: 'Emily Davis',
-      role: 'CEO, FutureTech',
-      testimonial:
-        'Outstanding results! Their strategic guidance has been a game-changer for our business.',
-      avatar: '/avatar6.jpg',
-    },
-  ];
-
-  const visibleTestimonials = showAllTestimonials
-    ? testimonials
-    : testimonials.slice(0, 3);
-
-  const services = [
-    {
-      title: 'Strategic Consulting',
-      content: 'Tailored strategies to help your business achieve its goals',
-      link: '/solutions',
-    },
-    {
-      title: 'Expert Guidance',
-      content: 'Leverage our deep expertise for informed decisions',
-      link: '/solutions',
-    },
-    {
-      title: 'Custom Solutions',
-      content: 'Bespoke solutions for unique business needs',
-      link: '/solutions',
-    },
-    {
-      title: 'Industry Insights',
-      content: 'Actionable insights to stay ahead in your industry',
-      link: '/solutions',
-    },
-  ];
-
+const AnimatedGradientHeader = () => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      {/* Hero Section (Conditional) */}
-      {showHeroSection && (
-        <Box
-          sx={{
-            background: HOLO_GRADIENT,
-            py: 10,
-            textAlign: 'center',
-            // Responsive design
-            '@media (max-width:600px)': {
-              py: 6, // Reduce padding on smaller screens
-            },
-          }}
+    <Box
+      sx={{
+        position: 'relative',
+        overflow: 'hidden',
+        py: 10,
+        textAlign: 'center',
+      }}
+    >
+      <Box
+        component={motion.div}
+        initial={{ opacity: 0, scale: 1.2 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8 }}
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: HOLO_GRADIENT_ANIMATED,
+          animation: 'gradientShift 15s ease infinite',
+          '@keyframes gradientShift': {
+            '0%': { backgroundPosition: '0% 50%' },
+            '50%': { backgroundPosition: '100% 50%' },
+            '100%': { backgroundPosition: '0% 50%' },
+          },
+        }}
+      />
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
         >
-          <Container maxWidth="lg">
-            <Typography
-              variant="h1"
+          <Typography
+            variant="h1"
+            sx={{
+              fontWeight: 800,
+              mb: 4,
+              color: 'white',
+              textShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              fontSize: { xs: '2.5rem', md: '4rem' },
+            }}
+          >
+            {['Accelerate', 'Your', 'Business', 'Growth'].map((word, i) => (
+              <motion.span
+                key={word}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                style={{ display: 'inline-block', marginRight: '0.25em' }}
+              >
+                {word}
+              </motion.span>
+            ))}
+          </Typography>
+        </motion.div>
+
+        <Box sx={{ maxWidth: 800, mx: 'auto', mb: 6 }}>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <Chip
+              label="98% Client Satisfaction"
               sx={{
-                fontWeight: 800,
-                mb: 4,
+                mb: 3,
                 color: 'white',
-                // Responsive design
-                '@media (max-width:600px)': {
-                  fontSize: '2.5rem', // Reduce font size on smaller screens
-                },
+                bgcolor: 'rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(8px)',
               }}
-            >
-              Accelerate Your Business Growth
-            </Typography>
+            />
             <Typography
               variant="h6"
               sx={{
-                mb: 6,
-                color: 'rgba(255, 255, 255, 0.8)',
-                // Responsive design
-                '@media (max-width:600px)': {
-                  fontSize: '1rem', // Reduce font size on smaller screens
-                },
+                color: 'rgba(255, 255, 255, 0.9)',
+                fontSize: { xs: '1rem', md: '1.25rem' },
               }}
             >
-              Strategic Consulting, Expert Guidance, and Custom Solutions to
-              Propel Your Business Forward
+              Trusted by 500+ industry leaders worldwide. Transform your business
+              with data-driven strategies and proven results.
             </Typography>
-            <StyledButton href="/contact" size="large">
-              Get Started
-            </StyledButton>
-          </Container>
-        </Box>
-      )}
-
-      <Container maxWidth="lg" component="main" sx={{ py: 8 }}>
-        <Box sx={{ mb: 8 }}>{children}</Box>
-
-        {/* Services Section (Grid) */}
-        <Grid container spacing={4} sx={{ mb: 8 }}>
-          {services.map((service, index) => (
-            <Grid item xs={12} md={6} key={index}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <SectionCard>
-                  <CardContent sx={{ textAlign: 'center', p: 4 }}>
-                    <Typography
-                      variant="h5"
-                      gutterBottom
-                      sx={{ fontWeight: 700 }}
-                    >
-                      {service.title}
-                    </Typography>
-                    <Typography variant="body1" sx={{ mb: 3 }}>
-                      {service.content}
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      href={service.link}
-                      sx={{
-                        borderWidth: 2,
-                        '&:hover': { borderWidth: 2 },
-                      }}
-                    >
-                      Learn More
-                    </Button>
-                  </CardContent>
-                </SectionCard>
-              </motion.div>
-            </Grid>
-          ))}
-        </Grid>
-
-        {/* Testimonials Section (Slider/Carousel - using Grid for now) */}
-        <Box sx={{ textAlign: 'center', mb: 8 }}>
-          <Typography variant="h3" sx={{ fontWeight: 800, mb: 6 }}>
-            Client Success Stories
-          </Typography>
-          <Grid container spacing={4}>
-            {visibleTestimonials.map((testimonial) => (
-              <Grid item xs={12} md={4} key={testimonial.id}>
-                <motion.div whileHover={{ scale: 1.02 }}>
-                  <TestimonialCard>
-                    <CardContent sx={{ p: 4 }}>
-                      <Avatar
-                        src={testimonial.avatar}
-                        sx={{
-                          width: 80,
-                          height: 80,
-                          mb: 3,
-                          mx: 'auto',
-                          border: `2px solid ${theme.palette.primary.main}`,
-                        }}
-                      />
-                      <Typography
-                        variant="body1"
-                        sx={{ mb: 3, fontStyle: 'italic' }}
-                      >
-                        "{testimonial.testimonial}"
-                      </Typography>
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                        {testimonial.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {testimonial.role}
-                      </Typography>
-                    </CardContent>
-                  </TestimonialCard>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
-          {!showAllTestimonials && testimonials.length > 3 && (
-            <Button
-              variant="contained"
-              onClick={() => setShowAllTestimonials(true)}
-              sx={{ mt: 6, px: 6 }}
-            >
-              View More Testimonials
-            </Button>
-          )}
+          </motion.div>
         </Box>
 
-        {/* Call to Action Section */}
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Typography variant="h4" sx={{ fontWeight: 800, mb: 4 }}>
-            Ready to Accelerate Growth?
-          </Typography>
-          <StyledButton href="/contact" size="large">
-            Schedule Free Consultation
-          </StyledButton>
-        </Box>
+        <StyledButton
+          href="/contact"
+          size="large"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          sx={{
+            px: 8,
+            py: 2,
+            fontSize: '1.1rem',
+            background: 'linear-gradient(45deg, #ff6b6b 0%, #ff8e53 100%)',
+            boxShadow: '0 8px 24px rgba(255,107,107,0.3)',
+          }}
+        >
+          Start Free Trial →
+        </StyledButton>
       </Container>
-
-      {/* Footer */}
-      <Footer />
     </Box>
   );
 };
 
-export default Layout;
+const Layout: React.FC<LayoutProps> = ({ children, showHeroSection = false }) => {
+  const [activeService, setActiveService] = useState(0);
+  const controls = useAnimation();
+
+  const services = [
+    {
+      title: 'Strategic Consulting',
+      content: 'Data-driven strategies for exponential growth',
+      icon: StrategyIcon,
+    },
+    {
+      title: 'Growth Marketing',
+      content: 'Full-funnel marketing solutions with ROI tracking',
+      icon: GrowthIcon,
+    },
+    {
+      title: 'Tech Solutions',
+      content: 'Cutting-edge technology implementation',
+      icon: SolutionIcon,
+    },
+    {
+      title: 'Market Intelligence',
+      content: 'Real-time analytics & competitor insights',
+      icon: InsightIcon,
+    },
+  ];
+
+  // Interactive testimonial carousel
+  const TestimonialSlider = () => (
+    <Box sx={{ py: 8, position: 'relative' }}>
+      <Swiper
+        modules={[Navigation, Pagination, Autoplay]}
+        spaceBetween={30}
+        slidesPerView={1}
+        breakpoints={{
+          600: { slidesPerView: 2 },
+          900: { slidesPerView: 3 },
+        }}
+        autoplay={{ delay: 5000 }}
+        navigation
+        pagination={{ clickable: true }}
+      >
+        {testimonials.map((testimonial) => (
+          <SwiperSlide key={testimonial.id}>
+            <TestimonialCard
+              whileHover={{ scale: 1.02 }}
+              sx={{
+                borderRadius: 4,
+                p: 3,
+                bgcolor: 'background.paper',
+                minHeight: 320,
+              }}
+            >
+              <CardContent>
+                <Avatar
+                  src={testimonial.avatar}
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    mb: 3,
+                    border: '3px solid',
+                    borderColor: 'primary.main',
+                  }}
+                />
+                <Typography variant="h6" gutterBottom>
+                  {testimonial.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  {testimonial.role}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{ fontStyle: 'italic', position: 'relative' }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      position: 'absolute',
+                      left: -32,
+                      top: -16,
+                      fontSize: 64,
+                      color: 'divider',
+                    }}
+                  >
+                    “
+                  </Box>
+                  {testimonial.testimonial}
+                </Typography>
+              </CardContent>
+            </TestimonialCard>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {showHeroSection && <AnimatedGradientHeader />}
+
+      <Container maxWidth="xl" component="main" sx={{ py: 8 }}>
+        {/* Enhanced Services Grid */}
+        <Grid container spacing={4} sx={{ mb: 8 }}>
+          {services.map((service, index) => (
+            <Grid item xs={12} md={3} key={index}>
+              <SectionCard
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.15 }}
+                whileHover={{ y: -10 }}
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  cursor: 'pointer',
+                  border: '2px solid',
+                  borderColor: 'divider',
+                }}
+                onHoverStart={() => setActiveService(index)}
+              >
+                <CardContent sx={{ textAlign: 'center' }}>
+                  <service.icon
+                    style={{
+                      width: 80,
+                      height: 80,
+                      margin: '0 auto 24px',
+                      filter: activeService === index ? 'brightness(1.1)' : 'none',
+                      transition: 'all 0.3s ease',
+                    }}
+                  />
+                  <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
+                    {service.title}
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 3 }}>
+                    {service.content}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    href="/solutions"
+                    sx={{ borderRadius: 50 }}
+                  >
+                    Explore
+                  </Button>
+                </CardContent>
+              </SectionCard>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Testimonial Section */}
+        <Box sx={{ mb: 8 }}>
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: 800,
+              mb: 6,
+              textAlign: 'center',
+              fontSize: { xs: '2rem', md: '3rem' },
+            }}
+          >
+            Trusted by Industry Leaders
+          </Typography>
+          <TestimonialSlider />
+        </Box>
+
+        {/* Sticky CTA */}
+        <Box
+          sx={{
+            position: 'sticky',
+            bottom: 24,
+            zIndex: 1000,
+            mx: 'auto',
+            width: 'fit-content',
+            boxShadow: 6,
+            borderRadius: 50,
+          }}
+        >
+          <StyledButton
+            href="/contact"
+            size="large"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            sx={{
+              px: 8,
+              py: 2,
+              fontSize: '1.1rem',
+              bgcolor: 'primary.main',
+              '&:hover': { bgcolor: 'primary.dark' },
+            }}
+          >
+            🚀 Start Your Free Consultation
+          </StyledButton>
+        </Box>
+      </Container>
+
+      <Footer />
+    </Box>
+  );
+};
