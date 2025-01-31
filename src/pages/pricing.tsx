@@ -36,7 +36,7 @@ const LazyCard = styled(motion.div)(({ theme }) => ({
   },
 }));
 
-const FeatureItem = memo(({ icon: Icon, text, theme }: any) => (
+const FeatureItem = memo(({ icon: Icon, text, theme }: { icon: any; text: string; theme: any }) => (
   <Box
     sx={{
       display: 'flex',
@@ -122,31 +122,26 @@ const PricingGrid = () => {
     },
   ];
 
-  const handlePlanClick = useCallback(
-    (type) => {
-      router.push(`/contact?plan=${type}`);
-    },
-    [router]
-  );
+  const handlePlanClick = useCallback((type: string) => {
+    router.push(`/contact?plan=${type}`);
+  }, [router]);
 
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
-    
   return (
     <LazyMotion features={domAnimation}>
       <Box
-      sx={{
-        minHeight: '100vh',
-        background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`,
-        paddingTop: 6,
-        paddingBottom: 6,
-        paddingLeft: isMobile ? 2 : 6,
-        paddingRight: isMobile ? 2 : 6,
-        marginLeft: 6,
-        marginRight: 6,
-      }}
-    >
+        sx={{
+          minHeight: '100vh',
+          background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`,
+          paddingTop: 6,
+          paddingBottom: 6,
+          paddingLeft: isMobile ? 2 : 6,
+          paddingRight: isMobile ? 2 : 6,
+          marginLeft: 6,
+          marginRight: 6,
+        }}
+      >
         <Container maxWidth="lg">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
