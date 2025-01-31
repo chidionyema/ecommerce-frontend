@@ -1,11 +1,13 @@
-import React, { memo } from 'react';
+'use client';
+
+import React, { memo, useCallback } from 'react';
 import {
   Box,
   Typography,
+  useTheme,
   Grid,
   Button,
   Container,
-  useTheme,
   styled,
   useMediaQuery,
   alpha,
@@ -13,27 +15,69 @@ import {
 import { Info, Award, Clock, Users, Calendar, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { motion, LazyMotion, domAnimation } from 'framer-motion';
-import BaseCard from '../components/BaseCard';
 
-interface Feature {
-  icon: React.ElementType;
-  text: string;
-}
+const LazyCard = styled(motion.div)(({ theme }) => ({
+  borderRadius: '24px',
+  overflow: 'hidden',
+  transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+  minHeight: 500,
+  background: `linear-gradient(145deg, ${alpha(
+    theme.palette.background.paper,
+    0.9
+  )}, ${alpha(theme.palette.background.paper, 1)})`,
+  border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+  boxShadow: `0 8px 24px ${alpha(theme.palette.primary.dark, 0.1)}`,
+  '&:hover': {
+    transform: 'translateY(-8px)',
+    boxShadow: `0 16px 32px ${alpha(
+      theme.palette.primary.main,
+      0.3
+    )}, inset 0 0 24px ${alpha(theme.palette.primary.light, 0.1)}`,
+  },
+}));
 
-interface Plan {
-  type: string;
-  title: string;
-  gradient: string;
-  features: Feature[];
-  price: string;
-}
+const FeatureItem = memo(({ icon: Icon, text, theme }: any) => (
+  <Box
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      py: 1,
+      backgroundColor: alpha(theme.palette.divider, 0.1),
+      borderRadius: '8px',
+      padding: '12px',
+      transition: 'all 0.3s ease',
+      '&:hover': {
+        backgroundColor: alpha(theme.palette.divider, 0.2),
+      },
+    }}
+  >
+    <Icon
+      style={{
+        color: theme.palette.secondary.main,
+        fontSize: '1.5rem',
+        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+      }}
+    />
+    <Typography
+      variant="body2"
+      sx={{
+        ml: 2,
+        fontWeight: 500,
+        color: 'text.primary',
+        fontFamily: theme.typography.fontFamily,
+      }}
+    >
+      {text}
+    </Typography>
+  </Box>
+));
 
 const PricingGrid = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMdDown = useMediaQuery(theme.breakpoints.down('md'));
 
-  const plans: Plan[] = [
+  const plans = [
     {
       type: 'hourly',
       title: 'Expert Consultation',
@@ -78,27 +122,12 @@ const PricingGrid = () => {
     },
   ];
 
-  const LazyCard = styled(BaseCard)(({ theme }) => ({
-    borderRadius: '24px',
-    overflow: 'hidden',
-    transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-    minHeight: 500,
-    background: `
-      linear-gradient(
-        145deg, 
-        ${alpha(theme.palette.background.paper, 0.8)}, 
-        ${alpha(theme.palette.background.paper, 1)}
-      )`,
-    border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
-    boxShadow: `0 8px 24px ${alpha(theme.palette.primary.dark, 0.1)}`,
-    '&:hover': {
-      transform: 'translateY(-8px)',
-      boxShadow: `
-        0 16px 32px ${alpha(theme.palette.divider, 0.2)},
-        inset 0 0 24px ${alpha(theme.palette.divider, 0.05)}
-      `,
+  const handlePlanClick = useCallback(
+    (type) => {
+      router.push(`/contact?plan=${type}`);
     },
-  }));
+    [router]
+  );
 
   return (
     <LazyMotion features={domAnimation}>
@@ -120,10 +149,13 @@ const PricingGrid = () => {
               <Typography
                 variant="h2"
                 sx={{
-                  fontWeight: 700,
+                  fontWeight: 900,
                   mb: 3,
-                  color: 'text.primary',
-                  fontFamily: theme.typography.fontFamily,
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 70%)`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontSize: { xs: '2.5rem', md: '3.5rem' },
+                  lineHeight: 1.2,
                 }}
               >
                 Choose Your Path to Innovation
@@ -144,37 +176,25 @@ const PricingGrid = () => {
           </motion.div>
 
           <Grid container spacing={4}>
-            {plans.map(({ type, title, gradient, features, price }) => (
-              <Grid item xs={12} sm={6} md={4} key={type}>
-                <LazyCard
-                  sx={{
-                    padding: 4,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%',
-                  }}
-                >
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontWeight: 700,
-                      mb: 3,
-                      color: 'text.primary',
-                      fontFamily: theme.typography.fontFamily,
-                    }}
-                  >
+            {plans.map(({ type, title, gradient, features, price }, index) => (
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={4}
+                key={type}
+                component={motion.div}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + index * 0.1 }}
+              >
+                <LazyCard sx={{ padding: 4, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
                     {title}
                   </Typography>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 2,
-                      flexGrow: 1,
-                    }}
-                  >
-                    {features.map(({ icon: Icon, text }, i) => (
-                      <FeatureItem key={i} icon={Icon} text={text} theme={theme} />
+                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {features.map((feature, i) => (
+                      <FeatureItem key={i} {...feature} theme={theme} />
                     ))}
                   </Box>
                   <Typography
@@ -182,28 +202,27 @@ const PricingGrid = () => {
                     sx={{
                       fontWeight: 600,
                       mt: 4,
-                      color: 'text.primary',
-                      fontFamily: theme.typography.fontFamily,
+                      color: theme.palette.primary.main,
                     }}
                   >
                     {price}
                   </Typography>
                   <Button
+                    variant="contained"
+                    size="large"
                     sx={{
-                      background: theme.palette.secondary.main,
-                      color: theme.palette.getContrastText(
-                        theme.palette.secondary.main
-                      ),
-                      fontWeight: 600,
+                      mt: 3,
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                      color: theme.palette.common.white,
+                      fontWeight: 700,
                       '&:hover': {
-                        background: alpha(theme.palette.secondary.main, 0.8),
-                        boxShadow: `0 4px 12px ${alpha(
-                          theme.palette.secondary.main,
-                          0.3
-                        )}`,
+                        background: `linear-gradient(135deg, ${alpha(
+                          theme.palette.primary.main,
+                          0.8
+                        )}, ${alpha(theme.palette.secondary.main, 0.8)})`,
                       },
                     }}
-                    onClick={() => router.push(`/contact?plan=${type}`)}
+                    onClick={() => handlePlanClick(type)}
                   >
                     Get Started
                   </Button>
@@ -216,41 +235,5 @@ const PricingGrid = () => {
     </LazyMotion>
   );
 };
-
-const FeatureItem = memo(({ icon: Icon, text, theme }: Feature & { theme: any }) => (
-  <Box
-    sx={{
-      display: 'flex',
-      alignItems: 'center',
-      py: 1,
-      backgroundColor: alpha(theme.palette.divider, 0.1),
-      borderRadius: '8px',
-      padding: '12px',
-      transition: 'all 0.3s ease',
-      '&:hover': {
-        backgroundColor: alpha(theme.palette.divider, 0.2),
-      },
-    }}
-  >
-    <Icon
-      style={{
-        color: theme.palette.secondary.main,
-        fontSize: '1.5rem',
-        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
-      }}
-    />
-    <Typography
-      variant="body2"
-      sx={{
-        ml: 2,
-        fontWeight: 500,
-        color: 'text.primary',
-        fontFamily: theme.typography.fontFamily,
-      }}
-    >
-      {text}
-    </Typography>
-  </Box>
-));
 
 export default PricingGrid;

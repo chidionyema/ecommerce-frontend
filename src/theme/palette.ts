@@ -100,3 +100,4 @@ export const fontLoader = `
     font-display: swap;
   }
 `;
+

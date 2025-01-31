@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useRef } from 'react';
 import {
   Box,
   Container,
@@ -7,42 +7,69 @@ import {
   useMediaQuery,
   useTheme,
   alpha,
-} from "@mui/material";
-import { motion } from "framer-motion";
+} from '@mui/material';
+import { motion, useInView } from 'framer-motion';
 import {
-  FaPython,
-  FaReact,
-  FaNodeJs,
-  FaAws,
-  FaDocker,
-  FaJava,
-  FaMicrosoft,
-  FaBrain,
-  FaDatabase,
-  FaGoogle,
-  FaLinux,
-} from "react-icons/fa";
-import { PRIMARY_DARK, SECONDARY_DARK } from "../../theme/palette";
+  Cloud,
+  VpnKey,
+  Storage,
+  Api,
+} from '@mui/icons-material';
+import styled from 'styled-components';
 
-// Technology list with icons
+// Define techIcons array correctly
 const techIcons = [
-  { id: "python", title: "Python", icon: <FaPython />, color: "#3776AB" },
-  { id: "react", title: "React", icon: <FaReact />, color: "#61DAFB" },
-  { id: "nodejs", title: "Node.js", icon: <FaNodeJs />, color: "#68A063" },
-  { id: "aws", title: "AWS", icon: <FaAws />, color: "#FF9900" },
-  { id: "docker", title: "Docker", icon: <FaDocker />, color: "#2496ED" },
-  { id: "java", title: "Java", icon: <FaJava />, color: "#007396" },
-  { id: "dotnet", title: ".NET", icon: <FaMicrosoft />, color: "#512BD4" },
-  { id: "ai-ml", title: "AI/ML", icon: <FaBrain />, color: "#FF6F00" },
-  { id: "database", title: "Database", icon: <FaDatabase />, color: "#7A5CAB" },
-  { id: "gcp", title: "Google Cloud", icon: <FaGoogle />, color: "#4285F4" },
-  { id: "linux", title: "Linux", icon: <FaLinux />, color: "#FCC624" },
+  {
+    id: 1,
+    title: 'Cloud Computing',
+    icon: <Cloud sx={{ fontSize: '4rem', color: '#673ab7' }} />,
+    color: '#673ab7',
+  },
+  {
+    id: 2,
+    title: 'Security',
+    icon: <VpnKey sx={{ fontSize: '4rem', color: '#f44336' }} />,
+    color: '#f44336',
+  },
+  {
+    id: 3,
+    title: 'Data Storage',
+    icon: <Storage sx={{ fontSize: '4rem', color: '#2196f3' }} />,
+    color: '#2196f3',
+  },
+  {
+    id: 4,
+    title: 'API Development',
+    icon: <Api sx={{ fontSize: '4rem', color: '#4caf50' }} />,
+    color: '#4caf50',
+  },
 ];
+
+// Styled Motion Card
+const TechCard = styled(motion.div)<{ color: string }>`
+  text-align: center;
+  padding: 24px;
+  border-radius: 20px;
+  cursor: pointer;
+  background: ${(props) => alpha(props.color, 0.1)};
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px ${(props) => alpha(props.color, 0.3)};
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+`;
 
 export const TechnologyShowcase = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const ref = useRef(null);
+  const inView = useInView(ref, { amount: 0.5 }); // ✅ Fix threshold issue
 
   return (
     <Box
@@ -56,61 +83,53 @@ export const TechnologyShowcase = () => {
             theme.palette.secondary.light,
             0.05
           )}, transparent 80%)`,
-        position: "relative",
+        position: 'relative',
       }}
     >
-      <Container maxWidth="xl">
+      <Container maxWidth="xl" ref={ref}>
         <Typography
           variant="h2"
           sx={{
-            textAlign: "center",
+            textAlign: 'center',
             mb: 8,
             fontWeight: 900,
-            position: "relative",
-            "&::after": {
+            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+            '&::after': {
               content: '""',
-              display: "block",
-              width: "80px",
-              height: "4px",
-              background: `linear-gradient(90deg, ${PRIMARY_DARK}, ${SECONDARY_DARK})`,
-              borderRadius: "2px",
-              margin: "2rem auto 0",
+              display: 'block',
+              width: '80px',
+              height: '4px',
+              background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              borderRadius: '2px',
+              margin: '2rem auto 0',
             },
           }}
         >
           Core Technologies
         </Typography>
 
-        <Grid container spacing={isMobile? 3: 4}>
+        <Grid container spacing={isMobile ? 3 : 4}>
           {techIcons.map((tech, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={tech.id}>
-              <motion.div
+              <TechCard
+                color={tech.color} // ✅ Fix: Explicitly passing color
                 initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, margin: "-20%" }}
-                transition={{ delay: index * 0.05 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: index * 0.1 }}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
-                style={{
-                  textAlign: "center",
-                  padding: "24px",
-                  borderRadius: "20px",
-                  cursor: "pointer",
-                  background: alpha(tech.color, 0.1),
-                  perspective: "1000px", // Add 3D perspective
-                }}
+                tabIndex={0}
+                aria-label={`Learn more about ${tech.title}`}
               >
                 <motion.div
                   animate={{
-                    y: hoveredIndex === index? [-2, 2, -2]: 0,
-                    rotate: hoveredIndex === index? [0, 5, -5, 0]: 0,
-                    scale: hoveredIndex === index? 1.1: 1, // Add scale animation
+                    y: hoveredIndex === index ? [-2, 2, -2] : 0,
+                    scale: hoveredIndex === index ? 1.1 : 1,
+                    rotate: hoveredIndex === index ? 360 : 0, // Add rotation for dynamic effect
                   }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                   style={{
-                    fontSize: "4rem",
-                    color: tech.color,
-                    marginBottom: "10px",
+                    marginBottom: '10px',
                   }}
                 >
                   {tech.icon}
@@ -118,7 +137,7 @@ export const TechnologyShowcase = () => {
                 <Typography variant="h5" sx={{ fontWeight: 800 }}>
                   {tech.title}
                 </Typography>
-              </motion.div>
+              </TechCard>
             </Grid>
           ))}
         </Grid>
