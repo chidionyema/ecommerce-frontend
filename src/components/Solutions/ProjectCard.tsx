@@ -8,13 +8,14 @@ import {
   CardContent,
   CardActionArea,
   useTheme,
-  Icon,
   alpha,
   Button,
+  styled,
+  keyframes,
 } from '@mui/material';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import NextLink from 'next/link';
-import Image from 'next/image';
+import { useState } from 'react';
 import { ArrowRightAlt } from '@mui/icons-material';
 import {
   Cloud,
@@ -25,8 +26,30 @@ import {
   Layers,
   Server,
   Terminal,
+  
   Box as BoxIcon,
+  Shield,
+  Building2,
+  LucideIcon
 } from 'lucide-react';
+
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  technologies: string[];
+  technologyIcons: LucideIcon[];
+  role: string;
+  bannerText: string;
+  icon: LucideIcon;
+  iconColor: string;
+  clientName: string;
+  metrics: Array<{
+    label: string;
+    value: string;
+    description: string;
+  }>;
+}
 
 const technologyIconMap = {
   '.NET Core': Code2,
@@ -39,196 +62,265 @@ const technologyIconMap = {
   Terraform: BoxIcon,
   AWS: Cloud,
   Azure: Cloud,
-  'C#': Cpu,
-  'EF Core': Database,
-  SQL: Database,
+  'Node.js': Terminal,
+  Helm: BoxIcon
 };
 
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  technologies: string [];
-  clientName: string;
-  image?: string;
-  metrics: Array<{
-    label: string;
-    value: string;
-  }>;
-  icon: any;
-  iconColor: string;
-}
+// Convert Tailwind color classes to hex values
+const colorMap: Record<string, string> = {
+  'text-blue-600': '#2563eb',
+  'text-purple-600': '#9333ea',
+  'text-green-600': '#16a34a',
+  'text-red-600': '#dc2626',
+  'text-orange-600': '#ea580c'
+};
+
+const glintAnimation = keyframes`
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+`;
+
+const GlintEffect = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  zIndex: 1,
+  backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%)`,
+  animation: `${glintAnimation} 2s linear infinite`,
+  pointerEvents: 'none',
+}));
+
+const HoverEffectLayer = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  background: `linear-gradient(45deg, ${alpha(theme.palette.primary.main, 0.3)} 0%, ${alpha(
+    theme.palette.secondary.main,
+    0.1
+  )} 100%)`,
+  opacity: 0,
+  transition: 'opacity 0.3s ease',
+}));
 
 const ProjectCard = ({ project }: { project: Project }) => {
   const theme = useTheme();
-  const imageSize = 200;
+  const [hovered, setHovered] = useState(false);
+
+  const iconColor = colorMap[project.iconColor] || theme.palette.primary.main;
 
   return (
     <motion.div
       whileHover="hover"
       whileTap="tap"
-      initial={false}
-      style={{ height: '100%', position: 'relative' }}
+      initial="initial"
+      style={{ position: 'relative', overflow: 'visible' }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
     >
       <Card
         sx={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
+          position: 'relative',
+          overflow: 'visible',
+          bgcolor: 'background.paper',
+          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
           borderRadius: 4,
-          overflow: 'hidden',
-          transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+          boxShadow: theme.shadows[1],
+          transition: 'all 0.3s cubic-bezier(0.17, 0.55, 0.55, 1)',
           '&:hover': {
-            transform: 'translateY(-4px)',
-            boxShadow: `0 24px 48px ${alpha(theme.palette.primary.main, 0.1)}`,
+            transform: 'translateY(-8px)',
+            boxShadow: `0 32px 64px ${alpha(theme.palette.primary.main, 0.2)}`,
           },
         }}
       >
+        <HoverEffectLayer sx={{ '&:hover': { opacity: 0.2 } }} />
+
         <CardActionArea
           component={NextLink}
           href={`/projects/${project.id}`}
           sx={{
-            textDecoration: 'none',
-            flexGrow: 1,
+            p: 3,
             display: 'flex',
             flexDirection: 'column',
+            alignItems: 'center',
+            minHeight: 400,
           }}
         >
-          {project.image && (
+          {/* Project Icon */}
+          <motion.div
+            animate={hovered ? { scale: 1.1 } : { scale: 1 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+            style={{
+              position: 'relative',
+              zIndex: 1,
+              marginBottom: theme.spacing(3),
+            }}
+          >
             <Box
               sx={{
-                width: '100%',
-                height: imageSize,
                 position: 'relative',
+                width: 80,
+                height: 80,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: `linear-gradient(45deg, ${iconColor} 0%, ${alpha(iconColor, 0.3)} 100%)`,
+                borderRadius: '50%',
+                overflow: 'visible',
               }}
             >
-              <Image
-                src={project.image}
-                alt={project.name}
-                layout="fill"
-                objectFit="cover"
+              <project.icon
+                size={40}
+                style={{
+                  color: theme.palette.getContrastText(iconColor),
+                }}
               />
             </Box>
-          )}
+          </motion.div>
 
-          <CardContent sx={{ pb: 2, px: 3, py: 3, flexGrow: 1 }}>
-            {/* Icon */}
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                mb: 2,
-              }}
-            >
-              <Icon
-                sx={{
-                  color: project.iconColor,
-                  fontSize: '2rem',
-                }}
-              >
-                <project.icon />
-              </Icon>
-            </Box>
-
+          <CardContent sx={{ textAlign: 'center', px: 0, width: '100%' }}>
+            {/* Project Name */}
             <Typography
-              variant="h6"
-              align="center"
+              variant="h5"
+              component={motion.div}
+              animate={hovered ? { y: -5 } : { y: 0 }}
               sx={{
-                fontWeight: 600,
-                color: theme.palette.primary.main,
-                lineHeight: 1.2,
-                '&:hover': { textDecoration: 'underline' },
+                fontWeight: 800,
+                background: `linear-gradient(45deg, ${theme.palette.text.primary} 30%, ${alpha(
+                  theme.palette.text.primary,
+                  0.7
+                )} 90%)`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 1,
               }}
             >
               {project.name}
             </Typography>
+
+            {/* Description */}
             <Typography
               variant="body2"
-              align="center"
               color="text.secondary"
-              sx={{ mb: 2 }}
-            >
-              {project.clientName}
-            </Typography>
-
-            {/* Technologies - Updated to use icon map */}
-            <Box
               sx={{
-                display: 'flex',
-                gap: 1,
-                justifyContent: 'center',
-                flexWrap: 'wrap',
+                fontSize: '0.9rem',
+                minHeight: 60,
                 mb: 2,
+                px: 2,
               }}
             >
-              {project.technologies.map((tech) => {
-                const TechIcon =
-                  technologyIconMap[tech as keyof typeof technologyIconMap];
-                return (
-                  <Chip
-                    key={tech}
-                    icon={<TechIcon size={16} />}
-                    label={tech}
-                    variant="outlined"
-                    sx={{
-                      borderRadius: 1,
-                      borderColor: alpha(theme.palette.primary.main, 0.1),
-                      background: alpha(theme.palette.primary.main, 0.02),
-                      transition: 'all 0.2s ease',
-                      '&:hover': {
-                        background: alpha(theme.palette.primary.main, 0.15),
-                        transform: 'translateY(-1px)',
-                        boxShadow: theme.shadows,
-                      },
-                    }}
-                  />
-                );
-              })}
+              {project.description}
+            </Typography>
+
+            {/* Technology Icons Section */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>Main Technologies</Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
+                {project.technologyIcons.map((Icon, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Icon size={24} color={iconColor} />
+                  </motion.div>
+                ))}
+              </Box>
+
+              {/* Technology Chips */}
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+                {project.technologies.map((tech, index) => {
+                  const TechIcon = technologyIconMap[tech as keyof typeof technologyIconMap];
+                  return (
+                    <motion.div
+                      key={tech}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <Chip
+                        icon={TechIcon ? <TechIcon size={16} /> : undefined}
+                        label={tech}
+                        size="small"
+                        sx={{
+                          borderRadius: 2,
+                          bgcolor: alpha(iconColor, 0.1),
+                          '&:hover': { bgcolor: alpha(iconColor, 0.2) },
+                        }}
+                      />
+                    </motion.div>
+                  );
+                })}
+              </Box>
             </Box>
 
+            {/* Metrics Grid */}
             <Box
               sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: 2,
+                mb: 3,
               }}
             >
               {project.metrics.map((metric, index) => (
-                <Box key={index} sx={{ textAlign: 'center' }}>
-                  <Typography
-                    variant="body2"
+                <motion.div
+                  key={index}
+                  whileHover={{ scale: 1.05 }}
+                  style={{ originX: 0.5, originY: 0.5 }}
+                >
+                  <Box
                     sx={{
-                      fontWeight: 600,
-                      color: theme.palette.text.primary,
+                      p: 1.5,
+                      borderRadius: 2,
+                      bgcolor: alpha(theme.palette.primary.main, 0.03),
+                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                     }}
                   >
-                    {metric.value}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {metric.label}
-                  </Typography>
-                </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                      {metric.value}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {metric.label}
+                    </Typography>
+                  </Box>
+                </motion.div>
               ))}
             </Box>
           </CardContent>
         </CardActionArea>
 
-        <Button
-          component={NextLink}
-          href={`/projects/${project.id}`}
-          endIcon={<ArrowRightAlt />}
-          sx={{
-            color: theme.palette.primary.main,
-            fontWeight: 600,
-            py: 2,
-            '&:hover': {
-              background: alpha(theme.palette.primary.main, 0.1),
-            },
-          }}
-        >
-          View Details
-        </Button>
+        {/* Explore Button */}
+        <Box sx={{ p: 2, textAlign: 'center' }}>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              component={NextLink}
+              href={`/projects/${project.id}`}
+              endIcon={
+                <motion.div
+                  animate={hovered ? { x: 5 } : { x: 0 }}
+                  transition={{ repeat: Infinity, repeatType: 'mirror', duration: 1.2 }}
+                >
+                  <ArrowRightAlt />
+                </motion.div>
+              }
+              sx={{
+                width: '100%',
+                bgcolor: alpha(iconColor, 0.9),
+                color: theme.palette.getContrastText(iconColor),
+                '&:hover': {
+                  bgcolor: alpha(iconColor, 1),
+                },
+              }}
+            >
+              Explore Project
+            </Button>
+          </motion.div>
+        </Box>
       </Card>
     </motion.div>
   );

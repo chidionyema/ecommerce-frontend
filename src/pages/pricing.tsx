@@ -129,16 +129,24 @@ const PricingGrid = () => {
     [router]
   );
 
+
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
+    
   return (
     <LazyMotion features={domAnimation}>
       <Box
-        sx={{
-          backgroundColor: theme.palette.background.default,
-          p: theme.spacing(6),
-          py: 12,
-          px: isMdDown ? 2 : 0,
-        }}
-      >
+      sx={{
+        minHeight: '100vh',
+        background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`,
+        paddingTop: 6,
+        paddingBottom: 6,
+        paddingLeft: isMobile ? 2 : 6,
+        paddingRight: isMobile ? 2 : 6,
+        marginLeft: 6,
+        marginRight: 6,
+      }}
+    >
         <Container maxWidth="lg">
           <motion.div
             initial={{ opacity: 0, y: 40 }}

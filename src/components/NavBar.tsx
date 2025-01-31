@@ -99,7 +99,7 @@ const HolographicButton = styled(motion.button)<HolographicButtonProps>(
     borderRadius: theme.shape.borderRadius,
     overflow: 'hidden',
     cursor: 'pointer',
-    color: $active ? NEON_ACCENT : alpha(theme.palette.text.primary, 0.9),
+    color: $active? NEON_ACCENT: alpha(theme.palette.text.primary, 0.9),
     transition: 'color 0.3s ease',
 
     '&:disabled': {
@@ -113,7 +113,7 @@ const HolographicButton = styled(motion.button)<HolographicButtonProps>(
       position: 'absolute',
       inset: 0,
       background: CYBER_GRADIENT,
-      opacity: $active ? 0.15 : 0,
+      opacity: $active? 0.15: 0,
       transition: 'opacity 0.3s ease',
     },
 
@@ -129,7 +129,7 @@ const HolographicButton = styled(motion.button)<HolographicButtonProps>(
       right: 0,
       height: '2px',
       background: CYBER_GRADIENT,
-      transform: `scaleX(${$active ? 1 : 0})`,
+      transform: `scaleX(${$active? 1: 0})`,
       transformOrigin: 'right',
       transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
     },
@@ -210,20 +210,21 @@ const NavBar = () => {
   const [scrolled, setScrolled] = useState(false);
 
   // Scroll-driven animations
-  const { scrollY } = useScroll();
-  const yTransform = useTransform(scrollY, [0, 100], [0, -20]);
-  const opacityTransform = useTransform(scrollY, [0, 100], [1, 0.9]);
+// Scroll-driven animations
+const { scrollY } = useScroll();
+const yTransform = useTransform(scrollY, [0, 100], [0, -20]); // Added input range
+const opacityTransform = useTransform(scrollY, [0, 100], [1, 0.9]); // Added input range
 
-  const navItems = useMemo(
-    () => [
-      { label: 'Home', path: '/', icon: <Home /> },
-      { label: 'Solutions', path: '/solutions', icon: <Code /> },
-      { label: 'Resources', path: '/resources', icon: <Book /> },
-      { label: 'Pricing', path: '/pricing', icon: <Whatshot /> },
-      { label: 'Contact', path: '/contact', icon: <ContactMail /> },
-    ],
-    []
-  );
+const navItems = useMemo(
+  () => [
+    { label: 'Home', path: '/', icon: <Home /> },
+    { label: 'Solutions', path: '/solutions', icon: <Code /> },
+    { label: 'Resources', path: '/resources', icon: <Book /> },
+    { label: 'Pricing', path: '/pricing', icon: <Whatshot /> },
+    { label: 'Contact', path: '/contact', icon: <ContactMail /> },
+  ],
+  [] // Added empty dependency array
+);
 
   // Scroll debounce handler
   useEffect(() => {
@@ -276,11 +277,11 @@ const NavBar = () => {
             whileTap={{ scale: 0.98 }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              {isNavigating ? (
+              {isNavigating? (
                 <CircularProgress size={20} sx={{ color: NEON_ACCENT }} />
-              ) : (
+              ): (
                 <motion.div
-                  animate={{ rotate: isActive ? 15 : 0 }}
+                  animate={{ rotate: isActive? 15: 0 }}
                   transition={{ type: 'spring' }}
                 >
                   {item.icon}

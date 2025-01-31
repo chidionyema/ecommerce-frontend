@@ -152,17 +152,22 @@ const Resources: React.FC = () => {
     setIsLoading(false); // 🚀 Instantly set to false
   }, []);
 
-  const handleFilter = (_: React.MouseEvent<HTMLElement>, newFilter: string) => setFilter(newFilter);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  const handleFilter = (_: React.MouseEvent<HTMLElement>, newFilter: string) => setFilter(newFilter);
   return (
     <Box
-      sx={{
-        background: `linear-gradient(145deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
-        minHeight: '100vh',
-        py: 12,
-        px: isMdDown ? 2 : 0,
-      }}
-    >
+    sx={{
+      minHeight: '100vh',
+      background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`,
+      paddingTop: 6,
+      paddingBottom: 6,
+      paddingLeft: isMobile ? 2 : 6,
+      paddingRight: isMobile ? 2 : 6,
+      marginLeft: 6,
+      marginRight: 6,
+    }}
+  >
       <SEO
         title="Premium Resources - Expert Insights"
         description="Explore cutting-edge resources for modern software and cloud architecture."
@@ -183,7 +188,7 @@ const Resources: React.FC = () => {
               textShadow: `0 8px 24px ${alpha(theme.palette.secondary.main, 0.3)}`,
             }}
           >
-            Premium Resources
+            Tech Resources
           </Typography>
           <Typography
             variant="subtitle1"

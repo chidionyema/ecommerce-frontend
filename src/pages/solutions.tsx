@@ -11,34 +11,38 @@ import {
   useMediaQuery,
   alpha,
 } from '@mui/material';
-import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
-import { cvProjects } from '../data/cvProjects';
+import { cvProjects } from '../data/cvProjects'; // Make sure this path is correct
 import SEO from '../components/SEO';
 
-// Dynamically import ProjectCard
-const ProjectCard = dynamic(() => import('../components/Solutions/ProjectCard'), {
-  ssr: false,
-  loading: () => <Box>Loading...</Box>, // Add a loading fallback
-});
+const ProjectCard = dynamic(
+  () => import('../components/Solutions/ProjectCard'), // Make sure this path is correct
+  {
+    ssr: false,
+    loading: () => <Box>Loading...</Box>,
+  }
+);
 
-const PAGE_SIZE = 9; // Number of projects to display per page
+const PAGE_SIZE = 9;
 
 const Solutions = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Select the first PAGE_SIZE projects from the cvProjects array
-  const displayedProjects = useMemo(() => cvProjects.slice(0, PAGE_SIZE), []);
+  const displayedProjects = useMemo(() => cvProjects.slice(0, PAGE_SIZE), [cvProjects]);
 
   return (
-    <Box
+    <Box // Outer Box - Now correctly closed
       sx={{
         minHeight: '100vh',
         background: `linear-gradient(45deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`,
-        py: 10,
-        px: isMobile ? 2 : 0,
+        paddingTop: 6,
+        paddingBottom: 6,
+        paddingLeft: isMobile ? 2 : 6,
+        paddingRight: isMobile ? 2 : 6,
+        marginLeft: 6,
+        marginRight: 6,
       }}
     >
       <SEO
@@ -47,18 +51,17 @@ const Solutions = () => {
         keywords="enterprise solutions, cloud architecture, DevOps, technical resources"
       />
 
-      <Container maxWidth="lg">
-        {/* Header Section */}
-        <Box textAlign="center" mb={8}>
+      <Container maxWidth="xl">
+        <Box sx={{ textAlign: 'center', mb: 8 }}>
           <Typography
             variant="h1"
             sx={{
               fontWeight: 900,
-              fontSize: { xs: '2rem', sm: '3rem' },
-              background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              background: `linear-gradient(135deg, ${theme.palette.secondary.main} 30%, ${theme.palette.primary.main} 70%)`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              mb: 3,
+              fontSize: { xs: '2.5rem', md: '4rem' },
+              textShadow: `0 8px 24px ${alpha(theme.palette.secondary.main, 0.3)}`,
             }}
           >
             Enterprise-Grade Solutions
@@ -68,15 +71,14 @@ const Solutions = () => {
             sx={{
               color: theme.palette.text.secondary,
               fontSize: { xs: '1rem', sm: '1.25rem' },
-              maxWidth: 700,
-              mx: 'auto',
+              textAlign: 'center',
             }}
           >
-            Scalable, secure, and future-proof strategies built for enterprises aiming for innovation.
+            Scalable, secure, and future-proof strategies built for enterprises
+            aiming for innovation.
           </Typography>
         </Box>
 
-        {/* Projects Grid */}
         <Grid container spacing={4}>
           {displayedProjects.map((project) => (
             <Grid item xs={12} sm={6} md={4} key={project.id}>
@@ -85,10 +87,10 @@ const Solutions = () => {
           ))}
         </Grid>
 
-        {/* Call to Action */}
         <Box textAlign="center" mt={8}>
           <NextLink href="/contact" passHref>
             <Button
+              component="a"
               variant="contained"
               size="large"
               sx={{
@@ -109,7 +111,7 @@ const Solutions = () => {
           </NextLink>
         </Box>
       </Container>
-    </Box>
+    </Box> // Closing tag for the outer Box
   );
 };
 
