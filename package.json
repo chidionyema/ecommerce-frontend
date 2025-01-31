@@ -39,6 +39,7 @@
     "@mui/lab": "5.0.0-alpha.145",
     "@mui/material": "5.16.14",
     "@next/bundle-analyzer": "^15.1.6",
+    "@react-spring/parallax": "^9.7.5",
     "@reduxjs/toolkit": "2.2.5",
     "@shadcn/ui": "0.0.4",
     "@tanstack/react-virtual": "^3.11.2",
