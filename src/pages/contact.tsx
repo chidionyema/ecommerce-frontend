@@ -49,14 +49,26 @@ const Contact = () => {
 
   const validateField = useCallback((name: keyof FormData, value: string) => {
     try {
-      formSchema.pick({ [name]: formSchema.shape[name] }).parse({ [name]: value });
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+      const fieldSchema = z.object({ [name]: formSchema.shape[name] });
+      fieldSchema.parse({ [name]: value });
+  
+      // FIX: Remove the key if validation passes
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name]; // ✅ Removes the key instead of setting undefined
+        return newErrors;
+      });
+  
     } catch (error) {
       if (error instanceof z.ZodError) {
-        setErrors(prev => ({ ...prev, [name]: error.errors[0].message }));
+        setErrors(prev => ({
+          ...prev,
+          [name]: error.errors[0].message,
+        }));
       }
     }
   }, []);
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
