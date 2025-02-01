@@ -1,8 +1,8 @@
-// SocialProof.tsx
+'use client';
 import { Typography, useTheme, alpha, Box } from "@mui/material";
 import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
 import { motion } from "framer-motion";
-import { useRecentEngagements } from "./useRecentEngagements";
+import { useRecentEngagements } from "../../hooks/useRecentEngagements";
 
 export const SocialProof = () => {
   const theme = useTheme();
@@ -13,7 +13,15 @@ export const SocialProof = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.8, type: 'spring' }}
-      style={{ marginTop: theme.spacing(6) }}
+      style={{ 
+        marginTop: theme.spacing(6),
+        textAlign: 'center',
+        background: `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.9)}, ${alpha(theme.palette.secondary.dark, 0.95)})`,
+        padding: theme.spacing(3),
+        borderRadius: '12px',
+        boxShadow: `0px 10px 30px ${alpha(theme.palette.primary.light, 0.3)}`,
+        color: 'white',
+      }}
     >
       <Typography
         variant="body1"
@@ -29,9 +37,8 @@ export const SocialProof = () => {
       >
         <CheckCircleOutline 
           sx={{ 
-            color: theme.palette.success.light,
-            fontSize: '1.2rem',
-            filter: `drop-shadow(0 2px 4px ${alpha(theme.palette.success.dark, 0.2)})`
+            color: 'success.light',
+            fontSize: '1.5rem',
           }} 
           aria-hidden="true"
         />

@@ -1,28 +1,44 @@
-import { ThemeProvider, CssBaseline } from "@mui/material";
-import { ReactNode } from "react";
-import { darkTheme, lightTheme, techTheme } from "./themes";
+// theme/ThemeProvider.tsx
+'use client';
 
-type ThemeName = "dark" | "light" | "tech";
+import { createContext, useState, useContext, useMemo } from 'react';
+import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material';
+import { darkTheme, lightTheme, techTheme, cyberTheme } from './themes';
 
-interface AppThemeProviderProps {
-  children: ReactNode;
-  themeName?: ThemeName;
+type ThemeName = 'dark' | 'light' | 'tech' | 'cyber';
+
+interface ThemeContextValue {
+  themeName: ThemeName;
+  setTheme: (name: ThemeName) => void;
 }
 
-export const AppThemeProvider = ({
-  children,
-  themeName = "dark",
-}: AppThemeProviderProps) => {
-  const themes = {
-    dark: darkTheme,
-    light: lightTheme,
-    tech: techTheme,
-  };
+const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error('useTheme must be used within ThemeProvider');
+  return context;
+};
+
+export const AppThemeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [themeName, setTheme] = useState<ThemeName>('dark');
+  
+  const theme = useMemo(() => {
+    switch (themeName) {
+      case 'dark': return darkTheme;
+      case 'light': return lightTheme;
+      case 'tech': return techTheme;
+      case 'cyber': return cyberTheme;
+      default: return darkTheme;
+    }
+  }, [themeName]);
 
   return (
-    <ThemeProvider theme={themes[themeName]}>
-      <CssBaseline />
-      {children}
-    </ThemeProvider>
+    <ThemeContext.Provider value={{ themeName, setTheme }}>
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
+      </MuiThemeProvider>
+    </ThemeContext.Provider>
   );
 };

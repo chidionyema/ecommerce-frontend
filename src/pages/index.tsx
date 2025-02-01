@@ -1,26 +1,17 @@
-'use client';
-
+// pages/index.tsx
 import Head from 'next/head';
-import { Box, useTheme } from '@mui/material';
+import PageLayout from '../components/Shared/PageLayout';
 import { HeroSection } from '../components/Home/Hero';
-import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
-import { WhyPartner } from '../components/Home/WhyPartner';
+import { TechnologyShowcase } from '../components/Common/TechnologyShowcase';
+import { WhyPartner } from '../components/Common/WhyPartner';
+import { ServicesGrid } from '../components/Common/ServicesGrid'; // Use named import
+import { TestimonialsSection } from '../components/Common/TestimonialsSection'; // Use named import
 
 export default function HomePage() {
-  const theme = useTheme(); // Correct: useTheme inside the functional component
-
   return (
-    <Box
-      sx={{
-        backgroundColor: theme.palette.background.default, // Access theme here
-        minHeight: '100vh',
-        p: theme.spacing(6),
-      }}
-    >
+    <>
       <Head>
-        <title>
-          Enterprise Tech Solutions | Digital Transformation Experts
-        </title>
+        <title>Enterprise Tech Solutions | Digital Transformation Experts</title>
         <meta
           name="description"
           content="Enterprise-grade technology solutions with precision engineering and proven results"
@@ -28,8 +19,13 @@ export default function HomePage() {
       </Head>
 
       <HeroSection />
-      <TechnologyShowcase />
-      <WhyPartner />
-    </Box>
+      
+      <PageLayout>
+        <TechnologyShowcase />
+        <WhyPartner />
+        <ServicesGrid />
+        <TestimonialsSection />
+      </PageLayout>
+    </>
   );
 }

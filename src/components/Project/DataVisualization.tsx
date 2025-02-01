@@ -191,7 +191,7 @@ export const ComparisonCard = ({ before, after }: ComparisonCardProps) => {
                   background: '#EF4444',
                   borderRadius: 2
                 }
-              }}>
+              }}> 
                 {before.description}
               </Typography>
             </Box>

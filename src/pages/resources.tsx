@@ -1,21 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Grid,
-  Button,
-  Container,
-  useTheme,
-  useMediaQuery,
-  alpha,
-} from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Grid, useTheme, alpha, Card, CardContent } from '@mui/material';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
-import { Cloud, VpnKey, Code } from '@mui/icons-material';
+import { Cloud, VpnKey, Code, Download, AccessTime, ErrorOutline, ArrowRight } from '@mui/icons-material';
+import SEO from '../components/SEO';
+import PageLayout from '../components/Shared/PageLayout';
+import PageHeader from '../components/Shared/PageHeader';
 
-const resources = [
+// Dynamic Import (Fixing Type Error)
+
+
+// Define the Resource interface
+interface Resource {
+  id: number;
+  title: string;
+  summary: string;
+  icon: React.ElementType;
+  path: string;
+  downloads: string;
+  trending: boolean;
+  tags: string[];
+  time: string;
+}
+
+// Sample resource data
+const resources: Resource[] = [
   {
     id: 1,
     title: 'Cloud Mastery',
@@ -25,7 +36,7 @@ const resources = [
     downloads: '2.4K+',
     trending: true,
     tags: ['devops', 'aws', 'azure'],
-    time: '18 min read'
+    time: '18 min read',
   },
   {
     id: 2,
@@ -36,7 +47,7 @@ const resources = [
     downloads: '1.8K+',
     trending: true,
     tags: ['security', 'encryption'],
-    time: '25 min read'
+    time: '25 min read',
   },
   {
     id: 3,
@@ -47,126 +58,157 @@ const resources = [
     downloads: '3.1K+',
     trending: false,
     tags: ['design', 'patterns'],
-    time: '30 min read'
+    time: '30 min read',
   },
 ];
 
-const ResourceHexagon = ({ resource }) => {
+const ResourceCard = ({ resource }: { resource: Resource }) => {
   const theme = useTheme();
-  const [hovered, setHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Box
-      component={motion.div}
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ type: 'spring', stiffness: 100 }}
-      sx={{
-        position: 'relative',
-        width: 300,
-        height: 300,
-        cursor: 'pointer',
-        perspective: 1000,
-      }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
+    <motion.div
+      className="relative"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.03 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      transition={{ duration: 0.3 }}
     >
-      <Box
+      <Card
         sx={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-          background: `
-            linear-gradient(
-              45deg,
-              ${alpha(theme.palette.primary.main, 0.8)} 0%,
-              ${alpha(theme.palette.secondary.main, 0.8)} 100%
-            )`,
-          transform: hovered ? 'rotateY(180deg)' : 'rotateY(0deg)',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-          transformStyle: 'preserve-3d',
+          width: 340,
+          borderRadius: 4,
+          overflow: 'hidden',
+          background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.light})`,
+          color: theme.palette.common.white,
+          position: 'relative',
+          boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2)',
         }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backfaceVisibility: 'hidden',
-            p: 4,
-          }}
-        >
-          <resource.icon sx={{ fontSize: 48, mb: 2, color: 'white' }} />
-          <Typography variant="h6" align="center" sx={{ color: 'white' }}>
+        <CardContent sx={{ p: 4 }}>
+          {/* Icon & Badge */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <resource.icon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />
+            {resource.trending && (
+              <Box
+                sx={{
+                  px: 2,
+                  py: 0.5,
+                  borderRadius: 8,
+                  bgcolor: alpha(theme.palette.warning.main, 0.2),
+                  color: theme.palette.warning.light,
+                  fontSize: '0.75rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontWeight: 600,
+                }}
+              >
+                <ErrorOutline sx={{ fontSize: 14, mr: 1 }} />
+                Trending
+              </Box>
+            )}
+          </Box>
+
+          {/* Title & Description */}
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
             {resource.title}
           </Typography>
-        </Box>
-
-        <Box
-          sx={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            transform: 'rotateY(180deg)',
-            backfaceVisibility: 'hidden',
-            p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            backgroundColor: alpha(theme.palette.background.paper, 0.9),
-          }}
-        >
-          <Typography variant="body2" paragraph>
+          <Typography variant="body2" sx={{ opacity: 0.8, mb: 3 }}>
             {resource.summary}
           </Typography>
-          <NextLink href={resource.path} passHref>
-            <Button variant="contained" size="small" sx={{ mt: 2 }}>
-              Explore Guide
-            </Button>
-          </NextLink>
-        </Box>
-      </Box>
-    </Box>
+
+          {/* Metadata */}
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', color: 'white' }}>
+              <Download sx={{ fontSize: 16, mr: 1 }} />
+              <Typography variant="caption">{resource.downloads}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', color: 'white' }}>
+              <AccessTime sx={{ fontSize: 16, mr: 1 }} />
+              <Typography variant="caption">{resource.time}</Typography>
+            </Box>
+          </Box>
+
+          {/* Tags */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+            {resource.tags.map((tag) => (
+              <Box
+                key={tag}
+                sx={{
+                  px: 2,
+                  py: 0.5,
+                  borderRadius: 8,
+                  fontSize: '0.75rem',
+                  bgcolor: alpha(theme.palette.info.main, 0.2),
+                  color: theme.palette.info.light,
+                }}
+              >
+                {tag}
+              </Box>
+            ))}
+          </Box>
+
+          {/* Hover Button */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isHovered ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'absolute',
+              bottom: 16,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '85%',
+            }}
+          >
+            <NextLink href={resource.path} passHref>
+              <Box
+                component="a"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  py: 1.5,
+                  borderRadius: 2,
+                  bgcolor: theme.palette.primary.main,
+                  color: theme.palette.common.white,
+                  fontWeight: 600,
+                  transition: '0.3s',
+                  '&:hover': { bgcolor: theme.palette.primary.dark },
+                }}
+              >
+                Explore Guide <ArrowRight sx={{ fontSize: 18, ml: 1 }} />
+              </Box>
+            </NextLink>
+          </motion.div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 
-export default function ResourcesPage() {
-  const theme = useTheme();
-
+const ResourcesGrid = () => {
   return (
-    <Box sx={{ minHeight: '100vh' }}>
-      <Box sx={{ 
-        py: 8, 
-        background: `
-          radial-gradient(
-            circle at 50% 100%,
-            ${alpha(theme.palette.primary.dark, 0.8)} 0%,
-            ${alpha(theme.palette.secondary.dark, 0.9)} 100%
-          )`
-      }}>
-        <Container maxWidth="xl">
-          <Typography variant="h2" align="center" sx={{ 
-            color: 'white', 
-            mb: 8,
-            fontWeight: 900,
-            textShadow: '0 4px 12px rgba(0,0,0,0.3)'
-          }}>
-            Interactive Tech Resources
-          </Typography>
-          <Grid container justifyContent="center" spacing={8}>
-            {resources.map((resource) => (
-              <Grid item key={resource.id}>
-                <ResourceHexagon resource={resource} />
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-    </Box>
+    <>
+      <SEO
+        title="Technical Resources - Expert Guides"
+        description="Access our comprehensive library of technical resources and implementation guides."
+        keywords="technical resources, cloud guides, security, architecture"
+      />
+      <PageLayout>
+        <PageHeader title="Interactive Tech Resources" />
+        <Grid container justifyContent="center" spacing={4}>
+          {resources.map((resource) => (
+            <Grid item key={resource.id}>
+              <ResourceCard resource={resource} />
+            </Grid>
+          ))}
+        </Grid>
+      </PageLayout>
+    </>
   );
-}
+};
+
+export default ResourcesGrid;

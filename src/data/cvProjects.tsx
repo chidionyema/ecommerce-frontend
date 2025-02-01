@@ -46,7 +46,7 @@ export interface CVProject {
 }
 
 // ✅ Map Technologies to Icons
-const technologyIconMap = {
+export const technologyIconMap = {
   ".NET Core": Code2,        // Good match - general code icon
   "Java": Terminal,          // Could be more specific (e.g., a coffee cup icon)
   "WebSockets": GitBranch,    // Not a strong connection - maybe a network icon?

@@ -1,191 +1,207 @@
+// pricing.tsx
 'use client';
 
-import React from 'react';
+import { useCallback, memo } from 'react';
 import {
-  Box,
-  Typography,
-  Container,
   useTheme,
-  useMediaQuery,
-  alpha,
+  Grid,
   Button,
-  styled
+  alpha,
+  styled,
+  Typography,
+  Box,
 } from '@mui/material';
-import { motion } from 'framer-motion';
-import { Info, Award, Clock, Users, Briefcase } from '@mui/icons-material';
+import { Info, Award, Clock, Users, Calendar, Briefcase } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { motion, LazyMotion, domAnimation } from 'framer-motion';
+import SEO from '../components/SEO';
+import PageLayout from '../components/Shared/PageLayout';
+import PageHeader from '../components/Shared/PageHeader';
 
-// TypeScript Interfaces
-interface Plan {
-  type: string;
-  title: string;
-  features: Feature[];
-  price: string;
-}
+// PremiumCard with softer shape and enhanced shadows
+const PremiumCard = styled(motion.div)(({ theme }) => ({
+  borderRadius: '12px',
+  overflow: 'hidden',
+  minHeight: 520,
+  padding: theme.spacing(4),
+  display: 'flex',
+  flexDirection: 'column',
+  background: theme.palette.mode === 'dark'? alpha(theme.palette.primary.dark, 0.2): theme.palette.background.paper,
+  border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+  boxShadow: theme.palette.mode === 'dark'? `0 2px 8px ${alpha(theme.palette.primary.dark, 0.5)}`: `0 12px 32px ${alpha(theme.palette.grey, 0.2)}`,
+  position: 'relative',
+  transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+  '&:hover': {
+    transform: 'translateY(-6px)',
+    boxShadow: theme.palette.mode === 'dark'? `0 4px 12px ${alpha(theme.palette.primary.dark, 0.8)}`: `0 18px 40px ${alpha(theme.palette.primary.main, 0.3)}`,
+  },
+}));
 
-interface Feature {
-  Icon: React.ElementType;
-  text: string;
-}
+// FeatureItem with scaling hover effect
+const FeatureItem = memo(({ icon: Icon, text }: { icon: any; text: string }) => {
+  const theme = useTheme();
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        py: 1.5,
+        px: 2,
+        backgroundColor: alpha(theme.palette.divider, 0.12),
+        borderRadius: '8px',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          backgroundColor: alpha(theme.palette.divider, 0.2),
+          transform: 'scale(1.05)',
+        },
+      }}
+    >
+      <Icon style={{ color: theme.palette.secondary.main, fontSize: '1.7rem' }} />
+      <Typography
+        variant="body2"
+        sx={{
+          ml: 2,
+          fontWeight: 500,
+          color: theme.palette.text.primary,
+          fontFamily: theme.typography.fontFamily,
+        }}
+      >
+        {text}
+      </Typography>
+    </Box>
+  );
+});
 
-const plans: Plan[] = [
+const plans = [
   {
     type: 'hourly',
     title: 'Expert Consultation',
     features: [
-      { Icon: Clock, text: 'Flexible hourly consulting' },
-      { Icon: Award, text: 'Technical leadership' },
-      { Icon: Users, text: 'Priority scheduling' },
+      { icon: Clock, text: 'Flexible hourly consulting' },
+      { icon: Award, text: 'Expert technical guidance' },
+      { icon: Calendar, text: 'Priority scheduling' },
     ],
-    price: '$295/hr'
+    price: '$295/hr',
   },
   {
     type: 'project',
     title: 'Managed Solutions',
     features: [
-      { Icon: Briefcase, text: 'End-to-end project delivery' },
-      { Icon: Users, text: 'Dedicated team' },
-      { Icon: Award, text: 'Quality guarantee' },
+      { icon: Briefcase, text: 'End-to-end project management' },
+      { icon: Users, text: 'Dedicated engineering team' },
+      { icon: Award, text: 'Quality assurance guarantee' },
     ],
-    price: 'Custom Quote'
+    price: 'Custom Quote',
   },
   {
     type: 'retainer',
     title: 'Strategic Partnership',
     features: [
-      { Icon: Users, text: '24/7 support' },
-      { Icon: Award, text: 'Technology roadmap' },
-      { Icon: Info, text: 'Performance reviews' },
+      { icon: Users, text: '24/7 technical support' },
+      { icon: Award, text: 'Strategic technology roadmap' },
+      { icon: Info, text: 'Monthly performance reviews' },
     ],
-    price: 'From $15k/mo'
+    price: 'Starting at $15k/mo',
   },
 ];
 
-const StyledPricingTier = styled(motion.div)(({ theme }) => ({
-  position: 'relative',
-  minHeight: 400,
-  padding: theme.spacing(4),
-  borderRadius: '20px',
-  background: `linear-gradient(145deg,
-    ${alpha(theme.palette.primary.main, 0.1)},
-    ${alpha(theme.palette.secondary.main, 0.05)}
-  )`,
-  backdropFilter: 'blur(10px)',
-  border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
-  boxShadow: `0 16px 32px ${alpha(theme.palette.primary.dark, 0.1)}`,
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-}));
-
-const PricingTier = ({ tier }: { tier: Plan }) => {
+const PricingGrid: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const router = useRouter();
+
+  const handlePlanClick = useCallback((type: string) => {
+    router.push(`/contact?plan=${type}`);
+  }, [router]);
 
   return (
-    <StyledPricingTier
-      whileHover={{ scale: 1.05 }}
-      sx={{ mx: isMobile ? 2 : 4 }}
-    >
-      <Box>
-        <Box sx={{
-          position: 'absolute',
-          top: -20,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '80%',
-          height: 60,
-          bgcolor: 'background.paper',
-          borderRadius: '12px',
-          boxShadow: 3,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <Typography variant="h5" color="primary">
-            {tier.title}
-          </Typography>
-        </Box>
-
-        <Box sx={{ mt: 6 }}>
-          {tier.features.map((feature, i) => (
-            <Box key={i} sx={{ py: 1, display: 'flex', alignItems: 'center' }}>
-              <feature.Icon sx={{ 
-                mr: 2, 
-                color: 'secondary.main',
-                fontSize: '1.5rem'
-              }} />
-              <Typography variant="body1">{feature.text}</Typography>
-            </Box>
-          ))}
-        </Box>
-      </Box>
-
-      <Box sx={{ textAlign: 'center', mt: 4 }}>
-        <Button
-          variant="contained"
-          sx={{
-            background: `linear-gradient(
-              to right,
-              ${theme.palette.primary.main},
-              ${theme.palette.secondary.main}
-            )`,
-            color: 'white',
-            px: 6,
-            py: 1.5,
-            borderRadius: '50px',
-            fontWeight: 700,
-            width: '100%',
-            maxWidth: 240
-          }}
+    <LazyMotion features={domAnimation}>
+      <>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
-          {tier.price}
-        </Button>
-      </Box>
-    </StyledPricingTier>
+          <PageHeader
+            title="Unlock Your Business Potential"
+            subtitle="Choose the plan that best fits your growth strategy."
+          />
+        </motion.div>
+
+        <Grid container spacing={6} sx={{ mt: 2 }}>
+          {plans.map(({ type, title, features, price }, index) => (
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              key={type}
+              component={motion.div}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 + index * 0.1 }}
+            >
+              <PremiumCard>
+                <Typography variant="h5" sx={{ fontWeight: 800, mb: 3 }}>
+                  {title}
+                </Typography>
+                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {features.map((feature, i) => (
+                    <FeatureItem key={i} {...feature} />
+                  ))}
+                </Box>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 700,
+                    mt: 4,
+                    color: theme.palette.primary.main,
+                    fontSize: '1.4rem',
+                  }}
+                >
+                  {price}
+                </Typography>
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{
+                    mt: 3,
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                    color: theme.palette.common.white,
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    px: 4,
+                    py: 1.2,
+                    '&:hover': {
+                      background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.85)}, ${alpha(theme.palette.secondary.main, 0.85)})`,
+                      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.5)}`,
+                    },
+                  }}
+                  onClick={() => handlePlanClick(type)}
+                >
+                  Get Started
+                </Button>
+              </PremiumCard>
+            </Grid>
+          ))}
+        </Grid>
+      </>
+    </LazyMotion>
   );
 };
 
-export default function PricingPage() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
+const PricingPage: React.FC = () => {
   return (
-    <Box sx={{ 
-      minHeight: '100vh',
-      background: `linear-gradient(
-        45deg,
-        ${alpha(theme.palette.primary.light, 0.1)} 0%,
-        ${alpha(theme.palette.secondary.light, 0.1)} 100%
-      )`,
-      py: 8
-    }}>
-      <Container maxWidth="xl">
-        <Typography variant="h2" align="center" sx={{ 
-          mb: 8,
-          fontWeight: 900,
-          background: `linear-gradient(135deg, 
-            ${theme.palette.primary.main} 30%, 
-            ${theme.palette.secondary.main} 70%
-          )`,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          fontSize: isMobile ? '2.5rem' : '3rem'
-        }}>
-          Strategic Partnership Options
-        </Typography>
-        
-        <Box sx={{ 
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
-          gap: 4,
-          maxWidth: 1200,
-          margin: '0 auto'
-        }}>
-          {plans.map((tier) => (
-            <PricingTier key={tier.type} tier={tier} />
-          ))}
-        </Box>
-      </Container>
-    </Box>
+    <>
+      <SEO
+        title="Pricing Plans - Premium Solutions"
+        description="Discover our flexible pricing plans tailored to accelerate your success."
+        keywords="pricing plans, consulting rates, enterprise pricing, technology consulting"
+      />
+      <PageLayout>
+        <PricingGrid />
+      </PageLayout>
+    </>
   );
-}
+};
+
+export default PricingPage;

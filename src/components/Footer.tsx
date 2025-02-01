@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Link, Container, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { NEON_ACCENT } from '../theme/palette';
+import { NEON_ACCENT, PALETTE } from '../theme/palette';
 
 // Styled component for social media icons
 const SocialIconLink = styled(Link)(({ theme }) => ({
@@ -11,12 +11,15 @@ const SocialIconLink = styled(Link)(({ theme }) => ({
   width: 40,
   height: 40,
   borderRadius: '50%',
-  backgroundColor: theme.palette.grey[200],
+  backgroundColor:
+    theme.palette.mode === 'light'
+      ? PALETTE.light.divider
+      : PALETTE.dark.divider,
   color: theme.palette.text.primary,
   transition: 'all 0.3s ease',
   '&:hover': {
     backgroundColor: NEON_ACCENT,
-    color: theme.palette.getContrastText(NEON_ACCENT),
+    color: PALETTE.dark.textPrimary, // Use a contrasting color
   },
   margin: theme.spacing(0, 1),
 }));

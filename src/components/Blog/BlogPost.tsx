@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Typography, Box } from '@mui/material';
-import SEO from './SEO';
+import SEO from '../SEO';
 
 interface BlogPostProps {
   title: string;

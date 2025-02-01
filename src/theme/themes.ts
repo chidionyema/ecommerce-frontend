@@ -2,22 +2,15 @@ import { createTheme, responsiveFontSizes, ThemeOptions } from "@mui/material/st
 import { alpha } from "@mui/material/styles";
 import {
   PALETTE,
-  PRIMARY_DARK,
-  SECONDARY_DARK,
-  NEON_ACCENT,
-  TECH_BLUE,
-  TECH_GRADIENT,
-  GLOW_EFFECT,
-  STANDARD_BORDER,
-  BACKDROP_BLUR,
-  BORDER_RADIUS,
   typography,
   fontLoader,
-  microShine,
-  gradientShift,
+  THEME_VARS,
+  GRADIENTS,
 } from "./palette";
 
-// Define custom transitions
+// --- Custom Theme Options ---
+
+// Define custom transitions interface
 interface CustomTransitions {
   spring: {
     type: "spring";
@@ -31,21 +24,32 @@ interface CustomTransitions {
   };
 }
 
-// Extend Material-UI theme with custom transitions
+// Define a custom interface for CyberAppBar theme options
+interface CyberAppBarThemeOptions {
+  appBarBackgroundColor: string;
+  appBarBorderColor: string;
+  appBarBoxShadow: string;
+  appBarUnderlineColor: string;
+}
+
+// Extend Material-UI theme with custom transitions and CyberAppBar options
 declare module "@mui/material/styles" {
   interface Theme {
     customTransitions: CustomTransitions;
+    cyberAppBar: CyberAppBarThemeOptions;
   }
   interface ThemeOptions {
     customTransitions?: CustomTransitions;
+    cyberAppBar?: Partial<CyberAppBarThemeOptions>;
   }
 }
 
-// Define baseThemeOptions as ThemeOptions
+// --- Base Theme Options ---
+
 const baseThemeOptions: ThemeOptions = {
   typography,
   shape: {
-    borderRadius: Number(BORDER_RADIUS.replace("px", "")),
+    borderRadius: Number(THEME_VARS.borderRadius.replace("px", "")),
   },
   components: {
     MuiCssBaseline: {
@@ -56,28 +60,19 @@ const baseThemeOptions: ThemeOptions = {
         body: {
           transition: "background 0.3s ease, color 0.3s ease",
         },
-        ".cyber-button": {
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          "&:hover": {
-            transform: "translateY(-2px)",
-            boxShadow: GLOW_EFFECT,
-          },
-        },
-        "@keyframes microShine": microShine,
-        "@keyframes gradientShift": gradientShift,
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: "none",
+          textTransform: "none", // This is handled in typography.button now
         },
       },
     },
     MuiAlert: {
       styleOverrides: {
         root: {
-          borderRadius: "8px",
+          borderRadius: THEME_VARS.borderRadius,
           padding: "16px",
         },
       },
@@ -87,91 +82,133 @@ const baseThemeOptions: ThemeOptions = {
     spring: { type: "spring", stiffness: 300, damping: 20, mass: 0.5 },
     quick: { duration: 0.3, ease: "easeInOut" },
   },
+  // CyberAppBar theme options
+  cyberAppBar: {
+    appBarBackgroundColor: alpha(PALETTE.dark.primaryDark, 0.98),
+    appBarBorderColor: alpha(PALETTE.dark.primary, 0.2),
+    appBarBoxShadow: `0 0 24px ${alpha(PALETTE.dark.primary, 0.2)}`,
+    appBarUnderlineColor: GRADIENTS.tech,
+  },
 };
+
+// --- Theme Creation ---
 
 // Create baseTheme from baseThemeOptions
 const baseTheme = createTheme(baseThemeOptions);
 
-// Dark Theme using baseThemeOptions
+// Dark Theme
 export const darkTheme = responsiveFontSizes(
   createTheme({
-    ...baseThemeOptions, // Spread ThemeOptions instead of Theme instance
+    ...baseThemeOptions,
     palette: {
       mode: "dark",
       primary: {
-        main: PALETTE.deepBlue,
-        contrastText: PALETTE.white,
+        main: PALETTE.dark.primary,
+        contrastText: PALETTE.dark.textPrimary,
       },
       secondary: {
-        main: PALETTE.electric,
-        contrastText: PALETTE.white,
+        main: PALETTE.dark.secondary,
+        contrastText: PALETTE.dark.textPrimary,
       },
       error: {
-        main: PALETTE.errorRed,
+        main: PALETTE.dark.error,
       },
       background: {
-        default: PRIMARY_DARK,
-        paper: alpha(PRIMARY_DARK, 0.9),
+        default: PALETTE.dark.background,
+        paper: PALETTE.dark.paper,
       },
       text: {
-        primary: PALETTE.white,
-        secondary: alpha(NEON_ACCENT, 0.8),
+        primary: PALETTE.dark.textPrimary,
+        secondary: PALETTE.dark.textSecondary,
       },
+      divider: PALETTE.dark.divider,
     },
   })
 );
 
-// Light Theme using baseThemeOptions
+// Light Theme
 export const lightTheme = responsiveFontSizes(
   createTheme({
     ...baseThemeOptions,
     palette: {
       mode: "light",
       primary: {
-        main: PALETTE.lightGray,
-        contrastText: PALETTE.offBlack,
+        main: PALETTE.light.primary,
+        contrastText: PALETTE.light.textPrimary,
       },
       secondary: {
-        main: PALETTE.skyGlow,
-        contrastText: PALETTE.offBlack,
+        main: PALETTE.light.secondary,
+        contrastText: PALETTE.light.textPrimary,
       },
       error: {
-        main: PALETTE.errorRed,
+        main: PALETTE.light.error,
       },
       background: {
-        default: PALETTE.white,
-        paper: PALETTE.lightGray,
+        default: PALETTE.light.background,
+        paper: PALETTE.light.paper,
       },
       text: {
-        primary: PALETTE.offBlack,
-        secondary: PALETTE.slate,
+        primary: PALETTE.light.textPrimary,
+        secondary: PALETTE.light.textSecondary,
       },
+      divider: PALETTE.light.divider,
     },
   })
 );
 
-// Tech Blue Theme using baseThemeOptions
+// Tech Blue Theme
 export const techTheme = responsiveFontSizes(
   createTheme({
     ...baseThemeOptions,
     palette: {
       mode: "dark",
       primary: {
-        main: TECH_BLUE,
-        contrastText: PALETTE.white,
+        main: PALETTE.dark.primary,
+        contrastText: PALETTE.dark.textPrimary,
       },
       secondary: {
-        main: PALETTE.neonAqua,
-        contrastText: PALETTE.offBlack,
+        main: PALETTE.dark.primaryLight,
+        contrastText: PALETTE.dark.textPrimary,
       },
       background: {
-        default: PALETTE.deepBlue,
-        paper: alpha(TECH_BLUE, 0.9),
+        default: PALETTE.dark.background,
+        paper: PALETTE.dark.paper,
       },
       text: {
-        primary: PALETTE.white,
-        secondary: alpha(PALETTE.neonAqua, 0.8),
+        primary: PALETTE.dark.textPrimary,
+        secondary: PALETTE.dark.textSecondary,
       },
+      divider: PALETTE.dark.divider,
+    },
+  })
+);
+
+// Cyber Theme (using the cyberAppBar theme options)
+export const cyberTheme = responsiveFontSizes(
+  createTheme({
+    ...baseThemeOptions,
+    palette: {
+      mode: "dark",
+      primary: {
+        main: PALETTE.dark.primary,
+        contrastText: PALETTE.dark.textPrimary,
+      },
+      secondary: {
+        main: PALETTE.dark.secondary,
+        contrastText: PALETTE.dark.textPrimary,
+      },
+      error: {
+        main: PALETTE.dark.error,
+      },
+      background: {
+        default: PALETTE.dark.background,
+        paper: PALETTE.dark.paper,
+      },
+      text: {
+        primary: PALETTE.dark.textPrimary,
+        secondary: PALETTE.dark.textSecondary,
+      },
+      divider: PALETTE.dark.divider,
     },
   })
 );

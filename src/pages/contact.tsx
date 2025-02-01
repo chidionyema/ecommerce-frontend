@@ -1,15 +1,27 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  useTheme, Container, Grid, TextField, Button, Typography, useMediaQuery, 
-  alpha, CircularProgress, InputAdornment, Box, Alert, IconButton, Collapse
+import {
+  useTheme,
+  TextField,
+  Button,
+  alpha,
+  CircularProgress,
+  InputAdornment,
+  Box,
+  Alert,
+  IconButton,
+  Collapse,
+  Stack,
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Send, AccountCircle, Email, Phone, Description, Close, CheckCircle } from '@mui/icons-material';
-import { z, ZodError } from 'zod';
+import { z } from 'zod';
 import emailjs from '@emailjs/browser';
+import SEO from '../components/SEO';
+import PageLayout from '../components/Shared/PageLayout';
+import PageHeader from '../components/Shared/PageHeader';
 
 const EMAILJS_CONFIG = {
   SERVICE_ID: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
@@ -36,56 +48,41 @@ const INITIAL_FORM_DATA: FormData = {
 const Contact = () => {
   const theme = useTheme();
   const router = useRouter();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string | undefined>(undefined);
+  const [selectedPlan, setSelectedPlan] = useState<string>();
+  const [step, setStep] = useState(0); // Track which fields are visible
 
   useEffect(() => {
-    if (router.isReady) setSelectedPlan(router.query.plan as string | undefined);
-  }, [router.isReady, router.query]);
+    const params = new URLSearchParams(window.location.search);
+    setSelectedPlan(params.get('plan') || undefined);
+  }, []);
 
   const validateField = useCallback((name: keyof FormData, value: string) => {
     try {
-      const fieldSchema = z.object({ [name]: formSchema.shape[name] });
-      fieldSchema.parse({ [name]: value });
-  
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-  
-    } catch (error: unknown) {
-      if (error instanceof ZodError) {
-        setErrors(prev => ({
-          ...prev,
-          [name]: error.errors[0].message,
-        }));
-      } else {
-        console.error("An unexpected error occurred during validation:", error);
-        setErrors(prev => ({
-          ...prev,
-          [name]: "An unexpected error occurred.",
-        }));
+      formSchema.pick({ [name]: formSchema.shape[name] }).parse({ [name]: value });
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setErrors(prev => ({ ...prev, [name]: error.errors[0].message }));
       }
     }
-  }, [formSchema]);
+  }, []);
 
-  useEffect(() => {
-    if (router.isReady) setSelectedPlan(router.query.plan as string | undefined);
-  }, [router.isReady, router.query]);
-
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     validateField(name as keyof FormData, value);
+
+    // Progressive Form: Reveal the next field when a valid input is detected
+    if (name === 'name' && value.length > 1) setStep(1);
+    if (name === 'email' && formSchema.shape.email.safeParse(value).success) setStep(2);
+    if (name === 'phone' && formSchema.shape.phone.safeParse(value).success) setStep(3);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
     setSuccess(false);
@@ -101,6 +98,7 @@ const Contact = () => {
       );
       setSuccess(true);
       setFormData(INITIAL_FORM_DATA);
+      setStep(0);
     } catch (error) {
       setErrors({ form: 'Failed to send message. Please try again later.' });
     } finally {
@@ -109,61 +107,145 @@ const Contact = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ 
-      py: { xs: 4, md: 8 }, 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center',
-      background: `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, ${alpha(theme.palette.secondary.light, 0.1)} 100%)`
-    }}>
-      <Box sx={{ width: '100%', transform: 'translateY(-20px)' }}>
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
+    <>
+      <SEO
+        title="Contact Us - Get in Touch"
+        description="Reach out to our team for inquiries, support, or partnership opportunities."
+        keywords="contact, support, inquiry, partnership"
+      />
+      <PageLayout>
+        <PageHeader title={selectedPlan ? `Get Started with ${selectedPlan}` : "Let's Work Together"} />
+
+        <Box
+          component={motion.form}
+          onSubmit={handleSubmit}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
+          sx={{
+            maxWidth: 500,
+            mx: 'auto',
+            p: 4,
+            borderRadius: 6,
+            background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(theme.palette.background.default, 1)})`,
+            boxShadow: `0px 12px 24px ${alpha(theme.palette.primary.dark, 0.1)}`,
+            mt: 6,
+            position: 'relative',
+            overflow: 'hidden',
+            '&:before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 4,
+              background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+            },
+          }}
         >
-          <Typography
-            variant="h2"
-            sx={{
-              mb: 3,
-              textAlign: 'center',
-              fontWeight: 800,
-              background: `linear-gradient(150deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              fontSize: isMobile ? '2.5rem' : '3.5rem',
-              lineHeight: 1.2,
-              letterSpacing: '-0.05em',
-              textShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
-            }}
-          >
-            {selectedPlan ? `Get Started with ${selectedPlan}` : "Let's Work Together"}
-          </Typography>
+          <Collapse in={!!errors.form}>
+            <Alert
+              severity="error"
+              action={
+                <IconButton onClick={() => setErrors(prev => ({ ...prev, form: '' }))}>
+                  <Close />
+                </IconButton>
+              }
+              sx={{ mb: 3 }}
+            >
+              {errors.form}
+            </Alert>
+          </Collapse>
 
-          <Typography variant="h6" sx={{ 
-            textAlign: 'center', 
-            color: 'text.secondary',
-            mb: 6,
-            px: 2,
-            fontSize: isMobile ? '1rem' : '1.25rem',
-            maxWidth: '600px',
-            margin: '0 auto',
-            lineHeight: 1.6
-          }}>
-            {selectedPlan ? `Share details about your project to get started with our ${selectedPlan} plan` : 'Fill out the form below and we’ll get back to you within 24 hours'}
-          </Typography>
-        </motion.div>
+          <Stack spacing={3}>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                label="Name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                error={!!errors.name}
+                helperText={errors.name}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AccountCircle color="action" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </motion.div>
 
-        <motion.form 
-          onSubmit={handleSubmit} 
-          initial={{ opacity: 0, scale: 0.98 }} 
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          {/* Rest of the form remains the same with improved styling */}
-        </motion.form>
-      </Box>
-    </Container>
+            {step >= 1 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  error={!!errors.email}
+                  helperText={errors.email}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Email color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </motion.div>
+            )}
+
+            {step >= 2 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  error={!!errors.phone}
+                  helperText={errors.phone}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Phone color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </motion.div>
+            )}
+
+            {step >= 3 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  error={!!errors.message}
+                  helperText={errors.message}
+                  multiline
+                  rows={4}
+                />
+              </motion.div>
+            )}
+          </Stack>
+
+          <Button type="submit" fullWidth size="large" variant="contained" disabled={loading} startIcon={loading ? <CircularProgress size={24} /> : <Send />} sx={{ mt: 4, borderRadius: '50px' }}>
+            {loading ? 'Sending...' : 'Send Message'}
+          </Button>
+        </Box>
+      </PageLayout>
+    </>
   );
 };
 
