@@ -4,11 +4,13 @@ import {
   Shield, Building2, DollarSign, Landmark, Cloud, CircuitBoard, Cpu, Server, Key, Settings, Mail,
   Terminal, Database, Code2, GitBranch, Box as BoxIcon, Layers
 } from 'lucide-react';
+import { Metric } from '../types/project';
 
 export interface CVProject {
   id: string;
   name: string;
   description: string;
+  metrics: Metric[];
   technologies: string[];
   technologyIcons: any[];
   role: string;
@@ -38,12 +40,9 @@ export interface CVProject {
       description: string;
     };
   };
-  metrics: Array<{
-    label: string;
-    value: string;
-    description: string;
-  }>;
 }
+
+
 
 // ✅ Map Technologies to Icons
 export const technologyIconMap = {

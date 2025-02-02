@@ -10,11 +10,10 @@ import {
   useTheme // Added
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { motion, useTransform, useScroll } from 'framer-motion';
 import { cvProjects } from '../../data/cvProjects';
 import { Project } from '../../types/project';
 import { Particles } from '../../components/Particles';
-import { GlassCard, GradientText } from '../../components/Theme/GlassCard';
+import { GlassCard } from '../../components/Theme/GlassCard';
 import QuickFacts from '../../components/Project/QuickFacts';
 import { LessonsLearned } from '../../components/Project/LessonsLearned';
 import { ChallengeSection } from '../../components/Project/ChallengeSection';
@@ -22,16 +21,14 @@ import { ApproachTimeline } from '../../components/Project/ApproachTimeline';
 import { MetricTilesContainer } from '../../components/Project/MetricsSection';
 import { AchievementsList } from '../../components/Project/AchievementsList';
 import { ReturnButton } from '../../components/Project/ReturnButton'; // Fixed import
-import ProjectHeader from '../../components/Project/ProjectHeader'; // Fixed path
+import {ProjectHeader } from '../../components/Project/ProjectHeader'; // Fixed path
 
 const ProjectDetails = () => {
   const theme = useTheme(); // Added theme hook
   const params = useParams();
   const router = useRouter();
   const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({ container: containerRef });
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
-
+ 
   const projectId = params?.id as string;
   const project = useMemo(
     () => cvProjects.find((p: Project) => p.id === projectId),
@@ -86,7 +83,7 @@ const ProjectDetails = () => {
 
           <Grid item xs={12} md={4}>
             <QuickFacts
-              teamSize={project.teamSize.toString()} // Convert to string
+              teamSize={project.teamSize} // Convert to string
               timeline={project.timeline}
               technologies={project.technologies}
               technologyIcons={project.technologyIcons}

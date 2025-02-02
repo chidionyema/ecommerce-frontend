@@ -23,3 +23,11 @@ export interface ApproachStep {
   title: string;
   description: string;
 }
+
+// types/project.ts
+export interface Metric {
+  label: string;
+  value: string;  // Stored as string but converted when needed
+  description: string;
+  progressValue?: number;  // Ensure it's always a number
+}

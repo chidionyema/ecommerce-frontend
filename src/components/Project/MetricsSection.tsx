@@ -1,64 +1,62 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import { Box, Typography, useTheme, CircularProgress, Stack } from '@mui/material';
+import { Box, Typography, Grid, CircularProgress, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
+import { GlassCard } from '../../components/Theme/GlassCard'; // Ensure correct import
+import { Metric } from '@/src/types/project';
+import { useTheme } from '@mui/material'; // ✅ Import theme hook
 
-// ✅ Correct the import
-const MetricTiles = dynamic(() => import('./DataVisualization'), { ssr: false });
 
-interface Metric {
-  value: number;
-  label: string;
-  description: string;
-}
 
-interface MetricTilesProps {
-  metrics: Metric[];
-}
-
-const StyledTile = (props: any) => {
-  const theme = useTheme();
-  return (
-    <Box
-      sx={{
-        background: theme.palette.background.paper,
-        borderRadius: theme.shape.borderRadius,
-        boxShadow: theme.shadows[3],
-        padding: theme.spacing(3),
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: theme.shadows[6],
-        },
-      }}
-      {...props}
-    />
-  );
-};
-
-const MetricTilesContainer = ({ metrics }: MetricTilesProps) => {
-  return (
-    <Stack spacing={3} direction="row" justifyContent="center">
-      {metrics.map((metric, index) => (
-        <motion.div key={index} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <StyledTile>
-            <CircularProgress variant="determinate" value={metric.value} size={80} thickness={4} />
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              {metric.label}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {metric.description}
-            </Typography>
-          </StyledTile>
-        </motion.div>
-      ))}
-    </Stack>
-  );
-};
-
-export default MetricTilesContainer;
+  export const MetricTilesContainer = ({ metrics }: { metrics: Metric[] }) => {
+    const theme = useTheme(); // ✅ Define the theme variable inside the function
+  
+    return (
+      <Grid container spacing={3}>
+        {metrics.map((metric, index) => {
+          const progress = metric.progressValue ?? (parseFloat(metric.value.toString()) || 0);
+  
+          return (
+            <Grid item xs={12} sm={6} key={index}>
+              <motion.div whileHover={{ scale: 1.02 }}>
+                <GlassCard sx={{ p: 3 }}>
+                  <Stack direction="row" spacing={3} alignItems="center">
+                    <Box sx={{ position: 'relative' }}>
+                      <CircularProgress
+                        variant="determinate"
+                        value={progress}
+                        size={72}
+                        thickness={3}
+                        sx={{
+                          color: index % 2 ? theme.palette.primary.main : theme.palette.secondary.main, // ✅ theme is now defined
+                          transform: 'rotate(-90deg)',
+                        }}
+                      />
+                      <Typography variant="h6" sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        fontWeight: 700,
+                      }}>
+                        {metric.value}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
+                        {metric.label}
+                      </Typography>
+                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                        {metric.description}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </GlassCard>
+              </motion.div>
+            </Grid>
+          );
+        })}
+      </Grid>
+    );
+  };
+  

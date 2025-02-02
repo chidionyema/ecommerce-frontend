@@ -16,7 +16,7 @@ export const ServicesGrid = () => {
   return (
     <Box sx={{ 
       py: { xs: 10, md: 16 }, 
-      background: `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.9)}, ${alpha(theme.palette.secondary.dark, 0.95)})`,
+      background: `linear-gradient(135deg, ${alpha(theme.palette.background.default, 0.25)}, ${alpha(theme.palette.primary.light, 0.1)})`,
       color: 'white'
     }}>
       <Container maxWidth="lg">

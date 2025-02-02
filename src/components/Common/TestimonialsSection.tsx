@@ -74,7 +74,7 @@ export const TestimonialsSection = () => {
               sx={{ 
                 fontWeight: 'bold', 
                 borderRadius: '25px', 
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`, 
+                background: `linear-gradient(135deg, ${alpha(theme.palette.background.default, 0.25)}, ${alpha(theme.palette.primary.light, 0.1)})`,
                 boxShadow: `0px 6px 20px ${alpha(theme.palette.primary.main, 0.5)}`,
               }}
             >

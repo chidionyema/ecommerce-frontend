@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Box, Container, Typography, useTheme } from '@mui/material';
+import { Box, Container, Typography, useTheme, alpha } from '@mui/material';
 import { motion } from 'framer-motion';
 
 export const TechnologyShowcase = () => {
@@ -8,7 +8,7 @@ export const TechnologyShowcase = () => {
 
   return (
     <Box sx={{
-      background: theme.palette.background.default,
+      background: `linear-gradient(135deg, ${alpha(theme.palette.background.default, 0.25)}, ${alpha(theme.palette.primary.light, 0.1)})`,
       py: { xs: 6, md: 12 },
       textAlign: 'center',
     }}>
