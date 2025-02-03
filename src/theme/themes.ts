@@ -97,6 +97,7 @@ const baseThemeOptions: ThemeOptions = {
 // Create baseTheme from baseThemeOptions
 const baseTheme = createTheme(baseThemeOptions);
 
+
 // Dark Theme
 export const darkTheme = responsiveFontSizes(
   createTheme({

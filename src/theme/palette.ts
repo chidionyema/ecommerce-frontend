@@ -187,7 +187,7 @@ export const ANIMATIONS = {
     }
   `,
 };
-
+export const NEON_ACCENT = '#00FF00'; // Example neon color
 // --- Mixins ---
 export const MIXINS = {
   cyberGlass: (intensity: number) => ({

@@ -46,20 +46,35 @@ export interface CVProject {
 
 // ✅ Map Technologies to Icons
 export const technologyIconMap = {
-  ".NET Core": Code2,        // Good match - general code icon
-  "Java": Terminal,          // Could be more specific (e.g., a coffee cup icon)
-  "WebSockets": GitBranch,    // Not a strong connection - maybe a network icon?
-  "RabbitMQ": Database,      // RabbitMQ is a message queue, not a database
-  "MQTT": Layers,            // Okay, but could be more specific (e.g., a message icon)
-  "Docker": Server,          // Good match - containerization
-  "Kubernetes": Cloud,       // Good match - orchestration
-  "Terraform": BoxIcon,      // Okay, but could be more infrastructure-focused
-  "AWS": Cloud,              // Good match
-  "Azure": Landmark,         // Not a strong connection - maybe a cloud with an 'A'?
-  "C#": Cpu,                // Good match
-  "EF Core": Database,      // EF Core is an ORM, not a database
-  "SQL": Database,          // Good match
-  "Brighter CQRS": Key,     // Okay, but could be more specific to CQRS
+  ".NET Core": { 
+    icon: Code2,
+    color: '#512bd4'  // .NET purple
+  },
+  "Java": {
+    icon: Terminal,
+    color: '#007396'  // Java blue
+  },
+  "AWS": {
+    icon: Cloud,
+    color: '#FF9900'  // AWS orange
+  },
+  "Docker": {
+    icon: Server,
+    color: '#2496ED'  // Docker blue
+  },
+  "Kubernetes": {
+    icon: Cloud,
+    color: '#326CE5'  // Kubernetes blue
+  },
+  "React": {
+    icon: CircuitBoard,
+    color: '#61DAFB'  // React cyan
+  },
+  "TypeScript": {
+    icon: Code2,
+    color: '#3178C6'  // TypeScript blue
+  },
+  // Add colors for other technologies
 };
 
 export const cvProjects: CVProject[] = [
