@@ -54,7 +54,8 @@ const Contact = () => {
 
   const validateField = useCallback((name: keyof FormData, value: string) => {
     try {
-      formSchema.pick({ [name]: formSchema.shape[name] }).parse({ [name]: value });
+      const fieldSchema = z.object({ [name]: formSchema.shape[name as keyof FormData] });
+      fieldSchema.parse({ [name]: value });
       setErrors(prev => ({ ...prev, [name]: '' }));
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -124,8 +125,8 @@ const Contact = () => {
             borderRadius: 6,
             background: sharedCardBackground(theme),
             boxShadow: `0px 12px 24px rgba(0, 0, 0, 0.4)`,
-            mt: 6, // Margin-top for spacing from the top
-            mb: 8, // Add margin-bottom to create space below the form
+            mt: 10, // Increased margin-top for spacing from the top
+            mb: 10, // Increased margin-bottom to create space below the form
             position: 'relative',
           }}
         >
@@ -142,15 +143,15 @@ const Contact = () => {
         </Box>
 
         {/* Spacing between the form and the next section */}
-        <Box sx={{ mb: 8 }} /> {/* Add a spacer with margin-bottom */}
+        <Box sx={{ mb: 10 }} /> {/* Increased margin-bottom */}
 
         {/* Other Sections */}
         <TechnologyShowcase />
-        <Box sx={{ mb: 8 }} /> {/* Add a spacer with margin-bottom */}
+        <Box sx={{ mb: 10 }} /> {/* Increased margin-bottom */}
         <WhyPartner />
-        <Box sx={{ mb: 8 }} /> {/* Add a spacer with margin-bottom */}
+        <Box sx={{ mb: 10 }} /> {/* Increased margin-bottom */}
         <ServicesGrid />
-        <Box sx={{ mb: 8 }} /> {/* Add a spacer with margin-bottom */}
+        <Box sx={{ mb: 10 }} /> {/* Increased margin-bottom */}
         <TestimonialsSection />
       </ConsistentPageLayout>
     </>
