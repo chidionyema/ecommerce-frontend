@@ -185,22 +185,12 @@ export const techTheme = responsiveFontSizes(
 );
 
 
-export const ProjectCardBackground = styled(Paper)<PaperProps>(({ theme }) => ({
-  background: `
-    linear-gradient(145deg, #1F1B24 0%, #3D3A45 100%),
-    radial-gradient(circle at 70% 20%, rgba(212,175,55,0.15) 0%, transparent 70%)
-  `,
-  border: `1px solid ${alpha(theme.palette.divider, 0.15)}`, // Use divider color from theme
-  boxShadow: '0px 16px 48px rgba(0, 0, 0, 0.2)', // From your ProjectCard
-  borderRadius: 16,
-  padding: theme.spacing(3), // Add default padding for consistency
-  transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out', // Add transition for hover effect
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: `0 32px 64px ${alpha(theme.palette.primary.main, 0.25)}`, // From your ProjectCard
-  },
+export const ProjectCardBackground = styled('div')(({ theme }) => ({
+  background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+  padding: theme.spacing(4),
+  borderRadius: theme.shape.borderRadius,
+  
 }));
-
 
 // Cyber Theme (using the cyberAppBar theme options)
 export const cyberTheme = responsiveFontSizes(

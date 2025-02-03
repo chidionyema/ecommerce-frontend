@@ -2,7 +2,7 @@
 import { useState, useCallback, memo, useMemo, useEffect, useDeferredValue } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { m, LazyMotion, domAnimation, AnimatePresence, useMotionValue, useTransform, useScroll, useSpring } from 'framer-motion';
+import { m, LazyMotion, domAnimation, AnimatePresence, useMotionValue, useTransform, useScroll, useSpring, animate } from 'framer-motion';
 import {
   AppBar, Toolbar, Typography, Box, IconButton, Container,
   alpha, Stack, useTheme, useMediaQuery, CircularProgress,
@@ -35,7 +35,7 @@ const StyledAppBar = styled(m(AppBar))(({ theme }) => ({
   borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
   boxShadow: `0 8px 32px ${alpha(theme.palette.primary.main, 0.18)}`,
   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-  willChange: 'transform, opacity, background-color',
+  willChange: 'transform, opacity',
   '&::after': {
     content: '""',
     position: 'absolute',
@@ -157,14 +157,14 @@ const NavBar = () => {
   useEffect(() => {
     if (!isNavigating) return;
 
-    const interval = setInterval(() => {
-      progress.set(Math.min(progress.get() + 0.1, SCROLL_THRESHOLDS.LOADING));
-    }, 100);
-
-    return () => {
-      clearInterval(interval);
-      progress.set(0);
+    const animateProgress = async () => {
+      await animate(progress, SCROLL_THRESHOLDS.LOADING, {
+        duration: 1.5,
+        ease: "easeInOut",
+      });
     };
+
+    animateProgress();
   }, [isNavigating, progress]);
 
   useEffect(() => {
@@ -252,7 +252,7 @@ const NavBar = () => {
                 <Stack direction="row" gap={2}>
                   {navItems.map((item) => (
                     <Tooltip key={item.path} title={item.label} arrow>
-                      <Link href={item.path} passHref legacyBehavior>
+                      <Link href={item.path} passHref legacyBehavior prefetch>
                         <m.a
                           onClick={() => handleNavigationStart(item.path)}
                           style={{
@@ -383,7 +383,7 @@ const NavBar = () => {
                 ))}
               </Stack>
 
-              {/* Dynamic Sections */}
+              {/* Theme Section */}
               {activePanelSection === PANEL_SECTIONS.THEMES && (
                 <PanelSection title="Visual Themes">
                   <Stack gap={2}>
@@ -411,6 +411,7 @@ const NavBar = () => {
                 </PanelSection>
               )}
 
+              {/* Features Section */}
               {activePanelSection === PANEL_SECTIONS.FEATURES && (
                 <PanelSection title="Latest Features">
                   <Stack gap={2}>
@@ -439,6 +440,7 @@ const NavBar = () => {
                 </PanelSection>
               )}
 
+              {/* Community Section */}
               {activePanelSection === PANEL_SECTIONS.COMMUNITY && (
                 <PanelSection title="Join Our Community">
                   <Stack gap={2}>
@@ -471,6 +473,7 @@ const NavBar = () => {
                 </PanelSection>
               )}
 
+              {/* Resources Section */}
               {activePanelSection === PANEL_SECTIONS.RESOURCES && (
                 <PanelSection title="Learning Resources">
                   <Stack gap={2}>

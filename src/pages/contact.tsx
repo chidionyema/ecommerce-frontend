@@ -21,6 +21,7 @@ import { z } from 'zod';
 import emailjs from '@emailjs/browser';
 import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
+import { sharedCardBackground } from '../utils/sharedStyles';
 
 const EMAILJS_CONFIG = {
   SERVICE_ID: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
@@ -51,13 +52,7 @@ const Contact = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string>();
-  const [step, setStep] = useState(0); // Track which fields are visible
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setSelectedPlan(params.get('plan') || undefined);
-  }, []);
+  const [step, setStep] = useState(0);
 
   const validateField = useCallback((name: keyof FormData, value: string) => {
     try {
@@ -74,8 +69,6 @@ const Contact = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     validateField(name as keyof FormData, value);
-
-    // Progressive Form: Reveal the next field when a valid input is detected
     if (name === 'name' && value.length > 1) setStep(1);
     if (name === 'email' && formSchema.shape.email.safeParse(value).success) setStep(2);
     if (name === 'phone' && formSchema.shape.phone.safeParse(value).success) setStep(3);
@@ -92,7 +85,7 @@ const Contact = () => {
       await emailjs.send(
         EMAILJS_CONFIG.SERVICE_ID,
         EMAILJS_CONFIG.TEMPLATE_ID,
-        { ...formData, plan: selectedPlan || 'General Inquiry' },
+        formData,
         EMAILJS_CONFIG.USER_ID
       );
       setSuccess(true);
@@ -116,8 +109,8 @@ const Contact = () => {
         seoTitle="Contact Us - Get in Touch"
         seoDescription="Reach out to our team for inquiries, support, or partnership opportunities."
         seoKeywords="contact, support, inquiry, partnership"
-        title={selectedPlan ? `Get Started with ${selectedPlan}` : "Let's Work Together"}
-        subtitle="We'd love to hear from you. Fill out the form below and we'll get back to you soon."
+        title="Let's Work Together"
+        subtitle="Fill out the form below and we'll get back to you soon."
       >
         <Box
           component={motion.form}
@@ -130,129 +123,21 @@ const Contact = () => {
             mx: 'auto',
             p: 4,
             borderRadius: 6,
-            background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(theme.palette.background.default, 1)})`,
-            boxShadow: `0px 12px 24px ${alpha(theme.palette.primary.dark, 0.1)}`,
+            background: sharedCardBackground(theme),
+            boxShadow: `0px 12px 24px rgba(0, 0, 0, 0.4)`,
             mt: 6,
             position: 'relative',
-            overflow: 'hidden',
-            '&:before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 4,
-              background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            },
           }}
         >
-          <Collapse in={!!errors.form}>
-            <Alert
-              severity="error"
-              action={
-                <IconButton onClick={() => setErrors(prev => ({ ...prev, form: '' }))}>
-                  <Close />
-                </IconButton>
-              }
-              sx={{ mb: 3 }}
-            >
-              {errors.form}
-            </Alert>
-          </Collapse>
-
           <Stack spacing={3}>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                error={!!errors.name}
-                helperText={errors.name}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <AccountCircle color="action" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </motion.div>
-
-            {step >= 1 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  error={!!errors.email}
-                  helperText={errors.email}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Email color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </motion.div>
-            )}
-
-            {step >= 2 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  error={!!errors.phone}
-                  helperText={errors.phone}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Phone color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </motion.div>
-            )}
-
-            {step >= 3 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  error={!!errors.message}
-                  helperText={errors.message}
-                  multiline
-                  rows={4}
-                />
-              </motion.div>
-            )}
+            <TextField fullWidth label="Name" name="name" value={formData.name} onChange={handleChange} />
+            {step >= 1 && <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} />}
+            {step >= 2 && <TextField fullWidth label="Phone" name="phone" value={formData.phone} onChange={handleChange} />}
+            {step >= 3 && <TextField fullWidth label="Message" name="message" value={formData.message} onChange={handleChange} multiline rows={4} />}
           </Stack>
 
-          <Button
-            type="submit"
-            fullWidth
-            size="large"
-            variant="contained"
-            disabled={loading}
-            startIcon={loading ? <CircularProgress size={24} /> : <Send />}
-            sx={{ mt: 4, borderRadius: '50px' }}
-          >
-            {loading ? 'Sending...' : 'Send Message'}
+          <Button type="submit" fullWidth size="large" variant="contained" disabled={loading} sx={{ mt: 8 }}>
+            {loading ? <CircularProgress size={24} /> : 'Send Message'}
           </Button>
         </Box>
       </ConsistentPageLayout>

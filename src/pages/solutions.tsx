@@ -21,18 +21,48 @@ const Solutions = () => {
         seoTitle="Client Solutions - Premium Solutions"
         seoDescription="Explore our portfolio of enterprise-grade technical solutions and client success stories."
         seoKeywords="enterprise solutions, cloud architecture, DevOps, technical resources"
-        title="Unlock Your Business Potential"
+        title="Accelerate Your Path to Market"
         subtitle="Our enterprise solutions empower your business to innovate and grow."
       >
         <Container maxWidth="lg">
-          <Grid container spacing={4} sx={{ justifyContent: 'center', mt: 6, px: { xs: 2, md: 6 } }}>
+          {/* 
+            spacing={5} creates enough gap between columns/rows.
+            md=4 => Each item is 4/12 columns on desktop => 3 columns total
+          */}
+          <Grid
+            container
+            spacing={5}
+            sx={{
+              justifyContent: 'center',
+              alignItems: 'stretch',
+              mt: 8,
+              px: { xs: 3, md: 6 },
+            }}
+          >
             {cvProjects.map((project) => (
-              <Grid item xs={12} sm={6} md={4} key={project.id}>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={4}
+                key={project.id}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  // Let the Card grow/shrink as needed
+                  height: 'auto',
+                }}
+              >
+                {/* 
+                  The ProjectCard will fill this grid cell's width. 
+                  Since md=4 => 3 columns on medium & above.
+                */}
                 <ProjectCard project={project} />
               </Grid>
             ))}
           </Grid>
-          <Box textAlign="center" mt={8}>
+
+          <Box textAlign="center" mt={10}>
             <NextLink href="/contact" passHref legacyBehavior>
               <Button
                 component="a"

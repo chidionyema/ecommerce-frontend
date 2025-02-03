@@ -1,201 +1,152 @@
 'use client';
-import React, { useState, useRef } from 'react';
+
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Container,
   Grid,
-  Theme,
   Typography,
   useMediaQuery,
   useTheme,
+  styled
 } from '@mui/material';
 import { motion, useInView } from 'framer-motion';
-import styled from 'styled-components';
-import { ProjectCardBackground } from '../../theme/themes';
-import {
-  Cloud,
-  Lock,
-  Database,
-  Cpu,
-  Zap,
-  Server,
-  PieChart,
-  Smartphone,
-} from 'react-feather';
+import { TechIcon, techIcons } from './tech-data'; // Importing tech icons
 
-const techIcons = [
-  {
-    id: 1,
-    title: 'Cloud Computing',
-    icon: <Cloud size={32} strokeWidth={1.5} color="#673ab7" />, // Reduced icon size
-    color: '#673ab7',
+// Floating hover animation
+const floatingVariants = {
+  hover: {
+    y: [-5, 5, -5],
+    scale: 1.15,
+    rotate: [0, 15, -15, 0],
+    transition: {
+      y: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+      rotate: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
+      scale: { duration: 0.2 }
+    }
   },
-  {
-    id: 2,
-    title: 'Security & Encryption',
-    icon: <Lock size={32} strokeWidth={1.5} color="#f44336" />, // Reduced icon size
-    color: '#f44336',
-  },
-  {
-    id: 3,
-    title: 'Data Storage & Management',
-    icon: <Database size={32} strokeWidth={1.5} color="#2196f3" />, // Reduced icon size
-    color: '#2196f3',
-  },
-  {
-    id: 4,
-    title: 'API Development',
-    icon: <Cpu size={32} strokeWidth={1.5} color="#4caf50" />, // Reduced icon size
-    color: '#4caf50',
-  },
-  {
-    id: 5,
-    title: 'Artificial Intelligence',
-    icon: <Zap size={32} strokeWidth={1.5} color="#ff9800" />, // Reduced icon size
-    color: '#ff9800',
-  },
-  {
-    id: 6,
-    title: 'Web & Mobile Development',
-    icon: <Smartphone size={32} strokeWidth={1.5} color="#009688" />, // Reduced icon size
-    color: '#009688',
-  },
-  {
-    id: 7,
-    title: 'High Performance Computing',
-    icon: <Server size={32} strokeWidth={1.5} color="#ff5722" />, // Reduced icon size
-    color: '#ff5722',
-  },
-  {
-    id: 8,
-    title: 'Big Data & Analytics',
-    icon: <PieChart size={32} strokeWidth={1.5} color="#3f51b5" />, // Reduced icon size
-    color: '#3f51b5',
-  },
-];
-
-const TechCard = styled(motion.div)<{ color: string }>`
-  text-align: center;
-  padding: 20px; // Reduced padding
-  border-radius: 12px; // Reduced border-radius
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid transparent;
-
-  ${(props) => {
-    const theme = props.theme as Theme;
-    const background = theme.palette.mode === 'dark'
-    ? 'rgba(255, 255, 255, 0.05)'
-    : 'rgba(0, 0, 0, 0.05)';
-    return `background: ${background};`;
-  }}
-
-  &:hover {
-    transform: scale(1.03); // Reduced scale on hover
-    box-shadow: 0 8px 24px ${(props) => props.color}; // Reduced box-shadow on hover
-    border: 1px solid ${(props) => props.color};
-
-    ${(props) => {
-      const theme = props.theme as Theme;
-      const hoverBackground = theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.1)'
-      : 'rgba(0, 0, 0, 0.1)';
-      return `background: ${hoverBackground};`;
-    }}
+  rest: {
+    y: [-3, 3, -3],
+    scale: 1,
+    rotate: 0,
+    transition: {
+      y: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+      rotate: { duration: 0 }
+    }
   }
+};
 
-  @media (max-width: 768px) {
-    padding: 12px; // Reduced padding for mobile
+// Styled Tech Card
+const TechCard = styled(motion.div)<{ color: string }>(({ theme, color }) => ({
+  position: 'relative',
+  textAlign: 'center',
+  padding: theme.spacing(3),
+  borderRadius: '16px',
+  cursor: 'pointer',
+  overflow: 'hidden',
+  background: `linear-gradient(145deg, ${color}10 0%, #ffffff30 100%)`,
+  border: `1px solid ${color}30`,
+  transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+  width: '100%',
+  minHeight: 200,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  '&:hover': {
+    transform: 'scale(1.05) translateY(-5px)',
+    boxShadow: `0 12px 32px ${color}40`,
+    borderColor: `${color}80`,
   }
-`;
+}));
 
 export const TechnologyShowcase = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const ref = useRef(null);
-  const inView = useInView(ref, { amount: 0.5 });
+  const inView = useInView(ref, { amount: 0.5, once: true });
 
   return (
-    <ProjectCardBackground
+    <Box
       sx={{
-        py: 8, // Reduced vertical padding
+        py: 10,
+        width: '100vw', // Full viewport width
+        position: 'relative',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw',
+        background: `linear-gradient(
+          45deg, 
+          ${theme.palette.primary.main} 0%, 
+          ${theme.palette.secondary.main} 100%
+        )`,
+        overflow: 'hidden',
       }}
     >
-      <Box sx={{ py: { xs: 8, md: 12 } }}> {/* Reduced vertical padding */}
-        <Container maxWidth="xl" ref={ref}>
-          <Typography
-            variant="h2"
-            sx={{
-              textAlign: 'center',
-              mb: 6,
-              fontWeight: 900,
-              fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' }, // Reduced font sizes
-              background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              '&::after': {
-                content: '""',
-                display: 'block',
-                width: '60px', // Reduced width
-                height: '3px', // Reduced height
-                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                borderRadius: '2px',
-                margin: '1rem auto 0', // Reduced margin-top
-              },
-            }}
-          >
-            Core Technologies
-          </Typography>
+      <Container maxWidth="lg" ref={ref}>
+        <Typography
+          variant="h2"
+          align="center"
+          sx={{
+            color: 'common.white',
+            fontWeight: 900,
+            mb: 6,
+            textShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            letterSpacing: '-0.03em'
+          }}
+        >
+          Core Technologies
+        </Typography>
 
-          <Grid container spacing={isMobile? 2: 3}> {/* Reduced spacing */}
-            {techIcons.map((tech, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={tech.id}>
-                <TechCard
-                  color={tech.color}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={inView? { opacity: 1, y: 0 }: {}}
-                  transition={{ delay: index * 0.1, ease: 'easeInOut' }}
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                  tabIndex={0}
-                  aria-label={`Learn more about ${tech.title}`}
+        <Grid 
+          container 
+          spacing={isMobile ? 2 : 4} 
+          justifyContent="center"
+          sx={{ width: '100%', maxWidth: '1600px', margin: '0 auto' }} // Prevents unnecessary constraints
+        >
+          {techIcons.map((tech, index) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={tech.id} sx={{ display: 'flex' }}>
+              <TechCard
+                color={tech.color}
+                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
+                transition={{ delay: index * 0.08, type: 'spring', stiffness: 80, damping: 12 }}
+                whileHover="hover"
+                whileTap={{ scale: 0.98 }}
+              >
+                <motion.div
+                  variants={floatingVariants}
+                  initial="rest"
+                  animate="rest"
+                  whileHover="hover"
+                  style={{
+                    marginBottom: theme.spacing(2),
+                    display: 'flex',
+                    justifyContent: 'center',
+                    filter: `drop-shadow(0 0 12px ${tech.color}80)`
+                  }}
                 >
-                  <motion.div
-                    animate={{
-                      y: hoveredIndex === index? [-2, 2, -2]: 0,
-                      scale: hoveredIndex === index? 1.1: 1,
-                      rotate: hoveredIndex === index? [0, 5, -5, 0]: 0,
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
-                    style={{
-                      marginBottom: '12px',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                  >
-                    {tech.icon}
-                  </motion.div>
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontWeight: 800,
-                      fontSize: '0.9rem', // Reduced font size
-                    }}
-                  >
-                    {tech.title}
-                  </Typography>
-                </TechCard>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-    </ProjectCardBackground>
+                  {React.cloneElement(tech.icon, { size: 40, strokeWidth: 1.2 })}
+                </motion.div>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 800,
+                    fontSize: '1.1rem',
+                    background: `linear-gradient(45deg, ${tech.color}, ${tech.color}CC)`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    letterSpacing: '-0.015em'
+                  }}
+                >
+                  {tech.title}
+                </Typography>
+              </TechCard>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </Box>
   );
 };

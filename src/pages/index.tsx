@@ -19,10 +19,14 @@ export default function HomePage() {
         />
       </Head>
 
+      <Box sx={{ mt: 10 }}>
       <HeroSection />
+    </Box>
+
       
       <PageLayout>
-  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 30, mt: 15 }}>
+
     <TechnologyShowcase />
     <WhyPartner />
     <ServicesGrid />
