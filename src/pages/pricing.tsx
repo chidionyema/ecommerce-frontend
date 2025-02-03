@@ -22,6 +22,12 @@ import {
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import { sharedCardBackground } from '../utils/sharedStyles';
 
+import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
+import { WhyPartner } from '../components/Common/WhyPartner';
+import { ServicesGrid } from '../components/Common/ServicesGrid'; // Use named import
+import { TestimonialsSection } from '../components/Common/TestimonialsSection'; // Use named import
+
+
 const PremiumCard = styled(motion.div)(({ theme }) => ({
   borderRadius: 24,
   overflow: 'hidden',
@@ -211,6 +217,9 @@ const PricingPage: React.FC = () => {
       subtitle="Choose the plan that best fits your growth strategy."
     >
       <PricingGrid />
+      <WhyPartner />
+    <ServicesGrid />
+    <TestimonialsSection />
     </ConsistentPageLayout>
   );
 };

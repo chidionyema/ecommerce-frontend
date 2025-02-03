@@ -8,6 +8,11 @@ import { Cloud, VpnKey, Code, Download, AccessTime, ErrorOutline, ArrowRight } f
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import { sharedCardBackground } from '../utils/sharedStyles';
 
+import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
+import { WhyPartner } from '../components/Common/WhyPartner';
+import { ServicesGrid } from '../components/Common/ServicesGrid'; // Use named import
+import { TestimonialsSection } from '../components/Common/TestimonialsSection'; // Use named import
+
 const resources = [
   {
     id: 1,
@@ -129,6 +134,9 @@ const ResourcesPage: React.FC = () => {
           </Grid>
         ))}
       </Grid>
+      <WhyPartner />
+    <ServicesGrid />
+    <TestimonialsSection />
     </ConsistentPageLayout>
   );
 };

@@ -1,22 +1,19 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   useTheme,
   TextField,
   Button,
-  alpha,
-  CircularProgress,
-  InputAdornment,
   Box,
-  Alert,
-  IconButton,
-  Collapse,
   Stack,
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Send, AccountCircle, Email, Phone, Close } from '@mui/icons-material';
+import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
+import { WhyPartner } from '../components/Common/WhyPartner';
+import { ServicesGrid } from '../components/Common/ServicesGrid'; // Use named import
+import { TestimonialsSection } from '../components/Common/TestimonialsSection'; // Use named import
 import { z } from 'zod';
 import emailjs from '@emailjs/browser';
 import SEO from '../components/SEO';
@@ -140,6 +137,11 @@ const Contact = () => {
             {loading ? <CircularProgress size={24} /> : 'Send Message'}
           </Button>
         </Box>
+
+    <TechnologyShowcase />
+    <WhyPartner />
+    <ServicesGrid />
+    <TestimonialsSection />
       </ConsistentPageLayout>
     </>
   );
