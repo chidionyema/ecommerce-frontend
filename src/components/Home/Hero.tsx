@@ -9,7 +9,6 @@ import {
   SiKubernetes,
   SiNvidia
 } from 'react-icons/si'; // Real official brand icons from react-icons/si
-import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 
 const TECH_LOGOS = [
   { icon: SiAmazonaws, name: 'AWS' },

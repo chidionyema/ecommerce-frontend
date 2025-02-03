@@ -134,6 +134,7 @@ const ResourcesPage: React.FC = () => {
           </Grid>
         ))}
       </Grid>
+      <TechnologyShowcase />
       <WhyPartner />
     <ServicesGrid />
     <TestimonialsSection />

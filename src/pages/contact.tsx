@@ -7,6 +7,7 @@ import {
   Button,
   Box,
   Stack,
+  CircularProgress,
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -109,6 +110,7 @@ const Contact = () => {
         title="Let's Work Together"
         subtitle="Fill out the form below and we'll get back to you soon."
       >
+        {/* Contact Form */}
         <Box
           component={motion.form}
           onSubmit={handleSubmit}
@@ -122,7 +124,8 @@ const Contact = () => {
             borderRadius: 6,
             background: sharedCardBackground(theme),
             boxShadow: `0px 12px 24px rgba(0, 0, 0, 0.4)`,
-            mt: 6,
+            mt: 6, // Margin-top for spacing from the top
+            mb: 8, // Add margin-bottom to create space below the form
             position: 'relative',
           }}
         >
@@ -138,10 +141,17 @@ const Contact = () => {
           </Button>
         </Box>
 
-    <TechnologyShowcase />
-    <WhyPartner />
-    <ServicesGrid />
-    <TestimonialsSection />
+        {/* Spacing between the form and the next section */}
+        <Box sx={{ mb: 8 }} /> {/* Add a spacer with margin-bottom */}
+
+        {/* Other Sections */}
+        <TechnologyShowcase />
+        <Box sx={{ mb: 8 }} /> {/* Add a spacer with margin-bottom */}
+        <WhyPartner />
+        <Box sx={{ mb: 8 }} /> {/* Add a spacer with margin-bottom */}
+        <ServicesGrid />
+        <Box sx={{ mb: 8 }} /> {/* Add a spacer with margin-bottom */}
+        <TestimonialsSection />
       </ConsistentPageLayout>
     </>
   );

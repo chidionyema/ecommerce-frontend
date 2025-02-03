@@ -7,6 +7,11 @@ import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import ProjectCard from '../components/Solutions/ProjectCard';
 import { cvProjects } from '../data/cvProjects';
 
+import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
+import { WhyPartner } from '../components/Common/WhyPartner';
+import { ServicesGrid } from '../components/Common/ServicesGrid'; // Use named import
+import { TestimonialsSection } from '../components/Common/TestimonialsSection'; // Use named import
+
 const Solutions = () => {
   const theme = useTheme();
 
@@ -90,7 +95,12 @@ const Solutions = () => {
             </NextLink>
           </Box>
         </Container>
+        <TechnologyShowcase />
+    <WhyPartner />
+    <ServicesGrid />
+    <TestimonialsSection />
       </ConsistentPageLayout>
+  
     </>
   );
 };
