@@ -11,7 +11,7 @@ import {
   styled
 } from '@mui/material';
 import { motion, useInView } from 'framer-motion';
-import { TechIcon, techIcons } from './tech-data'; // Importing tech icons
+import { techIcons } from './tech-data'; // Importing tech icons
 
 // Floating hover animation
 const floatingVariants = {
