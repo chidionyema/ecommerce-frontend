@@ -2,10 +2,11 @@
 import Head from 'next/head';
 import PageLayout from '../components/Shared/PageLayout';
 import { HeroSection } from '../components/Home/Hero';
-import { TechnologyShowcase } from '../components/Common/TechnologyShowcase';
+import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
 import { WhyPartner } from '../components/Common/WhyPartner';
 import { ServicesGrid } from '../components/Common/ServicesGrid'; // Use named import
 import { TestimonialsSection } from '../components/Common/TestimonialsSection'; // Use named import
+import { Box } from '@mui/material';
 
 export default function HomePage() {
   return (
@@ -21,11 +22,14 @@ export default function HomePage() {
       <HeroSection />
       
       <PageLayout>
-        <TechnologyShowcase />
-        <WhyPartner />
-        <ServicesGrid />
-        <TestimonialsSection />
-      </PageLayout>
+  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <TechnologyShowcase />
+    <WhyPartner />
+    <ServicesGrid />
+    <TestimonialsSection />
+  </Box>
+</PageLayout>
+
     </>
   );
 }

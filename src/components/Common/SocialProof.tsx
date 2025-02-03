@@ -1,49 +1,56 @@
 'use client';
-import { Typography, useTheme, alpha, Box } from "@mui/material";
-import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
-import { motion } from "framer-motion";
-import { useRecentEngagements } from "../../hooks/useRecentEngagements";
+import { Typography, useTheme, alpha } from '@mui/material';
+import { motion } from 'framer-motion';
+import { useRecentEngagements } from '../../hooks/useRecentEngagements';
+import { ProjectCardBackground } from '../../theme/themes';;
+import { CheckCircle } from 'react-feather'; // Import Feather Icon
 
 export const SocialProof = () => {
   const theme = useTheme();
   const recentEngagement = useRecentEngagements();
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.8, type: 'spring' }}
-      style={{ 
-        marginTop: theme.spacing(6),
-        textAlign: 'center',
-        background: `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.9)}, ${alpha(theme.palette.secondary.dark, 0.95)})`,
-        padding: theme.spacing(3),
-        borderRadius: '12px',
-        boxShadow: `0px 10px 30px ${alpha(theme.palette.primary.light, 0.3)}`,
-        color: 'white',
-      }}
+      transition={{ delay: 0.5, duration: 0.5, ease: 'easeInOut' }}
     >
-      <Typography
-        variant="body1"
-        component="p"
+      <ProjectCardBackground
+        elevation={0}
         sx={{
-          color: alpha(theme.palette.text.primary, 0.9),
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 1.5,
-          fontWeight: 500,
+          mt: 6,
+          textAlign: 'center',
+          py: 3,
+          borderRadius: 12,
         }}
       >
-        <CheckCircleOutline 
-          sx={{ 
-            color: 'success.light',
-            fontSize: '1.5rem',
-          }} 
-          aria-hidden="true"
-        />
-        <span>{recentEngagement}</span>
-      </Typography>
+        <Typography
+          variant="body1"
+          component="p"
+          sx={{
+            color: alpha(theme.palette.text.primary, 0.9),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1.5,
+            fontWeight: 700,
+            fontSize: '1.2rem',
+          }}
+        >
+          <CheckCircle
+            size={28}
+            color={theme.palette.success.light}
+            strokeWidth={2}
+          />
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 0.5 }}
+          >
+            {recentEngagement}
+          </motion.span>
+        </Typography>
+      </ProjectCardBackground>
     </motion.div>
   );
 };

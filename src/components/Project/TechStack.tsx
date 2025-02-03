@@ -1,12 +1,9 @@
-// components/Technology/TechStack.tsx
 'use client';
+
 import { Grid, Chip } from '@mui/material';
 import { motion } from 'framer-motion';
 
-export const TechStack = ({ technologies, icons }: { 
-  technologies: string[], 
-  icons: React.ElementType[] 
-}) => {
+export const TechStack = ({ technologies, icons }: { technologies: string[]; icons: React.ElementType[] }) => {
   return (
     <Grid container spacing={1}>
       {technologies.map((tech, index) => (
@@ -16,17 +13,18 @@ export const TechStack = ({ technologies, icons }: {
   );
 };
 
-const TechChip = ({ tech, Icon }: { tech: string, Icon: React.ElementType }) => {
+const TechChip = ({ tech, Icon }: { tech: string; Icon: React.ElementType }) => {
   return (
     <Grid item xs={6}>
-      <motion.div whileHover={{ scale: 1.03 }}>
+      <motion.div whileHover={{ scale: 1.05 }}>
         <Chip
           label={tech}
           icon={<Icon />}
-          sx={{ 
+          sx={{
             width: '100%',
             bgcolor: 'background.paper',
-            '&:hover': { bgcolor: 'action.hover' }
+            '&:hover': { bgcolor: 'action.hover', boxShadow: 2 },
+            transition: 'all 0.3s ease',
           }}
         />
       </motion.div>

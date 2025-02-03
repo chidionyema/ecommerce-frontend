@@ -1,44 +1,58 @@
-// pricing.tsx
 'use client';
 
-import { useCallback, memo } from 'react';
+import React from 'react';
 import {
-  useTheme,
-  Grid,
-  Button,
-  alpha,
-  styled,
-  Typography,
   Box,
+  Typography,
+  Grid,
+  useTheme,
+  alpha,
+  Card,
+  CardContent,
+  Button,
 } from '@mui/material';
-import { Info, Award, Clock, Users, Calendar, Briefcase } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { motion, LazyMotion, domAnimation } from 'framer-motion';
-import SEO from '../components/SEO';
-import PageLayout from '../components/Shared/PageLayout';
-import PageHeader from '../components/Shared/PageHeader';
+import { useRouter } from 'next/navigation';
+import { styled } from '@mui/material/styles';
+import {
+  Info,
+  Award,
+  Clock,
+  Users,
+  Calendar,
+  Briefcase,
+} from 'lucide-react';
+import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 
-// PremiumCard with softer shape and enhanced shadows
 const PremiumCard = styled(motion.div)(({ theme }) => ({
-  borderRadius: '12px',
+  borderRadius: 24,
   overflow: 'hidden',
-  minHeight: 520,
-  padding: theme.spacing(4),
+  minHeight: 540,
+  maxWidth: 420,
+  padding: theme.spacing(6),
   display: 'flex',
   flexDirection: 'column',
-  background: theme.palette.mode === 'dark'? alpha(theme.palette.primary.dark, 0.2): theme.palette.background.paper,
-  border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
-  boxShadow: theme.palette.mode === 'dark'? `0 2px 8px ${alpha(theme.palette.primary.dark, 0.5)}`: `0 12px 32px ${alpha(theme.palette.grey, 0.2)}`,
+  background: `linear-gradient(145deg, #1F1B24 0%, #3D3A45 100%)`,
+  border: `2px solid ${alpha(theme.palette.secondary.main, 0.8)}`,
+  backdropFilter: 'blur(18px) saturate(180%)',
+  boxShadow: `
+    0 12px 24px ${alpha(theme.palette.primary.dark, 0.6)},
+    inset 0 0 0 1px ${alpha(theme.palette.secondary.main, 0.4)}
+  `,
   position: 'relative',
-  transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+  transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
   '&:hover': {
-    transform: 'translateY(-6px)',
-    boxShadow: theme.palette.mode === 'dark'? `0 4px 12px ${alpha(theme.palette.primary.dark, 0.8)}`: `0 18px 40px ${alpha(theme.palette.primary.main, 0.3)}`,
+    transform: 'translateY(-10px)',
+    boxShadow: `0 24px 48px ${alpha(theme.palette.primary.dark, 0.8)}`,
   },
 }));
 
-// FeatureItem with scaling hover effect
-const FeatureItem = memo(({ icon: Icon, text }: { icon: any; text: string }) => {
+interface FeatureItemProps {
+  icon: React.ElementType;
+  text: string;
+}
+
+const FeatureItem: React.FC<FeatureItemProps> = ({ icon: Icon, text }) => {
   const theme = useTheme();
   return (
     <Box
@@ -47,8 +61,8 @@ const FeatureItem = memo(({ icon: Icon, text }: { icon: any; text: string }) => 
         alignItems: 'center',
         py: 1.5,
         px: 2,
-        backgroundColor: alpha(theme.palette.divider, 0.12),
-        borderRadius: '8px',
+        backgroundColor: alpha(theme.palette.divider, 0.1),
+        borderRadius: '12px',
         transition: 'all 0.3s ease',
         '&:hover': {
           backgroundColor: alpha(theme.palette.divider, 0.2),
@@ -70,7 +84,7 @@ const FeatureItem = memo(({ icon: Icon, text }: { icon: any; text: string }) => 
       </Typography>
     </Box>
   );
-});
+};
 
 const plans = [
   {
@@ -109,25 +123,18 @@ const PricingGrid: React.FC = () => {
   const theme = useTheme();
   const router = useRouter();
 
-  const handlePlanClick = useCallback((type: string) => {
+  const handlePlanClick = (type: string) => {
     router.push(`/contact?plan=${type}`);
-  }, [router]);
+  };
 
   return (
     <LazyMotion features={domAnimation}>
-      <>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <PageHeader
-            title="Unlock Your Business Potential"
-            subtitle="Choose the plan that best fits your growth strategy."
-          />
-        </motion.div>
-
-        <Grid container spacing={6} sx={{ mt: 2 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <Grid container spacing={6} sx={{ mt: 6, px: { xs: 2, md: 6 } }}>
           {plans.map(({ type, title, features, price }, index) => (
             <Grid
               item
@@ -139,9 +146,10 @@ const PricingGrid: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 + index * 0.1 }}
+              sx={{ display: 'flex', justifyContent: 'center' }}
             >
               <PremiumCard>
-                <Typography variant="h5" sx={{ fontWeight: 800, mb: 3 }}>
+                <Typography variant="h4" sx={{ fontWeight: 800, mb: 3 }}>
                   {title}
                 </Typography>
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -150,11 +158,11 @@ const PricingGrid: React.FC = () => {
                   ))}
                 </Box>
                 <Typography
-                  variant="h6"
+                  variant="h4"
                   sx={{
                     fontWeight: 700,
                     mt: 4,
-                    color: theme.palette.primary.main,
+                    color: theme.palette.primary.light,
                     fontSize: '1.4rem',
                   }}
                 >
@@ -168,12 +176,15 @@ const PricingGrid: React.FC = () => {
                     background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                     color: theme.palette.common.white,
                     fontWeight: 700,
-                    borderRadius: '8px',
+                    borderRadius: '12px',
                     px: 4,
                     py: 1.2,
                     '&:hover': {
-                      background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.85)}, ${alpha(theme.palette.secondary.main, 0.85)})`,
-                      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.5)}`,
+                      background: `linear-gradient(135deg, ${alpha(
+                        theme.palette.primary.main,
+                        0.85
+                      )}, ${alpha(theme.palette.secondary.main, 0.85)})`,
+                      boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.5)}`,
                     },
                   }}
                   onClick={() => handlePlanClick(type)}
@@ -184,23 +195,21 @@ const PricingGrid: React.FC = () => {
             </Grid>
           ))}
         </Grid>
-      </>
+      </motion.div>
     </LazyMotion>
   );
 };
 
 const PricingPage: React.FC = () => {
   return (
-    <>
-      <SEO
-        title="Pricing Plans - Premium Solutions"
-        description="Discover our flexible pricing plans tailored to accelerate your success."
-        keywords="pricing plans, consulting rates, enterprise pricing, technology consulting"
-      />
-      <PageLayout>
-        <PricingGrid />
-      </PageLayout>
-    </>
+    <ConsistentPageLayout
+      seoTitle="Pricing Plans - Premium Solutions"
+      seoDescription="Discover our flexible pricing plans tailored to accelerate your success."
+      seoKeywords="pricing plans, consulting rates, enterprise pricing, technology consulting"
+      subtitle="Choose the plan that best fits your growth strategy."
+    >
+      <PricingGrid />
+    </ConsistentPageLayout>
   );
 };
 

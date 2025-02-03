@@ -14,14 +14,13 @@ import {
   Collapse,
   Stack,
 } from '@mui/material';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Send, AccountCircle, Email, Phone, Description, Close, CheckCircle } from '@mui/icons-material';
+import { Send, AccountCircle, Email, Phone, Close } from '@mui/icons-material';
 import { z } from 'zod';
 import emailjs from '@emailjs/browser';
 import SEO from '../components/SEO';
-import PageLayout from '../components/Shared/PageLayout';
-import PageHeader from '../components/Shared/PageHeader';
+import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 
 const EMAILJS_CONFIG = {
   SERVICE_ID: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
@@ -113,9 +112,13 @@ const Contact = () => {
         description="Reach out to our team for inquiries, support, or partnership opportunities."
         keywords="contact, support, inquiry, partnership"
       />
-      <PageLayout>
-        <PageHeader title={selectedPlan ? `Get Started with ${selectedPlan}` : "Let's Work Together"} />
-
+      <ConsistentPageLayout
+        seoTitle="Contact Us - Get in Touch"
+        seoDescription="Reach out to our team for inquiries, support, or partnership opportunities."
+        seoKeywords="contact, support, inquiry, partnership"
+        title={selectedPlan ? `Get Started with ${selectedPlan}` : "Let's Work Together"}
+        subtitle="We'd love to hear from you. Fill out the form below and we'll get back to you soon."
+      >
         <Box
           component={motion.form}
           onSubmit={handleSubmit}
@@ -240,11 +243,19 @@ const Contact = () => {
             )}
           </Stack>
 
-          <Button type="submit" fullWidth size="large" variant="contained" disabled={loading} startIcon={loading ? <CircularProgress size={24} /> : <Send />} sx={{ mt: 4, borderRadius: '50px' }}>
+          <Button
+            type="submit"
+            fullWidth
+            size="large"
+            variant="contained"
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={24} /> : <Send />}
+            sx={{ mt: 4, borderRadius: '50px' }}
+          >
             {loading ? 'Sending...' : 'Send Message'}
           </Button>
         </Box>
-      </PageLayout>
+      </ConsistentPageLayout>
     </>
   );
 };

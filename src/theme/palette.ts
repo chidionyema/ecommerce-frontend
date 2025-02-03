@@ -137,6 +137,13 @@ export const fontLoader = [
   },
 ];
 
+// In your palette.ts
+export const GRADIENTS = {
+  tech: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
+  cyber: 'linear-gradient(135deg, #ff00ff 0%, #00ffff 100%)',
+  quantum: 'linear-gradient(135deg, #8A2BE2 0%, #00BFFF 100%)' // Add this
+};
+
 // --- Theme Variables ---
 export const THEME_VARS = {
   borderRadius: "12px",
@@ -151,12 +158,6 @@ export const THEME_VARS = {
   backdropBlur: "blur(24px)",
 };
 
-// --- Gradients ---
-export const GRADIENTS = {
-  tech: `linear-gradient(135deg, ${PALETTE.dark.primary} 0%, ${PALETTE.dark.primaryLight} 100%)`,
-  cyber: `linear-gradient(135deg, ${PALETTE.dark.secondary} 0%, ${PALETTE.dark.primaryLight} 100%)`,
-  error: `linear-gradient(135deg, ${PALETTE.dark.error} 0%, ${PALETTE.dark.secondary} 100%)`,
-};
 
 // --- Animations (Consider moving to animations.ts) ---
 export const ANIMATIONS = {

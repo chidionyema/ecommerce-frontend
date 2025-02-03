@@ -20,13 +20,19 @@ import {
   useMotionValue,
   useTransform,
   MotionValue,
+  useSpring,
 } from 'framer-motion';
 import NextLink from 'next/link';
 import { ArrowRightAlt } from '@mui/icons-material';
 import Image from 'next/image';
+import { LucideIcon } from 'lucide-react';
+
+// ---------------------------
+// Define your technology icon map
+// ---------------------------
 import {
   Cloud,
-  Code as Code2, // Import Code as Code2
+  Code as Code2,
   Cpu,
   Database,
   GitBranch,
@@ -36,26 +42,6 @@ import {
   Box as BoxIcon,
 } from 'lucide-react';
 
-// Define a type for Lucide icons (since lucide-react doesn't export one)
-type LucideIcon = React.ComponentType<React.SVGProps<SVGSVGElement>>;
-
-// Project interface
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  technologies: string[];
-  clientName: string;
-  image?: string;
-  metrics: Array<{
-    label: string;
-    value: string;
-  }>;
-  icon?: LucideIcon; // Mark icon as optional
-  iconColor: string;
-}
-
-// Technology icon map with type safety
 const technologyIconMap: Record<string, LucideIcon> = {
   '.NET Core': Code2,
   Java: Terminal,
@@ -72,64 +58,81 @@ const technologyIconMap: Record<string, LucideIcon> = {
   SQL: Database,
 };
 
-// Color mapping with type safety – adjust these as needed for a radical new look
-const colorMap: Record<string, string> = {
-  'text-blue-600': '#2563eb',
-  'text-purple-600': '#9333ea',
-  'text-green-600': '#16a34a',
-  'text-indigo-600': '#4f46e5',
-  'text-sky-500': '#0ea5e9',
-  'text-red-600': '#dc2626',
-  'text-orange-600': '#ea580c',
-  'text-emerald-600': '#059669',
-  'text-teal-500': '#14b8a6',
-  'text-rose-600': '#e11d48',
-  'text-amber-600': '#d97706',
+// ---------------------------
+// Other constants and styled components
+// ---------------------------
+const gradientMap: Record<string, string> = {
+  'text-blue-600': 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+  'text-purple-600': 'linear-gradient(135deg, #9333ea 0%, #a855f7 100%)',
+  'text-green-600': 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+  'text-indigo-600': 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)',
+  'text-sky-500': 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)',
+  'text-red-600': 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+  'text-orange-600': 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)',
+  'text-emerald-600': 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+  'text-teal-500': 'linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%)',
+  'text-rose-600': 'linear-gradient(135deg, #e11d48 0%, #f43f5e 100%)',
+  'text-amber-600': 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
 };
 
-// Animation keyframes for the glint effect
-const glintAnimation = keyframes`
-  0% { transform: translateX(-150%); }
-  100% { transform: translateX(150%); }
+const particleAnimation = keyframes`
+  0% { transform: translateY(0) scale(0); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-100px) scale(1); opacity: 0; }
 `;
 
-// Styled component for the glint effect
-const GlintEffect = styled('div')(({ theme }) => ({
+const HolographicGlow = styled('div')(({ theme }) => ({
   position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  zIndex: 1,
-  backgroundImage:
-    'linear-gradient(to right, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
-  animation: `${glintAnimation} 2.5s linear infinite`,
-  pointerEvents: 'none',
-  borderRadius: 16,
+  inset: 0,
+  background: `linear-gradient(45deg,
+    ${alpha(theme.palette.primary.main, 0.4)} 0%,
+    ${alpha(theme.palette.secondary.main, 0.2)} 50%,
+    ${alpha(theme.palette.primary.main, 0.4)} 100%)`,
+  filter: 'blur(60px)',
+  opacity: 0,
+  transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  zIndex: -1,
 }));
 
-// A simple hover overlay (optional)
-const HoverEffectLayer = styled('div')(({ theme }) => ({
+const ParticleSystem = styled('div')(({ theme }) => ({
   position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  background: `linear-gradient(45deg, ${alpha(
-    theme.palette.primary.main,
-    0.3
-  )} 0%, ${alpha(theme.palette.secondary.main, 0.1)} 100%)`,
+  inset: 0,
+  overflow: 'hidden',
+  borderRadius: 16,
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    background: `radial-gradient(800px circle at var(--x) var(--y),
+      ${alpha(theme.palette.primary.main, 0.15)},
+      transparent 40%)`,
+  },
+}));
+
+const BorderGradient = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  inset: 0,
+  borderRadius: 16,
+  padding: '2px',
+  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+  mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+  WebkitMaskComposite: 'xor',
+  maskComposite: 'exclude',
+  background: `linear-gradient(45deg,
+    ${alpha(theme.palette.primary.main, 0.8)},
+    ${alpha(theme.palette.secondary.main, 0.4)})`,
   opacity: 0,
   transition: 'opacity 0.3s ease',
 }));
 
-// Tilt hook with proper typing
 const useTilt = (active: boolean) => {
   const x = useMotionValue(0.5);
   const y = useMotionValue(0.5);
-
-  const rotateX = useTransform(y, [0, 1], [-8, 8]);
-  const rotateY = useTransform(x, [0, 1], [-8, 8]);
+  
+  const springConfig = { stiffness: 300, damping: 20 };
+  const rotateX = useSpring(useTransform(y, [0, 1], [-12, 12]), springConfig);
+  const rotateY = useSpring(useTransform(x, [0, 1], [-12, 12]), springConfig);
+  const scale = useSpring(active ? 1.03 : 1, springConfig);
 
   const handleMove = (e: React.PointerEvent) => {
     const bounds = e.currentTarget.getBoundingClientRect();
@@ -139,41 +142,69 @@ const useTilt = (active: boolean) => {
 
   return {
     style: {
-      rotateX: active ? rotateX : 0,
-      rotateY: active ? rotateY : 0,
+      rotateX,
+      rotateY,
+      scale,
+      transformPerspective: 1200,
     },
     onPointerMove: active ? handleMove : undefined,
-  } as {
-    style: {
-      rotateX: MotionValue<number>;
-      rotateY: MotionValue<number>;
-    };
-    onPointerMove?: React.PointerEventHandler;
   };
 };
 
+const titleVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+};
+
+// ---------------------------
+// Project Interface
+// ---------------------------
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  technologies: string[];
+  clientName: string;
+  image?: string;
+  metrics: Array<{
+    label: string;
+    value: string;
+  }>;
+  icon?: LucideIcon; // Company icon (if provided)
+  iconColor: string;
+}
+
+// ---------------------------
+// ProjectCard Component
+// ---------------------------
 const ProjectCard = ({ project }: { project: Project }) => {
   const theme = useTheme();
   const [hovered, setHovered] = useState(false);
   const tilt = useTilt(hovered);
   const cardRef = useRef<HTMLDivElement>(null);
-  // Use the iconColor from your mapping or fallback to theme.primary
-  const iconColor = colorMap[project.iconColor] || theme.palette.primary.main;
+  const gradient = gradientMap[project.iconColor] || gradientMap['text-blue-600'];
 
-  // Fallback for project.icon if missing
-  const IconComponent = project.icon ? project.icon : Code2;
-
-  // Enable keyboard navigation: trigger click on Enter
+  // Particle effect on hover
   useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (document.activeElement === cardRef.current && e.key === 'Enter') {
-        cardRef.current?.click();
-      }
-    };
-
-    cardRef.current?.addEventListener('keypress', handleKeyPress);
-    return () => cardRef.current?.removeEventListener('keypress', handleKeyPress);
-  }, []);
+    if (!hovered || !cardRef.current) return;
+    const particles = 12;
+    const container = cardRef.current;
+    for (let i = 0; i < particles; i++) {
+      const particle = document.createElement('div');
+      particle.style.cssText = `
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: ${alpha(theme.palette.primary.main, 0.8)};
+        border-radius: 50%;
+        animation: ${particleAnimation} 1.2s ease-out;
+        left: ${Math.random() * 100}%;
+        top: ${Math.random() * 100}%;
+      `;
+      container.appendChild(particle);
+      setTimeout(() => particle.remove(), 1200);
+    }
+  }, [hovered, theme]);
 
   return (
     <motion.div
@@ -183,24 +214,19 @@ const ProjectCard = ({ project }: { project: Project }) => {
       whileHover="hover"
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
-      style={{
-        perspective: 1200,
-        position: 'relative',
-        overflow: 'visible',
-        margin: '16px', // Adjusted margin
-      }}
+      style={{ perspective: 1200, position: 'relative' }}
       tabIndex={0}
       role="article"
-      aria-label={`Project card: ${project.name}`}
+      aria-label={`Project: ${project.name}`}
     >
-      <AnimatePresence>{hovered && <GlintEffect key="glint" />}</AnimatePresence>
+      <ParticleSystem style={{ opacity: hovered ? 1 : 0 }} />
 
       <motion.div
         {...tilt}
         style={{
           ...tilt.style,
-          position: 'relative',
           transformStyle: 'preserve-3d',
+          willChange: 'transform',
         }}
       >
         <Card
@@ -208,59 +234,61 @@ const ProjectCard = ({ project }: { project: Project }) => {
             position: 'relative',
             overflow: 'visible',
             bgcolor: 'background.paper',
-            border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+            border: 'none',
             borderRadius: 16,
-            boxShadow: '0px 16px 48px rgba(0, 0, 0, 0.2)',
-            transition: 'all 0.3s cubic-bezier(0.19, 1, 0.22, 1)',
-            height: 420,
-            display: 'flex',
-            flexDirection: 'column',
-            // NEW: Use theme.palette.background.default for a neutral base,
-            // then overlay a very subtle radial gradient.
+            boxShadow: `0 24px 48px ${alpha(theme.palette.primary.main, 0.1)}`,
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            height: 440,
             background: `
-              linear-gradient(145deg, ${alpha(theme.palette.background.default, 1)} 0%, ${alpha(
-              theme.palette.background.default,
-              1
-            )} 100%),
-              radial-gradient(circle at 70% 20%, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 60%)
+              linear-gradient(145deg, #1F1B24 0%, #3D3A45 100%),
+              radial-gradient(circle at 70% 20%, rgba(212,175,55,0.15) 0%, transparent 70%)
             `,
             '&:hover': {
-              transform: 'translateY(-8px)',
-              boxShadow: `0 32px 64px ${alpha(theme.palette.primary.main, 0.25)}`,
+              boxShadow: `0 32px 64px ${alpha(theme.palette.primary.main, 0.3)}`,
             },
-            '&:active': {
-              transform: 'translateY(-4px) scale(0.98)',
+            '&:before': {
+              content: '""',
+              position: 'absolute',
+              inset: 0,
+              borderRadius: 16,
+              background: `
+                linear-gradient(45deg,
+                  ${alpha(theme.palette.primary.main, 0.1)},
+                  ${alpha(theme.palette.secondary.main, 0.05)})
+              `,
             },
           }}
         >
-          <HoverEffectLayer sx={{ '&:hover': { opacity: 0.2 } }} />
+          <HolographicGlow sx={{ opacity: hovered ? 0.6 : 0 }} />
+          <BorderGradient sx={{ opacity: hovered ? 1 : 0 }} />
+
           <CardActionArea
             component={NextLink}
             href={`/projects/${project.id}`}
             sx={{
               p: 4,
+              height: '100%',
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
-              minHeight: 420,
+              justifyContent: 'space-between',
             }}
           >
+            {/* Image section with parallax effect */}
             {project.image && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
+                style={{
+                  scale: hovered ? 1.05 : 1,
+                  transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
               >
                 <Box
                   sx={{
-                    width: 220,
-                    height: 160,
                     position: 'relative',
-                    mx: 'auto',
-                    mb: 2,
+                    width: '100%',
+                    height: 160,
                     borderRadius: 2,
                     overflow: 'hidden',
-                    bgcolor: alpha(theme.palette.divider, 0.1),
+                    transform: 'translateZ(60px)',
                   }}
                 >
                   <Image
@@ -268,172 +296,141 @@ const ProjectCard = ({ project }: { project: Project }) => {
                     alt={project.name}
                     fill
                     style={{ objectFit: 'cover' }}
-                    loading="lazy"
-                    placeholder="blur"
-                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
+                    priority
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: `linear-gradient(180deg, ${alpha(
+                        '#000',
+                        0.2
+                      )} 0%, transparent 100%)`,
+                    }}
                   />
                 </Box>
               </motion.div>
             )}
 
-            <CardContent
-              sx={{
-                textAlign: 'center',
-                px: 0,
-                width: '100%',
-                flexGrow: 1,
-              }}
-            >
+            <CardContent sx={{ px: 0, flexGrow: 1 }}>
+              {/* Title with gradient text and defined variants (using a larger variant for readability) */}
               <Typography
-                variant="h5"
+                variant="h4"
                 component={motion.div}
-                animate={hovered ? { y: -5 } : { y: 0 }}
+                variants={titleVariants}
+                initial="initial"
+                animate="animate"
                 sx={{
-                  fontWeight: 800,
-                  background: `linear-gradient(45deg, ${theme.palette.text.primary} 30%, ${alpha(
-                    theme.palette.text.primary,
-                    0.7
-                  )} 90%)`,
+                  fontWeight: 900,
+                  background: gradient,
+                  backgroundSize: '100% 100%',
+                  backgroundClip: 'text',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                  mb: 1,
+                  mb: 1.5,
                   textAlign: 'center',
+                  transition: 'background-size 0.6s ease',
                 }}
               >
                 {project.name}
               </Typography>
 
+              {/* Company Info: Icon & Name with larger text for readability */}
+              {project.clientName && (
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                  {project.icon && (
+                    <Box sx={{ mr: 1 }}>
+                      <project.icon size={24} color={theme.palette.primary.main} />
+                    </Box>
+                  )}
+                  <Typography variant="subtitle1" sx={{ fontWeight: 500, color: theme.palette.text.secondary }}>
+                    {project.clientName}
+                  </Typography>
+                </Box>
+              )}
+
+              {/* Description with animated underline and larger font */}
               <Typography
-                variant="body2"
+                variant="body1"
                 color="text.secondary"
                 sx={{
-                  fontSize: '0.9rem',
-                  minHeight: 60,
-                  mb: 2,
-                  px: 2,
+                  position: 'relative',
+                  pb: 1.5,
                   textAlign: 'center',
+                  '&:after': {
+                    content: '""',
+                    position: 'absolute',
+                    bottom: 0,
+                    left: '50%',
+                    width: hovered ? '100%' : '0%',
+                    height: 1,
+                    bgcolor: alpha(theme.palette.primary.main, 0.3),
+                    transform: 'translateX(-50%)',
+                    transition: 'width 0.4s ease',
+                  },
                 }}
               >
                 {project.description}
               </Typography>
 
-              <Box sx={{ mb: 4, overflow: 'hidden' }}>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                  Main Technologies
-                </Typography>
+              {/* Technology chips with staggered animation */}
+              <Box sx={{ my: 3 }}>
                 <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: 3,
-                    mb: 3,
+                  component={motion.div}
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
                   }}
-                >
-                  {project.technologies.map((tech, index) => {
-                    const TechIcon =
-                      technologyIconMap[tech as keyof typeof technologyIconMap];
-                    if (index < 3 && TechIcon) {
-                      return (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.1 }}
-                        >
-                          <TechIcon size={24} color={iconColor} />
-                        </motion.div>
-                      );
-                    }
-                    return null;
-                  })}
-                </Box>
-
-                <Box
                   sx={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: 2,
+                    gap: 1.5,
                     justifyContent: 'center',
-                    overflow: 'hidden',
                   }}
                 >
-                  {project.technologies.map((tech, index) => {
-                    const TechIcon =
-                      technologyIconMap[tech as keyof typeof technologyIconMap];
-                    if (index < 3 && TechIcon) {
-                      return (
-                        <motion.div
-                          key={tech}
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.05 }}
-                        >
-                          <Chip
-                            icon={<TechIcon size={16} />}
-                            label={tech}
-                            size="small"
-                            sx={{
-                              borderRadius: 2,
-                              bgcolor: alpha(iconColor, 0.1),
-                              '&:hover': { bgcolor: alpha(iconColor, 0.2) },
-                            }}
-                          />
-                        </motion.div>
-                      );
-                    }
-                    return null;
+                  {project.technologies.map((tech) => {
+                    const TechIcon = technologyIconMap[tech as keyof typeof technologyIconMap];
+                    return (
+                      <motion.div
+                        key={tech}
+                        variants={{
+                          hidden: { opacity: 0, y: 10 },
+                          visible: { opacity: 1, y: 0 },
+                        }}
+                      >
+                        <Chip
+                          icon={TechIcon ? <TechIcon size={18} color={theme.palette.primary.main} /> : undefined}
+                          label={tech}
+                          size="small"
+                          sx={{
+                            fontSize: '0.875rem',
+                            borderRadius: 2,
+                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                            '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) },
+                            transition: 'all 0.2s ease',
+                          }}
+                        />
+                      </motion.div>
+                    );
                   })}
                 </Box>
-              </Box>
-
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gap: 2,
-                  mb: 3,
-                }}
-              >
-                {project.metrics.map((metric, index) => (
-                  <motion.div
-                    key={index}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    style={{ originX: 0.5, originY: 0.5 }}
-                  >
-                    <Box
-                      sx={{
-                        p: 1.5,
-                        borderRadius: 2,
-                        bgcolor: alpha(theme.palette.primary.main, 0.03),
-                        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                        textAlign: 'center',
-                      }}
-                    >
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                        {metric.value}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {metric.label}
-                      </Typography>
-                    </Box>
-                  </motion.div>
-                ))}
               </Box>
             </CardContent>
           </CardActionArea>
 
-          {/* Progressive CTA overlay that appears on hover */}
+          {/* Floating CTA button */}
           <AnimatePresence>
             {hovered && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.3 }}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 20, opacity: 0 }}
                 style={{
                   position: 'absolute',
-                  bottom: 16,
+                  bottom: 24,
                   left: '50%',
                   transform: 'translateX(-50%)',
                   zIndex: 2,
@@ -442,19 +439,23 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 <Button
                   component={NextLink}
                   href={`/projects/${project.id}`}
-                  endIcon={<ArrowRightAlt />}
+                  endIcon={<ArrowRightAlt sx={{ transition: 'transform 0.3s ease' }} />}
                   sx={{
-                    bgcolor: alpha(iconColor, 0.9),
-                    color: theme.palette.getContrastText(iconColor),
+                    background: gradient,
+                    color: theme.palette.common.white,
                     borderRadius: 30,
                     px: 3,
                     py: 1,
-                    textTransform: 'none',
                     fontWeight: 700,
-                    '&:hover': { bgcolor: alpha(iconColor, 1) },
+                    boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.3)}`,
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      '& svg': { transform: 'translateX(4px)' },
+                    },
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                 >
-                  Explore Project
+                  Explore Innovation
                 </Button>
               </motion.div>
             )}

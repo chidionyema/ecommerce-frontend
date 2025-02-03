@@ -2,16 +2,17 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Container, Box, styled } from '@mui/material';
+import { Container, Box, styled, SxProps, Theme } from '@mui/material';
 
 interface PageLayoutProps {
   children: ReactNode;
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  sx?: SxProps<Theme>;
 }
 
-const PageLayout = ({ children, maxWidth = 'lg' }: PageLayoutProps) => {
+const PageLayout = ({ children, maxWidth = 'lg', sx }: PageLayoutProps) => {
   return (
-    <Container maxWidth={maxWidth}>
+    <Container maxWidth={maxWidth} sx={sx}>
       <ContentWrapper>{children}</ContentWrapper>
     </Container>
   );

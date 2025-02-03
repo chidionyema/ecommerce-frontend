@@ -62,3 +62,5 @@ button:not(.MuiButton-root) {
 .react-switch-transition {
   transition: background-color 300ms ease, color 300ms ease;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');

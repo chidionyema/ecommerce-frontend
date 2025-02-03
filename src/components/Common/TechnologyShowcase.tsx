@@ -1,21 +1,28 @@
 'use client';
 import React from 'react';
-import { Box, Container, Typography, useTheme, alpha } from '@mui/material';
+import {
+  Box,
+  Container,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import { motion } from 'framer-motion';
+import { styled } from '@mui/system';
+
+const TechnologyShowcaseBox = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(6, 0),
+  textAlign: 'center',
+}));
 
 export const TechnologyShowcase = () => {
   const theme = useTheme();
 
   return (
-    <Box sx={{
-      background: `linear-gradient(135deg, ${alpha(theme.palette.background.default, 0.25)}, ${alpha(theme.palette.primary.light, 0.1)})`,
-      py: { xs: 6, md: 12 },
-      textAlign: 'center',
-    }}>
+    <TechnologyShowcaseBox>
       <Container maxWidth="lg">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
-          animate={{ opacity: 1, y: 0 }} 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           <Typography variant="h3" sx={{ fontWeight: 900, mb: 4 }}>
@@ -26,6 +33,6 @@ export const TechnologyShowcase = () => {
           </Typography>
         </motion.div>
       </Container>
-    </Box>
+    </TechnologyShowcaseBox>
   );
 };
