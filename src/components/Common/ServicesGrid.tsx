@@ -65,12 +65,15 @@ export const ServicesGrid = () => {
           <Grid item xs={12} md={6} key={index}>
             <motion.div
               whileHover={{ y: -8, scale: 1.05 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ 
+                duration: 0.2, 
+                ease: 'easeInOut', 
+                delay: index * 0.1 
+              }}
             >
-              <ProjectCardBackground elevation={0}>
+              <ProjectCardBackground>
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                     {service.icon}
