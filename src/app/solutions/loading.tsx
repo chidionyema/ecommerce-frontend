@@ -1,5 +1,6 @@
 // app/solutions/loading.tsx
-import { Skeleton } from '@mui/material';
+import PageLayout from '@/src/components/Shared/PageLayout';
+import { Grid, Skeleton } from '@mui/material';
 
 export default function Loading() {
   return (
