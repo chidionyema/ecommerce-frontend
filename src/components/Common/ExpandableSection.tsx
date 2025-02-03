@@ -8,7 +8,6 @@ import {
   Typography,
   TypographyProps,
 } from '@mui/material';
-import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { styled } from '@mui/system';
 import { ProjectCardBackground } from '../../theme/themes';;
@@ -35,7 +34,7 @@ export const ExpandableSection = ({
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   return (
-    <ProjectCardBackground elevation={0} sx={{ mb: 4 }}>
+    <ProjectCardBackground sx={{ mb: 4 }}>
       <Box
         component={motion.div}
         onClick={() => setExpanded(!expanded)}

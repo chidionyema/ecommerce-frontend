@@ -16,7 +16,6 @@ export const SocialProof = () => {
       transition={{ delay: 0.5, duration: 0.5, ease: 'easeInOut' }}
     >
       <ProjectCardBackground
-        elevation={0}
         sx={{
           mt: 6,
           textAlign: 'center',

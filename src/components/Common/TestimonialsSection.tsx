@@ -88,11 +88,11 @@ const TestimonialCard = styled(Box)(({ theme }) => ({
   )})`,
   borderRadius: '12px',
   padding: '24px',
-  boxShadow: theme.shadows[3],
+  boxShadow: theme.shadows && Array.isArray(theme.shadows) ? theme.shadows[3] : 'none',
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
   '&:hover': {
-    transform: 'translateY(-5px)',
-    boxShadow: theme.shadows[6],
+    transform: 'translateY(-5px)', 
+    boxShadow: theme.shadows && Array.isArray(theme.shadows) ? theme.shadows[6] : 'none',
   },
 }));
 
