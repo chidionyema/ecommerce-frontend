@@ -1,11 +1,12 @@
 'use client';
 
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography, useTheme, SxProps, Theme } from '@mui/material';
 import { motion } from 'framer-motion';
 
 interface PageHeaderProps {
   title: string;
   subtitle?: string;
+  sx?: SxProps<Theme>;
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle }) => {

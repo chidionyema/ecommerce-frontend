@@ -67,7 +67,7 @@ const Solutions = () => {
             ))}
           </Grid>
 
-          <Box textAlign="center" mt={10}>
+          <Box textAlign="center" mt={10} mb={30} >
             <NextLink href="/contact" passHref legacyBehavior>
               <Button
                 component="a"

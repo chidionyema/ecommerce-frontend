@@ -121,7 +121,7 @@ const ResourcesPage: React.FC = () => {
                           borderRadius: 2,
                           bgcolor: theme.palette.primary.main,
                           color: theme.palette.common.white,
-                          fontWeight: 600,
+                          fontWeight: 600
                         }}
                       >
                         Explore Guide <ArrowRight sx={{ fontSize: 18, ml: 1 }} />
@@ -134,8 +134,12 @@ const ResourcesPage: React.FC = () => {
           </Grid>
         ))}
       </Grid>
+      <Box sx={{ mt: 30 }} >
       <TechnologyShowcase />
+      </Box>
+      <Box/>
       <WhyPartner />
+    <Box />
     <ServicesGrid />
     <TestimonialsSection />
     </ConsistentPageLayout>

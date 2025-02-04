@@ -216,10 +216,25 @@ const PricingPage: React.FC = () => {
       seoKeywords="pricing plans, consulting rates, enterprise pricing, technology consulting"
       subtitle="Choose the plan that best fits your growth strategy."
     >
-      <PricingGrid />
-      <WhyPartner />
-    <ServicesGrid />
-    <TestimonialsSection />
+      {/* PricingGrid with margin-bottom */}
+      <Box sx={{ mb: 30 }}> {/* Add margin-bottom to PricingGrid */}
+        <PricingGrid />
+      </Box>
+
+      {/* WhyPartner with margin-bottom */}
+      <Box> {/* Add margin-bottom to WhyPartner */}
+        <WhyPartner />
+      </Box>
+
+      {/* ServicesGrid with margin-bottom */}
+      <Box> {/* Add margin-bottom to ServicesGrid */}
+        <ServicesGrid />
+      </Box>
+
+      {/* TestimonialsSection with margin-bottom */}
+      <Box> {/* Add margin-bottom to TestimonialsSection */}
+        <TestimonialsSection />
+      </Box>
     </ConsistentPageLayout>
   );
 };

@@ -143,15 +143,15 @@ const Contact = () => {
         </Box>
 
         {/* Spacing between the form and the next section */}
-        <Box sx={{ mb: 10 }} /> {/* Increased margin-bottom */}
+        <Box sx={{ mb: 30 , mt: 30 }} /> 
 
         {/* Other Sections */}
         <TechnologyShowcase />
-        <Box sx={{ mb: 10 }} /> {/* Increased margin-bottom */}
+        <Box /> {/* Increased margin-bottom */}
         <WhyPartner />
-        <Box sx={{ mb: 10 }} /> {/* Increased margin-bottom */}
+        <Box /> {/* Increased margin-bottom */}
         <ServicesGrid />
-        <Box sx={{ mb: 10 }} /> {/* Increased margin-bottom */}
+        <Box /> {/* Increased margin-bottom */}
         <TestimonialsSection />
       </ConsistentPageLayout>
     </>

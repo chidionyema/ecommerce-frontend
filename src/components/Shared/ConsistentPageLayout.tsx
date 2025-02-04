@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Container, styled, alpha, Button } from '@mui/material';
+import { Container, styled, alpha, Button, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
 import PageHeader from './PageHeader';
 import SEO from '../SEO';
@@ -11,12 +11,12 @@ import { Send } from 'react-feather';
 const GradientBackground = styled('div')(({ theme }) => ({
   background: `
     linear-gradient(145deg, ${alpha(theme.palette.primary.dark, 0.95)} 0%, ${alpha(
-      theme.palette.secondary.dark,
-      0.85
-    )} 100%)
+    theme.palette.secondary.dark,
+    0.85
+  )} 100%)
   `,
-  minHeight: '100vh',
-  padding: theme.spacing(8, 0),
+  minHeight: '50vh', // Reduced height of the gradient background
+  padding: theme.spacing(4, 0), // Reduced padding
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -25,8 +25,8 @@ const GradientBackground = styled('div')(({ theme }) => ({
 const PanelWrapper = styled('div')(({ theme }) => ({
   background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
   borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows,
-  padding: theme.spacing(1),
+  boxShadow: theme.shadows[10],
+  padding: theme.spacing(2), // Reduced padding
   marginBottom: theme.spacing(2),
   textAlign: 'center',
 }));
@@ -78,7 +78,18 @@ const ConsistentPageLayout: React.FC<ConsistentPageLayoutProps> = ({
       <GradientBackground>
         <Container maxWidth="xl">
           <PanelWrapper>
-            <PageHeader title={title} subtitle={subtitle} />
+            {/* Override PageHeader styles to reduce size */}
+            <PageHeader
+              title={title}
+              subtitle={subtitle}
+              sx={{
+                '& .MuiTypography-root': {
+                  fontSize: { xs: '1.25rem', sm: '1.75rem' }, // Further reduced font size
+                  marginBottom: '4px', // Further reduced margin
+                },
+                padding: '8px', // Reduced padding inside PageHeader
+              }}
+            />
             <NextLink href="/contact" passHref legacyBehavior>
               <MotionCTAButton
                 animate={{ scale: [1, 1.1, 1] }}
