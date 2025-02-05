@@ -3,7 +3,7 @@
 import React from 'react';
 import { Grid, Typography, Box, useTheme, Container } from '@mui/material';
 import { motion } from 'framer-motion';
-import { SECTION_HEIGHT, COLORS, FONT_SIZES, SPACING } from '../../utils/sharedStyles';
+import { SECTION_HEIGHT, COLORS, FONT_SIZES, SPACING, CARD_SIZES } from '../../utils/sharedStyles';
 import { NEUTRAL_BACKGROUND } from '../../utils/sharedColors';
 import {
   Briefcase,
@@ -13,7 +13,7 @@ import {
   BarChart2,
   Layers,
 } from 'react-feather';
-// Import your TechCard component – this should match the style used in your TestimonialsSection
+// Import your TechCard component which now has optional props
 import TechCard from '../Common/TechCard';
 
 const services = [
@@ -109,4 +109,3 @@ export const ServicesGrid = () => {
 };
 
 export default ServicesGrid;
- 

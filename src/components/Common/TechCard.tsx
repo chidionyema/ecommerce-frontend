@@ -1,20 +1,19 @@
-// components/Common/TechCard.tsx
 'use client';
 
+import React, { ReactElement, ReactNode, useRef } from 'react';
 import { Typography, useTheme } from '@mui/material';
 import { motion, useInView } from 'framer-motion';
 import { styled } from '@mui/system';
 import { SPACING, FONT_SIZES } from '../../utils/sharedStyles';
-import React, { ReactElement, ReactNode, useRef } from 'react';
 
-interface TechCardProps {
+export interface TechCardProps {
   icon: ReactElement;
   title: string;
   color: string;
-  index?: number;              // mark as optional
-  floatingVariants?: any;
+  index?: number;               // now optional
+  floatingVariants?: any;       // now optional
   textColor?: string;
-  children?: ReactNode; // For additional content
+  children?: ReactNode;         // For additional content
   whileHover?: { scale: number };
 }
 
@@ -45,8 +44,11 @@ const TechCard: React.FC<TechCardProps> = ({
   icon,
   title,
   color,
-  index,
-  floatingVariants,
+  index = 0,                // default value
+  floatingVariants = {      // default variants if not supplied
+    initial: { y: 0 },
+    animate: { y: -10 },
+  },
   textColor,
   children,
   whileHover = { scale: 1.05 },
@@ -78,7 +80,7 @@ const TechCard: React.FC<TechCardProps> = ({
           filter: `drop-shadow(0 0 12px ${color}80)`,
         }}
       >
-        {icon ? React.cloneElement(icon, { size: 40, strokeWidth: 1.2 }) : null}
+        {React.cloneElement(icon, { size: 40, strokeWidth: 1.2 })}
       </motion.div>
 
       {/* Title */}
