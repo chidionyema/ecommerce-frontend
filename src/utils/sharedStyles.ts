@@ -29,19 +29,26 @@ export const FONT_SIZES = {
   };
   
   // utils/sharedStyles.ts
-export const CARD_GRID_CONFIG = {
+  export const CARD_GRID_CONFIG = {
     container: {
-      spacing: 6, // 48px gap between items
+      spacing: { xs: 4, sm: 6, md: 8 }, // Responsive spacing
       sx: {
         justifyContent: 'center',
-        margin: '-24px !important', // Negative margin = spacing/2
-        width: 'calc(100% + 48px)' // Compensate for negative margin
+        alignItems: 'stretch',
+        // Critical fix for spacing collapse:
+        margin: '-16px !important', // Compensates for grid spacing
+        width: 'calc(100% + 32px)' // Prevents horizontal overflow
       }
     },
     item: {
       sx: {
-        padding: '24px !important', // Half of spacing value
-        '&:hover': { zIndex: 2 }
+        padding: '16px !important', // Forces consistent spacing
+        minHeight: '100%',
+        '& > *': {
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column'
+        }
       }
     }
   };
