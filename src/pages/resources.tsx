@@ -1,19 +1,23 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Grid, useTheme, Card, CardContent, Button } from '@mui/material';
+import { 
+  Box, Typography, Grid, useTheme, Card, CardContent, Button 
+} from '@mui/material';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
-import { Cloud, VpnKey, Code, Download, AccessTime, ErrorOutline, ArrowRight } from '@mui/icons-material';
+import { 
+  Cloud, VpnKey, Code, Download, AccessTime, ErrorOutline, ArrowRight 
+} from '@mui/icons-material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
-import { SHARED_CARD_BACKGROUND } from '../utils/sharedStyles';
 import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
 import { WhyChooseUs } from '../components/Common/WhyChooseUs';
 import { ServicesGrid } from '../components/Common/ServicesGrid';
 import { TestimonialsSection } from '../components/Common/TestimonialsSection';
 
-// Import shared colors
-import { NEUTRAL_BACKGROUND, NEUTRAL_TEXT } from '../utils/sharedColors';
+// 🌟 **DEEP RICH GOLD-GREEN GRADIENT**
+const GOLD_GREEN_GRADIENT = `linear-gradient(135deg, #B8860B 0%, #556B2F 100%)`; // **Deep Goldenrod → Dark Olive Green**
+const GOLD_GREEN_HOVER = `linear-gradient(135deg, #A07800 0%, #44582D 100%)`; // **Refined Hover Effect**
 
 const resources = [
   {
@@ -24,7 +28,6 @@ const resources = [
     path: '/resources/cloud',
     downloads: '2.4K+',
     trending: true,
-    tags: ['devops', 'aws', 'azure'],
     time: '18 min read',
   },
   {
@@ -35,7 +38,6 @@ const resources = [
     path: '/resources/security',
     downloads: '1.8K+',
     trending: true,
-    tags: ['security', 'encryption'],
     time: '25 min read',
   },
   {
@@ -46,7 +48,6 @@ const resources = [
     path: '/resources/architecture',
     downloads: '3.1K+',
     trending: false,
-    tags: ['design', 'patterns'],
     time: '30 min read',
   },
 ];
@@ -60,7 +61,7 @@ const ResourcesPage: React.FC = () => {
       seoDescription="Access our comprehensive library of technical resources and implementation guides."
       subtitle="Access our expert technical resources to drive your success."
     >
-      <Grid container justifyContent="center" spacing={4} sx={{ mt: 6, px: { xs: 2, md: 6 } }}>
+      <Grid container justifyContent="center" spacing={6} sx={{ mt: 6, px: { xs: 2, md: 6 } }}>
         {resources.map((resource) => (
           <Grid item xs={12} sm={6} md={4} key={resource.id}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} whileHover={{ scale: 1.03 }}>
@@ -69,25 +70,35 @@ const ResourcesPage: React.FC = () => {
                   width: '100%',
                   height: 450,
                   borderRadius: 4,
-                  background: SHARED_CARD_BACKGROUND(theme),
-                  color: NEUTRAL_TEXT,
-                  boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2)',
+                  background: GOLD_GREEN_GRADIENT,
+                  color: '#FFF',
+                  boxShadow: '0px 10px 30px rgba(184, 134, 11, 0.5)', // Gold-green glow
                   display: 'flex',
                   flexDirection: 'column',
+                  backdropFilter: 'blur(18px) saturate(180%)',
+                  border: `2px solid rgba(184, 134, 11, 0.5)`, // Subtle golden edge
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-6px)',
+                    boxShadow: '0 12px 32px rgba(85, 107, 47, 0.7)', // Gold-green brilliance
+                    background: GOLD_GREEN_HOVER,
+                  },
                 }}
               >
                 <CardContent sx={{ p: 4, flex: 1 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <resource.icon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />
+                    <resource.icon sx={{ fontSize: 40, color: '#FFF' }} />
                     {resource.trending && (
                       <Box
                         sx={{
                           px: 2,
                           py: 0.5,
                           borderRadius: 8,
-                          bgcolor: theme.palette.warning.light,
-                          color: theme.palette.warning.dark,
+                          bgcolor: 'rgba(255, 255, 255, 0.2)',
+                          color: '#FFF',
                           fontSize: '0.75rem',
+                          display: 'flex',
+                          alignItems: 'center',
                         }}
                       >
                         <ErrorOutline sx={{ fontSize: 14, mr: 1 }} />
@@ -98,15 +109,15 @@ const ResourcesPage: React.FC = () => {
                   <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
                     {resource.title}
                   </Typography>
-                  <Typography variant="body1" sx={{ opacity: 0.8, mb: 3 }}>
+                  <Typography variant="body1" sx={{ opacity: 0.9, mb: 3 }}>
                     {resource.summary}
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', color: NEUTRAL_TEXT }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: '#FFF' }}>
                       <Download sx={{ fontSize: 16, mr: 1 }} />
                       {resource.downloads}
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', color: NEUTRAL_TEXT }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: '#FFF' }}>
                       <AccessTime sx={{ fontSize: 16, mr: 1 }} />
                       {resource.time}
                     </Box>
@@ -121,9 +132,13 @@ const ResourcesPage: React.FC = () => {
                           justifyContent: 'center',
                           py: 1.5,
                           borderRadius: 2,
-                          bgcolor: theme.palette.primary.main,
-                          color: NEUTRAL_TEXT,
-                          fontWeight: 600
+                          bgcolor: 'rgba(255, 255, 255, 0.2)',
+                          color: '#FFF',
+                          fontWeight: 600,
+                          transition: 'background 0.3s',
+                          '&:hover': {
+                            bgcolor: 'rgba(255, 255, 255, 0.3)',
+                          },
                         }}
                       >
                         Explore Guide <ArrowRight sx={{ fontSize: 18, ml: 1 }} />
@@ -135,8 +150,12 @@ const ResourcesPage: React.FC = () => {
                     size="small" 
                     sx={{ 
                       mt: 2, 
-                      color: theme.palette.primary.main, 
-                      borderColor: theme.palette.primary.main 
+                      color: '#FFF', 
+                      borderColor: 'rgba(255, 255, 255, 0.5)',
+                      '&:hover': {
+                        borderColor: '#FFF',
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      }
                     }} 
                   >
                     Contact Us
@@ -147,7 +166,9 @@ const ResourcesPage: React.FC = () => {
           </Grid>
         ))}
       </Grid>
-      <Box sx={{ mt: 30 }} >
+
+      {/* Additional Sections */}
+      <Box sx={{ mt: 30 }}>
         <TechnologyShowcase />
       </Box>
       <Box>

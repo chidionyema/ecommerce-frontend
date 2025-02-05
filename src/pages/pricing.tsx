@@ -290,7 +290,6 @@ const PricingPage: React.FC = () => {
         alignItems: 'center', 
         justifyContent: 'center', 
         minHeight: '40vh', 
-        backgroundImage: 'url(/images/hero-background.jpg)', // Replace with your actual hero image
         backgroundSize: 'cover', 
         backgroundPosition: 'center', 
         color: '#fff', 

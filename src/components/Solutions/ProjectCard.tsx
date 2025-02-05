@@ -41,18 +41,21 @@ const subtlePulse = keyframes`
 const FixedStyledCard = styled(Card)(({ theme }) => ({
   position: 'relative',
   overflow: 'hidden',
-  background: `linear-gradient(45deg, ${NEUTRAL_BACKGROUND} 0%, ${alpha(NEUTRAL_BACKGROUND, 0.95)} 100%)`,
+  background: `linear-gradient(45deg, ${NEUTRAL_BACKGROUND} 0%, rgba(255, 255, 255, 0.05) 100%)`, // Matches Pricing Card
   borderRadius: 16,
   boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.5)}`,
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-  width: 350,   // Fixed width
-  height: 400,  // Fixed height as requested
-  margin: 15,   // Optional: a 15px margin around the card (if used in isolation)
+  width: 350,
+  height: 400,
+  margin: '20px', // Increased spacing for more separation
+  backdropFilter: 'blur(18px) saturate(180%)', // Soft glassmorphism
+  border: `2px solid rgba(255, 255, 255, 0.1)`, // Subtle border for refinement
   '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: `0 8px 24px ${alpha(theme.palette.common.black, 0.7)}`,
+    transform: 'translateY(-6px)',
+    boxShadow: `0 10px 28px ${alpha(theme.palette.common.black, 0.7)}`,
   },
 }));
+
 
 // A clean overlay for the card that appears on hover (optional)
 const HoverOverlay = styled(motion.div)({
