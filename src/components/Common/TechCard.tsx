@@ -83,10 +83,10 @@ const TechCard: React.FC<TechCardProps> = ({
 
       {/* Title */}
       <Typography
-        variant="h6"
+        variant="h5"
         sx={{
           fontWeight: 800,
-          fontSize: FONT_SIZES.h6,
+          fontSize: FONT_SIZES.h5,
           background: `linear-gradient(45deg, ${color}, ${color}CC)`,
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
