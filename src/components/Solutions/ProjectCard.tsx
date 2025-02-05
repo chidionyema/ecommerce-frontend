@@ -44,7 +44,7 @@ const technologyIconMap: {
   [key: string]: { icon: LucideIcon; color: string };
 } = {
   ".NET Core": { icon: Code, color: '#512bd4' },
-  "Java": { icon: Terminal, color: '#007396' },          
+  "Java": { icon: Terminal, color: '#007396' },
   "WebSockets": { icon: GitBranch, color: '#00aced' },
   "RabbitMQ": { icon: Database, color: '#E51B24' },
   "MQTT": { icon: Layers, color: '#7FBA00' },
@@ -66,12 +66,13 @@ const ProjectCard = ({ project }: { project: Project }) => {
       href={`/projects/${project.id}`}
       sx={{
         margin: 'auto !important',
-        height: '100%',
+        height: 400, // Fixed height for uniformity across cards
         display: 'flex',
         flexDirection: 'column',
         padding: 2,
         width: '100%',
-        maxWidth: 400,
+        maxWidth: { xs: 'calc(100% - 32px)', sm: 400 },
+        position: 'relative',
         transition: 'transform 0.3s ease, box-shadow 0.3s ease',
         '&:hover': {
           transform: 'translateY(-8px)',
@@ -156,19 +157,16 @@ const ProjectCard = ({ project }: { project: Project }) => {
           transition={{ duration: 0.3, ease: 'easeOut' }}
           style={{
             position: 'absolute',
-            bottom: 8,
-            left: '50%',
-            transform: 'translateX(-50%)',
+            bottom: 16, // Increased spacing from bottom
+            right: 16,  // Positioned in bottom-right corner
             zIndex: 2,
-            width: '90%',
-            maxWidth: 200
+            width: 'auto',
           }}
         >
           <Button
             component={NextLink}
             href={`/projects/${project.id}`}
             endIcon={<ArrowRightAlt />}
-            fullWidth
             sx={{
               background: 'linear-gradient(45deg, #B8860B, #FFB90F)',
               color: '#000',
@@ -184,6 +182,9 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 background: 'linear-gradient(45deg, #A07B0A, #E6A200)',
                 boxShadow: `0 4px 16px ${alpha(theme.palette.common.black, 0.6)}`,
               },
+              marginLeft: 'auto',
+              display: 'flex',
+              alignItems: 'center',
             }}
           >
             View Details

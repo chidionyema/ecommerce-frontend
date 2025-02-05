@@ -12,8 +12,6 @@ import {
   IconButton,
   InputAdornment,
   styled,
-  SxProps,
-  Theme,
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -30,6 +28,10 @@ import {
   Phone,
   ChatBubbleOutline,
 } from '@mui/icons-material';
+import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
+import { TestimonialsSection } from '../components/Common/TestimonialsSection';
+import { ServicesGrid } from '../components/Common/ServicesGrid';
+import WhyChooseUs from '../components/Common/WhyChooseUs';
 
 // EmailJS configuration
 const EMAILJS_CONFIG = {
@@ -59,14 +61,16 @@ const INITIAL_FORM_DATA: FormData = {
 // Styled container with full-width mobile support
 const GoldFormContainer = styled(Box)(({ theme }) => ({
   width: '100%',
+  // Responsive values for maxWidth and margin are supported via the sx prop or styled utility.
+  // If you encounter issues, consider using theme.breakpoints.
   maxWidth: { xs: '100%', sm: 500 },
   margin: { xs: 0, sm: 'auto' },
   padding: theme.spacing(4),
   borderRadius: 16,
   background: `linear-gradient(45deg, ${NEUTRAL_BACKGROUND} 0%, rgba(255,255,255,0.05) 100%)`,
   boxShadow: `0 4px 12px ${
-    theme.palette.mode === 'light' 
-      ? 'rgba(0, 0, 0, 0.5)' 
+    theme.palette.mode === 'light'
+      ? 'rgba(0, 0, 0, 0.5)'
       : 'rgba(0, 0, 0, 0.7)'
   }`,
   backdropFilter: 'blur(18px) saturate(180%)',
@@ -157,7 +161,7 @@ const Contact = () => {
             p: { xs: 2, sm: 8 },
             width: '100%',
             maxWidth: 1200,
-            mx: 'auto'
+            mx: 'auto',
           }}
         >
           <MotionGoldFormContainer
@@ -168,7 +172,7 @@ const Contact = () => {
             transition={{ duration: 0.6 }}
             sx={{
               width: '100%',
-              px: { xs: 2, sm: 4 }
+              px: { xs: 2, sm: 4 },
             }}
           >
             <Typography

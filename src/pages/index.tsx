@@ -20,7 +20,7 @@ export default function HomePage() {
       </Head>
 
       {/* Wrap HeroSection in a Box with top margin */}
-      <Box sx={{ mt: SPACING }}>
+      <Box sx={{  }}>
         <Hero />
       </Box>
 
@@ -29,8 +29,8 @@ export default function HomePage() {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 20, // Use SPACING from sharedStyles.ts if needed
-            mt: SPACING, // Top margin for the inner Box
+            //gap: 20, // Use SPACING from sharedStyles.ts if needed
+           // mt: SPACING, // Top margin for the inner Box
             padding: SPACING, // Consistent padding for the inner Box
           }}
         >

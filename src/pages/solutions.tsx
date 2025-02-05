@@ -53,9 +53,10 @@ const Solutions = () => {
                   ...CARD_GRID_CONFIG.item.sx,
                   display: 'flex',
                   flexDirection: 'column',
-                  maxWidth: { xs: '400px', sm: 'none' },
+                  maxWidth: { xs: '100%', sm: 'none' }, 
                   margin: { xs: '0 auto', sm: 'initial' },
                   width: '100%',
+                  padding: { xs: 1, sm: 2 }, 
                 }}
               >
                 <ProjectCard
