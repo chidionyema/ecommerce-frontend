@@ -19,7 +19,7 @@ interface PageLayoutProps {
   cta?: ReactNode;
 }
 
-const PageLayout = ({ children, maxWidth = 'lg', sx, cta }: PageLayoutProps) => {
+const LandingPageLayout = ({ children, maxWidth = 'lg', sx, cta }: PageLayoutProps) => {
   return (
     <Container maxWidth={maxWidth} sx={sx}>
       <ContentWrapper>{children}</ContentWrapper>
@@ -74,4 +74,4 @@ const ContentWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-export default PageLayout;
+export default LandingPageLayout;

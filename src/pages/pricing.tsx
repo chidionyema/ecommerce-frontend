@@ -1,4 +1,3 @@
-// pages/PricingPage.tsx
 'use client';
 
 import React from 'react';
@@ -7,20 +6,18 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import GoldCard from '../components/GoldCard';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
-
-// Import pricing feature icons
+import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
+import { WhyChooseUs } from '../components/Common/WhyChooseUs';
+import { ServicesGrid } from '../components/Common/ServicesGrid';
+import { TestimonialsSection } from '../components/Common/TestimonialsSection';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import WorkIcon from '@mui/icons-material/Work';
 import GroupIcon from '@mui/icons-material/Group';
 import InfoIcon from '@mui/icons-material/Info';
-import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
-import { WhyChooseUs } from '../components/Common/WhyChooseUs';
-import { ServicesGrid } from '../components/Common/ServicesGrid';
-import { TestimonialsSection } from '../components/Common/TestimonialsSection';
+import { CARD_GRID_CONFIG } from '../utils/sharedStyles';
 
-// FeatureItem Component with colored icon wrapper
 interface FeatureItemProps {
   icon: React.ElementType;
   text: string;
@@ -58,7 +55,6 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ icon: Icon, text }) => (
   </Box>
 );
 
-// Example plans data with feature objects
 const plans = [
   {
     type: 'hourly',
@@ -106,7 +102,6 @@ const PricingPage: React.FC = () => {
       title="Flexible Plans for Every Need."
       subtitle="Choose the plan that aligns with your ambitious vision."
     >
-      {/* Consistent outer container */}
       <Box
         sx={{
           display: 'flex',
@@ -118,11 +113,18 @@ const PricingPage: React.FC = () => {
       >
         <Grid
           container
-          spacing={0.5} // reduced gap between cards
-          sx={{ px: { xs: 1, md: 2 } }}
+          spacing={CARD_GRID_CONFIG.container.spacing}
+          sx={CARD_GRID_CONFIG.container.sx}
         >
           {plans.map((plan) => (
-            <Grid item xs={12} sm={6} md={4} key={plan.type}>
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              key={plan.type}
+              sx={CARD_GRID_CONFIG.item.sx}
+            >
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -154,13 +156,11 @@ const PricingPage: React.FC = () => {
         </Grid>
       </Box>
       <Box sx={{ mb: 30, mt: 30 }} />
-        {/* Other Sections */}
-        <TechnologyShowcase />
-        <WhyChooseUs />
-        <ServicesGrid />
-        <TestimonialsSection />
-      </ConsistentPageLayout>
-   
+      <TechnologyShowcase />
+      <WhyChooseUs />
+      <ServicesGrid />
+      <TestimonialsSection />
+    </ConsistentPageLayout>
   );
 };
 

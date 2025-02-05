@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { Box } from '@mui/material';
-import PageLayout from '../components/Shared/PageLayout';
+import LandingPageLayout from '../components/Shared/LandingPageLayout';
 import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
 import { ServicesGrid } from '../components/Common/ServicesGrid';
 import { TestimonialsSection } from '../components/Common/TestimonialsSection';
@@ -24,7 +24,7 @@ export default function HomePage() {
         <Hero />
       </Box>
 
-      <PageLayout>
+      <LandingPageLayout>
         <Box
           sx={{
             display: 'flex',
@@ -39,7 +39,7 @@ export default function HomePage() {
           <ServicesGrid />
           <TestimonialsSection />
         </Box>
-      </PageLayout>
+        </LandingPageLayout>
     </div>
   );
 }

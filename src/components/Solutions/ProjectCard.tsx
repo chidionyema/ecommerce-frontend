@@ -14,7 +14,7 @@ import NextLink from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRightAlt } from '@mui/icons-material';
-import GoldCard from '../GoldCard'; // adjust the path if necessary
+import GoldCard from '../GoldCard';
 import { LucideIcon } from 'lucide-react';
 import { NEUTRAL_TEXT } from '../../utils/sharedColors';
 import { keyframes } from '@emotion/react';
@@ -78,9 +78,11 @@ const ProjectCard = ({ project }: { project: Project }) => {
     <GoldCard 
       href={`/projects/${project.id}`}
       sx={{
-        margin: '0 !important', // Remove any default margins
-        height: '100%', // Fill grid cell
-        padding: 2, // Internal spacing (theme.spacing(2) equals 16px)
+        margin: '0 !important',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: 2,
         transition: 'transform 0.3s ease, box-shadow 0.3s ease',
         '&:hover': {
           transform: 'translateY(-8px)',
@@ -92,8 +94,8 @@ const ProjectCard = ({ project }: { project: Project }) => {
         <Box
           sx={{
             position: 'relative',
-            width: 'calc(100% - 16px)', // Account for internal padding
-            margin: '8px', // Balanced spacing around the image
+            width: 'calc(100% - 16px)',
+            margin: '8px',
             height: 150,
             borderRadius: 2,
             overflow: 'hidden',

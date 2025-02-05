@@ -28,6 +28,23 @@ export const FONT_SIZES = {
     body2: '0.875rem',
   };
   
+  // utils/sharedStyles.ts
+export const CARD_GRID_CONFIG = {
+    container: {
+      spacing: 6, // 48px gap between items
+      sx: {
+        justifyContent: 'center',
+        margin: '-24px !important', // Negative margin = spacing/2
+        width: 'calc(100% + 48px)' // Compensate for negative margin
+      }
+    },
+    item: {
+      sx: {
+        padding: '24px !important', // Half of spacing value
+        '&:hover': { zIndex: 2 }
+      }
+    }
+  };
   
   export const COLORS = {
     primary: '#007bff',

@@ -11,6 +11,7 @@ import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
 import { WhyChooseUs } from '../components/Common/WhyChooseUs';
 import { ServicesGrid } from '../components/Common/ServicesGrid';
 import { TestimonialsSection } from '../components/Common/TestimonialsSection';
+import { CARD_GRID_CONFIG } from '../utils/sharedStyles';
 
 const Solutions = () => {
   const theme = useTheme();
@@ -30,25 +31,19 @@ const Solutions = () => {
         subtitle="Our enterprise solutions empower your business to innovate and grow."
       >
         <Container maxWidth="lg">
-          {/* Outer wrapper with adjusted spacing */}
           <Box
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 8, // Reduced gap between sections
-              mt: 4,  // Reduced top margin
-              p: 4,   // Reduced padding
+              gap: 8,
+              mt: 4,
+              p: 4,
             }}
           >
             <Grid
               container
-              spacing={4} // 32px gap between items (4 * 8px)
-              sx={{ 
-                justifyContent: 'center',
-                // Critical negative margin adjustment to compensate for inner padding:
-                margin: '-16px !important',
-                width: 'calc(100% + 32px)'
-              }}
+              spacing={CARD_GRID_CONFIG.container.spacing}
+              sx={CARD_GRID_CONFIG.container.sx}
             >
               {cvProjects.map((project) => (
                 <Grid
@@ -57,12 +52,7 @@ const Solutions = () => {
                   sm={6}
                   md={4}
                   key={project.id}
-                  sx={{
-                    padding: '16px !important', // 16px padding to match grid spacing
-                    '&:hover': {
-                      zIndex: 2 // Ensures hovered card appears above others
-                    }
-                  }}
+                  sx={CARD_GRID_CONFIG.item.sx}
                 >
                   <ProjectCard project={project} />
                 </Grid>

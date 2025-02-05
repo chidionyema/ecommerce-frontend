@@ -1,4 +1,3 @@
-// pages/ResourcesPage.tsx
 'use client';
 
 import React from 'react';
@@ -12,11 +11,9 @@ import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
 import { WhyChooseUs } from '../components/Common/WhyChooseUs';
 import { ServicesGrid } from '../components/Common/ServicesGrid';
 import { TestimonialsSection } from '../components/Common/TestimonialsSection';
-
-// Import resource icons
+import { CARD_GRID_CONFIG } from '../utils/sharedStyles';
 import { Cloud as CloudIcon, VpnKey, Code as CodeIcon } from '@mui/icons-material';
 
-// Example resources data
 const resources = [
   {
     id: 1,
@@ -56,9 +53,8 @@ const ResourcesPage: React.FC = () => {
       seoTitle="Technical Resources - Expert Guides"
       seoDescription="Access our comprehensive library of technical resources and implementation guides."
       subtitle="Access our expert technical resources to drive your success."
-       title="Discover. Learn. Grow."
+      title="Discover. Learn. Grow."
     >
-      {/* Consistent inner container */}
       <Box
         sx={{
           display: 'flex',
@@ -70,14 +66,14 @@ const ResourcesPage: React.FC = () => {
       >
         <Grid
           container
+          spacing={CARD_GRID_CONFIG.container.spacing}
+          sx={CARD_GRID_CONFIG.container.sx}
           justifyContent="center"
-          spacing={1} // Adjust spacing between cards as desired
-          sx={{ px: { xs: 1, md: 2 } }}
         >
           {resources.map((resource) => {
             const IconComponent = resource.icon;
             return (
-              <Grid item xs={12} sm={6} md={4} key={resource.id}>
+              <Grid item xs={12} sm={6} md={4} key={resource.id} sx={CARD_GRID_CONFIG.item.sx}>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -142,7 +138,7 @@ const ResourcesPage: React.FC = () => {
                           {resource.time}
                         </Box>
                       </Box>
-                      <NextLink href={resource.path} passHref>
+                      <NextLink href={resource.path} passHref legacyBehavior>
                         <Button variant="contained" size="small">
                           Explore Guide <ArrowRight sx={{ ml: 0.5 }} />
                         </Button>
@@ -155,13 +151,11 @@ const ResourcesPage: React.FC = () => {
           })}
         </Grid>
       </Box>
-        <Box sx={{ mb: 30, mt: 30 }} />
-        {/* Other Sections */}
-        <TechnologyShowcase />
-        <WhyChooseUs />
-        <ServicesGrid />
-        <TestimonialsSection />
-    
+      <Box sx={{ mb: 30, mt: 30 }} />
+      <TechnologyShowcase />
+      <WhyChooseUs />
+      <ServicesGrid />
+      <TestimonialsSection />
     </ConsistentPageLayout>
   );
 };
