@@ -24,7 +24,7 @@ export default function Document() {
                 anonymize_ip: true,
                 cookie_flags: 'SameSite=None;Secure'
               });
-            `
+            `,
           }}
         />
         {/* Preload critical resources */}
@@ -35,15 +35,15 @@ export default function Document() {
           type="font/woff2"
           crossOrigin="anonymous"
         />
-      
+
         {/* Security headers */}
-
-
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
         <meta httpEquiv="X-Frame-Options" content="DENY" />
         <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-
-        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.googletagmanager.com;"></meta>
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.googletagmanager.com;"
+        />
       </Head>
       <body>
         <Main />

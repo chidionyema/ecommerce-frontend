@@ -15,15 +15,19 @@ export const SPACING = {
     extraLarge: 24,
   };
   
-  export const FONT_SIZES = {
+// sharedStyles.ts
+export const FONT_SIZES = {
     h1: '3rem',
     h2: '2.5rem',
     h3: '2rem',
     h4: '1.5rem',
     h5: '1.25rem',
+    h6: '1rem',
+    subtitle1: '1rem', // Added subtitle1 (adjust the value as needed)
     body1: '1rem',
     body2: '0.875rem',
   };
+  
   
   export const COLORS = {
     primary: '#007bff',
