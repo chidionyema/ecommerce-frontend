@@ -7,7 +7,11 @@ interface ControlPanelTabsProps {
   prefersReducedMotion: boolean;
 }
 
-const ControlPanelTabs: React.FC<ControlPanelTabsProps> = ({ activeSection, setActiveSection }) => {
+const ControlPanelTabs: React.FC<ControlPanelTabsProps> = ({
+  activeSection,
+  setActiveSection,
+  prefersReducedMotion
+}) => {
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setActiveSection(newValue);
   };
@@ -23,7 +27,8 @@ const ControlPanelTabs: React.FC<ControlPanelTabsProps> = ({ activeSection, setA
       aria-label="Control Panel Tabs"
       sx={{
         maxWidth: '100vw',
-        '& .MuiTab-root': { minWidth: 120 } // Better mobile tab sizing
+        '& .MuiTab-root': { minWidth: 120 },
+        transition: prefersReducedMotion ? 'none' : 'all 0.3s ease' // Example usage
       }}
     >
       <Tab label="Themes" value="Themes" />

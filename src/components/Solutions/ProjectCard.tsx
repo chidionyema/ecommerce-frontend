@@ -15,7 +15,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRightAlt } from '@mui/icons-material';
 import GoldCard from '../GoldCard';
-import { LucideIcon } from 'lucide-react';
+import { Cpu, BoxIcon, Cloud, Layers, Database, Code, GitBranch, LucideIcon, Terminal, Server } from 'lucide-react';
 import { NEUTRAL_TEXT } from '../../utils/sharedColors';
 import { keyframes } from '@emotion/react';
 
@@ -43,8 +43,8 @@ export interface Project {
 const technologyIconMap: {
   [key: string]: { icon: LucideIcon; color: string };
 } = {
-  ".NET Core": { icon: Code2, color: '#512bd4' },
-  "Java": { icon: Terminal, color: '#007396' },
+  ".NET Core": { icon: Code, color: '#512bd4' },
+  "Java": { icon: Terminal, color: '#007396' },          
   "WebSockets": { icon: GitBranch, color: '#00aced' },
   "RabbitMQ": { icon: Database, color: '#E51B24' },
   "MQTT": { icon: Layers, color: '#7FBA00' },

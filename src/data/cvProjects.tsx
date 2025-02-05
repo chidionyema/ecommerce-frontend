@@ -2,7 +2,8 @@
 
 import {
   Shield, Building2, DollarSign, Landmark, Cloud, CircuitBoard, Cpu, Server, Key, Settings, Mail,
-  Terminal, Database, Code2, GitBranch, Box as BoxIcon, Layers
+  Terminal, Database, Code2, GitBranch, Box as BoxIcon, Layers,
+  Code
 } from 'lucide-react';
 import { Metric } from '../types/project';
 
@@ -47,7 +48,7 @@ export interface CVProject {
 // ✅ Map Technologies to Icons
 export const technologyIconMap = {
   ".NET Core": { 
-    icon: Code2,
+    icon: Code ,  
     color: '#512bd4'  // .NET purple
   },
   "Java": {
