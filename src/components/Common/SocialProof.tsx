@@ -2,8 +2,8 @@
 import { Typography, useTheme, alpha } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useRecentEngagements } from '../../hooks/useRecentEngagements';
-import { ProjectCardBackground } from '../../theme/themes';;
-import { CheckCircle } from 'react-feather'; // Import Feather Icon
+import { ProjectCardBackground } from '../../theme/themes';
+import { CheckCircle } from 'react-feather';
 
 export const SocialProof = () => {
   const theme = useTheme();
@@ -17,10 +17,10 @@ export const SocialProof = () => {
     >
       <ProjectCardBackground
         sx={{
-          mt: 6,
           textAlign: 'center',
           py: 3,
           borderRadius: 12,
+          // Remove mt (margin-top)
         }}
       >
         <Typography

@@ -7,36 +7,63 @@ import {
   Grid,
   useTheme,
   Button,
+  styled,
 } from '@mui/material';
-import { motion, LazyMotion, domAnimation } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import { styled } from '@mui/material/styles';
 import {
-  Info,
-  Award,
-  Clock,
-  Users,
-  Calendar,
-  Briefcase,
-} from 'lucide-react';
+  motion,
+  LazyMotion,
+  domAnimation,
+  useMotionValue,
+  useTransform,
+} from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { Info, Award, Clock, Users, Calendar, Briefcase } from 'lucide-react';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
-import { sharedCardBackground } from '../utils/sharedStyles';
-
+import { SHARED_CARD_BACKGROUND } from '../utils/sharedStyles';
 import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
-import { WhyPartner } from '../components/Common/WhyPartner';
-import { ServicesGrid } from '../components/Common/ServicesGrid'; // Use named import
-import { TestimonialsSection } from '../components/Common/TestimonialsSection'; // Use named import
+import { WhyChooseUs } from '../components/Common/WhyChooseUs';
+import { ServicesGrid } from '../components/Common/ServicesGrid';
+import { TestimonialsSection } from '../components/Common/TestimonialsSection';
 
+// Import shared colors (exact same values used in your ProjectCard)
+import { NEUTRAL_BACKGROUND, NEUTRAL_TEXT, ACCENT_GOLD } from '../utils/sharedColors';
 
+// ---------------------------------------------------------------------------
+// CUSTOM HOOK: useTilt
+// ---------------------------------------------------------------------------
+// This hook returns 3D rotation values based on pointer position.
+const useTilt = (active: boolean = true) => {
+  const x = useMotionValue(0.5);
+  const y = useMotionValue(0.5);
+  const rotateX = useTransform(y, [0, 1], [-10, 10]);
+  const rotateY = useTransform(x, [0, 1], [10, -10]);
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!active) return;
+    const bounds = e.currentTarget.getBoundingClientRect();
+    const posX = (e.clientX - bounds.left) / bounds.width;
+    const posY = (e.clientY - bounds.top) / bounds.height;
+    x.set(posX);
+    y.set(posY);
+  };
+
+  return { rotateX, rotateY, handlePointerMove };
+};
+
+// ---------------------------------------------------------------------------
+// PREMIUM CARD
+// ---------------------------------------------------------------------------
+// This card uses the same shared colors as the ProjectCard with a subtle gradient for depth.
 const PremiumCard = styled(motion.div)(({ theme }) => ({
   borderRadius: 24,
   overflow: 'hidden',
-  minHeight: 540, // Ensures all cards remain the same height
+  minHeight: 540,
   maxWidth: 420,
-  width: '100%', // Ensures consistent width across screens
+  width: '100%',
   display: 'flex',
   flexDirection: 'column',
-  background: sharedCardBackground(theme),
+  background: `linear-gradient(45deg, ${NEUTRAL_BACKGROUND} 0%, rgba(255, 255, 255, 0.05) 100%)`, 
+  // Add a subtle gradient for depth
   border: `2px solid rgba(255, 255, 255, 0.1)`,
   backdropFilter: 'blur(18px) saturate(180%)',
   boxShadow: `
@@ -51,6 +78,9 @@ const PremiumCard = styled(motion.div)(({ theme }) => ({
   },
 }));
 
+// ---------------------------------------------------------------------------
+// FEATURE ITEM
+// ---------------------------------------------------------------------------
 interface FeatureItemProps {
   icon: React.ElementType;
   text: string;
@@ -59,6 +89,8 @@ interface FeatureItemProps {
 const FeatureItem: React.FC<FeatureItemProps> = ({ icon: Icon, text }) => {
   return (
     <Box
+      component={motion.div}
+      whileHover={{ scale: 1.05 }}
       sx={{
         display: 'flex',
         alignItems: 'center',
@@ -67,19 +99,15 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ icon: Icon, text }) => {
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
         borderRadius: '12px',
         transition: 'all 0.3s ease',
-        '&:hover': {
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          transform: 'scale(1.05)',
-        },
       }}
     >
-      <Icon style={{ color: '#FFFFFF', fontSize: '1.7rem' }} />
+      <Icon style={{ color: NEUTRAL_TEXT, fontSize: '1.7rem' }} />
       <Typography
         variant="body2"
         sx={{
           ml: 2,
           fontWeight: 500,
-          color: '#FFFFFF',
+          color: NEUTRAL_TEXT,
         }}
       >
         {text}
@@ -88,6 +116,9 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ icon: Icon, text }) => {
   );
 };
 
+// ---------------------------------------------------------------------------
+// PLANS DATA
+// ---------------------------------------------------------------------------
 const plans = [
   {
     type: 'hourly',
@@ -121,9 +152,13 @@ const plans = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// PRICING GRID COMPONENT
+// ---------------------------------------------------------------------------
 const PricingGrid: React.FC = () => {
   const theme = useTheme();
   const router = useRouter();
+  const { rotateX, rotateY, handlePointerMove } = useTilt(true);
 
   const handlePlanClick = (type: string) => {
     router.push(`/contact?plan=${type}`);
@@ -136,13 +171,13 @@ const PricingGrid: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <Grid 
-          container 
-          spacing={6} 
-          sx={{ 
-            mt: 6, 
-            px: { xs: 2, md: 6 }, 
-            alignItems: 'stretch', // Ensures all cards stretch evenly
+        <Grid
+          container
+          spacing={6}
+          sx={{
+            mt: 6,
+            px: { xs: 2, md: 6 },
+            alignItems: 'stretch',
             justifyContent: 'center',
           }}
         >
@@ -156,11 +191,20 @@ const PricingGrid: React.FC = () => {
               component={motion.div}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              whileHover="hover"
               transition={{ delay: 0.2 + index * 0.1 }}
               sx={{ display: 'flex', justifyContent: 'center', height: '100%' }}
             >
-              <PremiumCard sx={{ height: '100%', width: '100%' }}>
-                <Typography variant="h4" sx={{ fontWeight: 800, mb: 3, color: '#FFFFFF' }}>
+              <PremiumCard
+                onPointerMove={handlePointerMove}
+                style={{ rotateX, rotateY }}
+                whileHover={{ scale: 1.03 }}
+                sx={{ height: '100%', width: '100%' }}
+              >
+                <Typography
+                  variant="h4"
+                  sx={{ fontWeight: 800, mb: 3, color: NEUTRAL_TEXT }}
+                >
                   {title}
                 </Typography>
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -173,7 +217,7 @@ const PricingGrid: React.FC = () => {
                   sx={{
                     fontWeight: 700,
                     mt: 4,
-                    color: '#FFD700',
+                    color: ACCENT_GOLD,
                     fontSize: '1.4rem',
                   }}
                 >
@@ -182,22 +226,42 @@ const PricingGrid: React.FC = () => {
                 <Button
                   variant="contained"
                   size="large"
-                  sx={{
-                    mt: 3,
-                    background: sharedCardBackground(theme),
-                    color: '#FFFFFF',
+                  sx={{mt: 3,
+                    background: SHARED_CARD_BACKGROUND(theme),
+                    color: NEUTRAL_TEXT,
                     fontWeight: 700,
                     borderRadius: '12px',
                     px: 4,
                     py: 1.2,
+                    textTransform: 'none',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'box-shadow 0.3s ease, background 0.3s ease',
                     '&:hover': {
-                      background: `linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3))`,
-                      boxShadow: `0 6px 16px rgba(255, 255, 255, 0.3)`,
+                      background: `linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.3))`,
+                      boxShadow: `0 6px 16px rgba(255,255,255,0.3)`,
+                    },
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)`,
+                      backgroundSize: '200% 100%',
+                      animation: '2s linear infinite',
+                      opacity: 0,
+                      transition: 'opacity 0.3s ease',
+                    },
+                    '&:hover::after': {
+                      opacity: 1,
                     },
                   }}
                   onClick={() => handlePlanClick(type)}
                 >
-                  Get Started
+                  {/* Subtle, concise, and impactful CTA for startups: */}
+                  **Launch Your Vision** 
                 </Button>
               </PremiumCard>
             </Grid>
@@ -208,32 +272,67 @@ const PricingGrid: React.FC = () => {
   );
 };
 
+// ---------------------------------------------------------------------------
+// PRICING PAGE
+// ---------------------------------------------------------------------------
 const PricingPage: React.FC = () => {
   return (
     <ConsistentPageLayout
-      seoTitle="Pricing Plans - Premium Solutions"
-      seoDescription="Discover our flexible pricing plans tailored to accelerate your success."
-      seoKeywords="pricing plans, consulting rates, enterprise pricing, technology consulting"
-      subtitle="Choose the plan that best fits your growth strategy."
+      seoTitle="Fuel Your Startup's Growth: Premium Tech Consulting Pricing" // Enhanced SEO title
+      seoDescription="Unlock your startup's full potential with our tailored pricing plans. Our expert consultants provide the guidance and support you need to succeed." 
+      seoKeywords="startup tech consulting, growth strategy, innovation, scaling, funding"
+      subtitle="Choose the plan that aligns with your ambitious vision." // More impactful subtitle
     >
-      {/* PricingGrid with margin-bottom */}
-      <Box sx={{ mb: 30 }}> {/* Add margin-bottom to PricingGrid */}
+      {/* Add a hero section with compelling visuals and copy */}
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '40vh', 
+        backgroundImage: 'url(/images/hero-background.jpg)', // Replace with your actual hero image
+        backgroundSize: 'cover', 
+        backgroundPosition: 'center', 
+        color: '#fff', 
+        textAlign: 'center' 
+      }}>
+        <Typography variant="h2" sx={{ fontSize: '3rem', fontWeight: 'bold', mb: 3 }}>
+          <span style={{ color: ACCENT_GOLD }}>Fuel Your Startup's Growth</span><br />
+          **Premium Tech Consulting for Visionaries**
+        </Typography>
+        <Typography variant="body1" sx={{ maxWidth: '600px', mb: 5 }}>
+          We understand the unique challenges and opportunities faced by startups. Our expert consultants are here to guide you every step of the way, from ideation to scaling. 
+        </Typography>
+        <Typography variant="body1" sx={{ maxWidth: '600px', mb: 5 }}>
+          **Embrace the future. Partner with us to build a thriving, disruptive company.**
+        </Typography>
+        <Button 
+          variant="contained" 
+          size="large" 
+          sx={{ 
+            backgroundColor: ACCENT_GOLD, 
+            color: '#fff', 
+            '&:hover': {
+              backgroundColor: '#ffd700' 
+            } 
+          }} 
+        >
+          **Book a Discovery Call** 
+        </Button>
+      </Box>
+
+      <Box sx={{ mb: 30 }}>
         <PricingGrid />
       </Box>
-
-      {/* WhyPartner with margin-bottom */}
-      <Box> {/* Add margin-bottom to WhyPartner */}
-        <WhyPartner />
+      <TechnologyShowcase /> 
+      <Box>
+        <WhyChooseUs />
       </Box>
-
-      {/* ServicesGrid with margin-bottom */}
-      <Box> {/* Add margin-bottom to ServicesGrid */}
+      <Box>
         <ServicesGrid />
       </Box>
-
-      {/* TestimonialsSection with margin-bottom */}
-      <Box> {/* Add margin-bottom to TestimonialsSection */}
-        <TestimonialsSection />
+      <Box>
+        <TestimonialsSection /> 
       </Box>
     </ConsistentPageLayout>
   );

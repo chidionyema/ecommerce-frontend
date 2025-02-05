@@ -1,4 +1,8 @@
+'use client';
 
+import React, { useState, useRef, useEffect } from 'react';
+
+import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion';
 import {
     Cloud,
     Lock,
@@ -61,4 +65,3 @@ export const techIcons = [
     },
 ];
 
-// Rest of the component code remains the same...

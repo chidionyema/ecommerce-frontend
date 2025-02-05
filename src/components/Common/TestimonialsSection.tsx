@@ -1,12 +1,11 @@
+// components/Common/TestimonialsSection.js
 'use client';
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Container,
   Typography,
   Grid,
-  CardContent,
   Avatar,
   alpha,
   Button,
@@ -14,59 +13,84 @@ import {
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { styled } from '@mui/system';
-import { User, Users, Smile, ThumbsUp, Star, Heart } from 'react-feather';
+import { SECTION_HEIGHT, COLORS, FONT_SIZES, SPACING, CARD_SIZES, BUTTON_SIZES } from '../../utils/sharedStyles';
+import TechCard from './TechCard';
+
 
 const testimonials = [
   {
     id: 1,
     name: 'John Doe',
     role: 'CEO, TechCorp',
-    testimonial: 'Their strategy transformed our entire approach.',
+    content: 'Their strategy transformed our entire approach.',
     avatar: '/avatar1.jpg',
-    icon: <User size={64} color="#03DAC6" strokeWidth={1.5} />,
+    icon: (
+      <motion.svg width="40" height="40" fill={COLORS.primary}>
+        <path d="M10 20 L20 10 L30 20" />
+      </motion.svg>
+    ),
   },
   {
     id: 2,
     name: 'Jane Smith',
     role: 'CTO, InnovateX',
-    testimonial: 'Precision execution that elevated our tech stack.',
+    content: 'Precision execution that elevated our tech stack.',
     avatar: '/avatar2.jpg',
-    icon: <Users size={64} color="#03DAC6" strokeWidth={1.5} />,
+    icon: (
+      <motion.svg width="40" height="40" fill={COLORS.primary}>
+        <path d="M10 20 L20 10 L30 20" />
+      </motion.svg>
+    ),
   },
   {
     id: 3,
     name: 'Michael Johnson',
     role: 'Founder, StartupHub',
-    testimonial: 'Top-tier consultancy with next-level expertise.',
+    content: 'Top-tier consultancy with next-level expertise.',
     avatar: '/avatar3.jpg',
-    icon: <Smile size={64} color="#03DAC6" strokeWidth={1.5} />,
+    icon: (
+      <motion.svg width="40" height="40" fill={COLORS.primary}>
+        <path d="M10 20 L20 10 L30 20" />
+      </motion.svg>
+    ),
   },
   {
     id: 4,
     name: 'Sarah Lee',
     role: 'Manager, TechSolutions',
-    testimonial: 'Best team we ever worked with.',
+    content: 'Best team we ever worked with.',
     avatar: '/avatar4.jpg',
-    icon: <ThumbsUp size={64} color="#03DAC6" strokeWidth={1.5} />,
+    icon: (
+      <motion.svg width="40" height="40" fill={COLORS.primary}>
+        <path d="M10 20 L20 10 L30 20" />
+      </motion.svg>
+    ),
   },
   {
     id: 5,
     name: 'David Brown',
     role: 'Director, InnovateNow',
-    testimonial: 'Great support and expertise.',
+    content: 'Great support and expertise.',
     avatar: '/avatar5.jpg',
-    icon: <Star size={64} color="#03DAC6" strokeWidth={1.5} />,
+    icon: (
+      <motion.svg width="40" height="40" fill={COLORS.primary}>
+        <path d="M10 20 L20 10 L30 20" />
+      </motion.svg>
+    ),
   },
   {
     id: 6,
     name: 'Emily Davis',
     role: 'CEO, FutureTech',
-    testimonial: 'Absolutely game-changing.',
+    content: 'Absolutely game-changing.',
     avatar: '/avatar6.jpg',
-    icon: <Heart size={64} color="#03DAC6" strokeWidth={1.5} />,
+    icon: (
+      <motion.svg width="40" height="40" fill={COLORS.primary}>
+        <path d="M10 20 L20 10 L30 20" />
+      </motion.svg>
+    ),
   },
 ];
-
 const ViewMoreButton = styled(Button)(({ theme }) => ({
   fontWeight: 'bold',
   borderRadius: 25,
@@ -77,23 +101,8 @@ const ViewMoreButton = styled(Button)(({ theme }) => ({
     background: `linear-gradient(to right, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
     boxShadow: `0px 6px 20px ${alpha(theme.palette.secondary.main, 0.5)}`,
   },
-  padding: '12px 24px',
-  fontSize: '1.1rem',
-}));
-
-const TestimonialCard = styled(Box)(({ theme }) => ({
-  background: `linear-gradient(145deg, ${theme.palette.background.paper}, ${alpha(
-    theme.palette.background.default,
-    0.9
-  )})`,
-  borderRadius: '12px',
-  padding: '24px',
-  boxShadow: theme.shadows && Array.isArray(theme.shadows) ? theme.shadows[3] : 'none',
-  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-5px)', 
-    boxShadow: theme.shadows && Array.isArray(theme.shadows) ? theme.shadows[6] : 'none',
-  },
+  padding: theme.spacing(1.5, 4),
+  fontSize: FONT_SIZES.body1,
 }));
 
 export const TestimonialsSection = () => {
@@ -101,64 +110,99 @@ export const TestimonialsSection = () => {
   const [showAll, setShowAll] = useState(false);
 
   return (
-    <Box sx={{ py: { xs: 10, md: 16 } }}>
+    <Box
+      sx={{
+        overflow: 'hidden',
+        background: `linear-gradient(45deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)`,
+        width: '100vw',
+        minHeight: SECTION_HEIGHT,
+        position: 'relative',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw',
+        py: SPACING.medium,
+      }}
+    >
       <Container maxWidth="lg">
         <Typography
           variant="h2"
+          textAlign="center"
+          fontWeight={900}
           sx={{
-            textAlign: 'center',
-            fontWeight: 900,
-            mb: 8,
-            fontSize: { xs: '2.5rem', md: '3.5rem' },
-            background: `linear-gradient(to right, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            color: 'common.white',
+            fontSize: FONT_SIZES.h2,
+            lineHeight: 1.2,
+            mb: SPACING.medium,
           }}
         >
           Client Success Stories
         </Typography>
-
-        <Grid container spacing={6} justifyContent="center">
-          {(showAll ? testimonials : testimonials.slice(0, 3)).map((t) => (
-            <Grid item xs={12} sm={6} md={4} key={t.id}>
-              <motion.div
-                whileHover={{ scale: 1.05, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
+        <Grid container spacing={SPACING.medium} justifyContent="center">
+          {(showAll? testimonials: testimonials.slice(0, 3)).map((t, index) => (
+            <Grid item key={t.id} xs={12} sm={6} md={4}>
+              <TechCard
+                icon={t.icon}
+                title={t.name}
+                color={theme.palette.primary.main}
+                index={index}
+                whileHover={{ scale: 1.05 }}
+                floatingVariants={{
+                  initial: { y: 0 },
+                  animate: { y: -10 },
+                }}
               >
-                <TestimonialCard>
-                  <CardContent sx={{ textAlign: 'center' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                      {t.icon}
-                    </Box>
-                    <Avatar
-                      src={t.avatar}
-                      sx={{
-                        width: 100,
-                        height: 100,
-                        mb: 3,
-                        mx: 'auto',
-                        border: `2px solid ${theme.palette.primary.main}`,
-                      }}
-                    />
-                    <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 3 }}>
-                      "{t.testimonial}"
-                    </Typography>
-                    <Typography variant="h5" sx={{ fontWeight: 800 }}>
-                      {t.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t.role}
-                    </Typography>
-                  </CardContent>
-                </TestimonialCard>
-              </motion.div>
+                <Box
+                  sx={{
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    p: SPACING.small,
+                  }}
+                >
+                  <Avatar
+                    src={t.avatar}
+                    sx={{
+                      width: 50,
+                      height: 50,
+                      mb: SPACING.small,
+                      mx: 'auto',
+                      border: `2px solid ${COLORS.primary}`,
+                    }}
+                  />
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontStyle: 'italic',
+                      mb: SPACING.small,
+                      fontSize: FONT_SIZES.body1,
+                    }}
+                  >
+                    "{t.content}"
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: 'common.white', fontSize: FONT_SIZES.body2 }}
+                  >
+                    {t.role}
+                  </Typography>
+                </Box>
+              </TechCard>
             </Grid>
           ))}
         </Grid>
 
         {!showAll && (
-          <Box sx={{ textAlign: 'center', mt: 6 }}>
-            <ViewMoreButton variant="contained" size="large" onClick={() => setShowAll(true)}>
+          <Box sx={{ textAlign: 'center', mt: SPACING.medium }}>
+            <ViewMoreButton
+              variant="contained"
+              size="large"
+              onClick={() => setShowAll(true)}
+              sx={{
+                padding: BUTTON_SIZES.medium.padding, // Use BUTTON_SIZES.medium.padding
+              }}
+            >
               View More
             </ViewMoreButton>
           </Box>
@@ -167,3 +211,5 @@ export const TestimonialsSection = () => {
     </Box>
   );
 };
+
+export default TestimonialsSection;

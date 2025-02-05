@@ -1,7 +1,15 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Container, Box, styled, SxProps, Theme, Button, alpha } from '@mui/material';
+import {
+  Container,
+  Box,
+  styled,
+  SxProps,
+  Theme,
+  Button,
+  alpha,
+} from '@mui/material';
 import { motion } from 'framer-motion';
 
 interface PageLayoutProps {
@@ -16,11 +24,11 @@ const PageLayout = ({ children, maxWidth = 'lg', sx, cta }: PageLayoutProps) => 
     <Container maxWidth={maxWidth} sx={sx}>
       <ContentWrapper>{children}</ContentWrapper>
 
-      {/* Conditionally render the CTA */}
-      <Box sx={{ textAlign: 'center', mt: 6 }}>
-        {cta? (
+      {/* CTA container using flex to center the button, with extra margin bottom */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6, mb: 8 }}>
+        {cta ? (
           cta // Render the custom CTA if provided
-        ): (
+        ) : (
           // Default CTA with animation
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -39,11 +47,14 @@ const PageLayout = ({ children, maxWidth = 'lg', sx, cta }: PageLayoutProps) => 
                 fontWeight: 700,
                 fontSize: '1.2rem',
                 borderRadius: 4,
-                background: (theme) => `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                background: (theme) =>
+                  `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                 color: 'common.white',
-                boxShadow: (theme) => `0 8px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
+                boxShadow: (theme) =>
+                  `0 8px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
                 '&:hover': {
-                  boxShadow: (theme) => `0 12px 24px ${alpha(theme.palette.primary.main, 0.6)}`,
+                  boxShadow: (theme) =>
+                    `0 12px 24px ${alpha(theme.palette.primary.main, 0.6)}`,
                 },
               }}
             >

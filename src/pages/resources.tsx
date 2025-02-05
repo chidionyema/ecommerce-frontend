@@ -1,17 +1,19 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Grid, useTheme, Card, CardContent } from '@mui/material';
+import { Box, Typography, Grid, useTheme, Card, CardContent, Button } from '@mui/material';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
 import { Cloud, VpnKey, Code, Download, AccessTime, ErrorOutline, ArrowRight } from '@mui/icons-material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
-import { sharedCardBackground } from '../utils/sharedStyles';
-
+import { SHARED_CARD_BACKGROUND } from '../utils/sharedStyles';
 import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
-import { WhyPartner } from '../components/Common/WhyPartner';
-import { ServicesGrid } from '../components/Common/ServicesGrid'; // Use named import
-import { TestimonialsSection } from '../components/Common/TestimonialsSection'; // Use named import
+import { WhyChooseUs } from '../components/Common/WhyChooseUs';
+import { ServicesGrid } from '../components/Common/ServicesGrid';
+import { TestimonialsSection } from '../components/Common/TestimonialsSection';
+
+// Import shared colors
+import { NEUTRAL_BACKGROUND, NEUTRAL_TEXT } from '../utils/sharedColors';
 
 const resources = [
   {
@@ -67,8 +69,8 @@ const ResourcesPage: React.FC = () => {
                   width: '100%',
                   height: 450,
                   borderRadius: 4,
-                  background: sharedCardBackground(theme),
-                  color: theme.palette.common.white,
+                  background: SHARED_CARD_BACKGROUND(theme),
+                  color: NEUTRAL_TEXT,
                   boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2)',
                   display: 'flex',
                   flexDirection: 'column',
@@ -100,11 +102,11 @@ const ResourcesPage: React.FC = () => {
                     {resource.summary}
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', color: theme.palette.common.white }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: NEUTRAL_TEXT }}>
                       <Download sx={{ fontSize: 16, mr: 1 }} />
                       {resource.downloads}
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', color: theme.palette.common.white }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: NEUTRAL_TEXT }}>
                       <AccessTime sx={{ fontSize: 16, mr: 1 }} />
                       {resource.time}
                     </Box>
@@ -120,7 +122,7 @@ const ResourcesPage: React.FC = () => {
                           py: 1.5,
                           borderRadius: 2,
                           bgcolor: theme.palette.primary.main,
-                          color: theme.palette.common.white,
+                          color: NEUTRAL_TEXT,
                           fontWeight: 600
                         }}
                       >
@@ -128,6 +130,17 @@ const ResourcesPage: React.FC = () => {
                       </Box>
                     </NextLink>
                   </motion.div>
+                  <Button 
+                    variant="outlined" 
+                    size="small" 
+                    sx={{ 
+                      mt: 2, 
+                      color: theme.palette.primary.main, 
+                      borderColor: theme.palette.primary.main 
+                    }} 
+                  >
+                    Contact Us
+                  </Button> 
                 </CardContent>
               </Card>
             </motion.div>
@@ -135,13 +148,17 @@ const ResourcesPage: React.FC = () => {
         ))}
       </Grid>
       <Box sx={{ mt: 30 }} >
-      <TechnologyShowcase />
+        <TechnologyShowcase />
       </Box>
-      <Box/>
-      <WhyPartner />
-    <Box />
-    <ServicesGrid />
-    <TestimonialsSection />
+      <Box>
+        <WhyChooseUs />
+      </Box>
+      <Box>
+        <ServicesGrid />
+      </Box>
+      <Box>
+        <TestimonialsSection />
+      </Box>
     </ConsistentPageLayout>
   );
 };

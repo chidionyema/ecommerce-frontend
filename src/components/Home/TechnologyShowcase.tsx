@@ -1,19 +1,12 @@
+// components/Home/TechnologyShowcase.tsx
 'use client';
+import { Box, Container, Typography, Grid, useTheme } from '@mui/material';
+import { useInView } from 'framer-motion';
+import { useRef } from 'react';
+import { SECTION_HEIGHT, COLORS, FONT_SIZES, SPACING } from '../../utils/sharedStyles';
+import TechCard from '../Common/TechCard';
+import { techIcons } from './tech-data';
 
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  Box,
-  Container,
-  Grid,
-  Typography,
-  useMediaQuery,
-  useTheme,
-  styled
-} from '@mui/material';
-import { motion, useInView } from 'framer-motion';
-import { techIcons } from './tech-data'; // Importing tech icons
-
-// Floating hover animation
 const floatingVariants = {
   hover: {
     y: [-5, 5, -5],
@@ -22,8 +15,8 @@ const floatingVariants = {
     transition: {
       y: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
       rotate: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
-      scale: { duration: 0.2 }
-    }
+      scale: { duration: 0.2 },
+    },
   },
   rest: {
     y: [-3, 3, -3],
@@ -31,57 +24,31 @@ const floatingVariants = {
     rotate: 0,
     transition: {
       y: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
-      rotate: { duration: 0 }
-    }
-  }
+      rotate: { duration: 0 },
+    },
+  },
 };
-
-// Styled Tech Card
-const TechCard = styled(motion.div)<{ color: string }>(({ theme, color }) => ({
-  position: 'relative',
-  textAlign: 'center',
-  padding: theme.spacing(3),
-  borderRadius: '16px',
-  cursor: 'pointer',
-  overflow: 'hidden',
-  background: `linear-gradient(145deg, ${color}10 0%, #ffffff30 100%)`,
-  border: `1px solid ${color}30`,
-  transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
-  width: '100%',
-  minHeight: 200,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  '&:hover': {
-    transform: 'scale(1.05) translateY(-5px)',
-    boxShadow: `0 12px 32px ${color}40`,
-    borderColor: `${color}80`,
-  }
-}));
 
 export const TechnologyShowcase = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const ref = useRef(null);
   const inView = useInView(ref, { amount: 0.5, once: true });
+
+  const cloudComputingColor = techIcons.find(tech => tech.title === 'Cloud Computing')?.color;
 
   return (
     <Box
       sx={{
-        py: 10,
-        width: '100vw', // Full viewport width
+        minHeight: SECTION_HEIGHT,
+        width: '100vw',
         position: 'relative',
         left: '50%',
         right: '50%',
         marginLeft: '-50vw',
         marginRight: '-50vw',
-        background: `linear-gradient(
-          45deg, 
-          ${theme.palette.primary.main} 0%, 
-          ${theme.palette.secondary.main} 100%
-        )`,
+        background: `linear-gradient(45deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)`,
         overflow: 'hidden',
+        py: SPACING.medium,
       }}
     >
       <Container maxWidth="lg" ref={ref}>
@@ -91,58 +58,26 @@ export const TechnologyShowcase = () => {
           sx={{
             color: 'common.white',
             fontWeight: 900,
-            mb: 6,
+            mb: SPACING.medium,
             textShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            letterSpacing: '-0.03em'
+            letterSpacing: '-0.03em',
+            fontSize: FONT_SIZES.h2,
           }}
         >
           Core Technologies
         </Typography>
 
-        <Grid 
-          container 
-          spacing={isMobile ? 2 : 4} 
-          justifyContent="center"
-          sx={{ width: '100%', maxWidth: '1600px', margin: '0 auto' }} // Prevents unnecessary constraints
-        >
+        <Grid container spacing={SPACING.medium} justifyContent="center">
           {techIcons.map((tech, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={tech.id} sx={{ display: 'flex' }}>
+            <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
               <TechCard
+                icon={tech.icon}
+                title={tech.title}
                 color={tech.color}
-                initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
-                transition={{ delay: index * 0.08, type: 'spring', stiffness: 80, damping: 12 }}
-                whileHover="hover"
-                whileTap={{ scale: 0.98 }}
-              >
-                <motion.div
-                  variants={floatingVariants}
-                  initial="rest"
-                  animate="rest"
-                  whileHover="hover"
-                  style={{
-                    marginBottom: theme.spacing(2),
-                    display: 'flex',
-                    justifyContent: 'center',
-                    filter: `drop-shadow(0 0 12px ${tech.color}80)`
-                  }}
-                >
-                  {React.cloneElement(tech.icon, { size: 40, strokeWidth: 1.2 })}
-                </motion.div>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 800,
-                    fontSize: '1.1rem',
-                    background: `linear-gradient(45deg, ${tech.color}, ${tech.color}CC)`,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    letterSpacing: '-0.015em'
-                  }}
-                >
-                  {tech.title}
-                </Typography>
-              </TechCard>
+                index={index}
+                floatingVariants={floatingVariants}
+                textColor={cloudComputingColor}
+              />
             </Grid>
           ))}
         </Grid>
@@ -150,3 +85,5 @@ export const TechnologyShowcase = () => {
     </Box>
   );
 };
+
+export default TechnologyShowcase;

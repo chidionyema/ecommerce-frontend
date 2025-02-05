@@ -8,18 +8,21 @@ import {
   Box,
   Stack,
   CircularProgress,
+  Typography,
+  IconButton,
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
-import { WhyPartner } from '../components/Common/WhyPartner';
+import { WhyChooseUs } from '../components/Common/WhyChooseUs';
 import { ServicesGrid } from '../components/Common/ServicesGrid'; // Use named import
 import { TestimonialsSection } from '../components/Common/TestimonialsSection'; // Use named import
 import { z } from 'zod';
 import emailjs from '@emailjs/browser';
 import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
-import { sharedCardBackground } from '../utils/sharedStyles';
+import { SHARED_CARD_BACKGROUND } from '../utils/sharedStyles';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const EMAILJS_CONFIG = {
   SERVICE_ID: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
@@ -51,6 +54,7 @@ const Contact = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [step, setStep] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
 
   const validateField = useCallback((name: keyof FormData, value: string) => {
     try {
@@ -123,18 +127,65 @@ const Contact = () => {
             mx: 'auto',
             p: 4,
             borderRadius: 6,
-            background: sharedCardBackground(theme),
+            background: 'rgba(255, 255, 255, 0.08)', // Subtle white overlay for better contrast on blue background
             boxShadow: `0px 12px 24px rgba(0, 0, 0, 0.4)`,
             mt: 10, // Increased margin-top for spacing from the top
             mb: 10, // Increased margin-bottom to create space below the form
             position: 'relative',
           }}
         >
+          <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', fontSize: '1.125rem' }}> 
+            {/* Changed font size to 1.125rem */}
+            Let's Connect
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 3, color: 'white' }}> 
+            {/* Changed color to 'white' for better contrast */}
+            Ready to discuss your project? Let's connect! Fill out the form below, and we'll be in touch soon to schedule a free consultation. 
+          </Typography>
           <Stack spacing={3}>
             <TextField fullWidth label="Name" name="name" value={formData.name} onChange={handleChange} />
-            {step >= 1 && <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} />}
-            {step >= 2 && <TextField fullWidth label="Phone" name="phone" value={formData.phone} onChange={handleChange} />}
-            {step >= 3 && <TextField fullWidth label="Message" name="message" value={formData.message} onChange={handleChange} multiline rows={4} />}
+            {step >= 1 && (
+              <TextField
+                fullWidth
+                label="Email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                type="email"
+              />
+            )}
+            {step >= 2 && (
+              <TextField
+                fullWidth
+                label="Phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                type={showPassword ? 'text' : 'password'}
+                InputProps={{
+                  endAdornment: (
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  ),
+                }}
+              />
+            )}
+            {step >= 3 && (
+              <TextField
+                fullWidth
+                label="Message"
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                multiline
+                rows={4}
+                placeholder="Tell us about your project..." 
+              />
+            )}
           </Stack>
 
           <Button type="submit" fullWidth size="large" variant="contained" disabled={loading} sx={{ mt: 8 }}>
@@ -143,12 +194,12 @@ const Contact = () => {
         </Box>
 
         {/* Spacing between the form and the next section */}
-        <Box sx={{ mb: 30 , mt: 30 }} /> 
+        <Box sx={{ mb: 30, mt: 30 }} />
 
         {/* Other Sections */}
         <TechnologyShowcase />
         <Box /> {/* Increased margin-bottom */}
-        <WhyPartner />
+        <WhyChooseUs />
         <Box /> {/* Increased margin-bottom */}
         <ServicesGrid />
         <Box /> {/* Increased margin-bottom */}

@@ -8,7 +8,7 @@ import ProjectCard from '../components/Solutions/ProjectCard';
 import { cvProjects } from '../data/cvProjects';
 
 import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
-import { WhyPartner } from '../components/Common/WhyPartner';
+import { WhyChooseUs } from '../components/Common/WhyChooseUs';
 import { ServicesGrid } from '../components/Common/ServicesGrid'; // Use named import
 import { TestimonialsSection } from '../components/Common/TestimonialsSection'; // Use named import
 
@@ -96,7 +96,7 @@ const Solutions = () => {
           </Box>
         </Container>
         <TechnologyShowcase />
-    <WhyPartner />
+    <WhyChooseUs />
     <ServicesGrid />
     <TestimonialsSection />
       </ConsistentPageLayout>
