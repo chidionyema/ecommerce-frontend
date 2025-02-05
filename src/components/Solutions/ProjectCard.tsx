@@ -40,19 +40,6 @@ export interface Project {
   iconColor: string;
 }
 
-import {
-  Cloud,
-  Code as Code2,
-  Cpu,
-  Database,
-  GitBranch,
-  Layers,
-  Server,
-  Terminal,
-  Box as BoxIcon,
-  CircuitBoard,
-} from 'lucide-react';
-
 const technologyIconMap: {
   [key: string]: { icon: LucideIcon; color: string };
 } = {
@@ -78,11 +65,13 @@ const ProjectCard = ({ project }: { project: Project }) => {
     <GoldCard 
       href={`/projects/${project.id}`}
       sx={{
-        margin: '0 !important',
+        margin: 'auto !important',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         padding: 2,
+        width: '100%',
+        maxWidth: 400,
         transition: 'transform 0.3s ease, box-shadow 0.3s ease',
         '&:hover': {
           transform: 'translateY(-8px)',
@@ -113,8 +102,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
             sx={{
               position: 'absolute',
               inset: 0,
-              background:
-                'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%)',
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%)',
             }}
           />
         </Box>
@@ -145,11 +133,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
             return (
               <Chip
                 key={tech}
-                icon={
-                  techData ? (
-                    <techData.icon size={16} color={techData.color} />
-                  ) : undefined
-                }
+                icon={techData?.icon ? <techData.icon size={16} color={techData.color} /> : undefined}
                 label={tech}
                 size="small"
                 sx={{
@@ -176,22 +160,26 @@ const ProjectCard = ({ project }: { project: Project }) => {
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 2,
+            width: '90%',
+            maxWidth: 200
           }}
         >
           <Button
             component={NextLink}
             href={`/projects/${project.id}`}
             endIcon={<ArrowRightAlt />}
+            fullWidth
             sx={{
               background: 'linear-gradient(45deg, #B8860B, #FFB90F)',
               color: '#000',
               borderRadius: 2,
-              px: 3,
+              px: { xs: 2, sm: 3 },
               py: 1,
               fontWeight: 600,
               textTransform: 'none',
               boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.4)}`,
               animation: `${subtlePulse} 2s infinite ease-in-out`,
+              fontSize: { xs: '0.9rem', sm: '1rem' },
               '&:hover': {
                 background: 'linear-gradient(45deg, #A07B0A, #E6A200)',
                 boxShadow: `0 4px 16px ${alpha(theme.palette.common.black, 0.6)}`,

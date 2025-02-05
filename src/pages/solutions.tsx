@@ -3,7 +3,6 @@
 import React from 'react';
 import { Grid, Button, Box, Container, useTheme, alpha } from '@mui/material';
 import NextLink from 'next/link';
-import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import ProjectCard from '../components/Solutions/ProjectCard';
 import { cvProjects } from '../data/cvProjects';
@@ -25,31 +24,36 @@ const Solutions = () => {
       subtitle="Our enterprise solutions empower your business to innovate and grow."
     >
       <Container maxWidth="lg">
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            mt: 4,
-            p: 4,
-          }}
-        >
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: 8, 
+          mt: 4, 
+          p: { xs: 2, sm: 4 } // Responsive padding
+        }}>
           <Grid
             container
             spacing={CARD_GRID_CONFIG.container.spacing}
-            sx={CARD_GRID_CONFIG.container.sx}
+            sx={{
+              ...CARD_GRID_CONFIG.container.sx,
+              justifyContent: 'center',
+              px: { xs: 1, sm: 0 } // Add horizontal padding on mobile
+            }}
           >
             {cvProjects.map((project) => (
               <Grid
                 item
                 xs={12}
                 sm={6}
-                md={4} // 3 cards per row on medium screens and up
+                md={4}
                 key={project.id}
                 sx={{
                   ...CARD_GRID_CONFIG.item.sx,
                   display: 'flex',
                   flexDirection: 'column',
+                  maxWidth: { xs: '400px', sm: 'none' },
+                  margin: { xs: '0 auto', sm: 'initial' },
+                  width: '100%', // Ensure full width
                   '& > *': {
                     flex: 1,
                     display: 'flex',

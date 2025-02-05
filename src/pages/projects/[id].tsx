@@ -61,7 +61,8 @@ const ProjectDetails = () => {
     >
       <Particles />
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-        <ReturnButton onClick={() => router.back()} />
+        {/* Shift the ReturnButton up slightly */}
+        <ReturnButton onClick={() => router.back()} sx={{ position: 'relative', top: '-10px' }} />
         <GlassCard sx={{ mb: 8, position: 'relative', p: 4, borderRadius: 3, boxShadow: 4 }}>
           <ProjectHeader project={project} />
         </GlassCard>
