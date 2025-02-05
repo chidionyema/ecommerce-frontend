@@ -2,7 +2,14 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useMemo, useRef } from 'react';
-import { Box, Typography, Container, CircularProgress, Grid, useTheme } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Container,
+  CircularProgress,
+  Grid,
+  useTheme,
+} from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { cvProjects } from '../../data/cvProjects';
 import { Project } from '../../types/project';
@@ -24,7 +31,10 @@ const ProjectDetails = () => {
   const containerRef = useRef(null);
   const projectId = params?.id as string;
 
-  const project = useMemo(() => cvProjects.find((p: Project) => p.id === projectId), [projectId]);
+  const project = useMemo(
+    () => cvProjects.find((p: Project) => p.id === projectId),
+    [projectId]
+  );
 
   if (!project) {
     return (
@@ -49,10 +59,10 @@ const ProjectDetails = () => {
       component="main"
       ref={containerRef}
       sx={{
-        background: `linear-gradient(45deg, ${alpha(theme.palette.primary.dark, 0.95)} 0%, ${alpha(
-          theme.palette.secondary.dark,
-          0.3,
-        )} 100%)`,
+        background: `linear-gradient(45deg, ${alpha(
+          theme.palette.primary.dark,
+          0.95
+        )} 0%, ${alpha(theme.palette.secondary.dark, 0.3)} 100%)`,
         minHeight: '100vh',
         padding: '7rem 0 4rem',
         position: 'relative',
@@ -61,9 +71,19 @@ const ProjectDetails = () => {
     >
       <Particles />
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-        {/* Shift the ReturnButton up slightly */}
-        <ReturnButton onClick={() => router.back()} sx={{ position: 'relative', top: '-10px' }} />
-        <GlassCard sx={{ mb: 8, position: 'relative', p: 4, borderRadius: 3, boxShadow: 4 }}>
+        {/* Wrap the ReturnButton in a Box to shift it upward */}
+        <Box sx={{ position: 'relative', top: '-10px' }}>
+          <ReturnButton onClick={() => router.back()} />
+        </Box>
+        <GlassCard
+          sx={{
+            mb: 8,
+            position: 'relative',
+            p: 4,
+            borderRadius: 3,
+            boxShadow: 4,
+          }}
+        >
           <ProjectHeader project={project} />
         </GlassCard>
         <Grid container spacing={4}>
