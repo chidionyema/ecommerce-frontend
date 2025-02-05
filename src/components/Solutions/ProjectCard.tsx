@@ -1,73 +1,30 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import {
   Box,
   Typography,
   Chip,
-  Card,
   CardContent,
-  CardActionArea,
+  Button,
   useTheme,
   alpha,
-  Button,
-  styled,
-  keyframes,
 } from '@mui/material';
-import { motion, AnimatePresence } from 'framer-motion';
 import NextLink from 'next/link';
-import { ArrowRightAlt } from '@mui/icons-material';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRightAlt } from '@mui/icons-material';
+import GoldCard from '../GoldCard'; // adjust the path if necessary
 import { LucideIcon } from 'lucide-react';
-import { SHARED_CARD_BACKGROUND } from '../../utils/sharedStyles';
+import { NEUTRAL_TEXT } from '../../utils/sharedColors';
+import { keyframes } from '@emotion/react';
 
-// Import shared colors
-import { NEUTRAL_BACKGROUND, NEUTRAL_TEXT } from '../../utils/sharedColors';
-
-// ---------------------------------------------------------------------------
-// KEYFRAMES & ANIMATIONS
-// ---------------------------------------------------------------------------
 const subtlePulse = keyframes`
   0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+  50% { transform: scale(1.05); }
   100% { transform: scale(1); }
 `;
 
-// ---------------------------------------------------------------------------
-// STYLED COMPONENTS
-// ---------------------------------------------------------------------------
-// FixedStyledCard now uses a fixed width of 350px and a fixed height of 400px.
-// The background uses a subtle linear-gradient for a premium neutral color blend.
-const FixedStyledCard = styled(Card)(({ theme }) => ({
-  position: 'relative',
-  overflow: 'hidden',
-  background: `linear-gradient(45deg, ${NEUTRAL_BACKGROUND} 0%, rgba(255, 255, 255, 0.05) 100%)`, // Matches Pricing Card
-  borderRadius: 16,
-  boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.5)}`,
-  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-  width: 350,
-  height: 400,
-  margin: '20px', // Increased spacing for more separation
-  backdropFilter: 'blur(18px) saturate(180%)', // Soft glassmorphism
-  border: `2px solid rgba(255, 255, 255, 0.1)`, // Subtle border for refinement
-  '&:hover': {
-    transform: 'translateY(-6px)',
-    boxShadow: `0 10px 28px ${alpha(theme.palette.common.black, 0.7)}`,
-  },
-}));
-
-
-// A clean overlay for the card that appears on hover (optional)
-const HoverOverlay = styled(motion.div)({
-  position: 'absolute',
-  inset: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.2)',
-  pointerEvents: 'none',
-});
-
-// ---------------------------------------------------------------------------
-// PROJECT INTERFACE
-// ---------------------------------------------------------------------------
 export interface Project {
   id: string;
   name: string;
@@ -83,7 +40,6 @@ export interface Project {
   iconColor: string;
 }
 
-// A simple map for technology icons (if needed)
 import {
   Cloud,
   Code as Code2,
@@ -94,221 +50,157 @@ import {
   Server,
   Terminal,
   Box as BoxIcon,
+  CircuitBoard,
 } from 'lucide-react';
 
-const technologyIconMap: Record<string, LucideIcon> = {
-  '.NET Core': Code2,
-  Java: Terminal,
-  WebSockets: GitBranch,
-  RabbitMQ: Database,
-  MQTT: Layers,
-  Docker: Server,
-  Kubernetes: Cloud,
-  Terraform: BoxIcon,
-  AWS: Cloud,
-  Azure: Cloud,
-  'C#': Cpu,
-  'EF Core': Database,
-  SQL: Database,
+const technologyIconMap: {
+  [key: string]: { icon: LucideIcon; color: string };
+} = {
+  ".NET Core": { icon: Code2, color: '#512bd4' },
+  "Java": { icon: Terminal, color: '#007396' },
+  "WebSockets": { icon: GitBranch, color: '#00aced' },
+  "RabbitMQ": { icon: Database, color: '#E51B24' },
+  "MQTT": { icon: Layers, color: '#7FBA00' },
+  "Docker": { icon: Server, color: '#2496ED' },
+  "Kubernetes": { icon: Cloud, color: '#326CE5' },
+  "Terraform": { icon: BoxIcon, color: '#623CE4' },
+  "AWS": { icon: Cloud, color: '#FF9900' },
+  "Azure": { icon: Cloud, color: '#007FFF' },
+  "C#": { icon: Cpu, color: '#178600' },
+  "EF Core": { icon: Database, color: '#512bd4' },
+  "SQL": { icon: Database, color: '#D82B2B' },
 };
 
-// ---------------------------------------------------------------------------
-// PROJECT CARD COMPONENT
-// ---------------------------------------------------------------------------
 const ProjectCard = ({ project }: { project: Project }) => {
   const theme = useTheme();
-  const [hovered, setHovered] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-      style={{ perspective: 1000, outline: 'none' }}
-      tabIndex={0}
-      role="article"
-      aria-label={`Project: ${project.name}`}
+    <GoldCard 
+      href={`/projects/${project.id}`}
+      sx={{
+        margin: '0 !important', // Remove any default margins
+        height: '100%', // Fill grid cell
+        padding: 2, // Internal spacing (theme.spacing(2) equals 16px)
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-8px)',
+          boxShadow: `0 24px 48px ${alpha(theme.palette.common.black, 0.4)}`,
+        }
+      }}
     >
-      <FixedStyledCard>
-        {/* Optional hover overlay */}
-        <AnimatePresence>
-          {hovered && (
-            <HoverOverlay
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            />
-          )}
-        </AnimatePresence>
-
-        <CardActionArea
-          component={NextLink}
-          href={`/projects/${project.id}`}
+      {project.image && (
+        <Box
           sx={{
-            p: 3,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            height: '100%',
+            position: 'relative',
+            width: 'calc(100% - 16px)', // Account for internal padding
+            margin: '8px', // Balanced spacing around the image
+            height: 150,
+            borderRadius: 2,
+            overflow: 'hidden',
+            mb: 2,
           }}
         >
-          {/* Image Section (if provided) */}
-          {project.image && (
-            <Box
-              sx={{
-                position: 'relative',
-                width: '100%',
-                height: 150,
-                borderRadius: 2,
-                overflow: 'hidden',
-                mb: 2,
-              }}
-            >
-              <Image
-                src={project.image}
-                alt={project.name}
-                fill
-                style={{ objectFit: 'cover' }}
-                priority
-              />
-              <Box
-                sx={{
-                  position: 'absolute',
-                  inset: 0,
-                  background:
-                    'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%)',
-                }}
-              />
-            </Box>
-          )}
-
-          <CardContent
+          <Image
+            src={project.image}
+            alt={project.name}
+            fill
+            style={{ objectFit: 'cover' }}
+            priority
+          />
+          <Box
             sx={{
-              px: 0,
-              flexGrow: 1,
-              textAlign: 'center',
+              position: 'absolute',
+              inset: 0,
+              background:
+                'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%)',
             }}
-          >
-            {/* Title */}
-            <Typography
-              variant="h5"
-              sx={{
-                fontWeight: 700,
-                mb: 1,
-                color: NEUTRAL_TEXT,
-              }}
-            >
-              {project.name}
-            </Typography>
+          />
+        </Box>
+      )}
 
-            {/* Client Info */}
-            {project.clientName && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mb: 2,
-                }}
-              >
-                {project.icon && (
-                  <Box sx={{ mr: 1 }}>
-                    <project.icon size={24} color={theme.palette.primary.light} />
-                  </Box>
-                )}
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    fontWeight: 500,
-                    color: theme.palette.grey[300],
-                  }}
-                >
-                  {project.clientName}
-                </Typography>
+      <CardContent sx={{ px: 0, flexGrow: 1, textAlign: 'center' }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: NEUTRAL_TEXT }}>
+          {project.name}
+        </Typography>
+        {project.clientName && (
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+            {project.icon && (
+              <Box sx={{ mr: 1 }}>
+                <project.icon size={24} color={theme.palette.primary.light} />
               </Box>
             )}
-
-            {/* Description */}
-            <Typography
-              variant="body2"
-              sx={{ color: theme.palette.grey[400], mb: 2 }}
-            >
-              {project.description}
+            <Typography variant="subtitle1" sx={{ fontWeight: 500, color: theme.palette.grey[300] }}>
+              {project.clientName}
             </Typography>
-
-            {/* Technology Chips */}
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
-              {project.technologies.map((tech) => {
-                const TechIcon = technologyIconMap[tech];
-                return (
-                  <Chip
-                    key={tech}
-                    icon={
-                      TechIcon ? <TechIcon size={16} color={theme.palette.primary.light} /> : undefined
-                    }
-                    label={tech}
-                    size="small"
-                    sx={{
-                      fontSize: '0.75rem',
-                      borderRadius: 1,
-                      bgcolor: alpha(theme.palette.primary.light, 0.1),
-                      color: theme.palette.grey[200],
-                    }}
-                  />
-                );
-              })}
-            </Box>
-          </CardContent>
-        </CardActionArea>
-
-        {/* Floating CTA Button */}
-        <AnimatePresence>
-          {hovered && (
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              style={{
-                position: 'absolute',
-                bottom: 24,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 2,
-              }}
-            >
-              <Button
-                component={NextLink}
-                href={`/projects/${project.id}`}
-                endIcon={<ArrowRightAlt />}
+          </Box>
+        )}
+        <Typography variant="body2" sx={{ color: theme.palette.grey[400], mb: 2 }}>
+          {project.description}
+        </Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+          {project.technologies.map((tech) => {
+            const techData = technologyIconMap[tech];
+            return (
+              <Chip
+                key={tech}
+                icon={
+                  techData ? (
+                    <techData.icon size={16} color={techData.color} />
+                  ) : undefined
+                }
+                label={tech}
+                size="small"
                 sx={{
-                  backgroundColor: theme.palette.primary.dark,
-                  color: NEUTRAL_TEXT,
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1,
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.4)}`,
-                  animation: `${subtlePulse} 2s infinite ease-in-out`,
-                  '&:hover': {
-                    backgroundColor: theme.palette.primary.main,
-                    boxShadow: `0 4px 16px ${alpha(theme.palette.common.black, 0.6)}`,
-                  },
+                  fontSize: '0.75rem',
+                  borderRadius: 1,
+                  bgcolor: alpha(theme.palette.primary.light, 0.1),
+                  color: theme.palette.grey[200],
                 }}
-              >
-                Enter Innovation Portal
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </FixedStyledCard>
-    </motion.div>
+              />
+            );
+          })}
+        </Box>
+      </CardContent>
+
+      <AnimatePresence>
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+          style={{
+            position: 'absolute',
+            bottom: 8,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 2,
+          }}
+        >
+          <Button
+            component={NextLink}
+            href={`/projects/${project.id}`}
+            endIcon={<ArrowRightAlt />}
+            sx={{
+              background: 'linear-gradient(45deg, #B8860B, #FFB90F)',
+              color: '#000',
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              fontWeight: 600,
+              textTransform: 'none',
+              boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.4)}`,
+              animation: `${subtlePulse} 2s infinite ease-in-out`,
+              '&:hover': {
+                background: 'linear-gradient(45deg, #A07B0A, #E6A200)',
+                boxShadow: `0 4px 16px ${alpha(theme.palette.common.black, 0.6)}`,
+              },
+            }}
+          >
+            View Details
+          </Button>
+        </motion.div>
+      </AnimatePresence>
+    </GoldCard>
   );
 };
 

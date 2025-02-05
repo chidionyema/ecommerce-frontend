@@ -1,4 +1,3 @@
-// components/Common/ServicesGrid.js
 'use client';
 import { Grid, Typography, Box, useTheme, Container } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -11,6 +10,7 @@ import {
   BarChart2,
   Layers,
 } from 'react-feather';
+import { NEUTRAL_BACKGROUND } from '../../utils/sharedColors';
 
 const services = [
   {
@@ -89,14 +89,21 @@ export const ServicesGrid = () => {
                 <Box
                   sx={{
                     p: SPACING.medium,
-                    borderRadius: 2,
-                    background: theme.palette.background.paper,
-                    boxShadow: 2,
+                    borderRadius: 16, // Matches the GoldCard aesthetic
+                    background: `linear-gradient(45deg, ${NEUTRAL_BACKGROUND} 0%, rgba(255,255,255,0.05) 100%)`,
+                    boxShadow: `0 4px 12px ${theme.palette.mode === 'light' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.7)'}`,
+                    backdropFilter: 'blur(18px) saturate(180%)',
+                    border: '2px solid rgba(255,255,255,0.1)',
                     width: CARD_SIZES.medium.width,
                     height: CARD_SIZES.medium.height,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-6px)',
+                      boxShadow: `0 10px 28px ${theme.palette.mode === 'light' ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.8)'}`,
+                    },
                   }}
                 >
                   {service.icon}

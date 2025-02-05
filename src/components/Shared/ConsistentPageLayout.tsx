@@ -13,7 +13,7 @@ const GradientBackground = styled('div')(({ theme }) => ({
     theme.palette.secondary.dark, 0.85
   )} 100%)
   `,
-  minHeight: '5vh', // Further reduced
+  minHeight: '3vh', // Further reduced
   padding: theme.spacing(1, 0), // Minimal padding
   display: 'flex',
   flexDirection: 'column',
