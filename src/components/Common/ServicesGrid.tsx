@@ -1,7 +1,10 @@
 'use client';
+
+import React from 'react';
 import { Grid, Typography, Box, useTheme, Container } from '@mui/material';
 import { motion } from 'framer-motion';
-import { SECTION_HEIGHT, COLORS, FONT_SIZES, SPACING, CARD_SIZES } from '../../utils/sharedStyles';
+import { SECTION_HEIGHT, COLORS, FONT_SIZES, SPACING } from '../../utils/sharedStyles';
+import { NEUTRAL_BACKGROUND } from '../../utils/sharedColors';
 import {
   Briefcase,
   BookOpen,
@@ -10,7 +13,8 @@ import {
   BarChart2,
   Layers,
 } from 'react-feather';
-import { NEUTRAL_BACKGROUND } from '../../utils/sharedColors';
+// Import your TechCard component – this should match the style used in your TestimonialsSection
+import TechCard from '../Common/TechCard';
 
 const services = [
   {
@@ -86,34 +90,15 @@ export const ServicesGrid = () => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
               >
-                <Box
-                  sx={{
-                    p: SPACING.medium,
-                    borderRadius: 16, // Matches the GoldCard aesthetic
-                    background: `linear-gradient(45deg, ${NEUTRAL_BACKGROUND} 0%, rgba(255,255,255,0.05) 100%)`,
-                    boxShadow: `0 4px 12px ${theme.palette.mode === 'light' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.7)'}`,
-                    backdropFilter: 'blur(18px) saturate(180%)',
-                    border: '2px solid rgba(255,255,255,0.1)',
-                    width: CARD_SIZES.medium.width,
-                    height: CARD_SIZES.medium.height,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                    '&:hover': {
-                      transform: 'translateY(-6px)',
-                      boxShadow: `0 10px 28px ${theme.palette.mode === 'light' ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.8)'}`,
-                    },
-                  }}
+                <TechCard
+                  icon={service.icon}
+                  title={service.title}
+                  color={theme.palette.primary.main}
                 >
-                  {service.icon}
-                  <Typography variant="h6" component="h3" textAlign="center" mt={2}>
-                    {service.title}
-                  </Typography>
                   <Typography variant="body2" color="text.secondary" textAlign="center" mt={1}>
                     {service.content}
                   </Typography>
-                </Box>
+                </TechCard>
               </motion.div>
             </Grid>
           ))}
