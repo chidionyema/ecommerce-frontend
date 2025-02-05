@@ -11,8 +11,8 @@ interface TechCardProps {
   icon: ReactElement;
   title: string;
   color: string;
-  index: number;
-  floatingVariants: any;
+  index?: number;              // mark as optional
+  floatingVariants?: any;
   textColor?: string;
   children?: ReactNode; // For additional content
   whileHover?: { scale: number };
