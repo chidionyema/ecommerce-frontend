@@ -1,4 +1,3 @@
-// pages/Contact.tsx
 'use client';
 
 import { useState, useCallback } from 'react';
@@ -13,6 +12,8 @@ import {
   IconButton,
   InputAdornment,
   styled,
+  SxProps,
+  Theme,
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -25,7 +26,14 @@ import emailjs from '@emailjs/browser';
 import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import { NEUTRAL_BACKGROUND } from '../utils/sharedColors';
-import { Visibility, VisibilityOff, Person, Email, Phone, ChatBubbleOutline } from '@mui/icons-material';
+import {
+  Visibility,
+  VisibilityOff,
+  Person,
+  Email,
+  Phone,
+  ChatBubbleOutline,
+} from '@mui/icons-material';
 
 // EmailJS configuration
 const EMAILJS_CONFIG = {
@@ -37,7 +45,9 @@ const EMAILJS_CONFIG = {
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  phone: z.string().regex(/^$|^[+]?[()0-9\s.-]{7,15}$/, 'Invalid phone number'),
+  phone: z
+    .string()
+    .regex(/^$|^[+]?[()0-9\s.-]{7,15}$/, 'Invalid phone number'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
@@ -57,11 +67,18 @@ const GoldFormContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(4),
   borderRadius: 16,
   background: `linear-gradient(45deg, ${NEUTRAL_BACKGROUND} 0%, rgba(255,255,255,0.05) 100%)`,
-  boxShadow: `0 4px 12px ${theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.7)'}`,
+  boxShadow: `0 4px 12px ${
+    theme.palette.mode === 'light'
+      ? 'rgba(0, 0, 0, 0.5)'
+      : 'rgba(0, 0, 0, 0.7)'
+  }`,
   backdropFilter: 'blur(18px) saturate(180%)',
   border: '2px solid rgba(255, 255, 255, 0.1)',
   position: 'relative',
 }));
+
+// Create a motion-enhanced version of GoldFormContainer
+const MotionGoldFormContainer = motion(GoldFormContainer);
 
 const Contact = () => {
   const theme = useTheme();
@@ -75,7 +92,9 @@ const Contact = () => {
 
   const validateField = useCallback((name: keyof FormData, value: string) => {
     try {
-      const fieldSchema = z.object({ [name]: formSchema.shape[name as keyof FormData] });
+      const fieldSchema = z.object({
+        [name]: formSchema.shape[name as keyof FormData],
+      });
       fieldSchema.parse({ [name]: value });
       setErrors((prev) => ({ ...prev, [name]: '' }));
     } catch (error) {
@@ -90,8 +109,10 @@ const Contact = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     validateField(name as keyof FormData, value);
     if (name === 'name' && value.length > 1) setStep(1);
-    if (name === 'email' && formSchema.shape.email.safeParse(value).success) setStep(2);
-    if (name === 'phone' && formSchema.shape.phone.safeParse(value).success) setStep(3);
+    if (name === 'email' && formSchema.shape.email.safeParse(value).success)
+      setStep(2);
+    if (name === 'phone' && formSchema.shape.phone.safeParse(value).success)
+      setStep(3);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -142,18 +163,23 @@ const Contact = () => {
             p: 8,
           }}
         >
-          <GoldFormContainer
-            component={motion.form}
+          {/* Use MotionGoldFormContainer instead of passing motion props to GoldFormContainer */}
+          <MotionGoldFormContainer
+            component="form"
             onSubmit={handleSubmit}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', fontSize: '1.125rem' }}>
+            <Typography
+              variant="h6"
+              sx={{ mb: 3, fontWeight: 'bold', fontSize: '1.125rem' }}
+            >
               Let's Connect
             </Typography>
             <Typography variant="body1" sx={{ mb: 3, color: 'white' }}>
-              Ready to discuss your project? Fill out the form below, and we'll be in touch soon to schedule a free consultation.
+              Ready to discuss your project? Fill out the form below, and we'll be
+              in touch soon to schedule a free consultation.
             </Typography>
             <Stack spacing={3}>
               <TextField
@@ -203,7 +229,10 @@ const Contact = () => {
                     ),
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
                           {showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                       </InputAdornment>
@@ -231,10 +260,17 @@ const Contact = () => {
                 />
               )}
             </Stack>
-            <Button type="submit" fullWidth size="large" variant="contained" disabled={loading} sx={{ mt: 8 }}>
+            <Button
+              type="submit"
+              fullWidth
+              size="large"
+              variant="contained"
+              disabled={loading}
+              sx={{ mt: 8 }}
+            >
               {loading ? <CircularProgress size={24} /> : 'Send Message'}
             </Button>
-          </GoldFormContainer>
+          </MotionGoldFormContainer>
         </Box>
         {/* Spacing between the form and the next section */}
         <Box sx={{ mb: 30, mt: 30 }} />

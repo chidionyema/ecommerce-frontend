@@ -1,8 +1,15 @@
-// components/GoldCard.tsx
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Card, CardActionArea, styled, alpha } from '@mui/material';
+import {
+  Card,
+  CardActionArea,
+  CardProps,
+  styled,
+  alpha,
+  SxProps,
+  Theme,
+} from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import NextLink from 'next/link';
 import { keyframes } from '@mui/system';
@@ -26,7 +33,7 @@ const GoldCardContainer = styled(Card)(({ theme }) => ({
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
   width: 350,
   height: 400,
-  
+  margin: '20px',
   backdropFilter: 'blur(18px) saturate(180%)',
   border: `2px solid rgba(255, 255, 255, 0.1)`,
   '&:hover': {
@@ -45,12 +52,13 @@ const HoverOverlay = styled(motion.div)({
 // ---------------------------------------------------------------------------
 // GOLD CARD COMPONENT
 // ---------------------------------------------------------------------------
-export interface GoldCardProps {
+export interface GoldCardProps extends CardProps {
   href?: string;
   children: React.ReactNode;
+  sx?: SxProps<Theme>; // Added the sx prop here
 }
 
-const GoldCard: React.FC<GoldCardProps> = ({ href, children }) => {
+const GoldCard: React.FC<GoldCardProps> = ({ href, children, sx, ...rest }) => {
   const [hovered, setHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -67,7 +75,7 @@ const GoldCard: React.FC<GoldCardProps> = ({ href, children }) => {
       tabIndex={0}
       role="article"
     >
-      <GoldCardContainer>
+      <GoldCardContainer sx={sx} {...rest}>
         <AnimatePresence>
           {hovered && (
             <HoverOverlay

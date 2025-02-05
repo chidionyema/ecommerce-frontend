@@ -84,22 +84,24 @@ const ProjectCard = ({ project }: { project: Project }) => {
         flexDirection: 'column',
         padding: 2,
         transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-        '&:hover': {
-          transform: 'translateY(-8px)',
-          boxShadow: `0 24px 48px ${alpha(theme.palette.common.black, 0.4)}`,
+        // Hover state: reveal the button inside the card
+        '&:hover .view-details-button': {
+          opacity: 1,
+          transform: 'translateY(0)'
         }
       }}
     >
+      {/* Image container with fixed height */}
       {project.image && (
         <Box
           sx={{
             position: 'relative',
-            width: 'calc(100% - 16px)',
-            margin: '8px',
-            height: 150,
-            borderRadius: 2,
-            overflow: 'hidden',
+            flexShrink: 0,
+            width: '100%',
+            height: 200, // Fixed height for images
             mb: 2,
+            borderRadius: '8px',
+            overflow: 'hidden'
           }}
         >
           <Image
@@ -120,65 +122,69 @@ const ProjectCard = ({ project }: { project: Project }) => {
         </Box>
       )}
 
-      <CardContent sx={{ px: 0, flexGrow: 1, textAlign: 'center' }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: NEUTRAL_TEXT }}>
-          {project.name}
-        </Typography>
-        {project.clientName && (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-            {project.icon && (
-              <Box sx={{ mr: 1 }}>
-                <project.icon size={24} color={theme.palette.primary.light} />
-              </Box>
-            )}
-            <Typography variant="subtitle1" sx={{ fontWeight: 500, color: theme.palette.grey[300] }}>
-              {project.clientName}
-            </Typography>
+      {/* Card content with flex behavior */}
+      <CardContent sx={{ 
+        px: 0, 
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
+      }}>
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: NEUTRAL_TEXT }}>
+            {project.name}
+          </Typography>
+          {project.clientName && (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+              {project.icon && (
+                <Box sx={{ mr: 1 }}>
+                  <project.icon size={24} color={theme.palette.primary.light} />
+                </Box>
+              )}
+              <Typography variant="subtitle1" sx={{ fontWeight: 500, color: theme.palette.grey[300] }}>
+                {project.clientName}
+              </Typography>
+            </Box>
+          )}
+          <Typography variant="body2" sx={{ color: theme.palette.grey[400], mb: 2 }}>
+            {project.description}
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+            {project.technologies.map((tech) => {
+              const techData = technologyIconMap[tech];
+              return (
+                <Chip
+                  key={tech}
+                  icon={
+                    techData ? (
+                      <techData.icon size={16} color={techData.color} />
+                    ) : undefined
+                  }
+                  label={tech}
+                  size="small"
+                  sx={{
+                    fontSize: '0.75rem',
+                    borderRadius: 1,
+                    bgcolor: alpha(theme.palette.primary.light, 0.1),
+                    color: theme.palette.grey[200],
+                  }}
+                />
+              );
+            })}
           </Box>
-        )}
-        <Typography variant="body2" sx={{ color: theme.palette.grey[400], mb: 2 }}>
-          {project.description}
-        </Typography>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
-          {project.technologies.map((tech) => {
-            const techData = technologyIconMap[tech];
-            return (
-              <Chip
-                key={tech}
-                icon={
-                  techData ? (
-                    <techData.icon size={16} color={techData.color} />
-                  ) : undefined
-                }
-                label={tech}
-                size="small"
-                sx={{
-                  fontSize: '0.75rem',
-                  borderRadius: 1,
-                  bgcolor: alpha(theme.palette.primary.light, 0.1),
-                  color: theme.palette.grey[200],
-                }}
-              />
-            );
-          })}
         </Box>
-      </CardContent>
 
-      <AnimatePresence>
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
-          style={{
-            position: 'absolute',
-            bottom: 8,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 2,
-          }}
-        >
+        {/* Button container: initially hidden, becomes visible on hover */}
+        <Box sx={{ 
+          mt: 3,
+          opacity: 0,
+          transform: 'translateY(10px)',
+          transition: 'all 0.3s ease',
+          position: 'relative',
+          zIndex: 1
+        }}>
           <Button
+            className="view-details-button"
             component={NextLink}
             href={`/projects/${project.id}`}
             endIcon={<ArrowRightAlt />}
@@ -200,8 +206,8 @@ const ProjectCard = ({ project }: { project: Project }) => {
           >
             View Details
           </Button>
-        </motion.div>
-      </AnimatePresence>
+        </Box>
+      </CardContent>
     </GoldCard>
   );
 };

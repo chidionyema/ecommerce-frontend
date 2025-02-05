@@ -52,7 +52,16 @@ const Solutions = () => {
                   sm={6}
                   md={4}
                   key={project.id}
-                  sx={CARD_GRID_CONFIG.item.sx}
+                  sx={{
+                    ...CARD_GRID_CONFIG.item.sx,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    '& > *': {
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column'
+                    }
+                  }}
                 >
                   <ProjectCard project={project} />
                 </Grid>
