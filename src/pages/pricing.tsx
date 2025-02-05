@@ -108,13 +108,17 @@ const PricingPage: React.FC = () => {
           flexDirection: 'column',
           gap: 20,
           mt: 8,
-          p: 8,
+          p: { xs: 2, sm: 8 },
         }}
       >
         <Grid
           container
           spacing={CARD_GRID_CONFIG.container.spacing}
-          sx={CARD_GRID_CONFIG.container.sx}
+          sx={{
+            ...CARD_GRID_CONFIG.container.sx,
+            justifyContent: 'center',
+            px: { xs: 1, sm: 0 },
+          }}
         >
           {plans.map((plan) => (
             <Grid
@@ -123,22 +127,43 @@ const PricingPage: React.FC = () => {
               sm={6}
               md={4}
               key={plan.type}
-              sx={CARD_GRID_CONFIG.item.sx}
+              sx={{
+                ...CARD_GRID_CONFIG.item.sx,
+                display: 'flex',
+                justifyContent: 'center',
+                maxWidth: { xs: '400px', sm: 'none' },
+                margin: { xs: '0 auto', sm: 'initial' },
+                width: '100%',
+              }}
             >
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
+                style={{ width: '100%' }}
               >
-                <GoldCard href="#">
+                <GoldCard
+                  href="#"
+                  sx={{
+                    margin: 'auto',
+                    width: '100%',
+                    maxWidth: 400,
+                  }}
+                >
                   <Box sx={{ flex: 1, textAlign: 'center', p: 2 }}>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mb: 2, color: '#FFF' }}>
+                    <Typography
+                      variant="h4"
+                      sx={{ fontWeight: 800, mb: 2, color: '#FFF' }}
+                    >
                       {plan.title}
                     </Typography>
                     {plan.features.map((feature, i) => (
                       <FeatureItem key={i} icon={feature.icon} text={feature.text} />
                     ))}
-                    <Typography variant="h4" sx={{ fontWeight: 700, mt: 2, color: '#FFF' }}>
+                    <Typography
+                      variant="h4"
+                      sx={{ fontWeight: 700, mt: 2, color: '#FFF' }}
+                    >
                       {plan.price}
                     </Typography>
                     <Button
