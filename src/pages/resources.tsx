@@ -61,25 +61,50 @@ const ResourcesPage: React.FC = () => {
           flexDirection: 'column',
           gap: 20,
           mt: 8,
-          p: 8,
+          p: { xs: 2, sm: 8 },
         }}
       >
         <Grid
           container
           spacing={CARD_GRID_CONFIG.container.spacing}
-          sx={CARD_GRID_CONFIG.container.sx}
-          justifyContent="center"
+          sx={{
+            ...CARD_GRID_CONFIG.container.sx,
+            justifyContent: 'center',
+            px: { xs: 1, sm: 0 },
+          }}
         >
           {resources.map((resource) => {
             const IconComponent = resource.icon;
             return (
-              <Grid item xs={12} sm={6} md={4} key={resource.id} sx={CARD_GRID_CONFIG.item.sx}>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={4}
+                key={resource.id}
+                sx={{
+                  ...CARD_GRID_CONFIG.item.sx,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  maxWidth: { xs: '400px', sm: 'none' },
+                  margin: { xs: '0 auto', sm: 'initial' },
+                  width: '100%',
+                }}
+              >
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, ease: 'easeOut' }}
+                  style={{ width: '100%' }}
                 >
-                  <GoldCard href={resource.path}>
+                  <GoldCard
+                    href={resource.path}
+                    sx={{
+                      margin: 'auto',
+                      width: '100%',
+                      maxWidth: 400,
+                    }}
+                  >
                     <Box sx={{ flex: 1, textAlign: 'center' }}>
                       <Box
                         sx={{
@@ -95,7 +120,10 @@ const ResourcesPage: React.FC = () => {
                       >
                         <IconComponent sx={{ fontSize: 40, color: '#FFD700' }} />
                       </Box>
-                      <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5, color: '#FFF' }}>
+                      <Typography
+                        variant="h4"
+                        sx={{ fontWeight: 700, mb: 0.5, color: '#FFF' }}
+                      >
                         {resource.title}
                       </Typography>
                       <Typography variant="body1" sx={{ mb: 1, color: '#FFF' }}>

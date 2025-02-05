@@ -24,20 +24,22 @@ const Solutions = () => {
       subtitle="Our enterprise solutions empower your business to innovate and grow."
     >
       <Container maxWidth="lg">
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: 8, 
-          mt: 4, 
-          p: { xs: 2, sm: 4 } // Responsive padding
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            mt: 4,
+            p: { xs: 2, sm: 4 },
+          }}
+        >
           <Grid
             container
             spacing={CARD_GRID_CONFIG.container.spacing}
             sx={{
               ...CARD_GRID_CONFIG.container.sx,
               justifyContent: 'center',
-              px: { xs: 1, sm: 0 } // Add horizontal padding on mobile
+              px: { xs: 1, sm: 0 },
             }}
           >
             {cvProjects.map((project) => (
@@ -53,15 +55,17 @@ const Solutions = () => {
                   flexDirection: 'column',
                   maxWidth: { xs: '400px', sm: 'none' },
                   margin: { xs: '0 auto', sm: 'initial' },
-                  width: '100%', // Ensure full width
-                  '& > *': {
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column'
-                  }
+                  width: '100%',
                 }}
               >
-                <ProjectCard project={project} />
+                <ProjectCard
+                  project={project}
+                  sx={{
+                    margin: 'auto',
+                    width: '100%',
+                    maxWidth: 400,
+                  }}
+                />
               </Grid>
             ))}
           </Grid>
