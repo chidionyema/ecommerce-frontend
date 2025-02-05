@@ -17,10 +17,6 @@ import {
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
-import { WhyChooseUs } from '../components/Common/WhyChooseUs';
-import { ServicesGrid } from '../components/Common/ServicesGrid';
-import { TestimonialsSection } from '../components/Common/TestimonialsSection';
 import { z } from 'zod';
 import emailjs from '@emailjs/browser';
 import SEO from '../components/SEO';
@@ -60,24 +56,23 @@ const INITIAL_FORM_DATA: FormData = {
   message: '',
 };
 
-// Create a styled container using the Gold Card aesthetic
+// Styled container with full-width mobile support
 const GoldFormContainer = styled(Box)(({ theme }) => ({
-  maxWidth: 500,
-  margin: 'auto',
+  width: '100%',
+  maxWidth: { xs: '100%', sm: 500 },
+  margin: { xs: 0, sm: 'auto' },
   padding: theme.spacing(4),
   borderRadius: 16,
   background: `linear-gradient(45deg, ${NEUTRAL_BACKGROUND} 0%, rgba(255,255,255,0.05) 100%)`,
   boxShadow: `0 4px 12px ${
-    theme.palette.mode === 'light'
-      ? 'rgba(0, 0, 0, 0.5)'
+    theme.palette.mode === 'light' 
+      ? 'rgba(0, 0, 0, 0.5)' 
       : 'rgba(0, 0, 0, 0.7)'
   }`,
   backdropFilter: 'blur(18px) saturate(180%)',
   border: '2px solid rgba(255, 255, 255, 0.1)',
-  position: 'relative',
 }));
 
-// Create a motion-enhanced version of GoldFormContainer
 const MotionGoldFormContainer = motion(GoldFormContainer);
 
 const Contact = () => {
@@ -153,23 +148,28 @@ const Contact = () => {
         title="Let's Work Together"
         subtitle="Fill out the form below and we'll get back to you soon."
       >
-        {/* Consistent outer container */}
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
             gap: 20,
             mt: 8,
-            p: 8,
+            p: { xs: 2, sm: 8 },
+            width: '100%',
+            maxWidth: 1200,
+            mx: 'auto'
           }}
         >
-          {/* Use MotionGoldFormContainer instead of passing motion props to GoldFormContainer */}
           <MotionGoldFormContainer
             component="form"
             onSubmit={handleSubmit}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            sx={{
+              width: '100%',
+              px: { xs: 2, sm: 4 }
+            }}
           >
             <Typography
               variant="h6"
@@ -272,9 +272,7 @@ const Contact = () => {
             </Button>
           </MotionGoldFormContainer>
         </Box>
-        {/* Spacing between the form and the next section */}
         <Box sx={{ mb: 30, mt: 30 }} />
-        {/* Other Sections */}
         <TechnologyShowcase />
         <WhyChooseUs />
         <ServicesGrid />

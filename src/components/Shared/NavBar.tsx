@@ -157,7 +157,7 @@ const BrandLogo = memo(() => {
             animation: 'cosmicGradient 6s ease infinite',
           }}
         >
-          GluStack
+          GLUStack
         </Typography>
       </m.a>
     </Link>
