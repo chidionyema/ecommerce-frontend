@@ -238,6 +238,8 @@ const NavLink: FC<{ item: NavItem; onClick?: () => void }> = memo(({ item, onCli
 
 const NavBar: FC = () => {
   const { activeTheme, setActiveTheme } = useThemeContext();
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const panelWidth = isMobile ? '100vw' : '800px';
@@ -394,10 +396,11 @@ const NavBar: FC = () => {
                 </IconButton>
               </Stack>
               <Box sx={{ mt: 1 }}>
-                <ControlPanelTabs 
-                  activeSection={activeSection}
-                  setActiveSection={setActiveSection}
-                />
+              <ControlPanelTabs 
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+            prefersReducedMotion={prefersReducedMotion}
+          />
               </Box>
             </Box>
 
@@ -405,6 +408,7 @@ const NavBar: FC = () => {
               <PanelContent
                 activeSection={activeSection as any}
                 handleThemeSelect={setActiveTheme}
+                prefersReducedMotion={prefersReducedMotion}
               />
               <Box sx={{
                 position: 'absolute',
