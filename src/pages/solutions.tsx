@@ -26,7 +26,7 @@ const Solutions: React.FC = () => {
       subtitle="Our enterprise solutions empower your business to innovate and grow."
     >
       {/* Understanding Our Solutions Section */}
-      <PageSection sx={{  }}> {/* Removed mb: SPACING.small from here */}
+      <PageSection> {/* Removed mb: SPACING.small from here */}
         <Container maxWidth="md">
           <Typography
             variant="h3"
@@ -38,7 +38,7 @@ const Solutions: React.FC = () => {
               mb: SPACING.medium,
             }}
           >
-            What are [Your Company Name] Solutions?
+            What are GLUStack's Solutions?
           </Typography>
           <Typography
             variant="body1"
@@ -46,12 +46,12 @@ const Solutions: React.FC = () => {
             color="text.secondary"
             sx={{ mb: SPACING.large }}
           >
-            At [Your Company Name], our 'Solutions' go beyond off-the-shelf products. We engineer bespoke technology solutions precisely tailored to address the unique challenges and opportunities of your business. We take a consultative approach, deeply understanding your needs to craft solutions that deliver measurable impact and drive sustainable growth.
+            At GLUStack, our 'Solutions' go beyond off-the-shelf products. We engineer bespoke technology solutions precisely tailored to address the unique challenges and opportunities of your business. We take a consultative approach, deeply understanding your needs to craft solutions that deliver measurable impact and drive sustainable growth.
           </Typography>
         </Container>
       </PageSection>
       {/* Our Featured Solutions Section */}
-      <PageSection sx={{ }}> {/* Removed mb: SPACING.large * 3 and mt: negative margin */}
+      <PageSection > {/* Removed mb: SPACING.large * 3 and mt: negative margin */}
         <Typography
           variant="h3"
           component="h2"
@@ -80,14 +80,15 @@ const Solutions: React.FC = () => {
         />
       </PageSection>
       {/* Industries We Serve Section */}
-      <PageSection>
+    {/* Industries We Serve Section */}
+    <PageSection>
         <Container maxWidth="md">
           <Typography
             variant="h3"
             component="h2"
             align="center"
             sx={{
-              ...styles.pageTitle,
+            ...styles.pageTitle,
               color: theme.palette.text.primary,
               mb: SPACING.medium,
             }}
@@ -100,11 +101,12 @@ const Solutions: React.FC = () => {
             color="text.secondary"
             sx={{ mb: SPACING.large }}
           >
-            [Placeholder: Briefly describe the industries you serve and your experience in them.  You can list industries or write a short paragraph highlighting your industry expertise.]
+            GLUStack has a proven track record of empowering businesses across a range of industries, including: Technology (building and scaling cloud platforms, microservices, and DevOps), Financial Services (secure banking platforms and fintech solutions), E-commerce (optimizing digital platforms and user experiences), Media (streamlining workflows and automating content delivery), and Public Sector (digital transformation and cloud migration). This diverse experience allows us to understand your unique challenges and deliver tailored solutions.
           </Typography>
           {/* Optional: Add a grid of industry logos here if you have them */}
         </Container>
       </PageSection>
+
       {/* Benefits of Our Solutions Section */}
       <PageSection>
         <Container maxWidth="md">
@@ -113,12 +115,12 @@ const Solutions: React.FC = () => {
             component="h2"
             align="center"
             sx={{
-              ...styles.pageTitle,
+            ...styles.pageTitle,
               color: theme.palette.text.primary,
               mb: SPACING.medium,
             }}
           >
-            Unlock the Benefits of [Your Company Name] Solutions
+            Unlock the Benefits of GLUStack Solutions
           </Typography>
           <Typography
             variant="body1"
@@ -126,7 +128,7 @@ const Solutions: React.FC = () => {
             color="text.secondary"
             sx={{ mb: SPACING.large }}
           >
-            [Placeholder: Write a paragraph summarizing the key benefits clients get from your solutions. Focus on value and outcomes.]
+            Partnering with GLUStack provides key benefits: enhanced scalability and reliability, improved security, accelerated innovation, increased efficiency, and cost optimization. We empower you to achieve your business goals by providing expert technology solutions that enhance your capabilities, drive innovation, and deliver tangible value.
           </Typography>
           {/* Optional: Add benefit bullet points or a more detailed explanation of benefits here */}
         </Container>

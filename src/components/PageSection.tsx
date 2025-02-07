@@ -1,5 +1,3 @@
-// components/PageSection.tsx
-import React from 'react';
 import { Box, Container, SxProps } from '@mui/material';
 
 interface PageSectionProps {
@@ -21,10 +19,10 @@ const PageSection: React.FC<PageSectionProps> = ({
       p: { xs: 2, sm: 4 },
       display: 'flex',          // ADD display: 'flex'
       justifyContent: 'center', // ADD justifyContent: 'center'
-      ...containerSx,
+    ...containerSx,
     }}
   >
-    <Box sx={{ mt: 2, mb: 2, ...sectionSx }}>{children}</Box>
+    <Box sx={{ mt: 2, mb: 2,...sectionSx }}>{children}</Box>
   </Container>
 );
 

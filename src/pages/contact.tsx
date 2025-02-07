@@ -11,10 +11,12 @@ import {
   InputAdornment,
   Container,
   Grid,
-  List, ListItem, ListItemIcon, ListItemText,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import { z } from 'zod';
-import NextLink from 'next/link';
 import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import GoldCard from '../components/GoldCard';
@@ -23,6 +25,7 @@ import { Person, Email, Phone, ChatBubbleOutline, AccessTime, Headset } from '@m
 import { CheckCircle } from 'lucide-react';
 import { getSharedStyles, SPACING } from '../utils/sharedStyles';
 
+// Form validation schema
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').trim(),
   email: z.string().email('Invalid email address').trim(),
@@ -89,7 +92,7 @@ const Contact: React.FC = () => {
     }
 
     try {
-      // Uncomment when ready to use EmailJS
+      // Placeholder for email sending logic
       // await emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, formData, EMAILJS_CONFIG.USER_ID);
       setSuccess(true);
       setFormData(INITIAL_FORM_DATA);
@@ -129,48 +132,84 @@ const Contact: React.FC = () => {
   return (
     <>
       <SEO
-        title="Contact Us - Expert Tech Solutions - [Your Company Name]"
+        title="Contact Us - Expert Tech Solutions - GLUStack"
         description="Contact [Your Company Name] for expert technology consulting and solutions. Let's discuss your project and drive your success."
         keywords="contact, support, inquiry, partnership, technology consulting, expert solutions"
       />
       <ConsistentPageLayout
-        seoTitle="Contact Us - Expert Tech Solutions - [Your Company Name]"
+        seoTitle="Contact Us - Expert Tech Solutions - GLUStack"
         seoDescription="Reach out to our team for inquiries, support, or partnership opportunities."
         seoKeywords="contact, support, inquiry, partnership"
         title="Let's Discuss Your Technology Needs"
         subtitle="Our team is ready to provide expert guidance and solutions."
       >
-        <Container maxWidth="md" sx={{ p: styles.containerPadding }}>
+        <Container 
+          maxWidth="lg"
+          sx={{ 
+            p: styles.containerPadding,
+            px: { xs: 2, sm: 4, md: 6 }
+          }}
+        >
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { md: '1fr 1.2fr' },
-              gap: { xs: 4, md: 8 },
+              gridTemplateColumns: { 
+                xs: '1fr',
+                md: '1.4fr 1.6fr'
+              },
+              gap: { xs: 4, md: 6 },
               width: '100%',
-              maxWidth: 1200,
+              maxWidth: 1400,
               mx: 'auto',
-              py: 5,
+              py: { xs: 3, md: 5 },
               alignItems: 'start',
             }}
           >
-            {/* Contact Info Section - Left Side */}
+            {/* Left-side Contact Info */}
             <Box
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 4,
-                textAlign: 'left',
+                gap: { xs: 2, md: 4 },
+                justifyContent: 'flex-start',
+                // Reduced overall padding to lessen left margin:
+                p: { xs: 1, md: 2 },
+                pl: 0, // set left padding to 0
+                borderRadius: 2,
+                backgroundColor: theme.palette.background.default,
+                boxShadow: theme.shadows[1],
               }}
             >
-              <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
+              <Typography
+                variant="h4"
+                component="h2"
+                gutterBottom
+                sx={{ 
+                  fontWeight: 700, 
+                  color: theme.palette.text.primary,
+                  fontSize: { xs: '1.8rem', md: '2.2rem' }
+                }}
+              >
                 Get in Touch Today
               </Typography>
-              <Typography variant="body1" sx={{ color: theme.palette.text.secondary, lineHeight: 1.7, fontSize: '1.05rem' }}>
+              <Typography
+                variant="body1"
+                sx={{ 
+                  color: theme.palette.text.secondary, 
+                  lineHeight: 1.7, 
+                  fontSize: { xs: '0.95rem', md: '1.05rem' },
+                  mb: 2
+                }}
+              >
                 We're eager to learn about your projects and challenges. Reach out to us, and let's explore how our expert technology solutions can drive your business forward.
               </Typography>
 
               <Box sx={{ mt: 2 }}>
-                <Typography variant="h6" component="h3" sx={{ fontWeight: 600, color: theme.palette.text.primary, mb: 1 }}>
+                <Typography
+                  variant="h6"
+                  component="h3"
+                  sx={{ fontWeight: 600, color: theme.palette.text.primary, mb: 1 }}
+                >
                   Office Hours
                 </Typography>
                 <List dense disablePadding>
@@ -178,25 +217,41 @@ const Contact: React.FC = () => {
                     <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
                       <AccessTime />
                     </ListItemIcon>
-                    <ListItemText primary="Monday - Friday: 9AM - 6PM EST" secondary="General Inquiries & Consultations" secondaryTypographyProps={{ color: 'text.secondary' }} />
+                    <ListItemText
+                      primary="Monday - Friday: 9AM - 6PM EST"
+                      secondary="General Inquiries & Consultations"
+                      secondaryTypographyProps={{ color: 'text.secondary' }}
+                    />
                   </ListItem>
                   <ListItem disableGutters sx={{ py: 0.5 }}>
                     <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
                       <AccessTime />
                     </ListItemIcon>
-                    <ListItemText primary="Saturday: By Appointment" secondary="Scheduled Meetings Only"  secondaryTypographyProps={{ color: 'text.secondary' }}/>
+                    <ListItemText
+                      primary="Saturday: By Appointment"
+                      secondary="Scheduled Meetings Only"
+                      secondaryTypographyProps={{ color: 'text.secondary' }}
+                    />
                   </ListItem>
                   <ListItem disableGutters sx={{ py: 0.5 }}>
                     <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
                       <AccessTime />
                     </ListItemIcon>
-                    <ListItemText primary="Sunday: Closed" secondary="Weekend Rest" secondaryTypographyProps={{ color: 'text.secondary' }}/>
+                    <ListItemText
+                      primary="Sunday: Closed"
+                      secondary="Weekend Rest"
+                      secondaryTypographyProps={{ color: 'text.secondary' }}
+                    />
                   </ListItem>
                 </List>
               </Box>
 
               <Box>
-                <Typography variant="h6" component="h3" sx={{ fontWeight: 600, color: theme.palette.text.primary, mb: 1 }}>
+                <Typography
+                  variant="h6"
+                  component="h3"
+                  sx={{ fontWeight: 600, color: theme.palette.text.primary, mb: 1 }}
+                >
                   Quick Support
                 </Typography>
                 <List dense disablePadding>
@@ -204,29 +259,38 @@ const Contact: React.FC = () => {
                     <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
                       <Headset />
                     </ListItemIcon>
-                    <ListItemText primary="Email: support@yourcompany.com" secondary="For Prompt Assistance" secondaryTypographyProps={{ color: 'text.secondary' }} />
+                    <ListItemText
+                      primary="Email: support@yourcompany.com"
+                      secondary="For Prompt Assistance"
+                      secondaryTypographyProps={{ color: 'text.secondary' }}
+                    />
                   </ListItem>
                   <ListItem disableGutters sx={{ py: 0.5 }}>
                     <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
                       <Phone />
                     </ListItemIcon>
-                    <ListItemText primary="Emergency: +1 (555) 123-4567" secondary="Urgent Technical Issues" secondaryTypographyProps={{ color: 'text.secondary' }} />
+                    <ListItemText
+                      primary="Emergency: +1 (555) 123-4567"
+                      secondary="Urgent Technical Issues"
+                      secondaryTypographyProps={{ color: 'text.secondary' }}
+                    />
                   </ListItem>
                 </List>
               </Box>
             </Box>
 
-            {/* Contact Form - Right Side */}
+            {/* Right-side Contact Form */}
             <GoldCard
               component="form"
               onSubmit={handleSubmit}
               elevation={3}
               sx={{
                 width: '100%',
-                p: { xs: 3, sm: 4 },
+                p: { xs: 2, sm: 3, md: 4 },
+                borderRadius: 3,
               }}
             >
-              <Grid container spacing={3}>
+              <Grid container spacing={{ xs: 2, md: 3 }}>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
@@ -238,6 +302,12 @@ const Contact: React.FC = () => {
                     error={Boolean(errors.name)}
                     helperText={errors.name}
                     placeholder="Enter your full name"
+                    sx={{ 
+                      '& .MuiInputBase-root': { 
+                        borderRadius: 2,
+                        height: { xs: '50px', md: '56px' }
+                      }
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -246,8 +316,6 @@ const Contact: React.FC = () => {
                       ),
                       ...styles.input,
                     }}
-                    id="name-input"
-                    aria-describedby="name-error"
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -262,6 +330,12 @@ const Contact: React.FC = () => {
                     error={Boolean(errors.email)}
                     helperText={errors.email}
                     placeholder="Your work email address"
+                    sx={{ 
+                      '& .MuiInputBase-root': { 
+                        borderRadius: 2,
+                        height: { xs: '50px', md: '56px' }
+                      }
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -270,8 +344,6 @@ const Contact: React.FC = () => {
                       ),
                       ...styles.input,
                     }}
-                    id="email-input"
-                    aria-describedby="email-error"
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -285,6 +357,12 @@ const Contact: React.FC = () => {
                     error={Boolean(errors.phone)}
                     helperText={errors.phone || 'Optional - for quicker follow-up'}
                     placeholder="Optional phone number"
+                    sx={{ 
+                      '& .MuiInputBase-root': { 
+                        borderRadius: 2,
+                        height: { xs: '50px', md: '56px' }
+                      }
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -293,8 +371,6 @@ const Contact: React.FC = () => {
                       ),
                       ...styles.input,
                     }}
-                    id="phone-input"
-                    aria-describedby="phone-error"
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -310,6 +386,11 @@ const Contact: React.FC = () => {
                     error={Boolean(errors.message)}
                     helperText={errors.message}
                     placeholder="Describe your project needs or questions here..."
+                    sx={{ 
+                      '& .MuiInputBase-root': { 
+                        borderRadius: 2
+                      }
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start" sx={{ alignSelf: 'flex-start', marginTop: '10px' }}>
@@ -318,8 +399,6 @@ const Contact: React.FC = () => {
                       ),
                       ...styles.input,
                     }}
-                    id="message-input"
-                    aria-describedby="message-error"
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -335,6 +414,7 @@ const Contact: React.FC = () => {
                       fontWeight: 'bold',
                       fontSize: '1.1rem',
                       textTransform: 'none',
+                      borderRadius: 2,
                       transition: 'transform 0.2s ease',
                       '&:hover': {
                         transform: 'translateY(-2px)',
@@ -358,8 +438,8 @@ const Contact: React.FC = () => {
             </GoldCard>
           </Box>
 
-          {/* Why Contact Us Section */}
-          <PageSection sx={{ py: 4 }}>
+          {/* Additional Sections */}
+          <PageSection>
             <Container maxWidth="md">
               <Typography
                 variant="h3"
@@ -372,7 +452,7 @@ const Contact: React.FC = () => {
                   fontWeight: 700,
                 }}
               >
-                Why Reach Out to [Your Company Name]?
+                Why Reach Out to GLUStack?  
               </Typography>
               <Typography
                 variant="body1"
@@ -385,28 +465,36 @@ const Contact: React.FC = () => {
               <List sx={{ maxWidth: 600, mx: 'auto' }}>
                 <ListItem disableGutters>
                   <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.secondary.main }}>
-                    <CheckCircle size={20} strokeWidth={3}/>
+                    <CheckCircle size={20} strokeWidth={3} />
                   </ListItemIcon>
-                  <ListItemText primary="Expert Consultation: Receive tailored advice from seasoned tech professionals." primaryTypographyProps={{ fontWeight: 500, color: 'text.primary' }} />
+                  <ListItemText
+                    primary="Expert Consultation: Receive tailored advice from seasoned tech professionals."
+                    primaryTypographyProps={{ fontWeight: 500, color: 'text.primary' }}
+                  />
                 </ListItem>
                 <ListItem disableGutters>
                   <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.secondary.main }}>
-                    <CheckCircle size={20} strokeWidth={3}/>
+                    <CheckCircle size={20} strokeWidth={3} />
                   </ListItemIcon>
-                  <ListItemText primary="Customized Solutions: Discuss your unique needs and explore bespoke technology strategies." primaryTypographyProps={{ fontWeight: 500, color: 'text.primary' }} />
+                  <ListItemText
+                    primary="Customized Solutions: Discuss your unique needs and explore bespoke technology strategies."
+                    primaryTypographyProps={{ fontWeight: 500, color: 'text.primary' }}
+                  />
                 </ListItem>
                 <ListItem disableGutters>
                   <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.secondary.main }}>
-                    <CheckCircle size={20} strokeWidth={3}/>
+                    <CheckCircle size={20} strokeWidth={3} />
                   </ListItemIcon>
-                  <ListItemText primary="Project Clarity: Gain clear insights into project scope, timelines, and potential outcomes." primaryTypographyProps={{ fontWeight: 500, color: 'text.primary' }} />
+                  <ListItemText
+                    primary="Project Clarity: Gain clear insights into project scope, timelines, and potential outcomes."
+                    primaryTypographyProps={{ fontWeight: 500, color: 'text.primary' }}
+                  />
                 </ListItem>
               </List>
             </Container>
           </PageSection>
 
-          {/* What to Expect When You Contact Us Section */}
-          <PageSection sx={{ pb: 6 }}>
+          <PageSection>
             <Container maxWidth="md">
               <Typography
                 variant="h3"
@@ -429,59 +517,43 @@ const Contact: React.FC = () => {
               >
                 We value your time and inquiries. Here’s what you can expect when you reach out to our team:
               </Typography>
-              <List sx={{ maxWidth: 600, mx: 'auto' , pt: 2}}>
+              <List sx={{ maxWidth: 600, mx: 'auto', pt: 2 }}>
                 <ListItem disableGutters>
                   <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
-                    <Typography variant="body2" color="text.primary" fontWeight={600}>1.</Typography>
+                    <Typography variant="body2" color="text.primary" fontWeight={600}>
+                      1.
+                    </Typography>
                   </ListItemIcon>
-                  <ListItemText primary="Prompt Acknowledgment: Expect a confirmation within 24 business hours that we've received your inquiry." primaryTypographyProps={{ color: 'text.primary' }} />
+                  <ListItemText
+                    primary="Prompt Acknowledgment: Expect a confirmation within 24 business hours that we've received your inquiry."
+                    primaryTypographyProps={{ color: 'text.primary' }}
+                  />
                 </ListItem>
                 <ListItem disableGutters>
                   <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
-                    <Typography variant="body2" color="text.primary" fontWeight={600}>2.</Typography>
+                    <Typography variant="body2" color="text.primary" fontWeight={600}>
+                      2.
+                    </Typography>
                   </ListItemIcon>
-                  <ListItemText primary="Expert Review: Your inquiry will be reviewed by a specialist to understand your needs thoroughly." primaryTypographyProps={{ color: 'text.primary' }} />
+                  <ListItemText
+                    primary="Expert Review: Your inquiry will be reviewed by a specialist to understand your needs thoroughly."
+                    primaryTypographyProps={{ color: 'text.primary' }}
+                  />
                 </ListItem>
                 <ListItem disableGutters>
                   <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
-                    <Typography variant="body2" color="text.primary" fontWeight={600}>3.</Typography>
+                    <Typography variant="body2" color="text.primary" fontWeight={600}>
+                      3.
+                    </Typography>
                   </ListItemIcon>
-                  <ListItemText primary="Personalized Follow-up: We'll contact you to schedule a consultation or provide a detailed response tailored to your inquiry." primaryTypographyProps={{ color: 'text.primary' }} />
+                  <ListItemText
+                    primary="Personalized Follow-up: We'll contact you to schedule a consultation or provide a detailed response tailored to your inquiry."
+                    primaryTypographyProps={{ color: 'text.primary' }}
+                  />
                 </ListItem>
               </List>
             </Container>
           </PageSection>
-
-          {/* Optional: Meet Our Team Section */}
-          {/*
-          <PageSection>
-            <Container maxWidth="md">
-              <Typography
-                variant="h3"
-                component="h2"
-                align="center"
-                sx={{
-                  ...styles.pageTitle,
-                  color: theme.palette.text.primary,
-                  mb: SPACING.medium,
-                  fontWeight: 700,
-                }}
-              >
-                Meet Our Team
-              </Typography>
-              <Typography
-                variant="body1"
-                align="center"
-                color="text.secondary"
-                sx={{ mb: SPACING.large, lineHeight: 1.7, fontSize: '1.05rem' }}
-              >
-                Our team is composed of seasoned technology experts, each with a deep passion for innovation and a proven track record of delivering exceptional results. We're more than just consultants; we're your partners in navigating the complexities of the digital world.
-              </Typography>
-               Add team member cards or profiles here if you want to include them
-            </Container>
-          </PageSection>
-          */}
-
         </Container>
       </ConsistentPageLayout>
     </>

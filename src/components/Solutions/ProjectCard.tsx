@@ -99,7 +99,9 @@ const ProjectCard = ({ project, sx }: { project: Project; sx?: any }) => {
                                 alignItems: 'center',
                             }}
                         >
-                            <project.icon sx={{ fontSize: 70, color: theme.palette.primary.main }} />
+                           <Box sx={{ fontSize: 70, color: theme.palette.primary.main }}> {/* Wrap the icon with Box */}
+                                <project.icon />
+                            </Box>
                         </Box>
                     ) : (
                         <Box

@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Box, Container, Typography, List, ListItem, ListItemIcon, useTheme, Button, Grid } from '@mui/material'; // Added Grid
+import { Box, Container, Typography, List, ListItem, ListItemIcon, useTheme, Button, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
-import { CheckCircle, Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-react'; // More varied icons
+import { CheckCircle, Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-react';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import NextLink from 'next/link';
 
@@ -11,31 +11,35 @@ const WhyChooseUs = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
 
-  // More descriptive and benefit-oriented reasons
+  // Benefit-oriented reasons
   const reasons = [
     {
       id: 1,
       text: 'Deep Industry Expertise',
-      description: 'Benefit from the insights of seasoned consultants with extensive experience across diverse technology sectors.',
-      icon: Lightbulb, // More relevant icon
+      description:
+        'Benefit from the insights of seasoned consultants with extensive experience across diverse technology sectors.',
+      icon: Lightbulb,
     },
     {
       id: 2,
       text: 'Tailored, Innovative Solutions',
-      description: 'Receive custom-crafted strategies and cutting-edge solutions designed specifically for your unique challenges and goals.',
-      icon: Rocket, // Icon for innovation
+      description:
+        'Receive custom-crafted strategies and cutting-edge solutions designed specifically for your unique challenges and goals.',
+      icon: Rocket,
     },
     {
       id: 3,
       text: 'Reliable & Agile Execution',
-      description: 'Count on our proven methodologies and adaptable approach to ensure projects are delivered on time and to the highest standards.',
-      icon: ShieldCheck, // Icon for reliability
+      description:
+        'Count on our proven methodologies and adaptable approach to ensure projects are delivered on time and to the highest standards.',
+      icon: ShieldCheck,
     },
     {
       id: 4,
       text: 'Scalable Solutions for Growth',
-      description: 'Implement future-proof solutions architected for scalability, supporting your business as it expands and evolves.',
-      icon: TrendingUp, // Icon for growth
+      description:
+        'Implement future-proof solutions architected for scalability, supporting your business as it expands and evolves.',
+      icon: TrendingUp,
     },
   ];
 
@@ -44,49 +48,56 @@ const WhyChooseUs = () => {
       component="section"
       sx={{
         width: '100%',
-        py: SPACING.large * 2, // Increased padding for more visual breathing room
+        py: SPACING.large * 2,
         bgcolor: theme.palette.background.default,
         overflow: 'hidden',
       }}
     >
       <Container maxWidth="lg">
         <Typography
-          variant="h2" // Keep h2 for main title, but adjust style
+          variant="h2"
           component="h2"
           align="center"
           sx={{
             ...styles.pageTitle,
             color: theme.palette.text.primary,
-            mb: SPACING.medium, // Reduced mb for tighter spacing
-            fontWeight: 700, // Make title bolder
+            mb: SPACING.medium,
+            fontWeight: 700,
           }}
         >
-          Why Partner with Us? {/* More engaging title */}
+          Why Partner with Us?
         </Typography>
 
-        <Grid container spacing={SPACING.medium} justifyContent="center"> {/* Use Grid for layout */}
+        <Grid
+          container
+          spacing={SPACING.medium}
+          justifyContent="center"
+          alignItems="stretch" // Ensure all grid items stretch to the same height
+        >
           {reasons.map((reason) => (
-            <Grid item xs={12} md={6} key={reason.id}> {/* Responsive grid items */}
+            <Grid item xs={12} md={6} key={reason.id}>
               <motion.div
-                initial={{ opacity: 0, y: 20 }} // Slightly changed animation
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  delay: reason.id * 0.1, // Slightly adjusted delay
-                  duration: 0.4, // Slightly adjusted duration
+                  delay: reason.id * 0.1,
+                  duration: 0.4,
                   ease: 'easeInOut',
                 }}
-                whileHover={{ scale: 1.03 }} // Reduced hover scale slightly
+                whileHover={{ scale: 1.03 }}
+                style={{ height: '100%' }}
               >
                 <Box
                   sx={{
                     p: SPACING.medium,
                     borderRadius: 'md',
-                    boxShadow: theme.shadows[2], // Added subtle shadow for depth
-                    backgroundColor: theme.palette.background.paper, // Card background
-                    height: '100%', // Ensure consistent height
+                    boxShadow: theme.shadows[2],
+                    backgroundColor: theme.palette.background.paper,
+                    height: '100%',     // Fill the available height
+                    minHeight: 300,     // Ensure a consistent minimum height regardless of content
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'flex-start', // Align items to start for better text flow
+                    alignItems: 'flex-start',
                   }}
                 >
                   <Box
@@ -94,31 +105,31 @@ const WhyChooseUs = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      bgcolor: theme.palette.primary.light, // Lighter primary for icon background
-                      color: theme.palette.primary.contrastText, // Ensure icon color contrast
+                      bgcolor: theme.palette.primary.light,
+                      color: theme.palette.primary.contrastText,
                       borderRadius: '50%',
                       width: 50,
                       height: 50,
-                      mb: SPACING.small, // Spacing below icon
+                      mb: SPACING.small,
                     }}
                   >
-                    <reason.icon size={28} color={theme.palette.primary.main} /> {/* Use reason-specific icon */}
+                    <reason.icon size={28} color={theme.palette.primary.main} />
                   </Box>
                   <Typography
-                    variant="h5" // Reduced to h5 for reason title
+                    variant="h5"
                     component="h3"
                     sx={{
                       fontWeight: 700,
                       color: theme.palette.text.primary,
-                      mb: SPACING.small, // Spacing below title
+                      mb: SPACING.small,
                     }}
                   >
                     {reason.text}
                   </Typography>
                   <Typography
-                    variant="body1" // Keep body1 for description
+                    variant="body1"
                     color="text.secondary"
-                    sx={{ flexGrow: 1 }} // Push description to take available space
+                    sx={{ flexGrow: 1 }} // Push description to take up available space
                   >
                     {reason.description}
                   </Typography>
@@ -128,10 +139,10 @@ const WhyChooseUs = () => {
           ))}
         </Grid>
 
-        <Box sx={{ textAlign: 'center', mt: SPACING.large }}> {/* Increased mt here */}
+        <Box sx={{ textAlign: 'center', mt: SPACING.large }}>
           <NextLink href="/contact" passHref legacyBehavior>
-            <Button variant="contained" color="secondary" size="large" sx={styles.button}> {/* Larger button */}
-              Explore Our Services {/* More action-oriented CTA */}
+            <Button variant="contained" color="secondary" size="large" sx={styles.button}>
+              Explore Our Services
             </Button>
           </NextLink>
         </Box>

@@ -45,25 +45,25 @@ const CyberButton = memo<CyberButtonProps>(({ children, onClick, disabled }) => 
 
   return (
     <m.div
-      whileHover={disabled ? {} : { scale: 1.02 }}
-      whileTap={disabled ? {} : { scale: 0.98 }}
-      style={{ cursor: disabled ? 'not-allowed' : 'pointer', flexShrink: 0 }}
+      whileHover={disabled? {}: { scale: 1.02 }}
+      whileTap={disabled? {}: { scale: 0.98 }}
+      style={{ cursor: disabled? 'not-allowed': 'pointer', flexShrink: 0 }}
     >
       <Box
         role="button"
-        tabIndex={disabled ? -1 : 0}
-        onClick={disabled ? undefined : onClick}
-        onKeyPress={disabled ? undefined : handleKeyPress}
+        tabIndex={disabled? -1: 0}
+        onClick={disabled? undefined: onClick}
+        onKeyPress={disabled? undefined: handleKeyPress}
         sx={{
           background: alpha(PALETTE.professional.primary, 0.05),
           borderRadius: '12px',
-          p: isMobile ? 1 : 1.5,
-          minWidth: isMobile ? 180 : 220,
+          p: isMobile? 1: 1.5,
+          minWidth: isMobile? 180: 220,
           border: `1px solid ${alpha(PALETTE.professional.accent, 0.2)}`,
           transition: 'all 0.3s ease',
           '&:hover': disabled
-            ? {}
-            : {
+          ? {}
+          : {
                 background: alpha(PALETTE.professional.accent, 0.08),
                 boxShadow: `0 8px 24px ${alpha(PALETTE.professional.accent, 0.1)}`,
                 borderColor: PALETTE.professional.accent,
@@ -71,7 +71,7 @@ const CyberButton = memo<CyberButtonProps>(({ children, onClick, disabled }) => 
           '&:focus-visible': {
             outline: `2px solid ${PALETTE.professional.accent}`,
           },
-          ...(disabled && {
+        ...(disabled && {
             opacity: 0.5,
             pointerEvents: 'none',
           }),
@@ -86,7 +86,7 @@ const CyberButton = memo<CyberButtonProps>(({ children, onClick, disabled }) => 
 interface PanelContentProps {
   activeSection: PanelSection;
   handleThemeSelect: (
-    themeName: ThemeName | 'custom',
+    themeName: ThemeName | 'custom' | 'professional',
     colors?: { primary: string; secondary: string }
   ) => void;
   prefersReducedMotion: boolean;
@@ -100,7 +100,7 @@ const PanelSectionWrapper: React.FC<{
   <m.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: prefersReducedMotion ? 0 : 0.4 }}
+    transition={{ duration: prefersReducedMotion? 0: 0.4 }}
   >
     <Typography
       variant="h4"
@@ -169,15 +169,15 @@ const PanelContent: React.FC<PanelContentProps> = ({
       const newColor = e.target.value;
       if (!isValidHex(newColor)) {
         setColorErrors((prev) => ({
-          ...prev,
+        ...prev,
           [colorType]: 'Invalid hex code',
         }));
         // Optionally, do not update the color if invalid.
         return;
       } else {
-        setColorErrors((prev) => ({ ...prev, [colorType]: '' }));
+        setColorErrors((prev) => ({...prev, [colorType]: '' }));
       }
-      const newColors = { ...customColors, [colorType]: newColor };
+      const newColors = {...customColors, [colorType]: newColor };
       setCustomColors(newColors);
       handleThemeSelect('custom', newColors);
     };
@@ -194,7 +194,7 @@ const PanelContent: React.FC<PanelContentProps> = ({
               {themes.map((theme) => (
                 <CyberButton
                   key={theme}
-                  onClick={() => handleThemeSelect(theme)}
+                  onClick={() => handleThemeSelect(theme)} // 'professional' is now a valid theme
                 >
                   <Stack direction="row" gap={2} alignItems="center">
                     <Box
@@ -205,10 +205,10 @@ const PanelContent: React.FC<PanelContentProps> = ({
                         borderRadius: '8px',
                         background:
                           theme === 'light'
-                            ? PALETTE.light.primary
-                            : theme === 'dark'
-                            ? PALETTE.dark.primary
-                            : GRADIENTS.professional,
+                          ? PALETTE.light.primary
+                          : theme === 'dark'
+                          ? PALETTE.dark.primary
+                          : GRADIENTS.tech,
                       }}
                     />
                     <Typography variant="h6" textTransform="capitalize">
@@ -277,8 +277,8 @@ const PanelContent: React.FC<PanelContentProps> = ({
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             transition={{
-              duration: prefersReducedMotion ? 0 : 0.4,
-              delay: prefersReducedMotion ? 0 : 0.2,
+              duration: prefersReducedMotion? 0: 0.4,
+              delay: prefersReducedMotion? 0: 0.2,
             }}
           >
             <Box
@@ -286,7 +286,7 @@ const PanelContent: React.FC<PanelContentProps> = ({
                 mt: 4,
                 p: 3,
                 borderRadius: '16px',
-                background: GRADIENTS.professional,
+                background: GRADIENTS.tech,
                 position: 'relative',
               }}
             >

@@ -7,10 +7,10 @@ import GoldCard from '../components/GoldCard';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import CardGrid from '../components/CardGrid';
 import PageSection from '../components/PageSection';
-import  TechnologyShowcase from '../components/Home/TechnologyShowcase';
-import  WhyChooseUs from '../components/Common/WhyChooseUs';
+import TechnologyShowcase from '../components/Home/TechnologyShowcase';
+import WhyChooseUs from '../components/Common/WhyChooseUs';
 import ServicesGrid from '../components/Common/ServicesGrid';
-import TestimonialsSection  from '../components/Common/TestimonialsSection';
+import TestimonialsSection from '../components/Common/TestimonialsSection';
 import { Cloud as CloudIcon, VpnKey, Code as CodeIcon, Security as SecurityIcon, Storage as StorageIcon } from '@mui/icons-material';
 import { CARD_STYLES, getSharedStyles, SPACING } from '../utils/sharedStyles';
 
@@ -80,7 +80,6 @@ const resourceCategories = [
   // Add more categories as needed
 ];
 
-
 const ResourcesPage: React.FC = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
@@ -100,22 +99,34 @@ const ResourcesPage: React.FC = () => {
         }}
       >
         <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+          {/* Updated icon container */}
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: theme.palette.mode === 'light'
-                ? 'rgba(25, 118, 210, 0.1)'
-                : 'rgba(144, 202, 249, 0.1)',
-              borderRadius: '50%',
+                ? 'rgba(25, 118, 210, 0.08)'
+                : 'rgba(144, 202, 249, 0.08)',
+              borderRadius: '16px',
               width: 60,
               height: 60,
               mb: 2,
               mx: 'auto',
+              border: `1px solid ${theme.palette.mode === 'light'
+                ? 'rgba(25, 118, 210, 0.3)'
+                : 'rgba(144, 202, 249, 0.3)'}`
             }}
           >
-            <IconComponent sx={{ fontSize: 32, color: theme.palette.primary.main }} />
+            <IconComponent
+              sx={{
+                fontSize: 32,
+                color: theme.palette.mode === 'light'
+                  ? theme.palette.primary.dark
+                  : theme.palette.primary.light,
+                transform: 'rotate(-10deg)',
+              }}
+            />
           </Box>
           <Typography
             variant="h5"
@@ -160,7 +171,7 @@ const ResourcesPage: React.FC = () => {
     );
   };
 
-    const renderCategoryCard = (category: typeof resourceCategories[0]) => {
+  const renderCategoryCard = (category: typeof resourceCategories[0]) => {
     const IconComponent = category.icon;
     return (
       <GoldCard
@@ -175,22 +186,34 @@ const ResourcesPage: React.FC = () => {
         }}
       >
         <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+          {/* Updated icon container */}
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: theme.palette.mode === 'light'
-                ? 'rgba(25, 118, 210, 0.1)'
-                : 'rgba(144, 202, 249, 0.1)',
-              borderRadius: '50%',
+                ? 'rgba(25, 118, 210, 0.08)'
+                : 'rgba(144, 202, 249, 0.08)',
+              borderRadius: '16px',
               width: 60,
               height: 60,
               mb: 2,
               mx: 'auto',
+              border: `1px solid ${theme.palette.mode === 'light'
+                ? 'rgba(25, 118, 210, 0.3)'
+                : 'rgba(144, 202, 249, 0.3)'}`
             }}
           >
-            <IconComponent sx={{ fontSize: 32, color: theme.palette.primary.main }} />
+            <IconComponent
+              sx={{
+                fontSize: 32,
+                color: theme.palette.mode === 'light'
+                  ? theme.palette.primary.dark
+                  : theme.palette.primary.light,
+                transform: 'rotate(-10deg)',
+              }}
+            />
           </Box>
           <Typography
             variant="h6" // Reduced variant to h6 for categories
@@ -235,7 +258,6 @@ const ResourcesPage: React.FC = () => {
     );
   };
 
-
   return (
     <ConsistentPageLayout
       seoTitle="Technical Resources - Expert Guides"
@@ -244,7 +266,7 @@ const ResourcesPage: React.FC = () => {
       subtitle="Access our expert technical resources to drive your success."
     >
       {/* Introduction Section */}
-      <PageSection  sx={{ mb: SPACING.small }}> {/* Reduced mb here - already was small, keeping it*/}
+      <PageSection>
         <Container maxWidth="md">
           <Typography
             variant="h3"
@@ -253,7 +275,6 @@ const ResourcesPage: React.FC = () => {
             sx={{
               ...styles.pageTitle,
               color: theme.palette.text.primary,
-
             }}
           >
             Unlock a World of Expertise
@@ -262,27 +283,32 @@ const ResourcesPage: React.FC = () => {
             variant="body1"
             align="center"
             color="text.secondary"
-
           >
             Welcome to our comprehensive resource library. Here you'll find in-depth guides, articles, and insights crafted by our expert team to help you navigate the complexities of modern technology and achieve your business goals.
           </Typography>
-          {/* Optional benefit points - customize these! */}
+          {/* Optional benefit points */}
           <Box component="ul" sx={{ listStyleType: 'none', m: 0, p: 0, maxWidth: 600, mx: 'auto' }}>
             <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
-              <Typography variant="body1" color="text.primary" fontWeight={500}>Stay ahead of the curve with cutting-edge technical insights.</Typography>
+              <Typography variant="body1" color="text.primary" fontWeight={500}>
+                Stay ahead of the curve with cutting-edge technical insights.
+              </Typography>
             </Box>
             <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
-              <Typography variant="body1" color="text.primary" fontWeight={500}>Gain practical knowledge you can immediately apply to your projects.</Typography>
+              <Typography variant="body1" color="text.primary" fontWeight={500}>
+                Gain practical knowledge you can immediately apply to your projects.
+              </Typography>
             </Box>
             <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
-              <Typography variant="body1" color="text.primary" fontWeight={500}>Learn from industry experts and accelerate your team's skill development.</Typography>
+              <Typography variant="body1" color="text.primary" fontWeight={500}>
+                Learn from industry experts and accelerate your team's skill development.
+              </Typography>
             </Box>
           </Box>
         </Container>
       </PageSection>
 
       {/* Featured Resources Section */}
-      <PageSection > {/* Removed negative margin-top here */}
+      <PageSection>
         <Typography
           variant="h3"
           component="h2"
@@ -299,8 +325,8 @@ const ResourcesPage: React.FC = () => {
       </PageSection>
 
       {/* Explore Resources by Topic Section */}
-      <PageSection > {/* Removed maxWidth from Container to allow full width centering */}
-        <Container > {/* Removed maxWidth="md"  from Container for full width centering of section */}
+      <PageSection>
+        <Container>
           <Typography
             variant="h3"
             component="h2"
@@ -309,7 +335,7 @@ const ResourcesPage: React.FC = () => {
               ...styles.pageTitle,
               color: theme.palette.text.primary,
               mb: SPACING.medium,
-              mx: 'auto', // Added mx: 'auto' for extra centering assurance - may not be strictly needed
+              mx: 'auto',
             }}
           >
             Explore Resources by Topic
@@ -318,12 +344,12 @@ const ResourcesPage: React.FC = () => {
             variant="body1"
             align="center"
             color="text.secondary"
-            sx={{ mb: SPACING.large, mx: 'auto' }} // Added mx: 'auto' here as well for body text if needed for wider screens
+            sx={{ mb: SPACING.large, mx: 'auto' }}
           >
             Dive deeper into specific areas of interest. Browse our resources categorized by technical domain to quickly find the guides and insights most relevant to your needs.
           </Typography>
           {/* Resource Categories Grid */}
-          <CardGrid data={resourceCategories} renderItem={renderCategoryCard} numColumns={4} sx={{ mx: 'auto' }}/> {/* Added mx: 'auto' to CardGrid for centering */}
+          <CardGrid data={resourceCategories} renderItem={renderCategoryCard} sx={{ mx: 'auto' }} />
         </Container>
       </PageSection>
 
@@ -350,24 +376,23 @@ const ResourcesPage: React.FC = () => {
           >
             In today's fast-paced tech landscape, staying informed and skilled is crucial. Our resources are designed to equip tech leaders, developers, and innovators with the knowledge they need to build robust, secure, and scalable platforms. We cut through the noise and deliver actionable insights based on real-world experience.
           </Typography>
-          {/* Optional target audience points - customize these! */}
+          {/* Optional target audience points */}
           <Box component="ul" sx={{ listStyleType: 'none', m: 0, p: 0, maxWidth: 600, mx: 'auto' }}>
             <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
-              <Typography variant="body1" color="text.primary" fontWeight={500}><b>Ideal for:</b> CTOs, VPs of Engineering, Lead Developers, Solution Architects, Security Engineers, Cloud Engineers</Typography>
+              <Typography variant="body1" color="text.primary" fontWeight={500}>
+                <b>Ideal for:</b> CTOs, VPs of Engineering, Lead Developers, Solution Architects, Security Engineers, Cloud Engineers
+              </Typography>
             </Box>
             <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
-              <Typography variant="body1" color="text.primary" fontWeight={500}><b>Perfect for those seeking to:</b> Deepen technical expertise, implement best practices, solve complex tech challenges, drive innovation.</Typography>
+              <Typography variant="body1" color="text.primary" fontWeight={500}>
+                <b>Perfect for those seeking to:</b> Deepen technical expertise, implement best practices, solve complex tech challenges, drive innovation.
+              </Typography>
             </Box>
           </Box>
         </Container>
       </PageSection>
 
-      {/* Optional: You can keep or remove these generic sections as per your design for Resources page */}
-      {/* <TechnologyShowcase />
-      <WhyChooseUs />
-      <ServicesGrid />
-      <TestimonialsSection /> */}
-
+ 
     </ConsistentPageLayout>
   );
 };
