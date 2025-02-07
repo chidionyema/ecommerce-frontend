@@ -133,7 +133,7 @@ const Contact: React.FC = () => {
     <>
       <SEO
         title="Contact Us - Expert Tech Solutions - GLUStack"
-        description="Contact [Your Company Name] for expert technology consulting and solutions. Let's discuss your project and drive your success."
+        description="Contact GLUStack for expert technology consulting and solutions. Let's discuss your project and drive your success."
         keywords="contact, support, inquiry, partnership, technology consulting, expert solutions"
       />
       <ConsistentPageLayout
@@ -153,16 +153,15 @@ const Contact: React.FC = () => {
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { 
-                xs: '1fr',
-                md: '1.4fr 1.6fr'
-              },
+              gridTemplateColumns: { xs: '1fr', md: '1.4fr 1.6fr' },
               gap: { xs: 4, md: 6 },
               width: '100%',
               maxWidth: 1400,
               mx: 'auto',
               py: { xs: 3, md: 5 },
               alignItems: 'start',
+              // Center each grid item on mobile
+              justifyItems: { xs: 'center', md: 'unset' },
             }}
           >
             {/* Left-side Contact Info */}
@@ -172,9 +171,10 @@ const Contact: React.FC = () => {
                 flexDirection: 'column',
                 gap: { xs: 2, md: 4 },
                 justifyContent: 'flex-start',
-                // Reduced overall padding to lessen left margin:
+                textAlign: { xs: 'center', md: 'left' },
+                alignItems: { xs: 'center', md: 'flex-start' },
                 p: { xs: 1, md: 2 },
-                pl: 0, // set left padding to 0
+                pl: 0, // Remove left padding
                 borderRadius: 2,
                 backgroundColor: theme.palette.background.default,
                 boxShadow: theme.shadows[1],
@@ -288,6 +288,8 @@ const Contact: React.FC = () => {
                 width: '100%',
                 p: { xs: 2, sm: 3, md: 4 },
                 borderRadius: 3,
+                // Center the form on mobile
+                mx: { xs: 'auto', md: 0 },
               }}
             >
               <Grid container spacing={{ xs: 2, md: 3 }}>
@@ -452,7 +454,7 @@ const Contact: React.FC = () => {
                   fontWeight: 700,
                 }}
               >
-                Why Reach Out to GLUStack?  
+                Why Reach Out to GLUStack?
               </Typography>
               <Typography
                 variant="body1"
