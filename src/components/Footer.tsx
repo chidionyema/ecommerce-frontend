@@ -1,13 +1,15 @@
 import React from 'react';
 import { Box, Typography, Link, Container, Grid, useTheme, IconButton } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
+import NextLink from 'next/link'; // Import NextLink
+
 // Import Material UI Icons
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import InstagramIcon from '@mui/icons-material/Instagram';
 
-// Styled component for social media icons
+// Styled component for social media icons - NO MORE component prop here
 const SocialIconLink = styled(IconButton)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
@@ -71,18 +73,27 @@ const Footer: React.FC = () => {
               Follow Us
             </Typography>
             <Box sx={{ mt: 1 }}>
-              <SocialIconLink component="a" href="#" aria-label="Facebook">
-                <FacebookIcon />
-              </SocialIconLink>
-              <SocialIconLink component="a" href="#" aria-label="Twitter">
-                <TwitterIcon />
-              </SocialIconLink>
-              <SocialIconLink component="a" href="#" aria-label="LinkedIn">
-                <LinkedInIcon />
-              </SocialIconLink>
-              <SocialIconLink component="a" href="#" aria-label="Instagram">
-                <InstagramIcon />
-              </SocialIconLink>
+              {/* Wrap IconButton with NextLink and use href on IconButton */}
+              <NextLink href="https://facebook.com" passHref legacyBehavior>
+                <SocialIconLink aria-label="Facebook">
+                  <FacebookIcon />
+                </SocialIconLink>
+              </NextLink>
+              <NextLink href="https://twitter.com" passHref legacyBehavior>
+                <SocialIconLink aria-label="Twitter">
+                  <TwitterIcon />
+                </SocialIconLink>
+              </NextLink>
+              <NextLink href="https://linkedin.com" passHref legacyBehavior>
+                <SocialIconLink aria-label="LinkedIn">
+                  <LinkedInIcon />
+                </SocialIconLink>
+              </NextLink>
+              <NextLink href="https://instagram.com" passHref legacyBehavior>
+                <SocialIconLink aria-label="Instagram">
+                  <InstagramIcon />
+                </SocialIconLink>
+              </NextLink>
             </Box>
           </Grid>
         </Grid>
