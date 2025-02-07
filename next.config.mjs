@@ -1,3 +1,5 @@
+// next.config.mjs
+
 export default {
   async headers() {
     return [
@@ -18,29 +20,41 @@ export default {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none';",
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none';",
           },
         ],
       },
     ];
   },
 
+  // Configure Next.js for static export
   output: "export",
   distDir: "out",
-  experimental: {
-    esmExternals: true,
-  },
+
+  // Images configuration
   images: {
-    unoptimized: true, // Required for static exports
-    formats: ['image/avif', 'image/webp'], // Added image formats
-    remotePatterns: [{
-      protocol: 'https',
-      hostname: 'your-cdn.com',
-    }],
+    unoptimized: true, // Required for static export
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'your-cdn.com',
+      },
+    ],
   },
 
+  // Explicit webpack caching configuration
   webpack: (config) => {
-    // Only modify CSS handling if needed
+    // Enable filesystem caching with buildDependencies set to the current config file’s pathname.
+    config.cache = {
+      type: 'filesystem',
+      buildDependencies: {
+        config: [new URL(import.meta.url).pathname],
+      },
+    };
+
+    // Add a custom CSS handling rule (this disables the built-in CSS support)
     config.module.rules.push({
       test: /\.css$/,
       use: [
@@ -49,7 +63,7 @@ export default {
           loader: "css-loader",
           options: {
             url: {
-              filter: (url) =>!url.startsWith("/_next/static/media"),
+              filter: (url) => !url.startsWith("/_next/static/media"),
             },
           },
         },
@@ -59,8 +73,10 @@ export default {
 
     return config;
   },
+
   experimental: {
+    esmExternals: true,
     optimizeCss: true,
     scrollRestoration: true,
-  }, // Added experimental section
+  },
 };

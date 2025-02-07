@@ -7,13 +7,13 @@ import { styled } from '@mui/system';
 import { SPACING, FONT_SIZES } from '../../utils/sharedStyles';
 
 export interface TechCardProps {
-  icon: ReactElement;
+  icon?: ReactElement | null; // allow null
   title: string;
   color: string;
-  index?: number;               // now optional
-  floatingVariants?: any;       // now optional
+  index?: number;             // optional
+  floatingVariants?: any;     // optional
   textColor?: string;
-  children?: ReactNode;         // For additional content
+  children?: ReactNode;       // additional content
   whileHover?: { scale: number };
 }
 
@@ -44,8 +44,8 @@ const TechCard: React.FC<TechCardProps> = ({
   icon,
   title,
   color,
-  index = 0,                // default value
-  floatingVariants = {      // default variants if not supplied
+  index = 0,
+  floatingVariants = {
     initial: { y: 0 },
     animate: { y: -10 },
   },
@@ -67,23 +67,23 @@ const TechCard: React.FC<TechCardProps> = ({
       whileHover="hover"
       whileTap={{ scale: 0.98 }}
     >
-      {/* Icon */}
-      <motion.div
-        variants={floatingVariants}
-        initial="rest"
-        animate="rest"
-        whileHover="hover"
-        style={{
-          marginBottom: theme.spacing(2),
-          display: 'flex',
-          justifyContent: 'center',
-          filter: `drop-shadow(0 0 12px ${color}80)`,
-        }}
-      >
-        {React.cloneElement(icon, { size: 40, strokeWidth: 1.2 })}
-      </motion.div>
+      {icon && (
+        <motion.div
+          variants={floatingVariants}
+          initial="rest"
+          animate="rest"
+          whileHover="hover"
+          style={{
+            marginBottom: theme.spacing(2),
+            display: 'flex',
+            justifyContent: 'center',
+            filter: `drop-shadow(0 0 12px ${color}80)`,
+          }}
+        >
+          {React.cloneElement(icon, { size: 40, strokeWidth: 1.2 })}
+        </motion.div>
+      )}
 
-      {/* Title */}
       <Typography
         variant="h5"
         sx={{
@@ -99,7 +99,6 @@ const TechCard: React.FC<TechCardProps> = ({
         {title}
       </Typography>
 
-      {/* Children (custom content) */}
       {children}
     </StyledTechCard>
   );

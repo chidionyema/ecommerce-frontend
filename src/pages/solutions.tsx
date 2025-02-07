@@ -1,20 +1,22 @@
 'use client';
-
 import React from 'react';
-import { Grid, Button, Box, Container, useTheme, alpha } from '@mui/material';
-import NextLink from 'next/link';
+import { useTheme, Typography, Grid, Box, Container } from '@mui/material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import ProjectCard from '../components/Solutions/ProjectCard';
 import { cvProjects } from '../data/cvProjects';
-import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
-import { WhyChooseUs } from '../components/Common/WhyChooseUs';
-import { ServicesGrid } from '../components/Common/ServicesGrid';
-import { TestimonialsSection } from '../components/Common/TestimonialsSection';
-import { CARD_GRID_CONFIG } from '../utils/sharedStyles';
-
-const Solutions = () => {
+import PageSection from '../components/PageSection';
+import CardGrid from '../components/CardGrid';
+import { SPACING, getSharedStyles } from '../utils/sharedStyles';
+// Import the additional components
+import ServicesGrid from '../components/Common/ServicesGrid';
+import TestimonialsSection from '../components/Common/TestimonialsSection';
+import WhyChooseUs from '../components/Common/WhyChooseUs';
+const Solutions: React.FC = () => {
   const theme = useTheme();
-
+  const styles = getSharedStyles(theme); // Get shared styles
+  const renderProjectCard = (project: typeof cvProjects[0]) => (
+    <ProjectCard project={project} />
+  );
   return (
     <ConsistentPageLayout
       seoTitle="Client Solutions - Premium Solutions"
@@ -23,89 +25,113 @@ const Solutions = () => {
       title="Tailored Solutions for Your Business"
       subtitle="Our enterprise solutions empower your business to innovate and grow."
     >
-      <Container maxWidth="lg">
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            mt: 4,
-            p: { xs: 2, sm: 4 },
-          }}
-        >
-          <Grid
-            container
-            spacing={CARD_GRID_CONFIG.container.spacing}
+      {/* Understanding Our Solutions Section */}
+      <PageSection sx={{  }}> {/* Removed mb: SPACING.small from here */}
+        <Container maxWidth="md">
+          <Typography
+            variant="h3"
+            component="h2"
+            align="center"
             sx={{
-              ...CARD_GRID_CONFIG.container.sx,
-              justifyContent: 'center',
-              px: { xs: 1, sm: 0 },
+              ...styles.pageTitle,
+              color: theme.palette.text.primary,
+              mb: SPACING.medium,
             }}
           >
-            {cvProjects.map((project) => (
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                md={4}
-                key={project.id}
-                sx={{
-                  ...CARD_GRID_CONFIG.item.sx,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  maxWidth: { xs: '100%', sm: 'none' }, 
-                  margin: { xs: '0 auto', sm: 'initial' },
-                  width: '100%',
-                  padding: { xs: 1, sm: 2 }, 
-                }}
-              >
-                <ProjectCard
-                  project={project}
-                  sx={{
-                    margin: 'auto',
-                    width: '100%',
-                    maxWidth: 400,
-                  }}
-                />
-              </Grid>
-            ))}
-          </Grid>
-
-          <Box textAlign="center" mt={10} mb={30}>
-            <NextLink href="/contact" passHref legacyBehavior>
-              <Button
-                component="a"
-                variant="contained"
-                size="large"
-                sx={{
-                  px: 6,
-                  py: 2,
-                  background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                  color: theme.palette.common.white,
-                  fontWeight: 700,
-                  fontSize: '1.2rem',
-                  borderRadius: '12px',
-                  boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.5)}`,
-                  '&:hover': {
-                    background: `linear-gradient(to right, ${alpha(
-                      theme.palette.primary.main,
-                      0.85
-                    )}, ${alpha(theme.palette.secondary.main, 0.85)})`,
-                  },
-                }}
-              >
-                Request a Demo
-              </Button>
-            </NextLink>
-          </Box>
-        </Box>
-      </Container>
-      <TechnologyShowcase />
-      <WhyChooseUs />
-      <ServicesGrid />
-      <TestimonialsSection />
+            What are [Your Company Name] Solutions?
+          </Typography>
+          <Typography
+            variant="body1"
+            align="center"
+            color="text.secondary"
+            sx={{ mb: SPACING.large }}
+          >
+            At [Your Company Name], our 'Solutions' go beyond off-the-shelf products. We engineer bespoke technology solutions precisely tailored to address the unique challenges and opportunities of your business. We take a consultative approach, deeply understanding your needs to craft solutions that deliver measurable impact and drive sustainable growth.
+          </Typography>
+        </Container>
+      </PageSection>
+      {/* Our Featured Solutions Section */}
+      <PageSection sx={{ }}> {/* Removed mb: SPACING.large * 3 and mt: negative margin */}
+        <Typography
+          variant="h3"
+          component="h2"
+          align="center"
+          gutterBottom
+          sx={{
+            color: theme.palette.text.primary,
+            fontWeight: 'bold',
+          }}
+        >
+          Our Featured Solutions
+        </Typography>
+        {/* Data Validation and Filtering - BEST PRACTICE*/}
+        <CardGrid
+          data={cvProjects.filter(
+            (project) =>
+              project && typeof project.id === 'string' && project.id.trim() !== ''
+          )}
+          renderItem={(project) => (
+            <Grid item sx={{ m: SPACING.medium }}>
+              <ProjectCard project={project} />
+            </Grid>
+          )}
+          spacing={SPACING.medium}
+          sx={{ mx: 'auto' }} // ADDED THIS LINE TO CENTER CardGrid
+        />
+      </PageSection>
+      {/* Industries We Serve Section */}
+      <PageSection>
+        <Container maxWidth="md">
+          <Typography
+            variant="h3"
+            component="h2"
+            align="center"
+            sx={{
+              ...styles.pageTitle,
+              color: theme.palette.text.primary,
+              mb: SPACING.medium,
+            }}
+          >
+            Industries We Empower with Technology Solutions
+          </Typography>
+          <Typography
+            variant="body1"
+            align="center"
+            color="text.secondary"
+            sx={{ mb: SPACING.large }}
+          >
+            [Placeholder: Briefly describe the industries you serve and your experience in them.  You can list industries or write a short paragraph highlighting your industry expertise.]
+          </Typography>
+          {/* Optional: Add a grid of industry logos here if you have them */}
+        </Container>
+      </PageSection>
+      {/* Benefits of Our Solutions Section */}
+      <PageSection>
+        <Container maxWidth="md">
+          <Typography
+            variant="h3"
+            component="h2"
+            align="center"
+            sx={{
+              ...styles.pageTitle,
+              color: theme.palette.text.primary,
+              mb: SPACING.medium,
+            }}
+          >
+            Unlock the Benefits of [Your Company Name] Solutions
+          </Typography>
+          <Typography
+            variant="body1"
+            align="center"
+            color="text.secondary"
+            sx={{ mb: SPACING.large }}
+          >
+            [Placeholder: Write a paragraph summarizing the key benefits clients get from your solutions. Focus on value and outcomes.]
+          </Typography>
+          {/* Optional: Add benefit bullet points or a more detailed explanation of benefits here */}
+        </Container>
+      </PageSection>
     </ConsistentPageLayout>
   );
 };
-
 export default Solutions;

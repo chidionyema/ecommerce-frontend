@@ -1,24 +1,24 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Grid, Button } from '@mui/material';
-import { motion } from 'framer-motion';
+import { useTheme, Typography, Box, Button, Container, Grid } from '@mui/material';
 import NextLink from 'next/link';
-import { ArrowRight, Download, AccessTime, ErrorOutline } from '@mui/icons-material';
 import GoldCard from '../components/GoldCard';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
-import { TechnologyShowcase } from '../components/Home/TechnologyShowcase';
-import { WhyChooseUs } from '../components/Common/WhyChooseUs';
-import { ServicesGrid } from '../components/Common/ServicesGrid';
-import { TestimonialsSection } from '../components/Common/TestimonialsSection';
-import { CARD_GRID_CONFIG } from '../utils/sharedStyles';
-import { Cloud as CloudIcon, VpnKey, Code as CodeIcon } from '@mui/icons-material';
+import CardGrid from '../components/CardGrid';
+import PageSection from '../components/PageSection';
+import  TechnologyShowcase from '../components/Home/TechnologyShowcase';
+import  WhyChooseUs from '../components/Common/WhyChooseUs';
+import ServicesGrid from '../components/Common/ServicesGrid';
+import TestimonialsSection  from '../components/Common/TestimonialsSection';
+import { Cloud as CloudIcon, VpnKey, Code as CodeIcon, Security as SecurityIcon, Storage as StorageIcon } from '@mui/icons-material';
+import { CARD_STYLES, getSharedStyles, SPACING } from '../utils/sharedStyles';
 
 const resources = [
   {
     id: 1,
     title: 'Cloud Mastery',
-    summary: 'Advanced cloud infrastructure deployment strategies',
+    summary: 'Advanced cloud infrastructure deployment strategies.',
     icon: CloudIcon,
     path: '/resources/cloud',
     downloads: '2.4K+',
@@ -28,7 +28,7 @@ const resources = [
   {
     id: 2,
     title: 'Security Vaults',
-    summary: 'Enterprise secrets management solutions',
+    summary: 'Enterprise secrets management solutions.',
     icon: VpnKey,
     path: '/resources/security',
     downloads: '1.8K+',
@@ -38,7 +38,7 @@ const resources = [
   {
     id: 3,
     title: 'Code Architect',
-    summary: 'Modern software architecture patterns',
+    summary: 'Modern software architecture patterns.',
     icon: CodeIcon,
     path: '/resources/architecture',
     downloads: '3.1K+',
@@ -47,143 +47,327 @@ const resources = [
   },
 ];
 
+// Define resource categories (customize these!)
+const resourceCategories = [
+  {
+    id: 'cloud-computing',
+    title: 'Cloud Computing',
+    summary: 'Deep dive into cloud infrastructure, deployment, and optimization.',
+    icon: CloudIcon,
+    path: '/resources/cloud-computing-category', // Update with actual category path if needed
+  },
+  {
+    id: 'cybersecurity',
+    title: 'Cybersecurity',
+    summary: 'Expert guides on enterprise security, threat mitigation, and data protection.',
+    icon: SecurityIcon,
+    path: '/resources/cybersecurity-category', // Update with actual category path if needed
+  },
+  {
+    id: 'software-architecture',
+    title: 'Software Architecture',
+    summary: 'Explore modern software design patterns and scalable system architectures.',
+    icon: CodeIcon,
+    path: '/resources/software-architecture-category', // Update with actual category path if needed
+  },
+  {
+    id: 'data-management',
+    title: 'Data Management',
+    summary: 'Resources on data storage, management, and strategies for data-driven decisions.',
+    icon: StorageIcon,
+    path: '/resources/data-management-category', // Update with actual category path if needed
+  },
+  // Add more categories as needed
+];
+
+
 const ResourcesPage: React.FC = () => {
+  const theme = useTheme();
+  const styles = getSharedStyles(theme);
+
+  const renderResourceCard = (resource: typeof resources[0]) => {
+    const IconComponent = resource.icon;
+    return (
+      <GoldCard
+        onClick={() => { window.location.href = resource.path; }}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          minHeight: CARD_STYLES.minHeight,
+          transition: CARD_STYLES.transition,
+          '&:hover': { transform: CARD_STYLES.hoverTransform },
+        }}
+      >
+        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.palette.mode === 'light'
+                ? 'rgba(25, 118, 210, 0.1)'
+                : 'rgba(144, 202, 249, 0.1)',
+              borderRadius: '50%',
+              width: 60,
+              height: 60,
+              mb: 2,
+              mx: 'auto',
+            }}
+          >
+            <IconComponent sx={{ fontSize: 32, color: theme.palette.primary.main }} />
+          </Box>
+          <Typography
+            variant="h5"
+            component="h3"
+            sx={{
+              fontWeight: 700,
+              mb: 1,
+              textAlign: 'center',
+              color: theme.palette.text.primary,
+            }}
+          >
+            {resource.title}
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              mb: 2,
+              textAlign: 'center',
+              color: theme.palette.text.secondary,
+              flexGrow: 1,
+            }}
+          >
+            {resource.summary}
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            size="medium"
+            component={NextLink}
+            href={resource.path}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: 2,
+              mt: 'auto',
+            }}
+          >
+            Explore Guide
+          </Button>
+        </Box>
+      </GoldCard>
+    );
+  };
+
+    const renderCategoryCard = (category: typeof resourceCategories[0]) => {
+    const IconComponent = category.icon;
+    return (
+      <GoldCard
+        onClick={() => { window.location.href = category.path; }}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          minHeight: CARD_STYLES.minHeight,
+          transition: CARD_STYLES.transition,
+          '&:hover': { transform: CARD_STYLES.hoverTransform },
+        }}
+      >
+        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.palette.mode === 'light'
+                ? 'rgba(25, 118, 210, 0.1)'
+                : 'rgba(144, 202, 249, 0.1)',
+              borderRadius: '50%',
+              width: 60,
+              height: 60,
+              mb: 2,
+              mx: 'auto',
+            }}
+          >
+            <IconComponent sx={{ fontSize: 32, color: theme.palette.primary.main }} />
+          </Box>
+          <Typography
+            variant="h6" // Reduced variant to h6 for categories
+            component="h3"
+            sx={{
+              fontWeight: 700,
+              mb: 1,
+              textAlign: 'center',
+              color: theme.palette.text.primary,
+            }}
+          >
+            {category.title}
+          </Typography>
+          <Typography
+            variant="body2" // Reduced variant to body2 for categories
+            sx={{
+              mb: 2,
+              textAlign: 'center',
+              color: theme.palette.text.secondary,
+              flexGrow: 1,
+            }}
+          >
+            {category.summary}
+          </Typography>
+          <Button
+            variant="outlined" // Changed to outlined style for categories to differentiate
+            color="primary"
+            size="medium"
+            component={NextLink}
+            href={category.path}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: 2,
+              mt: 'auto',
+            }}
+          >
+            Explore Category
+          </Button>
+        </Box>
+      </GoldCard>
+    );
+  };
+
+
   return (
     <ConsistentPageLayout
       seoTitle="Technical Resources - Expert Guides"
       seoDescription="Access our comprehensive library of technical resources and implementation guides."
-      subtitle="Access our expert technical resources to drive your success."
       title="Discover. Learn. Grow."
+      subtitle="Access our expert technical resources to drive your success."
     >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 20,
-          mt: 8,
-          p: { xs: 2, sm: 8 },
-        }}
-      >
-        <Grid
-          container
-          spacing={CARD_GRID_CONFIG.container.spacing}
+      {/* Introduction Section */}
+      <PageSection  sx={{ mb: SPACING.small }}> {/* Reduced mb here - already was small, keeping it*/}
+        <Container maxWidth="md">
+          <Typography
+            variant="h3"
+            component="h2"
+            align="center"
+            sx={{
+              ...styles.pageTitle,
+              color: theme.palette.text.primary,
+
+            }}
+          >
+            Unlock a World of Expertise
+          </Typography>
+          <Typography
+            variant="body1"
+            align="center"
+            color="text.secondary"
+
+          >
+            Welcome to our comprehensive resource library. Here you'll find in-depth guides, articles, and insights crafted by our expert team to help you navigate the complexities of modern technology and achieve your business goals.
+          </Typography>
+          {/* Optional benefit points - customize these! */}
+          <Box component="ul" sx={{ listStyleType: 'none', m: 0, p: 0, maxWidth: 600, mx: 'auto' }}>
+            <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
+              <Typography variant="body1" color="text.primary" fontWeight={500}>Stay ahead of the curve with cutting-edge technical insights.</Typography>
+            </Box>
+            <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
+              <Typography variant="body1" color="text.primary" fontWeight={500}>Gain practical knowledge you can immediately apply to your projects.</Typography>
+            </Box>
+            <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
+              <Typography variant="body1" color="text.primary" fontWeight={500}>Learn from industry experts and accelerate your team's skill development.</Typography>
+            </Box>
+          </Box>
+        </Container>
+      </PageSection>
+
+      {/* Featured Resources Section */}
+      <PageSection > {/* Removed negative margin-top here */}
+        <Typography
+          variant="h3"
+          component="h2"
+          align="center"
+          gutterBottom
           sx={{
-            ...CARD_GRID_CONFIG.container.sx,
-            justifyContent: 'center',
-            px: { xs: 1, sm: 0 },
+            color: theme.palette.text.primary,
+            fontWeight: 'bold',
           }}
         >
-          {resources.map((resource) => {
-            const IconComponent = resource.icon;
-            return (
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                md={4}
-                key={resource.id}
-                sx={{
-                  ...CARD_GRID_CONFIG.item.sx,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  maxWidth: { xs: '400px', sm: 'none' },
-                  margin: { xs: '0 auto', sm: 'initial' },
-                  width: '100%',
-                }}
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
-                  style={{ width: '100%' }}
-                >
-                  <GoldCard
-                    href={resource.path}
-                    sx={{
-                      margin: 'auto',
-                      width: '100%',
-                      maxWidth: 400,
-                    }}
-                  >
-                    <Box sx={{ flex: 1, textAlign: 'center' }}>
-                      <Box
-                        sx={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          backgroundColor: 'rgba(255, 215, 0, 0.2)',
-                          borderRadius: '50%',
-                          width: 70,
-                          height: 70,
-                          mb: 1,
-                        }}
-                      >
-                        <IconComponent sx={{ fontSize: 40, color: '#FFD700' }} />
-                      </Box>
-                      <Typography
-                        variant="h4"
-                        sx={{ fontWeight: 700, mb: 0.5, color: '#FFF' }}
-                      >
-                        {resource.title}
-                      </Typography>
-                      <Typography variant="body1" sx={{ mb: 1, color: '#FFF' }}>
-                        {resource.summary}
-                      </Typography>
-                      {resource.trending && (
-                        <Box
-                          sx={{
-                            px: 1.5,
-                            py: 0.5,
-                            borderRadius: 8,
-                            bgcolor: 'rgba(255, 255, 255, 0.2)',
-                            color: '#FFF',
-                            fontSize: '0.75rem',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            mb: 1,
-                          }}
-                        >
-                          <ErrorOutline sx={{ fontSize: 14, mr: 0.5 }} />
-                          Trending
-                        </Box>
-                      )}
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          gap: 1,
-                          mb: 1,
-                          color: '#FFF',
-                          fontSize: '0.875rem',
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Download sx={{ fontSize: 16, mr: 0.25 }} />
-                          {resource.downloads}
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <AccessTime sx={{ fontSize: 16, mr: 0.25 }} />
-                          {resource.time}
-                        </Box>
-                      </Box>
-                      <NextLink href={resource.path} passHref legacyBehavior>
-                        <Button variant="contained" size="small">
-                          Explore Guide <ArrowRight sx={{ ml: 0.5 }} />
-                        </Button>
-                      </NextLink>
-                    </Box>
-                  </GoldCard>
-                </motion.div>
-              </Grid>
-            );
-          })}
-        </Grid>
-      </Box>
-      <Box sx={{ mb: 30, mt: 30 }} />
-      <TechnologyShowcase />
+          Featured Resources
+        </Typography>
+        <CardGrid data={resources} renderItem={renderResourceCard} />
+      </PageSection>
+
+      {/* Explore Resources by Topic Section */}
+      <PageSection > {/* Removed maxWidth from Container to allow full width centering */}
+        <Container > {/* Removed maxWidth="md"  from Container for full width centering of section */}
+          <Typography
+            variant="h3"
+            component="h2"
+            align="center"
+            sx={{
+              ...styles.pageTitle,
+              color: theme.palette.text.primary,
+              mb: SPACING.medium,
+              mx: 'auto', // Added mx: 'auto' for extra centering assurance - may not be strictly needed
+            }}
+          >
+            Explore Resources by Topic
+          </Typography>
+          <Typography
+            variant="body1"
+            align="center"
+            color="text.secondary"
+            sx={{ mb: SPACING.large, mx: 'auto' }} // Added mx: 'auto' here as well for body text if needed for wider screens
+          >
+            Dive deeper into specific areas of interest. Browse our resources categorized by technical domain to quickly find the guides and insights most relevant to your needs.
+          </Typography>
+          {/* Resource Categories Grid */}
+          <CardGrid data={resourceCategories} renderItem={renderCategoryCard} numColumns={4} sx={{ mx: 'auto' }}/> {/* Added mx: 'auto' to CardGrid for centering */}
+        </Container>
+      </PageSection>
+
+      {/* Why These Resources Matter Section */}
+      <PageSection>
+        <Container maxWidth="md">
+          <Typography
+            variant="h3"
+            component="h2"
+            align="center"
+            sx={{
+              ...styles.pageTitle,
+              color: theme.palette.text.primary,
+              mb: SPACING.medium,
+            }}
+          >
+            Why Leverage Our Expert Resources?
+          </Typography>
+          <Typography
+            variant="body1"
+            align="center"
+            color="text.secondary"
+            sx={{ mb: SPACING.large }}
+          >
+            In today's fast-paced tech landscape, staying informed and skilled is crucial. Our resources are designed to equip tech leaders, developers, and innovators with the knowledge they need to build robust, secure, and scalable platforms. We cut through the noise and deliver actionable insights based on real-world experience.
+          </Typography>
+          {/* Optional target audience points - customize these! */}
+          <Box component="ul" sx={{ listStyleType: 'none', m: 0, p: 0, maxWidth: 600, mx: 'auto' }}>
+            <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
+              <Typography variant="body1" color="text.primary" fontWeight={500}><b>Ideal for:</b> CTOs, VPs of Engineering, Lead Developers, Solution Architects, Security Engineers, Cloud Engineers</Typography>
+            </Box>
+            <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
+              <Typography variant="body1" color="text.primary" fontWeight={500}><b>Perfect for those seeking to:</b> Deepen technical expertise, implement best practices, solve complex tech challenges, drive innovation.</Typography>
+            </Box>
+          </Box>
+        </Container>
+      </PageSection>
+
+      {/* Optional: You can keep or remove these generic sections as per your design for Resources page */}
+      {/* <TechnologyShowcase />
       <WhyChooseUs />
       <ServicesGrid />
-      <TestimonialsSection />
+      <TestimonialsSection /> */}
+
     </ConsistentPageLayout>
   );
 };

@@ -32,6 +32,16 @@ export const PALETTE = {
     paper: "#f5f5f5", // Light gray (for elevated surfaces)
     divider: "#bdbdbd",
   },
+  professional: {
+    primary: "#283e51", // Example: Darker, more professional primary
+    secondary: "#673ab7", // Example: A more muted secondary
+    accent: "#00acc1", // Example: A subtle accent color
+    textPrimary: "#37474f", // Darker text for light backgrounds
+    textSecondary: "#78909c", // Slightly lighter secondary text
+    background: "#ffffff", // Clean white background
+    paper: "#f5f5f5", // Light gray for paper elements
+    error: "#b00020",
+  },
   // Common Colors
   common: {
     black: "#000000",

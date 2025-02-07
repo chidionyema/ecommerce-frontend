@@ -1,124 +1,137 @@
-// components/Common/WhyChooseUs.js
 'use client';
-import {
-  Box,
-  Container,
-  Typography,
-  List,
-  ListItem,
-  ListItemIcon,
-  useTheme,
-  alpha,
-  Button,
-} from '@mui/material';
+
+import React from 'react';
+import { Box, Container, Typography, List, ListItem, ListItemIcon, useTheme, Button, Grid } from '@mui/material'; // Added Grid
 import { motion } from 'framer-motion';
-import { CheckCircle } from 'react-feather';
+import { CheckCircle, Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-react'; // More varied icons
+import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import NextLink from 'next/link';
-import {
-  SECTION_HEIGHT,
-  COLORS,
-  FONT_SIZES,
-  SPACING,
-  BUTTON_SIZES,
-} from '../../utils/sharedStyles';
 
-export const WhyChooseUs = () => {
+const WhyChooseUs = () => {
   const theme = useTheme();
+  const styles = getSharedStyles(theme);
 
+  // More descriptive and benefit-oriented reasons
   const reasons = [
-    'Expert Consultation',
-    'Innovative Solutions',
-    'Reliable Execution',
-    'Scalable Growth',
+    {
+      id: 1,
+      text: 'Deep Industry Expertise',
+      description: 'Benefit from the insights of seasoned consultants with extensive experience across diverse technology sectors.',
+      icon: Lightbulb, // More relevant icon
+    },
+    {
+      id: 2,
+      text: 'Tailored, Innovative Solutions',
+      description: 'Receive custom-crafted strategies and cutting-edge solutions designed specifically for your unique challenges and goals.',
+      icon: Rocket, // Icon for innovation
+    },
+    {
+      id: 3,
+      text: 'Reliable & Agile Execution',
+      description: 'Count on our proven methodologies and adaptable approach to ensure projects are delivered on time and to the highest standards.',
+      icon: ShieldCheck, // Icon for reliability
+    },
+    {
+      id: 4,
+      text: 'Scalable Solutions for Growth',
+      description: 'Implement future-proof solutions architected for scalability, supporting your business as it expands and evolves.',
+      icon: TrendingUp, // Icon for growth
+    },
   ];
 
   return (
     <Box
+      component="section"
       sx={{
-        minHeight: SECTION_HEIGHT,
-        background: `linear-gradient(45deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)`,
-        width: '100vw',
-        position: 'relative',
-        left: '50%',
-        right: '50%',
-        marginLeft: '-50vw',
-        marginRight: '-50vw',
-        py: SPACING.medium, // Consistent vertical padding
+        width: '100%',
+        py: SPACING.large * 2, // Increased padding for more visual breathing room
+        bgcolor: theme.palette.background.default,
+        overflow: 'hidden',
       }}
     >
-      <Container maxWidth="md">
+      <Container maxWidth="lg">
         <Typography
-          variant="h3"
+          variant="h2" // Keep h2 for main title, but adjust style
+          component="h2"
           align="center"
           sx={{
-            color: 'white',
-            fontWeight: 700,
-            mb: SPACING.medium, // Consistent margin-bottom
-            fontSize: FONT_SIZES.h3, // Use FONT_SIZES.h3
+            ...styles.pageTitle,
+            color: theme.palette.text.primary,
+            mb: SPACING.medium, // Reduced mb for tighter spacing
+            fontWeight: 700, // Make title bolder
           }}
         >
-          Why Choose Us?
+          Why Partner with Us? {/* More engaging title */}
         </Typography>
 
-        <List sx={{ mx: 'auto', width: '100%', maxWidth: '80%' }}>
-          {reasons.map((reason, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{
-                delay: index * 0.15,
-                duration: 0.3,
-                ease: 'easeInOut',
-              }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <ListItem>
-                <ListItemIcon>
-                  <CheckCircle
-                    size={24}
-                    color={COLORS.primary}
-                    strokeWidth={2}
-                  />
-                </ListItemIcon>
-                <Typography
-                  variant="h5"
-                  sx={{ fontWeight: 700, fontSize: FONT_SIZES.h5 }} // Use FONT_SIZES.h5
+        <Grid container spacing={SPACING.medium} justifyContent="center"> {/* Use Grid for layout */}
+          {reasons.map((reason) => (
+            <Grid item xs={12} md={6} key={reason.id}> {/* Responsive grid items */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }} // Slightly changed animation
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: reason.id * 0.1, // Slightly adjusted delay
+                  duration: 0.4, // Slightly adjusted duration
+                  ease: 'easeInOut',
+                }}
+                whileHover={{ scale: 1.03 }} // Reduced hover scale slightly
+              >
+                <Box
+                  sx={{
+                    p: SPACING.medium,
+                    borderRadius: 'md',
+                    boxShadow: theme.shadows[2], // Added subtle shadow for depth
+                    backgroundColor: theme.palette.background.paper, // Card background
+                    height: '100%', // Ensure consistent height
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start', // Align items to start for better text flow
+                  }}
                 >
-                  {reason}
-                </Typography>
-              </ListItem>
-            </motion.div>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      bgcolor: theme.palette.primary.light, // Lighter primary for icon background
+                      color: theme.palette.primary.contrastText, // Ensure icon color contrast
+                      borderRadius: '50%',
+                      width: 50,
+                      height: 50,
+                      mb: SPACING.small, // Spacing below icon
+                    }}
+                  >
+                    <reason.icon size={28} color={theme.palette.primary.main} /> {/* Use reason-specific icon */}
+                  </Box>
+                  <Typography
+                    variant="h5" // Reduced to h5 for reason title
+                    component="h3"
+                    sx={{
+                      fontWeight: 700,
+                      color: theme.palette.text.primary,
+                      mb: SPACING.small, // Spacing below title
+                    }}
+                  >
+                    {reason.text}
+                  </Typography>
+                  <Typography
+                    variant="body1" // Keep body1 for description
+                    color="text.secondary"
+                    sx={{ flexGrow: 1 }} // Push description to take available space
+                  >
+                    {reason.description}
+                  </Typography>
+                </Box>
+              </motion.div>
+            </Grid>
           ))}
-        </List>
+        </Grid>
 
-        <Box sx={{ textAlign: 'center', mt: SPACING.medium }}> {/* Consistent margin-top */}
+        <Box sx={{ textAlign: 'center', mt: SPACING.large }}> {/* Increased mt here */}
           <NextLink href="/contact" passHref legacyBehavior>
-            <Button
-              component={motion.button}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              variant="contained"
-              size="large"
-              sx={{
-                background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)`,
-                color: theme.palette.common.white,
-                px: BUTTON_SIZES.medium.padding, // Use BUTTON_SIZES.medium.padding
-                py: 1.5,
-                fontSize: FONT_SIZES.body1, // Use FONT_SIZES.body1
-                fontWeight: 700,
-                borderRadius: '16px',
-                boxShadow: `0 12px 32px ${alpha(
-                  theme.palette.primary.main,
-                  0.3,
-                )}`,
-                '&:hover': {
-                  background: alpha(theme.palette.primary.main, 0.08),
-                  borderColor: theme.palette.primary.main,
-                },
-              }}
-            >
-              Contact Us
+            <Button variant="contained" color="secondary" size="large" sx={styles.button}> {/* Larger button */}
+              Explore Our Services {/* More action-oriented CTA */}
             </Button>
           </NextLink>
         </Box>

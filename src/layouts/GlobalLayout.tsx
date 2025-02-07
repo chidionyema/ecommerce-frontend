@@ -16,7 +16,7 @@ const GlobalLayout = ({ children }: GlobalLayoutProps) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <NavBar />
-      <MainContent component="main" sx={{ marginTop: '96px', flex: 1 }}>
+      <MainContent component="main" sx={{  flex: 1 }}>
         {children}
       </MainContent>
       <Footer />

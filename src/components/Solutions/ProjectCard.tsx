@@ -1,198 +1,232 @@
-'use client';
+'use client'; // nargin appled 'use client';
 
 import React from 'react';
 import {
-  Box,
-  Typography,
-  Chip,
-  CardContent,
-  Button,
-  useTheme,
-  alpha,
+    Box,
+    Typography,
+    CardContent,
+    Button,
+    useTheme,
+    alpha,
 } from '@mui/material';
 import NextLink from 'next/link';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRightAlt } from '@mui/icons-material';
 import GoldCard from '../GoldCard';
-import { Cpu, BoxIcon, Cloud, Layers, Database, Code, GitBranch, LucideIcon, Terminal, Server } from 'lucide-react';
-import { NEUTRAL_TEXT } from '../../utils/sharedColors';
-import { keyframes } from '@emotion/react';
+import { CARD_SIZES, SPACING } from '../../utils/sharedStyles';
+import { DesignServices } from '@mui/icons-material'; // Default Icon
 
-const subtlePulse = keyframes`
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-`;
-
-export interface Project {
-  id: string;
-  name: string;
-  description: string;
-  technologies: string[];
-  clientName: string;
-  image?: string;
-  metrics?: Array<{
-    label: string;
-    value: string;
-  }>;
-  icon?: LucideIcon;
-  iconColor: string;
+interface Project {
+    id: string;
+    name: string;
+    description: string;
+    technologies: string[];
+    clientName?: string;
+    gradient?: string;
+    highlights?: string; // Keeping 'highlights' in data, but using 'achievements' in UI
+    imageUrl?: string;
+    icon?: React.ComponentType;
 }
 
-const technologyIconMap: {
-  [key: string]: { icon: LucideIcon; color: string };
-} = {
-  ".NET Core": { icon: Code, color: '#512bd4' },
-  "Java": { icon: Terminal, color: '#007396' },
-  "WebSockets": { icon: GitBranch, color: '#00aced' },
-  "RabbitMQ": { icon: Database, color: '#E51B24' },
-  "MQTT": { icon: Layers, color: '#7FBA00' },
-  "Docker": { icon: Server, color: '#2496ED' },
-  "Kubernetes": { icon: Cloud, color: '#326CE5' },
-  "Terraform": { icon: BoxIcon, color: '#623CE4' },
-  "AWS": { icon: Cloud, color: '#FF9900' },
-  "Azure": { icon: Cloud, color: '#007FFF' },
-  "C#": { icon: Cpu, color: '#178600' },
-  "EF Core": { icon: Database, color: '#512bd4' },
-  "SQL": { icon: Database, color: '#D82B2B' },
-};
+const ProjectCard = ({ project, sx }: { project: Project; sx?: any }) => {
+    const theme = useTheme();
+    const { width: CARD_WIDTH, height: CARD_HEIGHT } = CARD_SIZES.large;
+    const truncatedDescription = project.description.substring(0, 100) + (project.description.length > 100 ? '...' : '');
+    const DefaultIcon = DesignServices;
 
-const ProjectCard = ({ project }: { project: Project }) => {
-  const theme = useTheme();
-
-  return (
-    <GoldCard 
-      href={`/projects/${project.id}`}
-      sx={{
-        margin: 'auto !important',
-        height: 400, // Fixed height for uniformity across cards
-        display: 'flex',
-        flexDirection: 'column',
-        padding: 2,
-        width: '100%',
-        maxWidth: { xs: 'calc(100% - 32px)', sm: 400 },
-        position: 'relative',
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-        '&:hover': {
-          transform: 'translateY(-8px)',
-          boxShadow: `0 24px 48px ${alpha(theme.palette.common.black, 0.4)}`,
-        }
-      }}
-    >
-      {project.image && (
+    return (
         <Box
-          sx={{
-            position: 'relative',
-            width: 'calc(100% - 16px)',
-            margin: '8px',
-            height: 150,
-            borderRadius: 2,
-            overflow: 'hidden',
-            mb: 2,
-          }}
-        >
-          <Image
-            src={project.image}
-            alt={project.name}
-            fill
-            style={{ objectFit: 'cover' }}
-            priority
-          />
-          <Box
             sx={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%)',
+                m: SPACING.medium,
+                mx: 'auto',
+                width: 332,
             }}
-          />
-        </Box>
-      )}
-
-      <CardContent sx={{ px: 0, flexGrow: 1, textAlign: 'center' }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: NEUTRAL_TEXT }}>
-          {project.name}
-        </Typography>
-        {project.clientName && (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-            {project.icon && (
-              <Box sx={{ mr: 1 }}>
-                <project.icon size={24} color={theme.palette.primary.light} />
-              </Box>
-            )}
-            <Typography variant="subtitle1" sx={{ fontWeight: 500, color: theme.palette.grey[300] }}>
-              {project.clientName}
-            </Typography>
-          </Box>
-        )}
-        <Typography variant="body2" sx={{ color: theme.palette.grey[400], mb: 2 }}>
-          {project.description}
-        </Typography>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
-          {project.technologies.map((tech) => {
-            const techData = technologyIconMap[tech];
-            return (
-              <Chip
-                key={tech}
-                icon={techData?.icon ? <techData.icon size={16} color={techData.color} /> : undefined}
-                label={tech}
-                size="small"
+        >
+            <GoldCard
+                href={`/projects/${project.id}`}
+                className="gold-card" // Added class for ripple effect
                 sx={{
-                  fontSize: '0.75rem',
-                  borderRadius: 1,
-                  bgcolor: alpha(theme.palette.primary.light, 0.1),
-                  color: theme.palette.grey[200],
+                    boxSizing: 'border-box',
+                    width: '100%',
+                    height: CARD_HEIGHT,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    p: SPACING.medium,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'transform 0.3s ease, background 0.3s ease', // Transition for background too
+                    '&:hover': {
+                        transform: 'translateY(-4px)',
+                        background: `linear-gradient(135deg, ${theme.palette.background.paper} 70%, ${alpha(theme.palette.primary.light, 0.15)} 100%)`, // Hover gradient
+                    },
+                    ...sx,
                 }}
-              />
-            );
-          })}
-        </Box>
-      </CardContent>
+            >
+                {/* Enhanced Header Section: Image or Icon with Aspect Ratio and Border */}
+                <Box
+                    sx={{
+                        height: 140,
+                        width: '100%',
+                        borderRadius: 1,
+                        overflow: 'hidden',
+                        position: 'relative',
+                        bgcolor: 'background.paper',
+                        mb: SPACING.medium,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        aspectRatio: '16/9', // Consistent aspect ratio
+                        border: `1px solid ${alpha(theme.palette.divider, 0.2)}`, // Subtle border
+                    }}
+                >
+                    {project.imageUrl ? (
+                        <Box
+                            component="img"
+                            src={project.imageUrl}
+                            alt={project.name}
+                            sx={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                            }}
+                        />
+                    ) : project.icon ? (
+                        <Box
+                            sx={{
+                                width: '100%',
+                                height: '100%',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <project.icon sx={{ fontSize: 70, color: theme.palette.primary.main }} />
+                        </Box>
+                    ) : (
+                        <Box
+                            sx={{
+                                background: project.gradient || theme.palette.background.default,
+                                width: '100%',
+                                height: '100%',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <DefaultIcon sx={{ fontSize: 70, color: theme.palette.primary.main }} />
+                        </Box>
+                    )}
+                </Box>
 
-      <AnimatePresence>
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
-          style={{
-            position: 'absolute',
-            bottom: 16, // Increased spacing from bottom
-            right: 16,  // Positioned in bottom-right corner
-            zIndex: 2,
-            width: 'auto',
-          }}
-        >
-          <Button
-            component={NextLink}
-            href={`/projects/${project.id}`}
-            endIcon={<ArrowRightAlt />}
-            sx={{
-              background: 'linear-gradient(45deg, #B8860B, #FFB90F)',
-              color: '#000',
-              borderRadius: 2,
-              px: { xs: 2, sm: 3 },
-              py: 1,
-              fontWeight: 600,
-              textTransform: 'none',
-              boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.4)}`,
-              animation: `${subtlePulse} 2s infinite ease-in-out`,
-              fontSize: { xs: '0.9rem', sm: '1rem' },
-              '&:hover': {
-                background: 'linear-gradient(45deg, #A07B0A, #E6A200)',
-                boxShadow: `0 4px 16px ${alpha(theme.palette.common.black, 0.6)}`,
-              },
-              marginLeft: 'auto',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            View Details
-          </Button>
-        </motion.div>
-      </AnimatePresence>
-    </GoldCard>
-  );
+                {/* Card Content */}
+                <CardContent
+                    sx={{
+                        px: 0,
+                        pb: 0,
+                        height: `calc(100% - 140px - ${SPACING.medium}px)`,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden',
+                    }}
+                >
+                    {/* Title Section */}
+                    <Box sx={{ mb: SPACING.small, minHeight: 60, overflow: 'hidden' }}>
+                        <Typography
+                            variant="h6"
+                            component="h2"
+                            sx={{
+                                fontWeight: 700,
+                                lineHeight: 1.3,
+                                whiteSpace: 'normal',
+                            }}
+                        >
+                            {project.name}
+                        </Typography>
+                        {project.clientName && (
+                            <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.5 }}>
+                                {project.clientName}
+                            </Typography>
+                        )}
+                    </Box>
+
+                    {/* Technologies Section */}
+                    {project.technologies && project.technologies.length > 0 && (
+                        <Box sx={{ mb: SPACING.medium }}>
+                            <Typography variant="caption" fontWeight={600} color="text.primary" sx={{ display: 'block', mb: 0.5 }}>
+                                Technologies:
+                            </Typography>
+                            <Typography variant="body2" color="text.primary" fontWeight={500}>
+                                {project.technologies.slice(0, 3).join(', ')}
+                                {project.technologies.length > 3 && '...'}
+                            </Typography>
+                        </Box>
+                    )}
+
+                    {/* Achievements Section (using 'highlights' data) */}
+                    {project.highlights && (
+                        <Box sx={{ mb: SPACING.medium }}>
+                            <Typography variant="caption" fontWeight={600} color="text.primary" sx={{ display: 'block', mb: 0.5 }}>
+                                Achievements:
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                “{project.highlights}” {/* Displaying 'highlights' data as 'Achievements' in UI */}
+                            </Typography>
+                        </Box>
+                    )}
+
+                    {/* Description Section */}
+                    <Box
+                        sx={{
+                            flex: 1,
+                            overflowY: 'auto',
+                            pr: 1,
+                            mb: SPACING.medium,
+                            '&::-webkit-scrollbar': { width: 6 },
+                            '&::-webkit-scrollbar-thumb': {
+                                backgroundColor: alpha(theme.palette.primary.main, 0.3),
+                                borderRadius: 3,
+                            },
+                        }}
+                    >
+                        <Typography variant="body2">
+                            {truncatedDescription}
+                        </Typography>
+                    </Box>
+
+                    {/* Sticky Bottom Button with Hover Animation */}
+                    <Box
+                        sx={{
+                            pt: SPACING.small,
+                            position: 'sticky',
+                            bottom: 0,
+                            bgcolor: 'background.default',
+                            zIndex: 1,
+                        }}
+                    >
+                        <Button
+                            component={NextLink}
+                            href={`/projects/${project.id}`}
+                            fullWidth
+                            endIcon={<ArrowRightAlt />}
+                            sx={{
+                                bgcolor: 'primary.main',
+                                color: 'primary.contrastText',
+                                py: 1,
+                                fontWeight: 600,
+                                borderRadius: 2,
+                                '&:hover': {
+                                    bgcolor: 'primary.dark',
+                                    transform: 'scale(1.03)', // Button hover animation
+                                    transition: 'transform 0.2s ease-in-out',
+                                },
+                            }}
+                        >
+                            Learn More
+                        </Button>
+                    </Box>
+                </CardContent>
+            </GoldCard>
+        </Box>
+    );
 };
 
 export default ProjectCard;

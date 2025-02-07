@@ -64,4 +64,3 @@ export const techIcons = [
         color: '#3f51b5',
     },
 ];
-
