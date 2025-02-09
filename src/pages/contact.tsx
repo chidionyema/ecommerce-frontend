@@ -104,74 +104,19 @@ const Contact: React.FC = () => {
         keywords="contact, support, inquiry, partnership, technology consulting"
       />
       <ConsistentPageLayout>
-        <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 4, md: 6 } }}>
+        <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 4, md: 6 }, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Box
             sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' },
-              gap: { xs: 4, md: 6 },
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
               width: '100%',
+              height: '100vh', // Full viewport height to center vertically
               maxWidth: 1400,
               mx: 'auto',
               py: { xs: 3, md: 5 },
             }}
           >
-            {/* Left-side Contact Information */}
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 3,
-                p: { xs: 2, md: 3 },
-                borderRadius: 2,
-                backgroundColor: theme.palette.background.paper,
-                boxShadow: theme.shadows[3],
-                textAlign: { xs: 'center', md: 'left' },
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' } }}>
-                <Headset sx={{ fontSize: 40, color: theme.palette.secondary.main, mr: 2 }} />
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: { xs: '1.8rem', md: '2.2rem' },
-                    color: theme.palette.text.primary,
-                  }}
-                >
-                  Get in Touch Today
-                </Typography>
-              </Box>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: theme.palette.text.secondary,
-                  lineHeight: 1.7,
-                  fontSize: '1.1rem',
-                }}
-              >
-                We’d love to hear about your projects and challenges. Contact us to explore how our tailored tech solutions can accelerate your business.
-              </Typography>
-              <Divider sx={{ my: 2, borderColor: theme.palette.divider }} />
-              {/* Contact list items */}
-              <List>
-                <ListItem>
-                  <ListItemIcon>
-                    <Phone sx={{ color: theme.palette.text.secondary }} />
-                  </ListItemIcon>
-                  <ListItemText primary="+1 (555) 123-4567" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <Email sx={{ color: theme.palette.text.secondary }} />
-                  </ListItemIcon>
-                  <ListItemText primary="contact@glustack.com" />
-                </ListItem>
-              </List>
-            </Box>
-
-            {/* Right-side Contact Form */}
             <GoldCard
               component="form"
               onSubmit={handleSubmit}
@@ -183,9 +128,9 @@ const Contact: React.FC = () => {
                 overflow: 'visible',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: theme.palette.background.paper,  // Ensure white background for form
+                justifyContent: 'center', // Center vertically
+                alignItems: 'center',      // Center horizontally
+                backgroundColor: theme.palette.background.paper,
                 boxShadow: theme.shadows[3], // Add some shadow to make form stand out
               }}
             >
