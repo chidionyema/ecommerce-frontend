@@ -20,7 +20,7 @@ interface Project {
   iconColor?: string;
   clientName: string;
   metrics: { value: string; label: string }[];
-  technologies: string[]; // This will be an array of strings (e.g., technology names)
+  technologies: string[];
 }
 
 const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) => {
@@ -47,7 +47,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
           sx={{
             width: '100%',
             height: CARD_HEIGHT,
-            p: 2, // Adjusted padding
+            p: 2,
             position: 'relative',
             overflow: 'hidden',
             transition: 'transform 0.3s ease',
@@ -70,10 +70,10 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
             ...sx,
           }}
         >
-          {/* Header Section */}
+          {/* Header Section with Image */}
           <Box
             sx={{
-              height: '40%',
+              height: '60%', // Increased header height to show more of the image
               width: '100%',
               borderRadius: 1,
               overflow: 'hidden',
@@ -81,50 +81,22 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
               mb: SPACING.medium,
             }}
           >
-            {/* Image and Overlay (Conditional on imageLoaded) */}
+            {/* Image in Header Section */}
             {imageLoaded && (
-              <>
-                <Box
-                  component="img"
-                  src={imageUrl}
-                  alt={project.name}
-                  sx={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    zIndex: 0,
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundImage: `url(${imageUrl})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    filter: 'blur(2px)', // Reduced blur
-                    zIndex: 1,
-                    opacity: 0.8, // Increased opacity
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: alpha(theme.palette.primary.dark, 0.2), // Reduced opacity
-                    zIndex: 2,
-                  }}
-                />
-              </>
+              <Box
+                component="img"
+                src={imageUrl}
+                alt={project.name}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: 0, // Ensure it stays behind the content
+                }}
+              />
             )}
 
             {/* Client Name & Icon */}
@@ -136,12 +108,12 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
-                backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                backgroundColor: alpha(theme.palette.background.paper, 0.7), // Added opacity for contrast
                 px: 2,
                 py: 1,
                 borderRadius: 4,
                 boxShadow: theme.shadows[2],
-                zIndex: 3, // Above the overlay
+                zIndex: 1, // Above the background image
               }}
             >
               {project.icon ? (
@@ -158,9 +130,10 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
             </Box>
           </Box>
 
-          <CardContent sx={{ px: 0, pb: 0, height: '60%', display: 'flex', flexDirection: 'column' }}>
+          <CardContent sx={{ px: 0, pb: 0, height: '40%', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ mb: SPACING.small }}>
-              <Typography variant="h6" component="h2" fontWeight={800} gutterBottom>
+              {/* Increased header size */}
+              <Typography variant="h5" component="h2" fontWeight={800} gutterBottom sx={{ fontSize: '2rem' }}>
                 {project.name}
               </Typography>
 
@@ -187,7 +160,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                   Core Technologies
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  {project.technologies.slice(0, 5).map((tech: string, index: number) => {  // Explicitly typed `tech`
+                  {project.technologies.slice(0, 5).map((tech: string, index: number) => {
                     const techData = technologyIconMap[tech as keyof typeof technologyIconMap];
                     const IconComponent = techData?.icon || DefaultIcon;
                     return (
@@ -199,7 +172,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                           borderRadius: 2,
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 0.5, // Add gap between icon and text
+                          gap: 0.5,
                         }}
                       >
                         <IconComponent
@@ -207,7 +180,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                           color={techData?.color || theme.palette.primary.main}
                         />
                         <Typography variant="caption" color="textPrimary">
-                          {tech} {/* Use the technology name directly */}
+                          {tech}
                         </Typography>
                       </Box>
                     );

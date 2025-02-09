@@ -172,8 +172,8 @@ const Contact: React.FC = () => {
               sx={{
                 display: 'flex',
                 justifyContent: 'center',
-               
-                height: '100vh',
+                alignItems: 'center', // Ensures the form is centered vertically
+                height: '100%',
                 width: '100%',
               }}
             >
