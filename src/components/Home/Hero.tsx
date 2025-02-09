@@ -1,15 +1,10 @@
-'use client';
-
-import { Box, Container, Typography, Grid, Button, useTheme, alpha, useMediaQuery } from '@mui/material';
-import NextLink from 'next/link';
-import {
-  SiAmazonaws,
-  SiMicrosoftazure,
-  SiGooglecloud,
-  SiKubernetes,
-  SiNvidia,
-} from 'react-icons/si';
-import { SECTION_HEIGHT, COLORS, SPACING, FONT_SIZES } from '../../utils/sharedStyles';
+// ContactPage.js (or your component file)
+import React, { useState, useEffect } from 'react';
+import { Box, Container, Typography, Button, useTheme, alpha, Grid } from '@mui/material';
+import { motion } from 'framer-motion';
+import { SiAmazonaws, SiMicrosoftazure, SiGooglecloud, SiKubernetes, SiNvidia } from 'react-icons/si';
+import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
+import PageHeader from '../Shared/PageHeader';
 
 const TECH_LOGOS = [
   { icon: SiAmazonaws, name: 'AWS' },
@@ -19,113 +14,129 @@ const TECH_LOGOS = [
   { icon: SiNvidia, name: 'GPU Accelerated' },
 ];
 
-const HeroSection = () => {
+// HeroSection.js
+export const HeroSection = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const styles = getSharedStyles(theme);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const imageUrl = '/images/istockphoto-hero-1024x1024.jpg';
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = imageUrl;
+    img.onload = () => setImageLoaded(true);
+    img.onerror = () => setImageLoaded(false);
+  }, [imageUrl]);
+
 
   return (
-    <Box
-      component="section"
+    <PageHeader
+      title="**AI-Powered Cloud Solutions for Startups**"
+      subtitle="Accelerate growth with enterprise-grade technology and expert guidance."
       sx={{
+        backgroundImage: imageLoaded ? `url(${imageUrl})` : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         position: 'relative',
-        minHeight: SECTION_HEIGHT, // Responsive height
-        background: `linear-gradient(45deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)`,
+        minHeight: '500px',
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
-        py: 20,
+        justifyContent: 'center',
+        '&::before': {  //  <--  Overlay as a pseudo-element
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: imageLoaded
+            ? alpha(theme.palette.primary.dark, 0.7) //  <--  Adjust opacity here
+            : theme.palette.primary.dark,
+            backdropFilter: imageLoaded ? 'blur(4px)' : 'none', // Optional blur
+        },
+        '@media (max-width: 600px)': {
+          minHeight: '400px',
+          backgroundPosition: 'center',
+        },
       }}
     >
-      <Container maxWidth="xl">
-        {/* Headings */}
-        <Box sx={{ textAlign: 'center', mb: SPACING }}>
-          <Typography
-            variant="h3"
-            align="center"
+      <Container maxWidth="md" sx={{ py: 8, position: 'relative', zIndex: 2 }}>  {/* zIndex: 2 */}
+        <Typography
+          variant="h2"
+          component="h1"
+          color="white"
+          textAlign="center"
+          mb={4}
+          sx={{
+            fontSize: { xs: '2.25rem', sm: '3rem', md: '3.5rem' },
+            lineHeight: 1.2,
+            textShadow: imageLoaded ? '0 2px 4px rgba(0, 0, 0, 0.5)' : 'none', //  <-- Text shadow
+            WebkitTextFillColor: 'white',
+            WebkitTextStroke: imageLoaded ? '1px rgba(0, 0, 0, 0.3)' : 'none',
+          }}
+        >
+          Transform Your Startup with Smart Cloud Solutions
+        </Typography>
+
+        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="large"
             sx={{
-              color: 'white',
-              fontWeight: 700,
-              mb: 10 / 2,
-              fontSize: isMobile ? FONT_SIZES.h4 : FONT_SIZES.h3,
+              px: 6,
+              py: 2,
+              fontSize: '1.1rem',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: 4
+              }
             }}
           >
-            Next-Level Digital Transformation
-          </Typography>
-          <Typography
-            variant="h5"
-            align="center"
+            Book Free Demo
+          </Button>
+          <Button
+            variant="outlined"
+            color="inherit"
+            size="large"
             sx={{
+              borderWidth: 2,
+              px: 6,
+              py: 2,
+              fontSize: '1.1rem',
               color: 'white',
-              mb: 10,
-              fontSize: isMobile ? FONT_SIZES.body1 : FONT_SIZES.h5,
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+                borderWidth: 2
+              }
             }}
           >
-            Empowering startups with enterprise-grade cloud solutions
-          </Typography>
+            Learn More
+          </Button>
         </Box>
 
-        {/* Technology Logos */}
-        <Grid
-          container
-          spacing={isMobile ? 2 : 4}
-          justifyContent="center"
-          sx={{ mt: 10 / 2 }}
-        >
-          {TECH_LOGOS.map((tech, index) => {
-            const Icon = tech.icon;
-            return (
-              <Grid item key={index} xs={isMobile ? 6 : 'auto'}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Icon
-                    size={isMobile ? 60 : 80}
-                    color={theme.palette.common.white}
-                    style={{
-                      filter: `drop-shadow(0 0 10px ${alpha(theme.palette.common.white, 0.8)})`,
-                    }}
-                  />
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      color: 'white',
-                      mt: 20 / 2,
-                      fontSize: isMobile ? FONT_SIZES.body2 : FONT_SIZES.subtitle1,
-                    }}
-                  >
-                    {tech.name}
+        {/* Tech Logos Section Updated */}
+        <Box sx={{ mt: 8,  p: 3, borderRadius: 2 }}>
+          <Typography variant="body2" color="white" textAlign="center" mb={2}  sx={{
+            textShadow: imageLoaded ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none', // Text Shadow
+          }}>
+            Trusted by startups using:
+          </Typography>
+          <Grid container spacing={4} justifyContent="center">
+            {TECH_LOGOS.map(({ icon: Icon, name }, index) => (
+              <Grid item key={index} xs={6} sm={4} md={3} lg={2}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5 }}>
+                  <Icon color="white" size={28} />
+                  <Typography variant="body2" color="white">
+                    {name}
                   </Typography>
                 </Box>
               </Grid>
-            );
-          })}
-        </Grid>
-
-        {/* Call-to-Action Button */}
-        <Box sx={{ textAlign: 'center', mt: 15 }}>
-          <NextLink href="/contact" passHref>
-            <Button
-              variant="contained"
-              size="large"
-              sx={{
-                px: 6,
-                py: 2,
-                fontWeight: 700,
-                fontSize: isMobile ? FONT_SIZES.body1 : '1.25rem',
-                borderRadius: 2,
-                background: theme.palette.secondary.main,
-                color: 'white',
-                boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
-                '&:hover': {
-                  background: theme.palette.secondary.dark,
-                },
-              }}
-            >
-              Get in Touch
-            </Button>
-          </NextLink>
+            ))}
+          </Grid>
         </Box>
       </Container>
-    </Box>
+    </PageHeader>
   );
 };
 

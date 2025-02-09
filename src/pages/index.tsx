@@ -1,7 +1,7 @@
 'use client';
 
 import Head from 'next/head';
-import { Box, Container, Typography, useTheme, Divider } from '@mui/material';
+import { Box, Typography, useTheme, Divider } from '@mui/material'; // Removed Container
 import LandingPageLayout from '../components/Shared/LandingPageLayout';
 import TechnologyShowcase from '../components/Home/TechnologyShowcase';
 import ServicesGrid from '../components/Common/ServicesGrid';
@@ -24,69 +24,24 @@ export default function HomePage() {
       </Head>
 
       {/* Hero section */}
-      <Box sx={{ mb: SPACING.large * 2 }}> {/* Increased margin below Hero */}
+      <Box sx={{ mb: SPACING.large * 2 }}>
         <Hero />
       </Box>
 
-      <LandingPageLayout>
-        <Container maxWidth="lg" sx={{ mb: SPACING.large * 3 }}> {/* Increased margin below TechnologyShowcase */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: SPACING,
-              p: SPACING,
-            }}
-          >
-            <TechnologyShowcase />
-          </Box>
-        </Container>
-
-        {/* Removed StyledDivider */}
-
-        <Container maxWidth="lg" sx={{ mb: SPACING.large * 3 }}> {/* Increased margin below WhyChooseUs */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: SPACING,
-              p: SPACING,
-            }}
-          >
-            <WhyChooseUs />
-          </Box>
-        </Container>
-
-        {/* Removed StyledDivider */}
-
-        <Container maxWidth="lg" sx={{ mb: SPACING.large * 3 }}> {/* Increased margin below ServicesGrid */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: SPACING,
-              p: SPACING,
-            }}
-          >
-            <ServicesGrid />
-          </Box>
-        </Container>
-
-        {/* Removed StyledDivider */}
-
-        <Container maxWidth="lg" sx={{ mb: SPACING.large * 3 }}> {/* Increased margin below TestimonialsSection */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: SPACING,
-              p: SPACING,
-            }}
-          >
-            <TestimonialsSection />
-          </Box>
-        </Container>
-      </LandingPageLayout>
+      {/* Removed LandingPageLayout and individual Containers */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: SPACING.large * 3, // Apply spacing between sections
+          // Remove padding, let the sections handle their own padding
+        }}
+      >
+        <TechnologyShowcase />
+        <WhyChooseUs />
+        <ServicesGrid />
+        <TestimonialsSection />
+      </Box>
     </div>
   );
 }

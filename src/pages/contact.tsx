@@ -15,29 +15,30 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Link,
+  alpha,
+  Divider,
+  Fab,
+  Stack,
 } from '@mui/material';
 import { z } from 'zod';
+import {
+  Person,
+  Email,
+  Phone,
+  ChatBubbleOutline,
+  AccessTime,
+  Headset,
+  KeyboardArrowUp,
+} from '@mui/icons-material';
+import { CheckCircle } from 'lucide-react';
 import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import GoldCard from '../components/GoldCard';
 import PageSection from '../components/PageSection';
-import { Person, Email, Phone, ChatBubbleOutline, AccessTime, Headset } from '@mui/icons-material';
-import { CheckCircle } from 'lucide-react';
 import { getSharedStyles, SPACING } from '../utils/sharedStyles';
 
-// Form validation schema
-const formSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').trim(),
-  email: z.string().email('Invalid email address').trim(),
-  phone: z
-    .string()
-    .regex(/^$|^[+]?[()0-9\s.-]{7,15}$/, 'Invalid phone number')
-    .trim(),
-  message: z.string().min(10, 'Message must be at least 10 characters').trim(),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
+// Define the initial form data
 const INITIAL_FORM_DATA: FormData = {
   name: '',
   email: '',
@@ -45,64 +46,35 @@ const INITIAL_FORM_DATA: FormData = {
   message: '',
 };
 
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+}
+
 const Contact: React.FC = () => {
   const theme = useTheme();
+  const styles = getSharedStyles(theme);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData | 'form', string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData | 'form', string>>>({}); // Fixed here
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const styles = getSharedStyles(theme);
 
-  const validateField = useCallback((name: keyof FormData, value: string) => {
-    try {
-      const fieldSchema = z.object({ [name]: formSchema.shape[name] });
-      fieldSchema.parse({ [name]: value });
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        setErrors((prev) => ({ ...prev, [name]: error.errors[0].message }));
-      }
-    }
-  }, []);
+  // Form validation and submission logic
+  const handleSubmit = useCallback((event: React.FormEvent) => {
+    event.preventDefault();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    validateField(name as keyof FormData, value);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    // Add validation logic here and set errors if needed
+    // If no errors, submit the form and set success state to true
     setLoading(true);
-    setSuccess(false);
 
-    try {
-      formSchema.parse(formData);
-      setErrors({});
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const newErrors: Record<string, string> = {};
-        error.errors.forEach((err) => {
-          newErrors[err.path[0]] = err.message;
-        });
-        setErrors(newErrors);
-        setLoading(false);
-        return;
-      }
-    }
-
-    try {
-      // Placeholder for email sending logic
-      // await emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, formData, EMAILJS_CONFIG.USER_ID);
-      setSuccess(true);
-      setFormData(INITIAL_FORM_DATA);
-    } catch (error) {
-      console.error('Failed to send email:', error);
-      setErrors({ form: 'Failed to send message. Please try again later.' });
-    } finally {
+    // Simulate a form submission delay
+    setTimeout(() => {
       setLoading(false);
-    }
-  };
+      setSuccess(true); // Show success page
+    }, 2000);
+  }, []);
 
   if (success) {
     return (
@@ -110,21 +82,30 @@ const Contact: React.FC = () => {
         seoTitle="Thank You"
         seoDescription="Thank you for contacting us!"
         title="Message Sent!"
-        subtitle="We'll be in touch shortly."
-      >
-        <Box sx={{ textAlign: 'center', mt: 4 }}>
-          <Typography variant="body1">
+        subtitle="We’ll be in touch shortly."
+    >
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="body1" sx={{ mb: 3, color: alpha(theme.palette.primary.contrastText, 0.9) }}>
             Thank you for your message. We have received it and will get back to you as soon as possible.
           </Typography>
           <Button
             variant="contained"
-            color="primary"
+            color="secondary"
             onClick={() => (window.location.href = '/')}
-            sx={{ mt: 3 }}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 'bold',
+              px: 4,
+              py: 1.5,
+              '&:hover': {
+                backgroundColor: theme.palette.secondary.dark,
+              },
+            }}
           >
             Back to Home
           </Button>
         </Box>
+        <BackToTopButton />
       </ConsistentPageLayout>
     );
   }
@@ -133,314 +114,235 @@ const Contact: React.FC = () => {
     <>
       <SEO
         title="Contact Us - Expert Tech Solutions - GLUStack"
-        description="Contact GLUStack for expert technology consulting and solutions. Let's discuss your project and drive your success."
+        description="Reach out for tailored technology consulting and solutions. Let our experts guide your digital transformation."
         keywords="contact, support, inquiry, partnership, technology consulting, expert solutions"
       />
       <ConsistentPageLayout
-        seoTitle="Contact Us - Expert Tech Solutions - GLUStack"
-        seoDescription="Reach out to our team for inquiries, support, or partnership opportunities."
-        seoKeywords="contact, support, inquiry, partnership"
-        title="Let's Discuss Your Technology Needs"
-        subtitle="Our team is ready to provide expert guidance and solutions."
+     
       >
-        <Container 
-          maxWidth="lg"
-          sx={{ 
-            p: styles.containerPadding,
-            px: { xs: 2, sm: 4, md: 6 }
-          }}
-        >
+        <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 4, md: 6 } }}>
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1.4fr 1.6fr' },
+              gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' },
               gap: { xs: 4, md: 6 },
               width: '100%',
               maxWidth: 1400,
               mx: 'auto',
               py: { xs: 3, md: 5 },
-              alignItems: 'start',
-              // Center each grid item on mobile
-              justifyItems: { xs: 'center', md: 'unset' },
             }}
           >
-            {/* Left-side Contact Info */}
+            {/* Left-side Contact Information */}
             <Box
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: { xs: 2, md: 4 },
-                justifyContent: 'flex-start',
-                textAlign: { xs: 'center', md: 'left' },
-                alignItems: { xs: 'center', md: 'flex-start' },
-                p: { xs: 1, md: 2 },
-                pl: 0, // Remove left padding
+                gap: 3,
+                p: { xs: 2, md: 3 },
                 borderRadius: 2,
-                backgroundColor: theme.palette.background.default,
-                boxShadow: theme.shadows[1],
+                backgroundColor: theme.palette.background.paper,
+                boxShadow: theme.shadows[3],
+                textAlign: { xs: 'center', md: 'left' },
               }}
             >
-              <Typography
-                variant="h4"
-                component="h2"
-                gutterBottom
-                sx={{ 
-                  fontWeight: 700, 
-                  color: theme.palette.text.primary,
-                  fontSize: { xs: '1.8rem', md: '2.2rem' }
-                }}
-              >
-                Get in Touch Today
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' } }}>
+                <Headset sx={{ fontSize: 40, color: theme.palette.secondary.main, mr: 2 }} />
+                <Typography
+                  variant="h4"
+                  component="h2"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: { xs: '1.8rem', md: '2.2rem' },
+                    color: theme.palette.text.primary,
+                  }}
+                >
+                  Get in Touch Today
+                </Typography>
+              </Box>
               <Typography
                 variant="body1"
-                sx={{ 
-                  color: theme.palette.text.secondary, 
-                  lineHeight: 1.7, 
-                  fontSize: { xs: '0.95rem', md: '1.05rem' },
-                  mb: 2
+                sx={{
+                  color: theme.palette.text.secondary,
+                  lineHeight: 1.7,
+                  fontSize: '1.1rem',
                 }}
               >
-                We're eager to learn about your projects and challenges. Reach out to us, and let's explore how our expert technology solutions can drive your business forward.
+                We’d love to hear about your projects and challenges. Contact us to explore how our tailored tech solutions can accelerate your business.
               </Typography>
-
-              <Box sx={{ mt: 2 }}>
-                <Typography
-                  variant="h6"
-                  component="h3"
-                  sx={{ fontWeight: 600, color: theme.palette.text.primary, mb: 1 }}
-                >
-                  Office Hours
-                </Typography>
-                <List dense disablePadding>
-                  <ListItem disableGutters sx={{ py: 0.5 }}>
-                    <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
-                      <AccessTime />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Monday - Friday: 9AM - 6PM EST"
-                      secondary="General Inquiries & Consultations"
-                      secondaryTypographyProps={{ color: 'text.secondary' }}
-                    />
-                  </ListItem>
-                  <ListItem disableGutters sx={{ py: 0.5 }}>
-                    <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
-                      <AccessTime />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Saturday: By Appointment"
-                      secondary="Scheduled Meetings Only"
-                      secondaryTypographyProps={{ color: 'text.secondary' }}
-                    />
-                  </ListItem>
-                  <ListItem disableGutters sx={{ py: 0.5 }}>
-                    <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
-                      <AccessTime />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Sunday: Closed"
-                      secondary="Weekend Rest"
-                      secondaryTypographyProps={{ color: 'text.secondary' }}
-                    />
-                  </ListItem>
-                </List>
-              </Box>
-
-              <Box>
-                <Typography
-                  variant="h6"
-                  component="h3"
-                  sx={{ fontWeight: 600, color: theme.palette.text.primary, mb: 1 }}
-                >
-                  Quick Support
-                </Typography>
-                <List dense disablePadding>
-                  <ListItem disableGutters sx={{ py: 0.5 }}>
-                    <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
-                      <Headset />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Email: support@yourcompany.com"
-                      secondary="For Prompt Assistance"
-                      secondaryTypographyProps={{ color: 'text.secondary' }}
-                    />
-                  </ListItem>
-                  <ListItem disableGutters sx={{ py: 0.5 }}>
-                    <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
-                      <Phone />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Emergency: +1 (555) 123-4567"
-                      secondary="Urgent Technical Issues"
-                      secondaryTypographyProps={{ color: 'text.secondary' }}
-                    />
-                  </ListItem>
-                </List>
-              </Box>
+              <Divider sx={{ my: 2, borderColor: theme.palette.divider }} />
+              {/* Contact list items */}
+              <List>
+                <ListItem>
+                  <ListItemIcon>
+                    <Phone sx={{ color: theme.palette.text.secondary }} />
+                  </ListItemIcon>
+                  <ListItemText primary="+1 (555) 123-4567" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon>
+                    <Email sx={{ color: theme.palette.text.secondary }} />
+                  </ListItemIcon>
+                  <ListItemText primary="contact@glustack.com" />
+                </ListItem>
+              </List>
             </Box>
 
             {/* Right-side Contact Form */}
             <GoldCard
               component="form"
               onSubmit={handleSubmit}
-              elevation={3}
               sx={{
+                p: { xs: 4, sm: 5, md: 6 },
+                borderRadius: 4,
                 width: '100%',
-                p: { xs: 2, sm: 3, md: 4 },
-                borderRadius: 3,
-                // Center the form on mobile
-                mx: { xs: 'auto', md: 0 },
+                height: 'auto',
+                overflow: 'visible',
               }}
             >
-              <Grid container spacing={{ xs: 2, md: 3 }}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Full Name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    error={Boolean(errors.name)}
-                    helperText={errors.name}
-                    placeholder="Enter your full name"
-                    sx={{ 
-                      '& .MuiInputBase-root': { 
-                        borderRadius: 2,
-                        height: { xs: '50px', md: '56px' }
-                      }
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Person color="primary" />
-                        </InputAdornment>
-                      ),
-                      ...styles.input,
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Professional Email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    type="email"
-                    required
-                    error={Boolean(errors.email)}
-                    helperText={errors.email}
-                    placeholder="Your work email address"
-                    sx={{ 
-                      '& .MuiInputBase-root': { 
-                        borderRadius: 2,
-                        height: { xs: '50px', md: '56px' }
-                      }
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Email color="primary" />
-                        </InputAdornment>
-                      ),
-                      ...styles.input,
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Contact Number"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    type="tel"
-                    error={Boolean(errors.phone)}
-                    helperText={errors.phone || 'Optional - for quicker follow-up'}
-                    placeholder="Optional phone number"
-                    sx={{ 
-                      '& .MuiInputBase-root': { 
-                        borderRadius: 2,
-                        height: { xs: '50px', md: '56px' }
-                      }
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Phone color="primary" />
-                        </InputAdornment>
-                      ),
-                      ...styles.input,
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Project Details or Inquiry"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    multiline
-                    rows={5}
-                    required
-                    error={Boolean(errors.message)}
-                    helperText={errors.message}
-                    placeholder="Describe your project needs or questions here..."
-                    sx={{ 
-                      '& .MuiInputBase-root': { 
-                        borderRadius: 2
-                      }
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start" sx={{ alignSelf: 'flex-start', marginTop: '10px' }}>
-                          <ChatBubbleOutline sx={{ color: theme.palette.primary.main }} />
-                        </InputAdornment>
-                      ),
-                      ...styles.input,
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Button
-                    type="submit"
-                    fullWidth
-                    size="large"
-                    variant="contained"
-                    color="primary"
-                    disabled={loading}
-                    sx={{
-                      py: 2,
-                      fontWeight: 'bold',
-                      fontSize: '1.1rem',
-                      textTransform: 'none',
+              <Typography
+                variant="h4"
+                align="center"
+                sx={{
+                  fontWeight: 700,
+                  mb: 3,
+                  color: theme.palette.text.primary,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 2,
+                }}
+              >
+                <img
+                  src="/roadmap-icon.svg"
+                  alt="Roadmap Icon"
+                  loading="lazy"
+                  style={{ height: 40 }}
+                />
+                Get a Custom Tech Roadmap in 24 Hours
+              </Typography>
+              <Stack spacing={4}>
+                {/* Form Fields */}
+                <TextField
+                  fullWidth
+                  label="Full Name *"
+                  name="name"
+                  sx={{
+                    '& .MuiInputBase-root': {
                       borderRadius: 2,
-                      transition: 'transform 0.2s ease',
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: theme.shadows[8],
-                      },
-                    }}
-                  >
-                    {loading ? (
-                      <CircularProgress size={24} color="inherit" aria-label="Sending message" />
-                    ) : (
-                      'Send Inquiry'
-                    )}
-                  </Button>
-                  {errors.form && (
-                    <Typography color="error" align="center" role="alert" sx={{ mt: 2 }}>
-                      {errors.form}
-                    </Typography>
+                      height: { xs: '54px', md: '60px' },
+                      backgroundColor: theme.palette.background.paper,
+                    },
+                    '& .Mui-focused': {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Person sx={{ color: theme.palette.text.secondary }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  label="Email *"
+                  name="email"
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      borderRadius: 2,
+                      height: { xs: '54px', md: '60px' },
+                      backgroundColor: theme.palette.background.paper,
+                    },
+                    '& .Mui-focused': {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Email sx={{ color: theme.palette.text.secondary }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  label="Phone Number"
+                  name="phone"
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      borderRadius: 2,
+                      height: { xs: '54px', md: '60px' },
+                      backgroundColor: theme.palette.background.paper,
+                    },
+                    '& .Mui-focused': {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Phone sx={{ color: theme.palette.text.secondary }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  label="Message"
+                  name="message"
+                  multiline
+                  rows={4}
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      borderRadius: 2,
+                      height: { xs: '150px', md: '200px' },
+                      backgroundColor: theme.palette.background.paper,
+                    },
+                    '& .Mui-focused': {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <ChatBubbleOutline sx={{ color: theme.palette.text.secondary }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  size="large"
+                  variant="contained"
+                  color="secondary"
+                  disabled={loading}
+                  sx={{
+                    py: 2.5,
+                    fontWeight: 'bold',
+                    fontSize: '1.2rem',
+                    textTransform: 'none',
+                    borderRadius: 2,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      backgroundColor: theme.palette.secondary.dark,
+                    },
+                  }}
+                >
+                  {loading ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    'Send Inquiry'
                   )}
-                </Grid>
-              </Grid>
+                </Button>
+              </Stack>
             </GoldCard>
           </Box>
 
-          {/* Additional Sections */}
+          {/* Informational Sections */}
           <PageSection>
             <Container maxWidth="md">
               <Typography
@@ -456,109 +358,55 @@ const Contact: React.FC = () => {
               >
                 Why Reach Out to GLUStack?
               </Typography>
-              <Typography
-                variant="body1"
-                align="center"
-                color="text.secondary"
-                sx={{ mb: SPACING.large, lineHeight: 1.7, fontSize: '1.05rem' }}
-              >
-                Connecting with us is the first step towards transforming your technology landscape. Whether you're facing complex challenges, seeking innovative solutions, or aiming for strategic growth, our expertise is at your service. By reaching out, you gain access to:
-              </Typography>
-              <List sx={{ maxWidth: 600, mx: 'auto' }}>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.secondary.main }}>
+              <List>
+                <ListItem>
+                  <ListItemIcon sx={{ color: theme.palette.secondary.main }}>
                     <CheckCircle size={20} strokeWidth={3} />
                   </ListItemIcon>
-                  <ListItemText
-                    primary="Expert Consultation: Receive tailored advice from seasoned tech professionals."
-                    primaryTypographyProps={{ fontWeight: 500, color: 'text.primary' }}
-                  />
+                  <ListItemText primary="Expert tech consulting for your business" />
                 </ListItem>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.secondary.main }}>
+                <ListItem>
+                  <ListItemIcon sx={{ color: theme.palette.secondary.main }}>
                     <CheckCircle size={20} strokeWidth={3} />
                   </ListItemIcon>
-                  <ListItemText
-                    primary="Customized Solutions: Discuss your unique needs and explore bespoke technology strategies."
-                    primaryTypographyProps={{ fontWeight: 500, color: 'text.primary' }}
-                  />
+                  <ListItemText primary="Tailored solutions that scale with your business" />
                 </ListItem>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.secondary.main }}>
+                <ListItem>
+                  <ListItemIcon sx={{ color: theme.palette.secondary.main }}>
                     <CheckCircle size={20} strokeWidth={3} />
                   </ListItemIcon>
-                  <ListItemText
-                    primary="Project Clarity: Gain clear insights into project scope, timelines, and potential outcomes."
-                    primaryTypographyProps={{ fontWeight: 500, color: 'text.primary' }}
-                  />
-                </ListItem>
-              </List>
-            </Container>
-          </PageSection>
-
-          <PageSection>
-            <Container maxWidth="md">
-              <Typography
-                variant="h3"
-                component="h2"
-                align="center"
-                sx={{
-                  ...styles.pageTitle,
-                  color: theme.palette.text.primary,
-                  mb: SPACING.medium,
-                  fontWeight: 700,
-                }}
-              >
-                What to Expect After Contacting Us
-              </Typography>
-              <Typography
-                variant="body1"
-                align="center"
-                color="text.secondary"
-                sx={{ mb: SPACING.large, lineHeight: 1.7, fontSize: '1.05rem' }}
-              >
-                We value your time and inquiries. Here’s what you can expect when you reach out to our team:
-              </Typography>
-              <List sx={{ maxWidth: 600, mx: 'auto', pt: 2 }}>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
-                    <Typography variant="body2" color="text.primary" fontWeight={600}>
-                      1.
-                    </Typography>
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Prompt Acknowledgment: Expect a confirmation within 24 business hours that we've received your inquiry."
-                    primaryTypographyProps={{ color: 'text.primary' }}
-                  />
-                </ListItem>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
-                    <Typography variant="body2" color="text.primary" fontWeight={600}>
-                      2.
-                    </Typography>
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Expert Review: Your inquiry will be reviewed by a specialist to understand your needs thoroughly."
-                    primaryTypographyProps={{ color: 'text.primary' }}
-                  />
-                </ListItem>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 'auto', mr: 2, color: theme.palette.primary.main }}>
-                    <Typography variant="body2" color="text.primary" fontWeight={600}>
-                      3.
-                    </Typography>
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Personalized Follow-up: We'll contact you to schedule a consultation or provide a detailed response tailored to your inquiry."
-                    primaryTypographyProps={{ color: 'text.primary' }}
-                  />
+                  <ListItemText primary="Rapid response and support" />
                 </ListItem>
               </List>
             </Container>
           </PageSection>
         </Container>
+        <BackToTopButton />
       </ConsistentPageLayout>
     </>
+  );
+};
+
+// BackToTopButton with updated styling
+const BackToTopButton = () => {
+  const theme = useTheme();
+  return (
+    <Fab
+      color="secondary"
+      aria-label="Back to top"
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      sx={{
+        position: 'fixed',
+        bottom: 32,
+        right: 32,
+        boxShadow: theme.shadows[6],
+        '&:hover': {
+          backgroundColor: theme.palette.secondary.dark,
+        },
+      }}
+    >
+      <KeyboardArrowUp />
+    </Fab>
   );
 };
 

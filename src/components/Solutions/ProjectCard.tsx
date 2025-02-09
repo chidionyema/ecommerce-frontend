@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -8,12 +8,14 @@ import {
   Button,
   useTheme,
   alpha,
+  keyframes,
 } from '@mui/material';
 import NextLink from 'next/link';
 import { ArrowRightAlt } from '@mui/icons-material';
 import GoldCard from '../GoldCard';
 import { CARD_SIZES, SPACING } from '../../utils/sharedStyles';
-import { DesignServices } from '@mui/icons-material'; // Default Icon
+import { technologyIconMap } from '../../data/cvProjects';
+import { Code } from 'lucide-react';
 
 interface Project {
   id: string;
@@ -22,178 +24,214 @@ interface Project {
   technologies: string[];
   clientName?: string;
   gradient?: string;
-  highlights?: string; // Using 'highlights' as achievements data
+  highlights?: string;
   imageUrl?: string;
-  icon?: React.ComponentType;
+  icon?: React.ComponentType<any>;
+  iconColor?: string;
+  metrics?: Array<{ label: string; value: string; description: string }>;
 }
 
-const ProjectCard = ({ project, sx }: { project: Project; sx?: any }) => {
+const shineAnimation = keyframes`
+  0% { left: -50%; }
+  100% { left: 150%; }
+`;
+
+const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) => {
   const theme = useTheme();
-  const { width: CARD_WIDTH, height: CARD_HEIGHT } = CARD_SIZES.large;
+  const { width: CARD_WIDTH, height: CARD_HEIGHT } = CARD_SIZES.xlarge;
   const truncatedDescription =
-    project.description.substring(0, 100) +
-    (project.description.length > 100 ? '...' : '');
-  const DefaultIcon = DesignServices;
+    project.description.substring(0, 100) + (project.description.length > 100 ? '...' : '');
+  const DefaultIcon = Code;
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const imageUrl = '/images/istockphoto-todo.jpg';
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = imageUrl;
+    img.onload = () => setImageLoaded(true);
+    img.onerror = () => setImageLoaded(false);
+  }, [imageUrl]);
 
   return (
-    // Outer container uses flex to center the card horizontally
-    <Box
-      sx={{
-        m: SPACING.medium,
-        display: 'flex',
-        justifyContent: 'center',
-      }}
-    >
-      {/* Fixed width container to ensure consistent card size */}
-      <Box sx={{ width: 332 }}>
+    <Box sx={{ m: SPACING.small, display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ width: CARD_WIDTH }}>
         <GoldCard
           href={`/projects/${project.id}`}
-          className="gold-card"
           sx={{
-            boxSizing: 'border-box',
             width: '100%',
             height: CARD_HEIGHT,
-            display: 'flex',
-            flexDirection: 'column',
             p: SPACING.medium,
             position: 'relative',
             overflow: 'hidden',
-            transition: 'transform 0.3s ease, background 0.3s ease',
+            transition: 'transform 0.3s ease',
             '&:hover': {
-              transform: 'translateY(-4px)',
-              background: `linear-gradient(135deg, ${theme.palette.background.paper} 70%, ${alpha(
-                theme.palette.primary.light,
-                0.15
-              )} 100%)`,
+              transform: 'translateY(-8px)',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                top: '-50%',
+                width: '200%',
+                height: '200%',
+                background: `linear-gradient(45deg, transparent, ${alpha(
+                  theme.palette.common.white,
+                  0.2
+                )}, transparent)`,
+                transform: 'rotate(30deg)',
+                animation: `${shineAnimation} 1.5s forwards`,
+              },
             },
             ...sx,
           }}
         >
-          {/* Header Section: Image or Icon */}
+          {/* Header Section */}
           <Box
             sx={{
-              height: 140,
+              height: '40%',
               width: '100%',
               borderRadius: 1,
               overflow: 'hidden',
               position: 'relative',
-              bgcolor: 'background.paper',
               mb: SPACING.medium,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              aspectRatio: '16/9', // Maintain a consistent aspect ratio
-              border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
             }}
           >
-            {project.imageUrl ? (
-              <Box
-                component="img"
-                src={project.imageUrl}
-                alt={project.name}
-                sx={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
-              />
-            ) : project.icon ? (
-              <Box
-                sx={{
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <Box sx={{ fontSize: 70, color: theme.palette.primary.main }}>
-                  <project.icon />
-                </Box>
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  background: project.gradient || theme.palette.background.default,
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <DefaultIcon sx={{ fontSize: 70, color: theme.palette.primary.main }} />
-              </Box>
+            {/* Image and Overlay (Conditional on imageLoaded) */}
+            {imageLoaded && (
+              <>
+                <Box
+                  component="img"
+                  src={imageUrl}
+                  alt={project.name}
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    zIndex: 0,
+                  }}
+                />
+                {/* Blurred Image - Reduced Blur and Increased Opacity */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundImage: `url(${imageUrl})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    filter: 'blur(2px)', // Reduced blur
+                    zIndex: 1,
+                    opacity: 0.8, // Increased opacity
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: alpha(theme.palette.primary.dark, 0.2), // Reduced opacity
+                    zIndex: 2,
+                  }}
+                />
+              </>
             )}
+
+            {/* Client Name & Icon */}
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: SPACING.small,
+                left: SPACING.small,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                px: 2,
+                py: 1,
+                borderRadius: 4,
+                boxShadow: theme.shadows[2],
+                zIndex: 3, // Above the overlay
+              }}
+            >
+              {project.icon ? (
+                <project.icon
+                  size={24}
+                  color={project.iconColor || theme.palette.primary.main}
+                />
+              ) : (
+                <DefaultIcon size={24} color={theme.palette.primary.main} />
+              )}
+              <Typography variant="body2" fontWeight={700}>
+                {project.clientName}
+              </Typography>
+            </Box>
           </Box>
 
-          {/* Card Content */}
-          <CardContent
-            sx={{
-              px: 0,
-              pb: 0,
-              height: `calc(100% - 140px - ${SPACING.medium}px)`,
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Title Section */}
-            <Box sx={{ mb: SPACING.small, minHeight: 60, overflow: 'hidden' }}>
-              <Typography
-                variant="h6"
-                component="h2"
-                sx={{
-                  fontWeight: 700,
-                  lineHeight: 1.3,
-                  whiteSpace: 'normal',
-                }}
-              >
+          <CardContent sx={{ px: 0, pb: 0, height: '60%', display: 'flex', flexDirection: 'column' }}>
+            {/* Title & Metrics */}
+            <Box sx={{ mb: SPACING.small }}>
+              <Typography variant="h6" component="h2" fontWeight={800} gutterBottom>
                 {project.name}
               </Typography>
-              {project.clientName && (
-                <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                  {project.clientName}
-                </Typography>
+
+              {project.metrics && (
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                  {project.metrics.slice(0, 3).map((metric, index) => (
+                    <Box key={index} sx={{ textAlign: 'center' }}>
+                      <Typography variant="h6" color="primary.main" fontWeight={700}>
+                        {metric.value}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {metric.label}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
               )}
             </Box>
 
-            {/* Technologies Section */}
-            {project.technologies && project.technologies.length > 0 && (
+            {/* Technology Icons */}
+            {project.technologies && (
               <Box sx={{ mb: SPACING.medium }}>
-                <Typography
-                  variant="caption"
-                  fontWeight={600}
-                  color="text.primary"
-                  sx={{ display: 'block', mb: 0.5 }}
-                >
-                  Technologies:
+                <Typography variant="caption" fontWeight={700} display="block" mb={1}>
+                  Core Technologies
                 </Typography>
-                <Typography variant="body2" color="text.primary" fontWeight={500}>
-                  {project.technologies.slice(0, 3).join(', ')}
-                  {project.technologies.length > 3 && '...'}
-                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  {project.technologies.slice(0, 5).map((tech, index) => {
+                    const techData = technologyIconMap[tech as keyof typeof technologyIconMap];
+                    const IconComponent = techData?.icon || DefaultIcon;
+                    return (
+                      <Box
+                        key={index}
+                        sx={{
+                          p: 1,
+                          bgcolor: alpha(techData?.color || theme.palette.primary.main, 0.1),
+                          borderRadius: 2,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5, // Add gap between icon and text
+                        }}
+                      >
+                        <IconComponent
+                          size={20}
+                          color={techData?.color || theme.palette.primary.main}
+                        />
+                        <Typography variant="caption" color="textPrimary">
+                          {tech} {/* Use the technology name directly */}
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
               </Box>
             )}
 
-            {/* Achievements Section */}
-            {project.highlights && (
-              <Box sx={{ mb: SPACING.medium }}>
-                <Typography
-                  variant="caption"
-                  fontWeight={600}
-                  color="text.primary"
-                  sx={{ display: 'block', mb: 0.5 }}
-                >
-                  Achievements:
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                  “{project.highlights}”
-                </Typography>
-              </Box>
-            )}
-
-            {/* Description Section */}
+            {/* Description */}
             <Box
               sx={{
                 flex: 1,
@@ -210,16 +248,8 @@ const ProjectCard = ({ project, sx }: { project: Project; sx?: any }) => {
               <Typography variant="body2">{truncatedDescription}</Typography>
             </Box>
 
-            {/* Sticky Bottom Button */}
-            <Box
-              sx={{
-                pt: SPACING.small,
-                position: 'sticky',
-                bottom: 0,
-                bgcolor: 'background.default',
-                zIndex: 1,
-              }}
-            >
+            {/* CTA Button */}
+            <Box sx={{ position: 'sticky', bottom: 0, bgcolor: 'background.default', zIndex: 4 }}>
               <Button
                 component={NextLink}
                 href={`/projects/${project.id}`}
@@ -228,17 +258,16 @@ const ProjectCard = ({ project, sx }: { project: Project; sx?: any }) => {
                 sx={{
                   bgcolor: 'primary.main',
                   color: 'primary.contrastText',
-                  py: 1,
-                  fontWeight: 600,
+                  py: 1.5,
+                  fontWeight: 700,
                   borderRadius: 2,
                   '&:hover': {
                     bgcolor: 'primary.dark',
                     transform: 'scale(1.03)',
-                    transition: 'transform 0.2s ease-in-out',
                   },
                 }}
               >
-                Learn More
+                Explore Case Study
               </Button>
             </Box>
           </CardContent>

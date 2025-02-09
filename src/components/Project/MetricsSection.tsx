@@ -3,7 +3,7 @@
 import { Box, Typography, Grid, CircularProgress, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
 import { GlassCard } from '../Theme/GlassCard';
-import { Metric } from '@/src/types/project';
+import { Metric } from '../../types/project';
 import { useTheme } from '@mui/material/styles';
 
 export const MetricTilesContainer = ({ metrics }: { metrics: Metric[] }) => {

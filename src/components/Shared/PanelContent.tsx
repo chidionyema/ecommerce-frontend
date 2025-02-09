@@ -13,7 +13,7 @@ import {
 import { m } from 'framer-motion';
 import HorizontalScrollPanel from './HorizontalScrollPanel';
 import { PALETTE, GRADIENTS } from '../../theme/palette';
-import { ThemeName } from '@/src/theme/types';
+import { ThemeName } from '../../theme/types';
 import { ErrorBoundary } from 'react-error-boundary';
 
 const PANEL_SECTIONS = {

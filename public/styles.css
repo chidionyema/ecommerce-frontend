@@ -1,6 +1,5 @@
-/* Ensure proper @import order */
 /* styles.css */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -9,6 +8,8 @@
 :root {
   --deep-space: #050813; /* Updated from #080D19 */
   --crystal-white: #F5F7FA;
+  --primary-blue: #0077B6; /* Example primary blue */
+  --accent-orange: #FF9900; /* Example accent orange */ 
 }
 
 @supports (backdrop-filter: blur(24px)) {
@@ -28,19 +29,18 @@ body {
   /* Add subtle gradient texture */
   background-image: 
     radial-gradient(circle at 50% 50%, 
-   
       transparent 20%),
     linear-gradient(
       15deg,
       transparent 60%,
-   
     );
+  font-family: 'Orbitron', sans-serif; /* Apply Orbitron font globally */
 }
 
 /* Scoped button styles - only affect buttons outside the NavBar */
 button:not(.MuiButton-root) {
-  background-color: #4c5156;
-  color: #fff;
+  background-color: var(--accent-orange); /* Use accent color */
+  color: var(--deep-space); /* Text color for contrast */
   border: none;
   border-radius: 4px;
   padding: 10px 20px;
@@ -62,6 +62,7 @@ button:not(.MuiButton-root) {
 .react-switch-transition {
   transition: background-color 300ms ease, color 300ms ease;
 }
+
 /* styles.css or similar global CSS file */
 .gold-card {
   position: relative; /* Needed for pseudo-element positioning */
@@ -89,5 +90,3 @@ button:not(.MuiButton-root) {
   transform: scale(1.2); /* Slightly expand ripple */
   transition: opacity 0.2s, background-color 0.2s, transform 0.3s;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');

@@ -18,14 +18,15 @@ import {
 } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { Menu, Close, Home, Book, Paid, Email } from '@mui/icons-material';
-import { useRouter, usePathname } from 'next/navigation'; // Import usePathname
+import { usePathname } from 'next/navigation';
 import { Cpu } from 'lucide-react';
 
 // --- Styled Components ---
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: theme.palette.background.default,
-  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-  borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+  backgroundColor: alpha(theme.palette.background.default, 0.7),
+  backdropFilter: 'blur(10px)',
+  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
   transition: 'all 0.2s ease',
 }));
 
@@ -83,8 +84,7 @@ const NavBar: FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [menuOpen, setMenuOpen] = useState(false);
-  const pathname = usePathname(); // Use usePathname
-  //const router = useRouter(); // No longer needed here
+  const pathname = usePathname();
 
   const navItems = useMemo<NavItem[]>(
     () => [
@@ -95,10 +95,6 @@ const NavBar: FC = () => {
     ],
     []
   );
-
-  const navLinkHoverColor = alpha(theme.palette.primary.main, 0.1);
-  const navLinkColor = theme.palette.text.primary;
-
 
   return (
     <LazyMotion features={domAnimation}>
@@ -116,7 +112,7 @@ const NavBar: FC = () => {
             {!isMobile ? (
               <Stack direction="row" gap={3} alignItems="center">
                 {navItems.map((item) => {
-                  const isActive = pathname === item.path; // Use pathname
+                  const isActive = pathname === item.path;
                   const Icon = item.icon;
 
                   return (
@@ -124,22 +120,20 @@ const NavBar: FC = () => {
                       key={item.path}
                       component={Link}
                       href={item.path}
-                      startIcon={<Icon />}
                       sx={{
-                        color: isActive ? theme.palette.primary.main : navLinkColor,
+                        color: isActive
+                          ? theme.palette.primary.main
+                          : alpha(theme.palette.text.primary, 0.9),
                         fontWeight: isActive ? 700 : 500,
                         '&:hover': {
                           color: theme.palette.primary.main,
-                          backgroundColor: navLinkHoverColor,
+                          backgroundColor: 'transparent',
                         },
                         textTransform: 'none',
-                        borderRadius: 1,
                         px: 1.5,
                         py: 0.75,
-                        // Simplified active state styling
                         ...(isActive && {
                           borderBottom: `2px solid ${theme.palette.primary.main}`,
-                          pb: `calc(0.75rem - 2px)`, // Adjust padding to account for the border
                         }),
                       }}
                     >
@@ -153,8 +147,11 @@ const NavBar: FC = () => {
                     ml: 1,
                     px: 3,
                     py: 1,
-                    bgcolor: theme.palette.primary.main,
-                    '&:hover': { bgcolor: theme.palette.primary.dark },
+                    bgcolor: alpha(theme.palette.primary.main, 0.9),
+                    '&:hover': { 
+                      bgcolor: theme.palette.primary.dark,
+                      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
+                    },
                     borderRadius: 2,
                     textTransform: 'none',
                     fontWeight: 'bold',
@@ -166,7 +163,7 @@ const NavBar: FC = () => {
             ) : (
               <IconButton
                 edge="end"
-                onClick={() => setMenuOpen(true)} // Directly call setMenuOpen
+                onClick={() => setMenuOpen(true)}
                 sx={{ color: theme.palette.text.primary }}
               >
                 <Menu fontSize="large" />
@@ -180,7 +177,6 @@ const NavBar: FC = () => {
       <AnimatePresence>
         {isMobile && menuOpen && (
           <>
-            {/* Overlay */}
             <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -194,10 +190,9 @@ const NavBar: FC = () => {
                 backgroundColor: 'rgba(0,0,0,0.5)',
                 zIndex: 1299,
               }}
-              onClick={() => setMenuOpen(false)} // Directly call setMenuOpen
+              onClick={() => setMenuOpen(false)}
             />
 
-            {/* Menu Panel */}
             <m.div
               initial="closed"
               animate="open"
@@ -211,59 +206,71 @@ const NavBar: FC = () => {
                 width: '80%',
                 maxWidth: 320,
                 zIndex: 1300,
-                backgroundColor: theme.palette.background.paper,
+                backgroundColor: alpha(theme.palette.background.default, 0.95),
+                backdropFilter: 'blur(12px)',
                 padding: '24px',
                 boxShadow: '-4px 0 16px rgba(0,0,0,0.3)',
                 overflowY: 'auto',
               }}
             >
               <Box display="flex" justifyContent="flex-end" mb={3}>
-                <IconButton onClick={() => setMenuOpen(false)} sx={{ color: theme.palette.text.primary }}>
+                <IconButton
+                  onClick={() => setMenuOpen(false)}
+                  sx={{ color: theme.palette.text.primary }}
+                >
                   <Close fontSize="large" />
                 </IconButton>
               </Box>
 
               <Stack spacing={2}>
                 {navItems.map((item) => {
-                  const isActive = pathname === item.path; // Use pathname
+                  const isActive = pathname === item.path;
                   const Icon = item.icon;
                   return (
-                  <Button
-                    key={item.path}
-                    component={Link}
-                    href={item.path}
-                    onClick={() => setMenuOpen(false)}
-                    startIcon={<Icon />}
-                    sx={{
-                      color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
-                      justifyContent: 'flex-start',
-                      fontSize: '1.1rem',
-                      '&:hover': {
-                        color: theme.palette.primary.main,
-                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                      },
-                      fontWeight: isActive ? 700 : 500,
-                      borderRadius: 1,
-                      py: 1,
-                      pl: 2,
-                      pr: 4,
-                        //Simplified active state
+                    <Button
+                      key={item.path}
+                      component={Link}
+                      href={item.path}
+                      onClick={() => setMenuOpen(false)}
+                      startIcon={<Icon />}
+                      sx={{
+                        color: isActive
+                          ? theme.palette.primary.main
+                          : theme.palette.text.primary,
+                        justifyContent: 'flex-start',
+                        fontSize: '1.1rem',
+                        '&:hover': {
+                          color: theme.palette.primary.main,
+                          backgroundColor: alpha(
+                            theme.palette.primary.main,
+                            0.1
+                          ),
+                        },
+                        fontWeight: isActive ? 700 : 500,
+                        borderRadius: 1,
+                        py: 1,
+                        pl: 2,
+                        pr: 4,
                         ...(isActive && {
-                            borderBottom: `2px solid ${theme.palette.primary.main}`
-                        })
-                    }}
-                  >
-                    {item.label}
-                  </Button>
-                )})}
+                          borderBottom: `2px solid ${theme.palette.primary.main}`,
+                        }),
+                      }}
+                    >
+                      {item.label}
+                    </Button>
+                  );
+                })}
                 <Divider sx={{ my: 1 }} />
                 <Button
                   variant="contained"
                   sx={{
                     mt: 2,
                     py: 1.5,
-                    bgcolor: theme.palette.primary.main,
-                    '&:hover': { bgcolor: theme.palette.primary.dark },
+                    bgcolor: alpha(theme.palette.primary.main, 0.9),
+                    '&:hover': { 
+                      bgcolor: theme.palette.primary.dark,
+                      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
+                    },
                     borderRadius: 2,
                     textTransform: 'none',
                     fontWeight: 'bold',

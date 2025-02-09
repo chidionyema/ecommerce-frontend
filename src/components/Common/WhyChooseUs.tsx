@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Box, Container, Typography, List, ListItem, ListItemIcon, useTheme, Button, Grid } from '@mui/material';
+import React, { useState, useEffect } from 'react'; // Import useState and useEffect
+import { Box, Container, Typography, List, ListItem, ListItemIcon, useTheme, Button, Grid, alpha } from '@mui/material';
 import { motion } from 'framer-motion';
 import { CheckCircle, Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-react';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
@@ -10,6 +10,15 @@ import NextLink from 'next/link';
 const WhyChooseUs = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const imageUrl = '/images/istockphoto-globe.jpg';
+
+    useEffect(() => {
+        const img = new Image();
+        img.src = imageUrl;
+        img.onload = () => setImageLoaded(true);
+        img.onerror = () => setImageLoaded(false); // Handle errors
+      }, [imageUrl]);
 
   // Benefit-oriented reasons
   const reasons = [
@@ -49,20 +58,58 @@ const WhyChooseUs = () => {
       sx={{
         width: '100%',
         py: SPACING.large * 2,
-        bgcolor: theme.palette.background.default,
+        backgroundImage: imageLoaded ? `url(${imageUrl})` : 'none',
+        backgroundColor: !imageLoaded ? theme.palette.background.default : 'transparent',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        position: 'relative',
         overflow: 'hidden',
       }}
     >
-      <Container maxWidth="lg">
+       {/* Blurred Background Image (if loaded) */}
+      {imageLoaded && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundImage: `url(${imageUrl})`, // Apply image here
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(8px)', // Add blur
+            zIndex: 0, // Below the overlay
+          }}
+        />
+      )}
+      {/* Overlay (if loaded) */}
+      {imageLoaded && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: alpha(theme.palette.primary.dark, 0.7),
+            zIndex: 1,
+          }}
+        />
+      )}
+      <Container maxWidth="lg" sx={{position: 'relative', zIndex: 2}}>
         <Typography
           variant="h2"
           component="h2"
           align="center"
           sx={{
             ...styles.pageTitle,
-            color: theme.palette.text.primary,
+            color: imageLoaded ? 'white' : theme.palette.text.primary,
             mb: SPACING.medium,
             fontWeight: 700,
+            WebkitTextFillColor: 'white', // For Safari
+            WebkitTextStroke: imageLoaded ? '1px rgba(0, 0, 0, 0.3)' : 'none', // Stroke only if image loaded
+            textShadow: imageLoaded ? '0 2px 4px rgba(0, 0, 0, 0.5)' : 'none' // Add text shadow
           }}
         >
           Why Partner with Us?

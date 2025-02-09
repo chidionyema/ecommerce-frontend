@@ -15,6 +15,7 @@ export interface TechCardProps {
   textColor?: string;
   children?: ReactNode;       // additional content
   whileHover?: { scale: number };
+  sx?: object; // Add this line
 }
 
 const StyledTechCard = styled(motion.div)<{ color: string }>(({ theme, color }) => ({
@@ -24,8 +25,8 @@ const StyledTechCard = styled(motion.div)<{ color: string }>(({ theme, color }) 
   borderRadius: '16px',
   cursor: 'pointer',
   overflow: 'hidden',
-  background: `linear-gradient(145deg, ${color}10 0%, #ffffff30 100%)`,
-  border: `1px solid ${color}30`,
+  // Removed background gradient, as it will be overwritten most of the time
+  // Removed border, as it will be managed on a per-instance basis
   transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
   width: '100%',
   minHeight: 200,
@@ -36,7 +37,7 @@ const StyledTechCard = styled(motion.div)<{ color: string }>(({ theme, color }) 
   '&:hover': {
     transform: 'scale(1.05) translateY(-5px)',
     boxShadow: `0 12px 32px ${color}40`,
-    borderColor: `${color}80`,
+    // Removed border, as it will be managed on a per-instance basis
   },
 }));
 
@@ -52,6 +53,7 @@ const TechCard: React.FC<TechCardProps> = ({
   textColor,
   children,
   whileHover = { scale: 1.05 },
+  sx, // Add this line
 }) => {
   const theme = useTheme();
   const ref = useRef<HTMLDivElement>(null);
@@ -66,6 +68,7 @@ const TechCard: React.FC<TechCardProps> = ({
       transition={{ delay: index * 0.08, type: 'spring', stiffness: 80, damping: 12 }}
       whileHover="hover"
       whileTap={{ scale: 0.98 }}
+      sx={sx} // Apply the sx prop here
     >
       {icon && (
         <motion.div
