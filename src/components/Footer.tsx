@@ -38,7 +38,7 @@ const Footer: React.FC = () => {
         py: 4,
         px: 2,
         mt: 'auto',
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: alpha(theme.palette.background.default, 0.9), // Match the navbar background
         color: theme.palette.text.secondary,
         borderTop: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
       }}

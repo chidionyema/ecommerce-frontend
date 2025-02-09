@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import NextLink from 'next/link';
+import { motion } from 'framer-motion';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   AccessTime,
@@ -25,15 +26,11 @@ import {
   Info as InfoIcon,
   Headset,
 } from '@mui/icons-material';
-import { CheckCircle } from 'lucide-react';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import PageSection from '../components/PageSection';
 import GoldCard from '../components/GoldCard';
 import { CARD_STYLES, getSharedStyles, SPACING } from '../utils/sharedStyles';
 
-// ======================================================================
-// CONTENT EXTRACTION: Change copy here without affecting styles.
-// ======================================================================
 const pricingPageContent = {
   hero: {
     title: 'Flexible Pricing for Your Growing Startup',
@@ -94,9 +91,6 @@ const pricingPageContent = {
   },
 };
 
-// ======================================================================
-// PRICING PLANS DATA (Content for pricing cards)
-// ======================================================================
 type Plan = {
   type: string;
   title: string;
@@ -118,9 +112,7 @@ const plans: Plan[] = [
       { icon: CalendarTodayIcon, text: 'Instant Scheduling' },
     ],
     price: '$295/hr',
-    cardStyle: {
-      backgroundColor: 'rgba(25, 118, 210, 0.05)', // Muted blue
-    },
+    cardStyle: { backgroundColor: 'rgba(25, 118, 210, 0.05)' },
   },
   {
     type: 'project',
@@ -132,9 +124,7 @@ const plans: Plan[] = [
       { icon: EmojiEventsIcon, text: 'Quality Assurance' },
     ],
     price: 'Custom Quote',
-    cardStyle: {
-      backgroundColor: 'rgba(0, 121, 107, 0.05)', // Muted teal
-    },
+    cardStyle: { backgroundColor: 'rgba(0, 121, 107, 0.05)' },
   },
   {
     type: 'retainer',
@@ -146,24 +136,36 @@ const plans: Plan[] = [
       { icon: EmojiEventsIcon, text: 'Monthly Performance Reviews' },
     ],
     price: 'Starting at $15k/mo',
-    cardStyle: {
-      backgroundColor: 'rgba(63, 81, 181, 0.05)', // Muted indigo
-    },
+    cardStyle: { backgroundColor: 'rgba(63, 81, 181, 0.05)' },
     recommended: true,
   },
 ];
 
-// ======================================================================
-// HELPER COMPONENT: FeatureItem for bullet points in pricing cards
-// ======================================================================
 const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({
   icon: Icon,
   text,
 }) => {
   const theme = useTheme();
   return (
-    <Box display="flex" alignItems="center" gap={1} my={0.5}>
-      <Icon fontSize="small" sx={{ color: theme.palette.primary.main }} />
+    <Box display="flex" alignItems="center" gap={2} my={2}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: alpha(theme.palette.primary.main, 0.08),
+          borderRadius: '16px',
+          width: 40,
+          height: 40,
+          border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+        }}
+      >
+        <Icon sx={{
+          fontSize: 24,
+          color: theme.palette.primary.main,
+          transform: 'rotate(-10deg)',
+        }} />
+      </Box>
       <Typography variant="body2" color="text.secondary">
         {text}
       </Typography>
@@ -171,99 +173,98 @@ const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({
   );
 };
 
-// ======================================================================
-// RENDER FUNCTION FOR PRICING CARD (receives theme as a parameter)
-// ======================================================================
 const renderPlanCard = (
   plan: Plan,
   handlePlanClick: (type: string) => void,
   theme: Theme
 ) => (
-  <GoldCard
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+    viewport={{ once: true }}
     key={plan.type}
-    onClick={() => handlePlanClick(plan.type)}
-    sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      height: '100%',
-      minHeight: 450, // Adjusted for better card size consistency
-      p: 3,
-      borderRadius: 4,
-      position: 'relative',
-      background: `linear-gradient(135deg, ${plan.cardStyle.backgroundColor} 0%, transparent 100%)`,
-      border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-      boxShadow: theme.shadows[3],
-      cursor: 'pointer',
-      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-      '&:hover': {
-        transform: 'scale(1.05)', // Slightly stronger hover effect
-        boxShadow: theme.shadows[6],
-      },
-    }}
   >
-    {plan.recommended && (
-      <Chip
-        label="Most Popular"
-        color="secondary"
-        size="small"
-        sx={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          zIndex: 1,
-          fontSize: '0.8rem',
-          px: 1,
-          fontWeight: 'bold',
-          bgcolor: theme.palette.secondary.main,
-          color: theme.palette.secondary.contrastText,
-        }}
-      />
-    )}
-    <Box>
-      <Typography variant="h5" fontWeight="bold" mb={1}>
-        {plan.title}
-      </Typography>
-      <Typography variant="subtitle1" mb={2} color="text.secondary">
-        {plan.tagline}
-      </Typography>
-      {plan.features.map((feature, i) => (
-        <FeatureItem key={i} icon={feature.icon} text={feature.text} />
-      ))}
-    </Box>
-    <Box mt={2}>
-      <Typography variant="h6" fontWeight="bold" color="primary">
-        {plan.price}
-      </Typography>
-    </Box>
-    <Button
-      variant="contained"
-      color="primary"
+    <GoldCard
       onClick={() => handlePlanClick(plan.type)}
       sx={{
-        mt: 3,
-        textTransform: 'none',
-        fontWeight: 600,
-        borderRadius: 2,
-        px: 4,
-        py: 1.5,
-        background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-        boxShadow: theme.shadows[3],
-        transition: 'all 0.3s ease',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        height: '100%',
+        minHeight: 450,
+        p: 3,
+        borderRadius: 4,
+        position: 'relative',
+        background: theme.palette.mode === 'light' ? 'white' : '#28282a',
+        border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+        boxShadow: theme.shadows[5],
+        cursor: 'pointer',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
         '&:hover': {
-          transform: 'scale(1.02)',
-          boxShadow: theme.shadows[6],
+          transform: 'scale(1.05)',
+          boxShadow: theme.shadows[8],
         },
       }}
     >
-      Select Plan
-    </Button>
-  </GoldCard>
+      {plan.recommended && (
+        <Chip
+          label="Most Popular"
+          size="small"
+          sx={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            zIndex: 1,
+            fontSize: '0.8rem',
+            px: 1,
+            fontWeight: 600,
+            bgcolor: alpha(theme.palette.primary.main, 0.1),
+            color: theme.palette.primary.main,
+          }}
+        />
+      )}
+      <Box>
+        <Typography variant="h5" fontWeight="bold" mb={1}>
+          {plan.title}
+        </Typography>
+        <Typography variant="subtitle1" mb={2} color="text.secondary">
+          {plan.tagline}
+        </Typography>
+        {plan.features.map((feature, i) => (
+          <FeatureItem key={i} icon={feature.icon} text={feature.text} />
+        ))}
+      </Box>
+      <Box mt={2}>
+        <Typography variant="h6" fontWeight="bold" color="primary">
+          {plan.price}
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handlePlanClick(plan.type)}
+          sx={{
+            mt: 3,
+            textTransform: 'none',
+            fontWeight: 600,
+            borderRadius: 2,
+            px: 4,
+            py: 1.5,
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+            boxShadow: theme.shadows[3],
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'scale(1.02)',
+              boxShadow: theme.shadows[6],
+            },
+          }}
+        >
+          Select Plan
+        </Button>
+      </Box>
+    </GoldCard>
+  </motion.div>
 );
 
-// ======================================================================
-// MAIN PRICING PAGE COMPONENT
-// ======================================================================
 const PricingPage: React.FC = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
@@ -298,9 +299,8 @@ const PricingPage: React.FC = () => {
           </Typography>
           <Box textAlign="center">
             <Button
-              aria-label="Explore our pricing plans"
               variant="contained"
-              color="secondary"
+              color="primary"
               component={NextLink}
               href="/contact"
               sx={{
@@ -310,7 +310,7 @@ const PricingPage: React.FC = () => {
                 px: 6,
                 py: 2,
                 fontSize: '1.1rem',
-                background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                 boxShadow: theme.shadows[4],
                 transition: 'all 0.3s ease',
                 '&:hover': {
@@ -327,18 +327,22 @@ const PricingPage: React.FC = () => {
 
       {/* PRICING PLANS SECTION */}
       <PageSection>
-        <Typography
-          variant="h4"
-          textAlign="center"
-          gutterBottom
-          sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}
-        >
-          {pricingPageContent.pricingSection.heading}
-        </Typography>
         <Container>
-          <Grid container spacing={SPACING.medium} justifyContent="center" sx={{ mt: 4 }}>
+          <Typography
+            variant="h3"
+            textAlign="center"
+            gutterBottom
+            sx={{
+              fontWeight: 'bold',
+              color: theme.palette.text.primary,
+              mb: SPACING.large,
+            }}
+          >
+            {pricingPageContent.pricingSection.heading}
+          </Typography>
+          <Grid container spacing={4} justifyContent="center" sx={{ mt: 4 }}>
             {plans.map((plan) => (
-              <Grid item xs={12} sm={6} md={4} key={plan.type}>
+              <Grid item key={plan.type} xs={12} sm={6} lg={4}>
                 {renderPlanCard(plan, handlePlanClick, theme)}
               </Grid>
             ))}
@@ -346,17 +350,34 @@ const PricingPage: React.FC = () => {
         </Container>
       </PageSection>
 
-      {/* WHICH PLAN IS RIGHT FOR YOU SECTION */}
+      {/* GUIDE SECTION */}
       <PageSection>
-        <Typography variant="h3" textAlign="center" gutterBottom>
+        <Typography
+          variant="h3"
+          textAlign="center"
+          gutterBottom
+          sx={{
+            fontWeight: 'bold',
+            color: theme.palette.text.primary,
+            mb: SPACING.medium,
+          }}
+        >
           {pricingPageContent.guideSection.heading}
         </Typography>
-        <Typography variant="body1" textAlign="center" maxWidth={800} mx="auto">
+        <Typography
+          variant="body1"
+          textAlign="center"
+          sx={{
+            color: theme.palette.text.secondary,
+            mb: SPACING.medium,
+            fontSize: '1.1rem',
+          }}
+        >
           {pricingPageContent.guideSection.description}
         </Typography>
         <Box display="flex" flexDirection="column" gap={4} mt={4}>
           {pricingPageContent.guideSection.items.map((item, index) => (
-            <Box key={index} p={2} borderRadius={2} boxShadow={alpha(theme.palette.divider, 0.2)}>
+            <Box key={index} p={3} borderRadius={2} boxShadow={alpha(theme.palette.divider, 0.2)}>
               <Typography variant="h6" fontWeight="bold" mb={1}>
                 {item.title}
               </Typography>
@@ -399,7 +420,7 @@ const PricingPage: React.FC = () => {
         </Box>
       </PageSection>
 
-      {/* FINAL CALL TO ACTION SECTION */}
+      {/* FINAL CTA SECTION */}
       <PageSection>
         <Typography variant="h3" textAlign="center" gutterBottom>
           {pricingPageContent.finalCta.heading}

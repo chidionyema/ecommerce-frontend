@@ -119,7 +119,7 @@ const TechnologyShowcase = () => {
                 floatingVariants={styles.floatingAnimation}
                 // Apply necessary styles directly here to ensure visibility
                 sx={{ 
-                  backgroundColor: alpha(theme.palette.background.paper, 0.95), // Strong background color
+                  backgroundColor: alpha(theme.palette.background.default, 0.95), // Matches nav background color
                   boxShadow: '0 16px 32px rgba(0, 0, 0, 0.5)', // Strong shadow
                   borderRadius: 3, // Slightly increase border radius
                   padding: SPACING.medium,

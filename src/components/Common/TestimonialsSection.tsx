@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -13,8 +11,8 @@ import {
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
-import { SPACING, getSharedStyles } from '../../utils/sharedStyles'; // Make sure path is correct
-import TechCard from '../Common/TechCard'; // Make sure path is correct
+import { SPACING, getSharedStyles } from '../../utils/sharedStyles'; // Ensure path is correct
+import TechCard from '../Common/TechCard'; // Ensure path is correct
 
 // Define the type for a testimonial
 interface Testimonial {
@@ -136,8 +134,8 @@ const TestimonialsSection = () => {
                 <TechCard
                   icon={null}
                   title={t.name}
-                  sx={{ 
-                    backgroundColor: alpha(theme.palette.background.paper, 0.95), // Strong background color
+                  sx={{
+                    backgroundColor: alpha(theme.palette.background.default, 0.9), // Matches the navbar background color
                     boxShadow: '0 16px 32px rgba(0, 0, 0, 0.5)', // Strong shadow
                     borderRadius: 3, // Slightly increase border radius
                     padding: SPACING.medium,
@@ -147,7 +145,7 @@ const TestimonialsSection = () => {
                       transform: 'translateY(-5px)',
                       boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)', // Increase hover shadow
                     },
-                  }} 
+                  }}
                 >
                   <Avatar
                     src={t.avatar}

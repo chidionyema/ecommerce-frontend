@@ -63,7 +63,7 @@ const ServicesGrid = () => {
       sx={{
         width: '100%',
         py: SPACING.large,
-        backgroundColor: theme.palette.background.paper, // Remove any background image issues
+        backgroundColor: theme.palette.background.paper, // Use theme's paper background
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -104,18 +104,18 @@ const ServicesGrid = () => {
                 icon={service.icon ? <service.icon /> : null}
                 title={service.title}
                 color={theme.palette.primary.main}
-               sx={{ 
-                                backgroundColor: alpha(theme.palette.background.paper, 0.95), // Strong background color
-                                boxShadow: '0 16px 32px rgba(0, 0, 0, 0.5)', // Strong shadow
-                                borderRadius: 3, // Slightly increase border radius
-                                padding: SPACING.medium,
-                                zIndex: 2, // Ensure cards are on top
-                                border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`, // Add subtle border for better definition
-                                ':hover': {
-                                  transform: 'translateY(-5px)',
-                                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)', // Increase hover shadow
-                                },
-                              }} 
+                sx={{
+                  backgroundColor: alpha(theme.palette.background.default, 0.9), // Adjust to default background with opacity
+                  boxShadow: '0 16px 32px rgba(0, 0, 0, 0.5)', // Strong shadow
+                  borderRadius: 3, // Slightly increase border radius
+                  padding: SPACING.medium,
+                  zIndex: 2, // Ensure cards are on top
+                  border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`, // Add subtle border for better definition
+                  ':hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)', // Increase hover shadow
+                  },
+                }}
               >
                 <Typography
                   variant="body2"

@@ -132,7 +132,7 @@ const WhyChooseUs = () => {
           alignItems="stretch" // Ensure all grid items stretch to the same height
         >
           {reasons.map((reason) => (
-            <Grid item xs={12} md={6} key={reason.id}>
+            <Grid item key={reason.id} xs={12} md={6}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -149,7 +149,7 @@ const WhyChooseUs = () => {
                     p: SPACING.medium,
                     borderRadius: 'md',
                     boxShadow: theme.shadows[4], // Increase shadow intensity
-                    backgroundColor: alpha(theme.palette.background.paper, 0.95), // Slightly lighter background for better contrast
+                    backgroundColor: alpha(theme.palette.background.default, 0.95), // Matches nav background color
                     height: '100%', // Fill the available height
                     minHeight: 300, // Ensure a consistent minimum height regardless of content
                     display: 'flex',

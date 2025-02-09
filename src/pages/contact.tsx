@@ -9,6 +9,7 @@ import {
   InputAdornment,
   Container,
   Grid,
+  alpha,
   List,
   ListItem,
   ListItemIcon,
@@ -21,7 +22,6 @@ import { Person, Email, Phone, ChatBubbleOutline, Headset, KeyboardArrowUp } fro
 import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import GoldCard from '../components/GoldCard';
-import PageSection from '../components/PageSection';
 import { getSharedStyles, SPACING } from '../utils/sharedStyles';
 
 // Define FormData interface
@@ -35,12 +35,17 @@ interface FormData {
 const Contact: React.FC = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
+
+  // Extract background color from the theme for consistency
+  const navBackgroundColor = alpha(theme.palette.background.default, 0.7);
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     phone: '',
     message: '',
   });
+
   const [errors, setErrors] = useState<Partial<Record<keyof FormData | 'form', string>>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -120,7 +125,7 @@ const Contact: React.FC = () => {
                 gap: 3,
                 p: { xs: 2, md: 3 },
                 borderRadius: 2,
-                backgroundColor: theme.palette.background.paper,
+                backgroundColor: navBackgroundColor, // Consistent with nav background color
                 boxShadow: theme.shadows[3],
                 textAlign: { xs: 'center', md: 'left' },
               }}
@@ -190,7 +195,7 @@ const Contact: React.FC = () => {
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  backgroundColor: theme.palette.background.paper,
+                  backgroundColor: theme.palette.background.paper, // White background for the form container
                   boxShadow: theme.shadows[3],
                 }}
               >
@@ -206,7 +211,7 @@ const Contact: React.FC = () => {
                   Get a Custom Tech Roadmap in 24 Hours
                 </Typography>
                 <Stack spacing={4} sx={{ width: '100%' }}>
-                  {/* Form Fields */}
+                  {/* Form Fields with White Background */}
                   <TextField
                     fullWidth
                     label="Full Name *"
@@ -215,7 +220,10 @@ const Contact: React.FC = () => {
                       '& .MuiInputBase-root': {
                         borderRadius: 2,
                         height: { xs: '54px', md: '60px' },
-                        backgroundColor: theme.palette.background.paper,
+                        backgroundColor: theme.palette.background.paper, // White background for input fields
+                      },
+                      '& .Mui-focused .MuiInputBase-root': {
+                        backgroundColor: theme.palette.background.paper, // White background when focused
                       },
                       '& .Mui-focused': {
                         borderColor: theme.palette.secondary.main,
@@ -237,7 +245,10 @@ const Contact: React.FC = () => {
                       '& .MuiInputBase-root': {
                         borderRadius: 2,
                         height: { xs: '54px', md: '60px' },
-                        backgroundColor: theme.palette.background.paper,
+                        backgroundColor: theme.palette.background.paper, // White background for input fields
+                      },
+                      '& .Mui-focused .MuiInputBase-root': {
+                        backgroundColor: theme.palette.background.paper, // White background when focused
                       },
                       '& .Mui-focused': {
                         borderColor: theme.palette.secondary.main,
@@ -259,7 +270,10 @@ const Contact: React.FC = () => {
                       '& .MuiInputBase-root': {
                         borderRadius: 2,
                         height: { xs: '54px', md: '60px' },
-                        backgroundColor: theme.palette.background.paper,
+                        backgroundColor: theme.palette.background.paper, // White background for input fields
+                      },
+                      '& .Mui-focused .MuiInputBase-root': {
+                        backgroundColor: theme.palette.background.paper, // White background when focused
                       },
                       '& .Mui-focused': {
                         borderColor: theme.palette.secondary.main,
@@ -283,7 +297,10 @@ const Contact: React.FC = () => {
                       '& .MuiInputBase-root': {
                         borderRadius: 2,
                         height: { xs: '150px', md: '200px' },
-                        backgroundColor: theme.palette.background.paper,
+                        backgroundColor: theme.palette.background.paper, // White background for input fields
+                      },
+                      '& .Mui-focused .MuiInputBase-root': {
+                        backgroundColor: theme.palette.background.paper, // White background when focused
                       },
                       '& .Mui-focused': {
                         borderColor: theme.palette.secondary.main,
