@@ -1,4 +1,3 @@
-'use client';
 import React from 'react';
 import { useTheme, Typography, Grid, Box, Container } from '@mui/material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
@@ -11,12 +10,14 @@ import { SPACING, getSharedStyles } from '../utils/sharedStyles';
 import ServicesGrid from '../components/Common/ServicesGrid';
 import TestimonialsSection from '../components/Common/TestimonialsSection';
 import WhyChooseUs from '../components/Common/WhyChooseUs';
+
 const Solutions: React.FC = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme); // Get shared styles
   const renderProjectCard = (project: typeof cvProjects[0]) => (
     <ProjectCard project={project} />
   );
+
   return (
     <ConsistentPageLayout
       seoTitle="Client Solutions - Premium Solutions"
@@ -26,7 +27,7 @@ const Solutions: React.FC = () => {
       subtitle="Our enterprise solutions empower your business to innovate and grow."
     >
       {/* Understanding Our Solutions Section */}
-      <PageSection> {/* Removed mb: SPACING.small from here */}
+      <PageSection>
         <Container maxWidth="md">
           <Typography
             variant="h3"
@@ -36,6 +37,7 @@ const Solutions: React.FC = () => {
               ...styles.pageTitle,
               color: theme.palette.text.primary,
               mb: SPACING.medium,
+              fontWeight: 'bold',
             }}
           >
             What are GLUStack's Solutions?
@@ -44,14 +46,22 @@ const Solutions: React.FC = () => {
             variant="body1"
             align="center"
             color="text.secondary"
-            sx={{ mb: SPACING.large }}
+            sx={{
+              mb: SPACING.large,
+              background: 'rgba(0, 0, 0, 0.5)', // Darkened overlay for better readability
+              color: 'white',
+              padding: '10px 20px',
+              borderRadius: '5px',
+              lineHeight: 1.8, // Improved line spacing for readability
+            }}
           >
             At GLUStack, our 'Solutions' go beyond off-the-shelf products. We engineer bespoke technology solutions precisely tailored to address the unique challenges and opportunities of your business. We take a consultative approach, deeply understanding your needs to craft solutions that deliver measurable impact and drive sustainable growth.
           </Typography>
         </Container>
       </PageSection>
+
       {/* Our Featured Solutions Section */}
-      <PageSection > {/* Removed mb: SPACING.large * 3 and mt: negative margin */}
+      <PageSection>
         <Typography
           variant="h3"
           component="h2"
@@ -60,6 +70,7 @@ const Solutions: React.FC = () => {
           sx={{
             color: theme.palette.text.primary,
             fontWeight: 'bold',
+            mb: SPACING.medium,
           }}
         >
           Our Featured Solutions
@@ -79,18 +90,19 @@ const Solutions: React.FC = () => {
           sx={{ mx: 'auto' }} // ADDED THIS LINE TO CENTER CardGrid
         />
       </PageSection>
+
       {/* Industries We Serve Section */}
-    {/* Industries We Serve Section */}
-    <PageSection>
+      <PageSection>
         <Container maxWidth="md">
           <Typography
             variant="h3"
             component="h2"
             align="center"
             sx={{
-            ...styles.pageTitle,
+              ...styles.pageTitle,
               color: theme.palette.text.primary,
               mb: SPACING.medium,
+              fontWeight: 'bold',
             }}
           >
             Industries We Empower with Technology Solutions
@@ -99,11 +111,17 @@ const Solutions: React.FC = () => {
             variant="body1"
             align="center"
             color="text.secondary"
-            sx={{ mb: SPACING.large }}
+            sx={{
+              mb: SPACING.large,
+              background: 'rgba(0, 0, 0, 0.5)', // Darkened overlay for better readability
+              color: 'white',
+              padding: '10px 20px',
+              borderRadius: '5px',
+              lineHeight: 1.8, // Improved line spacing for readability
+            }}
           >
             GLUStack has a proven track record of empowering businesses across a range of industries, including: Technology (building and scaling cloud platforms, microservices, and DevOps), Financial Services (secure banking platforms and fintech solutions), E-commerce (optimizing digital platforms and user experiences), Media (streamlining workflows and automating content delivery), and Public Sector (digital transformation and cloud migration). This diverse experience allows us to understand your unique challenges and deliver tailored solutions.
           </Typography>
-          {/* Optional: Add a grid of industry logos here if you have them */}
         </Container>
       </PageSection>
 
@@ -115,9 +133,10 @@ const Solutions: React.FC = () => {
             component="h2"
             align="center"
             sx={{
-            ...styles.pageTitle,
+              ...styles.pageTitle,
               color: theme.palette.text.primary,
               mb: SPACING.medium,
+              fontWeight: 'bold',
             }}
           >
             Unlock the Benefits of GLUStack Solutions
@@ -126,14 +145,21 @@ const Solutions: React.FC = () => {
             variant="body1"
             align="center"
             color="text.secondary"
-            sx={{ mb: SPACING.large }}
+            sx={{
+              mb: SPACING.large,
+              background: 'rgba(0, 0, 0, 0.5)', // Darkened overlay for better readability
+              color: 'white',
+              padding: '10px 20px',
+              borderRadius: '5px',
+              lineHeight: 1.8, // Improved line spacing for readability
+            }}
           >
             Partnering with GLUStack provides key benefits: enhanced scalability and reliability, improved security, accelerated innovation, increased efficiency, and cost optimization. We empower you to achieve your business goals by providing expert technology solutions that enhance your capabilities, drive innovation, and deliver tangible value.
           </Typography>
-          {/* Optional: Add benefit bullet points or a more detailed explanation of benefits here */}
         </Container>
       </PageSection>
     </ConsistentPageLayout>
   );
 };
+
 export default Solutions;

@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import {
   Box,
@@ -189,17 +187,17 @@ const renderPlanCard = (
       flexDirection: 'column',
       justifyContent: 'space-between',
       height: '100%',
-      minHeight: CARD_STYLES.minHeight,
+      minHeight: 450, // Adjusted for better card size consistency
       p: 3,
       borderRadius: 4,
       position: 'relative',
       background: `linear-gradient(135deg, ${plan.cardStyle.backgroundColor} 0%, transparent 100%)`,
       border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-      boxShadow: theme.shadows[2],
+      boxShadow: theme.shadows[3],
       cursor: 'pointer',
       transition: 'transform 0.3s ease, box-shadow 0.3s ease',
       '&:hover': {
-        transform: CARD_STYLES.hoverTransform,
+        transform: 'scale(1.05)', // Slightly stronger hover effect
         boxShadow: theme.shadows[6],
       },
     }}
@@ -281,8 +279,7 @@ const PricingPage: React.FC = () => {
       subtitle={pricingPageContent.hero.subtitle}
     >
       {/* HERO SECTION */}
-      <PageSection
-    >
+      <PageSection>
         <Container maxWidth="sm">
           <Typography
             variant="h3"

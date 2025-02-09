@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useCallback } from 'react';
 import {
   useTheme,
@@ -117,9 +115,7 @@ const Contact: React.FC = () => {
         description="Reach out for tailored technology consulting and solutions. Let our experts guide your digital transformation."
         keywords="contact, support, inquiry, partnership, technology consulting, expert solutions"
       />
-      <ConsistentPageLayout
-     
-      >
+      <ConsistentPageLayout>
         <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 4, md: 6 } }}>
           <Box
             sx={{

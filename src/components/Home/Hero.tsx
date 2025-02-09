@@ -19,7 +19,7 @@ export const HeroSection = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const imageUrl = '/images/istockphoto-hero-1024x1024.jpg';
+  const imageUrl = '/images/istockphoto-realhero.jpg';
 
   useEffect(() => {
     const img = new Image();

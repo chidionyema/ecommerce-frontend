@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import {
   Box,
@@ -8,7 +6,6 @@ import {
   useTheme,
   Container,
   Grid,
-  alpha,
   Chip,
 } from '@mui/material';
 import NextLink from 'next/link';
@@ -25,13 +22,48 @@ import PageSection from '../components/PageSection';
 import CardGrid from '../components/CardGrid';
 import { CARD_STYLES, getSharedStyles, SPACING } from '../utils/sharedStyles';
 
-const resources = [
+// Free Resources
+const freeResources = [
+  {
+    id: 1,
+    title: 'Basic Cloud Concepts',
+    summary: 'Introduction to cloud infrastructure and basic concepts.',
+    icon: CloudIcon,
+    path: '/free-resources/cloud',
+    downloads: '1.5K+',
+    trending: true,
+    time: '10 min read',
+  },
+  {
+    id: 2,
+    title: 'Basic Security Vaults',
+    summary: 'Learn the basics of securing your infrastructure with vaults.',
+    icon: VpnKey,
+    path: '/free-resources/security',
+    downloads: '1.2K+',
+    trending: true,
+    time: '12 min read',
+  },
+  {
+    id: 3,
+    title: 'Introduction to API Security',
+    summary: 'Learn how to secure APIs with best practices and minimal overhead.',
+    icon: SecurityIcon,
+    path: '/free-resources/api-security',
+    downloads: '1.1K+',
+    trending: false,
+    time: '15 min read',
+  },
+];
+
+// Premium Resources
+const premiumResources = [
   {
     id: 1,
     title: 'Cloud Mastery',
-    summary: 'Advanced cloud infrastructure deployment strategies.',
+    summary: 'Complete guide with scripts, code, and docs to master cloud infrastructure.',
     icon: CloudIcon,
-    path: '/resources/cloud',
+    path: '/premium-resources/cloud',
     downloads: '2.4K+',
     trending: true,
     time: '18 min read',
@@ -39,9 +71,9 @@ const resources = [
   {
     id: 2,
     title: 'Security Vaults',
-    summary: 'Enterprise secrets management solutions.',
+    summary: 'Full premium package with security vault setup scripts and complete documentation.',
     icon: VpnKey,
-    path: '/resources/security',
+    path: '/premium-resources/security',
     downloads: '1.8K+',
     trending: true,
     time: '25 min read',
@@ -49,47 +81,12 @@ const resources = [
   {
     id: 3,
     title: 'Code Architect',
-    summary: 'Modern software architecture patterns.',
+    summary: 'Detailed code architecture patterns with production-ready examples.',
     icon: CodeIcon,
-    path: '/resources/architecture',
+    path: '/premium-resources/architecture',
     downloads: '3.1K+',
     trending: false,
     time: '30 min read',
-  },
-];
-
-const resourceCategories = [
-  {
-    id: 'cloud-computing',
-    title: 'Cloud Computing',
-    summary:
-      'Deep dive into cloud infrastructure, deployment, and optimization.',
-    icon: CloudIcon,
-    path: '/resources/cloud-computing-category',
-  },
-  {
-    id: 'cybersecurity',
-    title: 'Cybersecurity',
-    summary:
-      'Expert guides on enterprise security, threat mitigation, and data protection.',
-    icon: SecurityIcon,
-    path: '/resources/cybersecurity-category',
-  },
-  {
-    id: 'software-architecture',
-    title: 'Software Architecture',
-    summary:
-      'Explore modern software design patterns and scalable system architectures.',
-    icon: CodeIcon,
-    path: '/resources/software-architecture-category',
-  },
-  {
-    id: 'data-management',
-    title: 'Data Management',
-    summary:
-      'Resources on data storage, management, and strategies for data-driven decisions.',
-    icon: StorageIcon,
-    path: '/resources/data-management-category',
   },
 ];
 
@@ -97,7 +94,7 @@ const ResourcesPage: React.FC = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
 
-  const renderResourceCard = (resource: typeof resources[0]) => {
+  const renderResourceCard = (resource: typeof freeResources[0] | typeof premiumResources[0]) => {
     const IconComponent = resource.icon;
     return (
       <motion.div
@@ -110,20 +107,23 @@ const ResourcesPage: React.FC = () => {
             window.location.href = resource.path;
           }}
           sx={{
-           
             background: theme.palette.mode === 'light' ? 'white' : '#28282a',
+            display: 'flex',
             flexDirection: 'column',
             height: '100%',
-            minHeight: CARD_STYLES.minHeight,
-            transition: CARD_STYLES.transition,
+            minHeight: 450,
+            maxWidth: 350,
+            width: '100%',
+            borderRadius: 4,
+            boxShadow: theme.shadows[5],
+            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
             '&:hover': {
-              transform: CARD_STYLES.hoverTransform,
-              boxShadow:
-                '0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08)',
+              transform: 'scale(1.05)',
+              boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.15)',
             },
           }}
         >
-          <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Box
               sx={{
                 display: 'flex',
@@ -133,18 +133,18 @@ const ResourcesPage: React.FC = () => {
                   ? 'rgba(25, 118, 210, 0.08)'
                   : 'rgba(144, 202, 249, 0.08)',
                 borderRadius: '16px',
-                width: 60,
-                height: 60,
-                mb: 2,
+                width: 80,
+                height: 80,
+                mb: 3,
                 mx: 'auto',
-                border: `1px solid ${theme.palette.mode === 'light'
+                border: `2px solid ${theme.palette.mode === 'light'
                   ? 'rgba(25, 118, 210, 0.3)'
                   : 'rgba(144, 202, 249, 0.3)'}`,
               }}
             >
               <IconComponent
                 sx={{
-                  fontSize: 32,
+                  fontSize: 40,
                   color: theme.palette.mode === 'light'
                     ? theme.palette.primary.dark
                     : theme.palette.primary.light,
@@ -157,9 +157,10 @@ const ResourcesPage: React.FC = () => {
               component="h3"
               sx={{
                 fontWeight: 700,
-                mb: 1,
+                mb: 2,
                 textAlign: 'center',
                 color: theme.palette.text.primary,
+                fontSize: '1.25rem',
               }}
             >
               {resource.title}
@@ -167,15 +168,15 @@ const ResourcesPage: React.FC = () => {
             <Typography
               variant="body1"
               sx={{
-                mb: 2,
+                mb: 3,
                 textAlign: 'center',
                 color: theme.palette.text.secondary,
-                flexGrow: 1,
+                fontSize: '1rem',
               }}
             >
               {resource.summary}
             </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
               {resource.trending && (
                 <Chip label="Trending" color="primary" size="small" />
               )}
@@ -184,7 +185,7 @@ const ResourcesPage: React.FC = () => {
             <Button
               variant="contained"
               color="primary"
-              size="medium"
+              size="large"
               component={NextLink}
               href={resource.path}
               sx={{
@@ -192,108 +193,11 @@ const ResourcesPage: React.FC = () => {
                 fontWeight: 600,
                 borderRadius: 2,
                 mt: 'auto',
+                py: 1.5,
+                fontSize: '1rem',
               }}
             >
-              Explore Guide
-            </Button>
-          </Box>
-        </Box>
-      </motion.div>
-    );
-  };
-
-  const renderCategoryCard = (category: typeof resourceCategories[0]) => {
-    const IconComponent = category.icon;
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
-        viewport={{ once: true }}
-      >
-        <Box
-          onClick={() => {
-            window.location.href = category.path;
-          }}
-          sx={{
-      
-            background: theme.palette.mode === 'light' ? 'white' : '#28282a',
-            flexDirection: 'column',
-            height: '100%',
-            minHeight: CARD_STYLES.minHeight,
-            transition: CARD_STYLES.transition,
-            '&:hover': {
-              transform: CARD_STYLES.hoverTransform,
-              boxShadow:
-                '0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08)',
-            },
-          }}
-        >
-          <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: theme.palette.mode === 'light'
-                  ? 'rgba(25, 118, 210, 0.08)'
-                  : 'rgba(144, 202, 249, 0.08)',
-                borderRadius: '16px',
-                width: 60,
-                height: 60,
-                mb: 2,
-                mx: 'auto',
-                border: `1px solid ${theme.palette.mode === 'light'
-                  ? 'rgba(25, 118, 210, 0.3)'
-                  : 'rgba(144, 202, 249, 0.3)'}`,
-              }}
-            >
-              <IconComponent
-                sx={{
-                  fontSize: 32,
-                  color: theme.palette.mode === 'light'
-                    ? theme.palette.primary.dark
-                    : theme.palette.primary.light,
-                  transform: 'rotate(-10deg)',
-                }}
-              />
-            </Box>
-            <Typography
-              variant="h5"
-              component="h3"
-              sx={{
-                fontWeight: 700,
-                mb: 1,
-                textAlign: 'center',
-                color: theme.palette.text.primary,
-              }}
-            >
-              {category.title}
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                mb: 2,
-                textAlign: 'center',
-                color: theme.palette.text.secondary,
-                flexGrow: 1,
-              }}
-            >
-              {category.summary}
-            </Typography>
-            <Button
-              variant="outlined"
-              color="primary"
-              size="medium"
-              component={NextLink}
-              href={category.path}
-              sx={{
-                textTransform: 'none',
-                fontWeight: 600,
-                borderRadius: 2,
-                mt: 'auto',
-              }}
-            >
-              Explore Category
+              {resource.title.includes('Premium') ? 'Access Premium Resource' : 'Access Free Resource'}
             </Button>
           </Box>
         </Box>
@@ -303,15 +207,13 @@ const ResourcesPage: React.FC = () => {
 
   return (
     <ConsistentPageLayout
-      seoTitle="Technical Resources - Expert Guides & Insights"
-      seoDescription="Explore our comprehensive library of technical resources, guides, and insights on cloud computing, cybersecurity, software architecture, and data management."
-      title="Discover. Learn. Grow."
-      subtitle="Access our expert technical resources to drive your success."
+      seoTitle="Technical Resources - Free & Premium Code & Docs"
+      seoDescription="Access both free and premium resources with production-ready code, test scripts, and documentation."
+      title="Unlock Premium & Free Resources"
+      subtitle="Get access to free and premium resources including code, scripts, and production-ready docs."
     >
       {/* Introduction Section */}
-      <PageSection
-      
-      >
+      <PageSection>
         <Container maxWidth="md">
           <Typography
             variant="h2"
@@ -324,48 +226,27 @@ const ResourcesPage: React.FC = () => {
               fontWeight: 'bold',
             }}
           >
-            Unlock a World of Expertise
+            Free & Premium Resources for Your Projects
           </Typography>
           <Typography
             variant="body1"
             align="center"
             color="text.secondary"
-            sx={{ mb: SPACING.medium }}
+            sx={{
+              mb: SPACING.medium,
+              background: 'rgba(0, 0, 0, 0.5)',  // Adding overlay for better readability
+              color: 'white',
+              padding: '10px 20px',
+              borderRadius: '5px',
+            }}
           >
-            Welcome to our comprehensive resource library. Here you'll find
-            in-depth guides, articles, and insights crafted by our expert team
-            to help you navigate the complexities of modern technology and
-            achieve your business goals.
+            Access production-ready code, comprehensive test scripts, and in-depth documentation. Perfect for developers and tech teams who want to hit the ground running.
           </Typography>
-          {/* Benefit points (using Grid for better layout) */}
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item xs={12} sm={6} md={4}>
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="body1" color="text.primary" fontWeight={500}>
-                  Stay ahead of the curve with cutting-edge technical insights.
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="body1" color="text.primary" fontWeight={500}>
-                  Gain practical knowledge you can immediately apply to your projects.
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="body1" color="text.primary" fontWeight={500}>
-                  Learn from industry experts and accelerate your team's skill development.
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
         </Container>
       </PageSection>
 
-      {/* Featured Resources Section */}
-      <PageSection >
+      {/* Free Resources Section */}
+      <PageSection>
         <Typography
           variant="h3"
           component="h2"
@@ -377,54 +258,38 @@ const ResourcesPage: React.FC = () => {
             mb: SPACING.medium,
           }}
         >
-          Featured Resources
+          Featured Free Resources
         </Typography>
-        <CardGrid 
-          data={resources} 
+        <CardGrid
+          data={freeResources}
           renderItem={renderResourceCard}
           sx={{ mx: 'auto', gap: SPACING.medium }}
         />
       </PageSection>
 
-      {/* Explore Resources by Topic Section */}
-      <PageSection
-      
-      >
-        <Container>
-          <Typography
-            variant="h3"
-            component="h2"
-            align="center"
-            sx={{
-              ...styles.pageTitle,
-              color: theme.palette.text.primary,
-              mb: SPACING.medium,
-              mx: 'auto',
-              fontWeight: 'bold',
-            }}
-          >
-            Explore Resources by Topic
-          </Typography>
-          <Typography
-            variant="body1"
-            align="center"
-            color="text.secondary"
-            sx={{ mb: SPACING.large, mx: 'auto' }}
-          >
-            Dive deeper into specific areas of interest. Browse our resources
-            categorized by technical domain to quickly find the guides and
-            insights most relevant to your needs.
-          </Typography>
-          {/* Resource Categories Grid */}
-          <CardGrid
-            data={resourceCategories}
-            renderItem={renderCategoryCard}
-            sx={{ mx: 'auto', gap: SPACING.medium }}
-          />
-        </Container>
+      {/* Premium Resources Section */}
+      <PageSection>
+        <Typography
+          variant="h3"
+          component="h2"
+          align="center"
+          gutterBottom
+          sx={{
+            color: theme.palette.text.primary,
+            fontWeight: 'bold',
+            mb: SPACING.medium,
+          }}
+        >
+          Featured Premium Resources
+        </Typography>
+        <CardGrid
+          data={premiumResources}
+          renderItem={renderResourceCard}
+          sx={{ mx: 'auto', gap: SPACING.medium }}
+        />
       </PageSection>
 
-      {/* Why These Resources Matter Section */}
+      {/* Why Choose Our Resources Section */}
       <PageSection>
         <Container maxWidth="md">
           <Typography
@@ -437,38 +302,22 @@ const ResourcesPage: React.FC = () => {
               mb: SPACING.medium,
             }}
           >
-            Why Leverage Our Expert Resources?
+            Why Choose Our Resources?
           </Typography>
           <Typography
             variant="body1"
             align="center"
             color="text.secondary"
-            sx={{ mb: SPACING.large }}
+            sx={{
+              mb: SPACING.large,
+              background: 'rgba(0, 0, 0, 0.5)',  // Adding overlay for better readability
+              color: 'white',
+              padding: '10px 20px',
+              borderRadius: '5px',
+            }}
           >
-            In today's fast-paced tech landscape, staying informed and skilled is
-            crucial. Our resources are designed to equip tech leaders,
-            developers, and innovators with the knowledge they need to build
-            robust, secure, and scalable platforms. We cut through the noise and
-            deliver actionable insights based on real-world experience.
+            Our free and premium resources are designed to save you time and help you deliver results faster. Each resource comes with complete code, test scripts, and documentation to ensure you're always prepared for success. Learn from industry experts, follow best practices, and ship your projects faster while saving on development costs.
           </Typography>
-          {/* Optional target audience points */}
-          <Box
-            component="ul"
-            sx={{ listStyleType: 'none', m: 0, p: 0, maxWidth: 600, mx: 'auto' }}
-          >
-            <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
-              <Typography variant="body1" color="text.primary" fontWeight={500}>
-                <b>Ideal for:</b> CTOs, VPs of Engineering, Lead Developers,
-                Solution Architects, Security Engineers, Cloud Engineers
-              </Typography>
-            </Box>
-            <Box component="li" sx={{ py: 0.5, textAlign: 'center' }}>
-              <Typography variant="body1" color="text.primary" fontWeight={500}>
-                <b>Perfect for those seeking to:</b> Deepen technical
-                expertise, implement best practices, solve complex tech challenges, drive innovation.
-              </Typography>
-            </Box>
-          </Box>
         </Container>
       </PageSection>
     </ConsistentPageLayout>

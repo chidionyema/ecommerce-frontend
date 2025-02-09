@@ -132,9 +132,7 @@ const ServicesGrid = () => {
                 icon={service.icon ? <service.icon /> : null}  // Use the icon
                 title={service.title}
                 color={theme.palette.primary.main}
-                sx={{
-                  backgroundColor: alpha(theme.palette.background.paper, 0.95), // Increased opacity
-                }}
+               
               >
                 <Typography
                   variant="body2"

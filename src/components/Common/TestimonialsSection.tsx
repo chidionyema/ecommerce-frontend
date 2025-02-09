@@ -1,13 +1,20 @@
-'use client';
-
 import React, { useState } from 'react';
 import { Box, Container, Typography, Grid, Avatar, Button, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
-import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import NextLink from 'next/link';
-import TechCard from '../Common/TechCard';
+import { SPACING, getSharedStyles } from '../../utils/sharedStyles'; // Make sure path is correct
+import TechCard from '../Common/TechCard'; // Make sure path is correct
 
-const testimonials = [
+// Define the type for a testimonial
+interface Testimonial {
+  id: number;
+  name: string;
+  role: string;
+  content: string;
+  avatar: string;
+}
+
+const testimonials: Testimonial[] = [
   {
     id: 1,
     name: 'John Doe',
@@ -31,24 +38,24 @@ const testimonials = [
   },
   {
     id: 4,
-    name: 'John Doe',
-    role: 'CEO, TechCorp',
-    content: 'Their strategy transformed our entire approach.',
-    avatar: '/avatar1.jpg',
+    name: 'Emily Davis',
+    role: 'Marketing Director, GlobalReach',
+    content: 'Exceptional results that exceeded our expectations.',
+    avatar: '/avatar4.jpg',
   },
   {
     id: 5,
-    name: 'Jane Smith',
-    role: 'CTO, InnovateX',
-    content: 'Precision execution that elevated our tech stack.',
-    avatar: '/avatar2.jpg',
+    name: 'David Lee',
+    role: 'Product Manager, AgileSolutions',
+    content: 'Innovative solutions that drove significant growth.',
+    avatar: '/avatar5.jpg',
   },
   {
     id: 6,
-    name: 'Michael Johnson',
-    role: 'Founder, StartupHub',
-    content: 'Top-tier consultancy with next-level expertise.',
-    avatar: '/avatar3.jpg',
+    name: 'Sarah Chen',
+    role: 'Lead Developer, CodeCrafters',
+    content: 'Expert guidance that streamlined our development process.',
+    avatar: '/avatar6.jpg',
   },
 ];
 
@@ -63,18 +70,41 @@ const TestimonialsSection = () => {
       sx={{
         width: '100%',
         py: SPACING.large,
-        bgcolor: theme.palette.background.default,
         overflow: 'hidden',
+        position: 'relative',
       }}
     >
-      <Container maxWidth="lg">
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundImage: 'url("/images/istockphoto-1303809341-1024x1024.jpg")', // Make sure path is correct
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+          '&:before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.4)', // Adjust alpha for darkness
+          },
+        }}
+      />
+
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <Typography
           variant="h2"
           component="h2"
           align="center"
           sx={{
             ...styles.pageTitle,
-            color: theme.palette.text.primary,
+            color: 'inherit',
             mb: SPACING.large,
           }}
         >
@@ -89,7 +119,11 @@ const TestimonialsSection = () => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
               >
-                <TechCard icon={null} title={t.name} color={theme.palette.text.primary}  >
+                <TechCard
+                  icon={null}
+                  title={t.name}
+                
+                >
                   <Avatar
                     src={t.avatar}
                     sx={{

@@ -117,12 +117,7 @@ const TechnologyShowcase = () => {
                 color={tech.color}
                 index={index}
                 floatingVariants={styles.floatingAnimation}
-                sx={{
-                    backgroundColor: alpha(theme.palette.background.paper, 0.7), // Translucent background
-                    backdropFilter: 'blur(10px)',  // Add backdrop blur
-                    border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`, // Subtle border
-                    boxShadow: theme.shadows[4], // Keep a good shadow
-                  }}
+               
               />
             </Grid>
           ))}
