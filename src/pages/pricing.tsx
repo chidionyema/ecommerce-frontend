@@ -150,7 +150,7 @@ const plans: Plan[] = [
       backgroundColor: 'rgba(63, 81, 181, 0.05)', // Muted indigo
     },
     recommended: true,
-  },
+  }
 ];
 
 // ======================================================================

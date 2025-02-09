@@ -1,15 +1,5 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  CardContent,
-  Button,
-  useTheme,
-  alpha,
-  keyframes,
-} from '@mui/material';
+import { Box, Typography, CardContent, Button, useTheme, alpha, keyframes } from '@mui/material';
 import NextLink from 'next/link';
 import { ArrowRightAlt } from '@mui/icons-material';
 import GoldCard from '../GoldCard';
@@ -17,24 +7,21 @@ import { CARD_SIZES, SPACING } from '../../utils/sharedStyles';
 import { technologyIconMap } from '../../data/cvProjects';
 import { Code } from 'lucide-react';
 
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  technologies: string[];
-  clientName?: string;
-  gradient?: string;
-  highlights?: string;
-  imageUrl?: string;
-  icon?: React.ComponentType<any>;
-  iconColor?: string;
-  metrics?: Array<{ label: string; value: string; description: string }>;
-}
-
 const shineAnimation = keyframes`
   0% { left: -50%; }
   100% { left: 150%; }
 `;
+
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ElementType | null;
+  iconColor?: string;
+  clientName: string;
+  metrics: { value: string; label: string }[];
+  technologies: string[]; // This will be an array of strings (e.g., technology names)
+}
 
 const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) => {
   const theme = useTheme();
@@ -53,14 +40,14 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
   }, [imageUrl]);
 
   return (
-    <Box sx={{ m: SPACING.small, display: 'flex', justifyContent: 'center' }}>
-      <Box sx={{ width: CARD_WIDTH }}>
+    <Box sx={{ m: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Box sx={{ width: CARD_WIDTH, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <GoldCard
           href={`/projects/${project.id}`}
           sx={{
             width: '100%',
             height: CARD_HEIGHT,
-            p: SPACING.medium,
+            p: 2, // Adjusted padding
             position: 'relative',
             overflow: 'hidden',
             transition: 'transform 0.3s ease',
@@ -111,7 +98,6 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                     zIndex: 0,
                   }}
                 />
-                {/* Blurred Image - Reduced Blur and Increased Opacity */}
                 <Box
                   sx={{
                     position: 'absolute',
@@ -173,7 +159,6 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
           </Box>
 
           <CardContent sx={{ px: 0, pb: 0, height: '60%', display: 'flex', flexDirection: 'column' }}>
-            {/* Title & Metrics */}
             <Box sx={{ mb: SPACING.small }}>
               <Typography variant="h6" component="h2" fontWeight={800} gutterBottom>
                 {project.name}
@@ -202,7 +187,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                   Core Technologies
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  {project.technologies.slice(0, 5).map((tech, index) => {
+                  {project.technologies.slice(0, 5).map((tech: string, index: number) => {  // Explicitly typed `tech`
                     const techData = technologyIconMap[tech as keyof typeof technologyIconMap];
                     const IconComponent = techData?.icon || DefaultIcon;
                     return (
@@ -247,30 +232,30 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
             >
               <Typography variant="body2">{truncatedDescription}</Typography>
             </Box>
-
-            {/* CTA Button */}
-            <Box sx={{ position: 'sticky', bottom: 0, bgcolor: 'background.default', zIndex: 4 }}>
-              <Button
-                component={NextLink}
-                href={`/projects/${project.id}`}
-                fullWidth
-                endIcon={<ArrowRightAlt />}
-                sx={{
-                  bgcolor: 'primary.main',
-                  color: 'primary.contrastText',
-                  py: 1.5,
-                  fontWeight: 700,
-                  borderRadius: 2,
-                  '&:hover': {
-                    bgcolor: 'primary.dark',
-                    transform: 'scale(1.03)',
-                  },
-                }}
-              >
-                Explore Case Study
-              </Button>
-            </Box>
           </CardContent>
+
+          {/* CTA Button - Positioned at the bottom */}
+          <Box sx={{ pt: SPACING.medium }}>
+            <Button
+              component={NextLink}
+              href={`/projects/${project.id}`}
+              fullWidth
+              endIcon={<ArrowRightAlt />}
+              sx={{
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                py: 1.5,
+                fontWeight: 700,
+                borderRadius: 2,
+                '&:hover': {
+                  bgcolor: 'primary.dark',
+                  transform: 'scale(1.03)',
+                },
+              }}
+            >
+              Explore Case Study
+            </Button>
+          </Box>
         </GoldCard>
       </Box>
     </Box>

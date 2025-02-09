@@ -13,22 +13,11 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Link,
-  alpha,
   Divider,
   Fab,
   Stack,
 } from '@mui/material';
-import { z } from 'zod';
-import {
-  Person,
-  Email,
-  Phone,
-  ChatBubbleOutline,
-  AccessTime,
-  Headset,
-  KeyboardArrowUp,
-} from '@mui/icons-material';
+import { Person, Email, Phone, ChatBubbleOutline, Headset, KeyboardArrowUp } from '@mui/icons-material';
 import { CheckCircle } from 'lucide-react';
 import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
@@ -36,14 +25,7 @@ import GoldCard from '../components/GoldCard';
 import PageSection from '../components/PageSection';
 import { getSharedStyles, SPACING } from '../utils/sharedStyles';
 
-// Define the initial form data
-const INITIAL_FORM_DATA: FormData = {
-  name: '',
-  email: '',
-  phone: '',
-  message: '',
-};
-
+// Define the interface for FormData
 interface FormData {
   name: string;
   email: string;
@@ -54,8 +36,16 @@ interface FormData {
 const Contact: React.FC = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
-  const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData | 'form', string>>>({}); // Fixed here
+
+  // Define formData state with the correct type
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+  });
+
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData | 'form', string>>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -63,11 +53,9 @@ const Contact: React.FC = () => {
   const handleSubmit = useCallback((event: React.FormEvent) => {
     event.preventDefault();
 
-    // Add validation logic here and set errors if needed
-    // If no errors, submit the form and set success state to true
+    // Simulate a form submission delay
     setLoading(true);
 
-    // Simulate a form submission delay
     setTimeout(() => {
       setLoading(false);
       setSuccess(true); // Show success page
@@ -81,9 +69,9 @@ const Contact: React.FC = () => {
         seoDescription="Thank you for contacting us!"
         title="Message Sent!"
         subtitle="We’ll be in touch shortly."
-    >
+      >
         <Box sx={{ mt: 4 }}>
-          <Typography variant="body1" sx={{ mb: 3, color: alpha(theme.palette.primary.contrastText, 0.9) }}>
+          <Typography variant="body1" sx={{ mb: 3, color: theme.palette.primary.contrastText }}>
             Thank you for your message. We have received it and will get back to you as soon as possible.
           </Typography>
           <Button
@@ -111,9 +99,9 @@ const Contact: React.FC = () => {
   return (
     <>
       <SEO
-        title="Contact Us - Expert Tech Solutions - GLUStack"
+        title="Contact Us - Expert Tech Solutions"
         description="Reach out for tailored technology consulting and solutions. Let our experts guide your digital transformation."
-        keywords="contact, support, inquiry, partnership, technology consulting, expert solutions"
+        keywords="contact, support, inquiry, partnership, technology consulting"
       />
       <ConsistentPageLayout>
         <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 4, md: 6 } }}>
@@ -193,6 +181,12 @@ const Contact: React.FC = () => {
                 width: '100%',
                 height: 'auto',
                 overflow: 'visible',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: theme.palette.background.paper,  // Ensure white background for form
+                boxShadow: theme.shadows[3], // Add some shadow to make form stand out
               }}
             >
               <Typography
@@ -202,21 +196,11 @@ const Contact: React.FC = () => {
                   fontWeight: 700,
                   mb: 3,
                   color: theme.palette.text.primary,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 2,
                 }}
               >
-                <img
-                  src="/roadmap-icon.svg"
-                  alt="Roadmap Icon"
-                  loading="lazy"
-                  style={{ height: 40 }}
-                />
                 Get a Custom Tech Roadmap in 24 Hours
               </Typography>
-              <Stack spacing={4}>
+              <Stack spacing={4} sx={{ width: '100%' }}>
                 {/* Form Fields */}
                 <TextField
                   fullWidth
@@ -337,47 +321,7 @@ const Contact: React.FC = () => {
               </Stack>
             </GoldCard>
           </Box>
-
-          {/* Informational Sections */}
-          <PageSection>
-            <Container maxWidth="md">
-              <Typography
-                variant="h3"
-                component="h2"
-                align="center"
-                sx={{
-                  ...styles.pageTitle,
-                  color: theme.palette.text.primary,
-                  mb: SPACING.medium,
-                  fontWeight: 700,
-                }}
-              >
-                Why Reach Out to GLUStack?
-              </Typography>
-              <List>
-                <ListItem>
-                  <ListItemIcon sx={{ color: theme.palette.secondary.main }}>
-                    <CheckCircle size={20} strokeWidth={3} />
-                  </ListItemIcon>
-                  <ListItemText primary="Expert tech consulting for your business" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon sx={{ color: theme.palette.secondary.main }}>
-                    <CheckCircle size={20} strokeWidth={3} />
-                  </ListItemIcon>
-                  <ListItemText primary="Tailored solutions that scale with your business" />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon sx={{ color: theme.palette.secondary.main }}>
-                    <CheckCircle size={20} strokeWidth={3} />
-                  </ListItemIcon>
-                  <ListItemText primary="Rapid response and support" />
-                </ListItem>
-              </List>
-            </Container>
-          </PageSection>
         </Container>
-        <BackToTopButton />
       </ConsistentPageLayout>
     </>
   );

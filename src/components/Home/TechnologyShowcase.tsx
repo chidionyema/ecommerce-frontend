@@ -1,11 +1,10 @@
-// components/Home/TechnologyShowcase.tsx
 'use client';
 
 import { Box, Container, Typography, Grid, useTheme, alpha } from '@mui/material';
 import { useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
-import TechCard from '../Common/TechCard';
+import TechCard from '../Common/TechCard'; // Assuming TechCard doesn't take sx
 import { techIcons } from './tech-data';
 
 const TechnologyShowcase = () => {
@@ -14,7 +13,7 @@ const TechnologyShowcase = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { amount: 0.5, once: true });
   const [imageLoaded, setImageLoaded] = useState(false);
-  const imageUrl = '/images/istockphoto-digital.jpg';
+  const imageUrl = '/images/istockphoto-digital.jpg'; // Replace with your actual image URL
 
   useEffect(() => {
     const img = new Image();
@@ -37,7 +36,7 @@ const TechnologyShowcase = () => {
         overflow: 'hidden',
       }}
     >
-      {/* Blurred Background Image - Keep, but potentially adjust */}
+      {/* Blurred Background Image */}
       {imageLoaded && (
         <Box
           sx={{
@@ -49,14 +48,14 @@ const TechnologyShowcase = () => {
             backgroundImage: `url(${imageUrl})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            filter: 'blur(4px)', //  Adjust blur as needed!
+            filter: 'blur(15px)', // Increase blur intensity for stronger effect
             zIndex: 0,
-            opacity: 0.8, // Adjust as needed
+            opacity: 0.9, // Slightly increase opacity for more depth
           }}
         />
       )}
 
-      {/* Overlay - Keep, but potentially adjust */}
+      {/* Overlay */}
       {imageLoaded && (
         <Box
           sx={{
@@ -65,24 +64,25 @@ const TechnologyShowcase = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: alpha(theme.palette.primary.dark, 0.3), // Adjust opacity!
+            backgroundColor: alpha(theme.palette.primary.dark, 0.8), // Further increase overlay opacity
             zIndex: 1,
           }}
         />
       )}
 
-      <Container  ref={ref} sx={{ position: 'relative', zIndex: 2 }}>
+      {/* Content Section */}
+      <Container ref={ref} sx={{ position: 'relative', zIndex: 2 }}>
         <Typography
           variant="h2"
           component="h2"
           align="center"
           sx={{
             ...styles.pageTitle,
-            color: imageLoaded ? 'white' : theme.palette.text.primary,
+            color: 'white',
             mb: SPACING.large,
             WebkitTextFillColor: 'white',
-            WebkitTextStroke: imageLoaded ? '1px rgba(0, 0, 0, 0.3)' : 'none',
-            textShadow: imageLoaded ? '0 2px 4px rgba(0, 0, 0, 0.5)' : 'none',
+            WebkitTextStroke: '1px rgba(0, 0, 0, 0.5)',
+            textShadow: '0 4px 8px rgba(0, 0, 0, 0.8)', // Increase shadow intensity
             px: { xs: 2, sm: 4, md: 8 },
             width: '100%',
           }}
@@ -95,11 +95,11 @@ const TechnologyShowcase = () => {
           align="center"
           sx={{
             ...styles.pageSubTitle,
-            color: imageLoaded ? alpha(theme.palette.common.white, 0.9) : theme.palette.text.secondary,
+            color: alpha(theme.palette.common.white, 0.9),
             maxWidth: '800px',
             mx: 'auto',
             mb: SPACING.large,
-            textShadow: imageLoaded ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none',
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
             px: { xs: 2, sm: 4, md: 8 },
             width: '100%',
           }}
@@ -107,17 +107,29 @@ const TechnologyShowcase = () => {
           We leverage the latest technologies to build scalable, secure, and innovative solutions.
         </Typography>
 
+        {/* Grid for Cards */}
         <Grid container spacing={SPACING.medium} justifyContent="center">
           {techIcons.map((tech, index) => (
             <Grid item key={index} xs={12} sm={6} md={4}>
-              {/* Apply custom styles *here*, to this instance of TechCard */}
-              <TechCard
+              <TechCard 
                 icon={tech.icon}
                 title={tech.title}
                 color={tech.color}
                 index={index}
                 floatingVariants={styles.floatingAnimation}
-               
+                // Apply necessary styles directly here to ensure visibility
+                sx={{ 
+                  backgroundColor: alpha(theme.palette.background.paper, 0.95), // Strong background color
+                  boxShadow: '0 16px 32px rgba(0, 0, 0, 0.5)', // Strong shadow
+                  borderRadius: 3, // Slightly increase border radius
+                  padding: SPACING.medium,
+                  zIndex: 2, // Ensure cards are on top
+                  border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`, // Add subtle border for better definition
+                  ':hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)', // Increase hover shadow
+                  },
+                }} 
               />
             </Grid>
           ))}

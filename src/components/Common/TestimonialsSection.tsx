@@ -1,5 +1,16 @@
+'use client';
+
 import React, { useState } from 'react';
-import { Box, Container, Typography, Grid, Avatar, Button, useTheme } from '@mui/material';
+import {
+  Box,
+  Container,
+  Typography,
+  Grid,
+  Avatar,
+  Button,
+  useTheme,
+  alpha,
+} from '@mui/material';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles'; // Make sure path is correct
@@ -74,6 +85,7 @@ const TestimonialsSection = () => {
         position: 'relative',
       }}
     >
+      {/* Background Image with Stronger Overlay */}
       <Box
         sx={{
           position: 'absolute',
@@ -81,7 +93,7 @@ const TestimonialsSection = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundImage: 'url("/images/istockphoto-1303809341-1024x1024.jpg")', // Make sure path is correct
+          backgroundImage: 'url("/images/istockphoto-1303809341-1024x1024.jpg")', // Ensure path is correct
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed',
@@ -92,7 +104,7 @@ const TestimonialsSection = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.4)', // Adjust alpha for darkness
+            backgroundColor: 'rgba(0, 0, 0, 0.7)', // Increase overlay opacity
           },
         }}
       />
@@ -104,12 +116,14 @@ const TestimonialsSection = () => {
           align="center"
           sx={{
             ...styles.pageTitle,
-            color: 'inherit',
+            color: 'white', // Ensure text is white for contrast
             mb: SPACING.large,
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.7)', // Increase text shadow for better readability
           }}
         >
           Client Success Stories
         </Typography>
+
         <Grid container spacing={SPACING.medium} justifyContent="center">
           {(showAll ? testimonials : testimonials.slice(0, 3)).map((t, index) => (
             <Grid item key={t.id} xs={12} sm={6} md={4}>
@@ -122,7 +136,18 @@ const TestimonialsSection = () => {
                 <TechCard
                   icon={null}
                   title={t.name}
-                
+                  sx={{ 
+                    backgroundColor: alpha(theme.palette.background.paper, 0.95), // Strong background color
+                    boxShadow: '0 16px 32px rgba(0, 0, 0, 0.5)', // Strong shadow
+                    borderRadius: 3, // Slightly increase border radius
+                    padding: SPACING.medium,
+                    zIndex: 2, // Ensure cards are on top
+                    border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`, // Add subtle border for better definition
+                    ':hover': {
+                      transform: 'translateY(-5px)',
+                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)', // Increase hover shadow
+                    },
+                  }} 
                 >
                   <Avatar
                     src={t.avatar}
@@ -139,8 +164,9 @@ const TestimonialsSection = () => {
                     sx={{
                       fontStyle: 'italic',
                       mb: SPACING.small,
-                      color: theme.palette.text.secondary,
+                      color: 'white', // Ensure testimonial content is white for contrast
                       textAlign: 'center',
+                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)', // Add subtle shadow to testimonial text
                     }}
                   >
                     "{t.content}"
@@ -148,9 +174,10 @@ const TestimonialsSection = () => {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: theme.palette.text.secondary,
+                      color: 'white', // Ensure role is white for contrast
                       textAlign: 'center',
                       display: 'block',
+                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)', // Add subtle shadow to role text
                     }}
                   >
                     {t.role}

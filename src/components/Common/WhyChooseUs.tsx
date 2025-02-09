@@ -1,7 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react'; // Import useState and useEffect
-import { Box, Container, Typography, List, ListItem, ListItemIcon, useTheme, Button, Grid, alpha } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Container,
+  Typography,
+  List,
+  ListItem,
+  Button,
+  useTheme,
+  alpha,
+  Grid,
+} from '@mui/material';
 import { motion } from 'framer-motion';
 import { CheckCircle, Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-react';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
@@ -13,12 +23,12 @@ const WhyChooseUs = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const imageUrl = '/images/istockphoto-globe.jpg';
 
-    useEffect(() => {
-        const img = new Image();
-        img.src = imageUrl;
-        img.onload = () => setImageLoaded(true);
-        img.onerror = () => setImageLoaded(false); // Handle errors
-      }, [imageUrl]);
+  useEffect(() => {
+    const img = new Image();
+    img.src = imageUrl;
+    img.onload = () => setImageLoaded(true);
+    img.onerror = () => setImageLoaded(false);
+  }, [imageUrl]);
 
   // Benefit-oriented reasons
   const reasons = [
@@ -66,7 +76,7 @@ const WhyChooseUs = () => {
         overflow: 'hidden',
       }}
     >
-       {/* Blurred Background Image (if loaded) */}
+      {/* Blurred Background Image (if loaded) */}
       {imageLoaded && (
         <Box
           sx={{
@@ -78,7 +88,7 @@ const WhyChooseUs = () => {
             backgroundImage: `url(${imageUrl})`, // Apply image here
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            filter: 'blur(8px)', // Add blur
+            filter: 'blur(12px)', // Increase blur intensity
             zIndex: 0, // Below the overlay
           }}
         />
@@ -92,12 +102,12 @@ const WhyChooseUs = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: alpha(theme.palette.primary.dark, 0.7),
+            backgroundColor: alpha(theme.palette.primary.dark, 0.75), // Increase opacity
             zIndex: 1,
           }}
         />
       )}
-      <Container maxWidth="lg" sx={{position: 'relative', zIndex: 2}}>
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
         <Typography
           variant="h2"
           component="h2"
@@ -108,8 +118,8 @@ const WhyChooseUs = () => {
             mb: SPACING.medium,
             fontWeight: 700,
             WebkitTextFillColor: 'white', // For Safari
-            WebkitTextStroke: imageLoaded ? '1px rgba(0, 0, 0, 0.3)' : 'none', // Stroke only if image loaded
-            textShadow: imageLoaded ? '0 2px 4px rgba(0, 0, 0, 0.5)' : 'none' // Add text shadow
+            WebkitTextStroke: imageLoaded ? '1px rgba(0, 0, 0, 0.5)' : 'none', // Stroke only if image loaded
+            textShadow: imageLoaded ? '0 4px 8px rgba(0, 0, 0, 0.7)' : 'none', // Increase shadow intensity
           }}
         >
           Why Partner with Us?
@@ -138,10 +148,10 @@ const WhyChooseUs = () => {
                   sx={{
                     p: SPACING.medium,
                     borderRadius: 'md',
-                    boxShadow: theme.shadows[2],
-                    backgroundColor: theme.palette.background.paper,
-                    height: '100%',     // Fill the available height
-                    minHeight: 300,     // Ensure a consistent minimum height regardless of content
+                    boxShadow: theme.shadows[4], // Increase shadow intensity
+                    backgroundColor: alpha(theme.palette.background.paper, 0.95), // Slightly lighter background for better contrast
+                    height: '100%', // Fill the available height
+                    minHeight: 300, // Ensure a consistent minimum height regardless of content
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'flex-start',

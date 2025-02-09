@@ -1,4 +1,3 @@
-// TechCard.tsx
 'use client';
 
 import React, { ReactElement, ReactNode, useRef } from 'react';
@@ -13,9 +12,10 @@ export interface TechCardProps {
   color?: string;
   index?: number;
   floatingVariants?: any;
-  textColor?: string; // Not used currently, but you might need it later
+  textColor?: string; 
   children?: ReactNode;
   whileHover?: { scale: number };
+  sx?: any; // Add sx prop to TechCardProps
 }
 
 const StyledTechCard = styled(motion.div)<{ color?: string }>(({ theme, color = 'transparent' }) => ({ // Default color is transparent
@@ -50,6 +50,7 @@ const TechCard: React.FC<TechCardProps> = ({
   textColor, // Not used currently
   children,
   whileHover = { scale: 1.05 },
+  sx, // Add sx prop to component
 }) => {
   const theme = useTheme();
   const ref = useRef<HTMLDivElement>(null);
@@ -64,6 +65,7 @@ const TechCard: React.FC<TechCardProps> = ({
       transition={{ delay: index * 0.08, type: 'spring', stiffness: 80, damping: 12 }}
       whileHover="hover"
       whileTap={{ scale: 0.98 }}
+      sx={sx} // Apply sx prop to the root element
     >
       {icon && (
         <motion.div

@@ -1,6 +1,16 @@
-// ContactPage.js (or your component file)
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Typography, Button, useTheme, alpha, Grid } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  useTheme,
+  alpha,
+  Grid,
+  Container,
+  useMediaQuery,
+} from '@mui/material';
 import { motion } from 'framer-motion';
 import { SiAmazonaws, SiMicrosoftazure, SiGooglecloud, SiKubernetes, SiNvidia } from 'react-icons/si';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
@@ -19,7 +29,7 @@ export const HeroSection = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const imageUrl = '/images/istockphoto-realhero.jpg';
+  const imageUrl = '/images/istockphoto-realhero.jpg'; // Replace with your actual image URL
 
   useEffect(() => {
     const img = new Image();
@@ -27,7 +37,6 @@ export const HeroSection = () => {
     img.onload = () => setImageLoaded(true);
     img.onerror = () => setImageLoaded(false);
   }, [imageUrl]);
-
 
   return (
     <PageHeader
@@ -42,7 +51,7 @@ export const HeroSection = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        '&::before': {  //  <--  Overlay as a pseudo-element
+        '&::before': {
           content: '""',
           position: 'absolute',
           top: 0,
@@ -50,9 +59,9 @@ export const HeroSection = () => {
           width: '100%',
           height: '100%',
           backgroundColor: imageLoaded
-            ? alpha(theme.palette.primary.dark, 0.7) //  <--  Adjust opacity here
-            : theme.palette.primary.dark,
-            backdropFilter: imageLoaded ? 'blur(4px)' : 'none', // Optional blur
+            ? alpha(theme.palette.primary.dark, 0.6) // Increased opacity for better contrast
+            : 'transparent', // Remove placeholder color for better initial UX
+          backdropFilter: imageLoaded ? 'blur(4px)' : 'none', // Optional blur
         },
         '@media (max-width: 600px)': {
           minHeight: '400px',
@@ -60,7 +69,7 @@ export const HeroSection = () => {
         },
       }}
     >
-      <Container maxWidth="md" sx={{ py: 8, position: 'relative', zIndex: 2 }}>  {/* zIndex: 2 */}
+      <Container maxWidth="md" sx={{ py: 8, position: 'relative', zIndex: 2 }}>
         <Typography
           variant="h2"
           component="h1"
@@ -70,9 +79,9 @@ export const HeroSection = () => {
           sx={{
             fontSize: { xs: '2.25rem', sm: '3rem', md: '3.5rem' },
             lineHeight: 1.2,
-            textShadow: imageLoaded ? '0 2px 4px rgba(0, 0, 0, 0.5)' : 'none', //  <-- Text shadow
+            textShadow: imageLoaded ? '0 2px 4px rgba(0, 0, 0, 0.7)' : 'none', // Increased text shadow
             WebkitTextFillColor: 'white',
-            WebkitTextStroke: imageLoaded ? '1px rgba(0, 0, 0, 0.3)' : 'none',
+            WebkitTextStroke: imageLoaded ? '1px rgba(0, 0, 0, 0.5)' : 'none', // Increased stroke width
           }}
         >
           Transform Your Startup with Smart Cloud Solutions
@@ -116,8 +125,9 @@ export const HeroSection = () => {
         </Box>
 
         {/* Tech Logos Section Updated */}
-        <Box sx={{ mt: 8,  p: 3, borderRadius: 2 }}>
-          <Typography variant="body2" color="white" textAlign="center" mb={2}  sx={{
+        <Box sx={{ mt: 8, p: 3, borderRadius: 2, backgroundColor: alpha(theme.palette.background.paper, 0.7) }}> 
+          {/* Added a subtle background for better contrast */}
+          <Typography variant="body2" color="white" textAlign="center" mb={2} sx={{
             textShadow: imageLoaded ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none', // Text Shadow
           }}>
             Trusted by startups using:
