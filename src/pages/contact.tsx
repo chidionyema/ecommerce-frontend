@@ -435,8 +435,22 @@ const Contact: React.FC = () => {
 
 
         {/* Enhanced FAQ Section */}
-        <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' } }}>
-          <Typography variant="h2" component="h2" sx={{
+     
+        <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3,
+                p: { xs: 2, md: 3 },
+                borderRadius: 2,
+                backgroundColor: navBackgroundColor,
+                boxShadow: theme.shadows[3],
+                textAlign: { xs: 'center', md: 'left' },
+              }}
+            >
+
+
+<Typography variant="h2" component="h2" sx={{
             mb: 6,
             textAlign: { xs: 'center', md: 'center' },
             fontWeight: 800,
@@ -447,18 +461,6 @@ const Contact: React.FC = () => {
             Frequently Asked Questions
           </Typography>
 
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 3,
-              p: { xs: 2, md: 3 },
-              borderRadius: 2,
-              backgroundColor: navBackgroundColor,
-              boxShadow: theme.shadows[3],
-              textAlign: { xs: 'center', md: 'left' },
-            }}
-          >
             <GoldCard sx={{
               p: { xs: 3, md: 4 },
               borderRadius: 4,
@@ -520,7 +522,7 @@ const Contact: React.FC = () => {
               ))}
             </GoldCard>
           </Box>
-        </Container>
+      
 
         <BackToTopButton />
       </ConsistentPageLayout>
