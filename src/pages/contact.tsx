@@ -141,8 +141,8 @@ const Contact: React.FC = () => {
         subtitle="We’ll be in touch shortly."
       >
         <Box sx={{ mt: 4 }}>
-          <Typography 
-            variant="body1" 
+          <Typography
+            variant="body1"
             role="alert"
             aria-live="assertive"
             sx={{
@@ -201,27 +201,31 @@ const Contact: React.FC = () => {
       />
       <ConsistentPageLayout>
         <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 4, md: 6 } }}>
-          <Box sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' },
-            gap: { xs: 4, md: 6 },
-            width: '100%',
-            maxWidth: 1400,
-            mx: 'auto',
-            py: { xs: 3, md: 5 },
-          }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' },
+              gap: { xs: 4, md: 6 },
+              width: '100%',
+              maxWidth: 1400,
+              mx: 'auto',
+              py: { xs: 3, md: 5 },
+            }}
+          >
             {/* Contact Information Section */}
-            <Box sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 3,
-              p: { xs: 2, md: 3 },
-              borderRadius: 2,
-              backgroundColor: navBackgroundColor,
-              boxShadow: theme.shadows[3],
-              textAlign: { xs: 'center', md: 'left' },
-            }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3,
+                p: { xs: 2, md: 3 },
+                borderRadius: 2,
+                backgroundColor: navBackgroundColor,
+                boxShadow: theme.shadows[3],
+                textAlign: { xs: 'center', md: 'left' },
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' } }}>
                 <Headset sx={{ fontSize: 40, color: theme.palette.secondary.main, mr: 2 }} />
                 <Typography
                   variant="h4"
@@ -246,24 +250,53 @@ const Contact: React.FC = () => {
                 We’d love to hear about your projects and challenges. Contact us to explore how our tailored tech solutions can accelerate your business.
               </Typography>
               <Divider sx={{ my: 2, borderColor: alpha(theme.palette.divider, 0.2) }} />
+              <List>
+                <ListItem>
+                  <ListItemIcon>
+                    <Phone sx={{ color: theme.palette.text.secondary }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="+1 (555) 123-4567"
+                    primaryTypographyProps={{
+                      sx: {
+                        color: theme.palette.text.primary,
+                        fontWeight: 500
+                      }
+                    }}
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon>
+                    <Email sx={{ color: theme.palette.text.secondary }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="contact@techsolutions.com"
+                    primaryTypographyProps={{
+                      sx: {
+                        color: theme.palette.text.primary,
+                        fontWeight: 500
+                      }
+                    }}
+                  />
+                </ListItem>
+              </List>
             </Box>
 
             {/* Contact Form Section */}
-            <Box sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%',
-              width: '100%',
-            }}>
-              <GoldCard component="form" onSubmit={handleSubmit} sx={{
-                p: { xs: 4, sm: 5, md: 6 },
-                borderRadius: 4,
-                width: '100%',
-                height: 'auto',
-                backgroundColor: alpha(theme.palette.background.paper, 0.9),
-                boxShadow: theme.shadows[3],
-              }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' } }}>
+              <GoldCard
+                component="form"
+                onSubmit={handleSubmit}
+                sx={{
+                  p: { xs: 4, sm: 5, md: 6 },
+                  borderRadius: 4,
+                  width: '100%',
+                  height: 'auto',
+                  backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                  boxShadow: theme.shadows[3],
+                  textAlign: { xs: 'center', md: 'left' }, // Added for mobile centering
+                }}
+              >
                 <Typography
                   variant="h4"
                   component="h1"
@@ -277,80 +310,150 @@ const Contact: React.FC = () => {
                   Get a Custom Tech Roadmap in 24 Hours
                 </Typography>
                 <Stack spacing={4} sx={{ width: '100%' }}>
-                  <TextField fullWidth label="Full Name *" name="name" value={formData.name} onChange={handleInputChange} error={!!errors.name} helperText={errors.name} sx={textFieldStyles} InputProps={{
-                    startAdornment: <InputAdornment position="start"><Person sx={{ color: theme.palette.text.secondary }} /></InputAdornment>,
-                  }} />
+                  <TextField
+                    fullWidth
+                    label="Full Name *"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    error={!!errors.name}
+                    helperText={errors.name}
+                    sx={textFieldStyles}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Person sx={{ color: theme.palette.text.secondary }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
 
-                  <TextField fullWidth label="Email *" name="email" value={formData.email} onChange={handleInputChange} error={!!errors.email} helperText={errors.email} sx={textFieldStyles} InputProps={{
-                    startAdornment: <InputAdornment position="start"><Email sx={{ color: theme.palette.text.secondary }} /></InputAdornment>,
-                  }} />
+                  <TextField
+                    fullWidth
+                    label="Email *"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                    sx={textFieldStyles}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Email sx={{ color: theme.palette.text.secondary }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
 
-                  <TextField fullWidth label="Phone Number" name="phone" value={formData.phone} onChange={handleInputChange} error={!!errors.phone} helperText={errors.phone} sx={textFieldStyles} InputProps={{
-                    startAdornment: <InputAdornment position="start"><Phone sx={{ color: theme.palette.text.secondary }} /></InputAdornment>,
-                  }} />
+                  <TextField
+                    fullWidth
+                    label="Phone Number"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    error={!!errors.phone}
+                    helperText={errors.phone}
+                    sx={textFieldStyles}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Phone sx={{ color: theme.palette.text.secondary }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
 
-                  <TextField fullWidth label="Message" name="message" multiline rows={4} value={formData.message} onChange={handleInputChange} error={!!errors.message} helperText={errors.message || `${formData.message?.length || 0}/500`} sx={{
-                    ...textFieldStyles,
-                    '& .MuiInputBase-root': {
-                      ...textFieldStyles['& .MuiInputBase-root'],
-                      height: { xs: '150px', md: '200px' },
-                    }
-                  }} InputProps={{
-                    startAdornment: <InputAdornment position="start"><ChatBubbleOutline sx={{ color: theme.palette.text.secondary }} /></InputAdornment>,
-                  }} />
+                  <TextField
+                    fullWidth
+                    label="Message"
+                    name="message"
+                    multiline
+                    rows={4}
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    error={!!errors.message}
+                    helperText={errors.message || `${formData.message?.length || 0}/500`}
+                    sx={{
+                      ...textFieldStyles,
+                      '& .MuiInputBase-root': {
+                        ...textFieldStyles['& .MuiInputBase-root'],
+                        height: { xs: '150px', md: '200px' },
+                      }
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <ChatBubbleOutline sx={{ color: theme.palette.text.secondary }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
 
-                  <Button type="submit" fullWidth size="large" variant="contained" color="secondary" disabled={loading} sx={{
-                    py: 2.5,
-                    fontWeight: 'bold',
-                    fontSize: '1.2rem',
-                    textTransform: 'none',
-                    borderRadius: 2,
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      backgroundColor: theme.palette.secondary.dark,
-                    },
-                  }}>
-                    {loading ? <CircularProgress size={24} color="inherit" /> : 'Send Inquiry'}
+                  <Button
+                    type="submit"
+                    fullWidth
+                    size="large"
+                    variant="contained"
+                    color="secondary"
+                    disabled={loading}
+                    sx={{
+                      py: 2.5,
+                      fontWeight: 'bold',
+                      fontSize: '1.2rem',
+                      textTransform: 'none',
+                      borderRadius: 2,
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        backgroundColor: theme.palette.secondary.dark,
+                      },
+                    }}
+                  >
+                    {loading ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : (
+                      'Send Inquiry'
+                    )}
                   </Button>
                 </Stack>
               </GoldCard>
             </Box>
           </Box>
+        </Container>
 
-          {/* Enhanced FAQ Section */}
-          <Container maxWidth="lg" sx={{
+
+        {/* Enhanced FAQ Section */}
+        <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' } }}>
+          <Typography variant="h2" component="h2" sx={{
+            mb: 6,
+            textAlign: { xs: 'center', md: 'center' }, // Added to ensure heading is centered on mobile
+            fontWeight: 800,
+            color: theme.palette.primary.main,
+            fontSize: { xs: '2.5rem', md: '3rem' },
+            letterSpacing: '-0.5px'
+          }}>
+            Frequently Asked Questions
+          </Typography>
+
+          <Box sx={{
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center',
-            py: 8,
+            width: '100%'
           }}>
-            <Typography variant="h2" component="h2" sx={{
-              mb: 6,
-              textAlign: 'center',
-              fontWeight: 800,
-              color: theme.palette.primary.main,
-              fontSize: { xs: '2.5rem', md: '3rem' },
-              letterSpacing: '-0.5px'
+            <GoldCard sx={{
+              p: { xs: 3, md: 4 },
+              borderRadius: 4,
+              width: '100%',
+              maxWidth: 1000,
+              backgroundColor: alpha(theme.palette.background.paper, 0.95),
+              boxShadow: theme.shadows[8],
+              textAlign: { xs: 'center', md: 'left' }, // Added for mobile centering
             }}>
-              Frequently Asked Questions
-            </Typography>
-
-            <Box sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              width: '100%'
-            }}>
-              <GoldCard sx={{
-                p: { xs: 3, md: 4 },
-                borderRadius: 4,
-                width: '100%',
-                maxWidth: 1000,
-                backgroundColor: alpha(theme.palette.background.paper, 0.95),
-                boxShadow: theme.shadows[8]
-              }}>
-                {faqItems.map((item, index) => (
-                  <Accordion key={index} sx={{
+              {faqItems.map((item, index) => (
+                <Accordion
+                  key={index}
+                  sx={{
                     mb: 3,
                     boxShadow: 'none',
                     '&:before': { display: 'none' },
@@ -359,11 +462,14 @@ const Contact: React.FC = () => {
                     '&:hover': {
                       transform: 'translateY(-2px)'
                     }
-                  }}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon sx={{
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{
                       color: theme.palette.secondary.main,
                       fontSize: '2rem'
-                    }} />} sx={{
+                    }} />}
+                    sx={{
                       minHeight: 72,
                       padding: { xs: 2, md: 3 },
                       '& .MuiAccordionSummary-content': {
@@ -372,31 +478,33 @@ const Contact: React.FC = () => {
                       },
                       backgroundColor: alpha(theme.palette.primary.light, 0.1),
                       borderRadius: 2,
+                    }}
+                  >
+                    <Typography variant="h5" sx={{
+                      fontWeight: 600,
+                      color: theme.palette.text.primary,
+                      fontSize: { xs: '1.2rem', md: '1.4rem' }
                     }}>
-                      <Typography variant="h5" sx={{
-                        fontWeight: 600,
-                        color: theme.palette.text.primary,
-                        fontSize: { xs: '1.2rem', md: '1.4rem' }
-                      }}>
-                        {item.question}
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails sx={{ p: { xs: 2, md: 3 } }}>
-                      <Typography variant="body1" sx={{
-                        color: theme.palette.text.secondary,
-                        lineHeight: 1.7,
-                        pl: 2,
-                        fontSize: { xs: '1rem', md: '1.1rem' }
-                      }}>
-                        {item.answer}
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                ))}
-              </GoldCard>
-            </Box>
-          </Container>
+                      {item.question}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ p: { xs: 2, md: 3 } }}>
+                    <Typography variant="body1" sx={{
+                      color: theme.palette.text.secondary,
+                      lineHeight: 1.7,
+                      pl: 2,
+                      fontSize: { xs: '1rem', md: '1.1rem' }
+                    }}>
+                      {item.answer}
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+              ))}
+            </GoldCard>
+          </Box>
         </Container>
+
+        <BackToTopButton />
       </ConsistentPageLayout>
     </>
   );
