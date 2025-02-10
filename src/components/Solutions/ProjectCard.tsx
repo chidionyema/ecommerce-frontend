@@ -41,7 +41,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
 
   return (
     <Box sx={{ m: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Box sx={{  m: 1, width: CARD_WIDTH, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Box sx={{ m: 1, width: CARD_WIDTH, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <GoldCard
           href={`/projects/${project.id}`}
           sx={{
@@ -67,13 +67,14 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                 animation: `${shineAnimation} 1.5s forwards`,
               },
             },
+            m: 2, // Adds margin around the card for consistency
             ...sx,
           }}
         >
           {/* Header Section with Image */}
           <Box
             sx={{
-              height: '35%', // Reduced to 35% for header
+              height: '35%',
               width: '100%',
               borderRadius: 1,
               overflow: 'hidden',
@@ -129,14 +130,16 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
             </Box>
           </Box>
 
-          <CardContent sx={{
-            px: 0, 
-            pb: 0, 
-            height: '65%', // Increased content height to 65%
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'space-between'
-          }}>
+          <CardContent
+            sx={{
+              px: 2, // Padding for content
+              pb: 2, // Bottom padding for content spacing
+              height: '65%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
             <Box sx={{ mb: SPACING.small }}>
               <Typography variant="h5" component="h2" fontWeight={800} gutterBottom sx={{ fontSize: '2rem' }}>
                 {project.name}
@@ -209,13 +212,16 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
               <Typography variant="body2">{truncatedDescription}</Typography>
             </Box>
 
-            <Box sx={{ 
-              pt: SPACING.medium,
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'flex-end',
-              marginTop: 'auto'
-            }}>
+            {/* Button Section */}
+            <Box
+              sx={{
+                pt: SPACING.medium,
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginTop: 'auto', // Ensures the button is at the bottom
+              }}
+            >
               <Button
                 component={NextLink}
                 href={`/projects/${project.id}`}
@@ -226,6 +232,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                   py: 1.5,
                   fontWeight: 700,
                   borderRadius: 2,
+                  px: 3, // Horizontal padding
                   '&:hover': {
                     bgcolor: 'primary.dark',
                     transform: 'scale(1.03)',
