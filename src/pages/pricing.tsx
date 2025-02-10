@@ -24,7 +24,6 @@ import {
   Work as WorkIcon,
   Group as GroupIcon,
   Info as InfoIcon,
-  Headset,
 } from '@mui/icons-material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import PageSection from '../components/PageSection';

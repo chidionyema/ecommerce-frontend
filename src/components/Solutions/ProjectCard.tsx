@@ -73,7 +73,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
           {/* Header Section with Image */}
           <Box
             sx={{
-              height: '55%', // Reduced from 60% to 55%
+              height: '35%', // Reduced to 35% for header
               width: '100%',
               borderRadius: 1,
               overflow: 'hidden',
@@ -129,10 +129,10 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
             </Box>
           </Box>
 
-          <CardContent sx={{ 
+          <CardContent sx={{
             px: 0, 
             pb: 0, 
-            height: '45%', // Increased from 40% to 45%
+            height: '65%', // Increased content height to 65%
             display: 'flex', 
             flexDirection: 'column',
             justifyContent: 'space-between'
