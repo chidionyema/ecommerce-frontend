@@ -159,11 +159,13 @@ const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({
           border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
         }}
       >
-        <Icon sx={{
-          fontSize: 24,
-          color: theme.palette.primary.main,
-          transform: 'rotate(-10deg)',
-        }} />
+        <Icon
+          sx={{
+            fontSize: 24,
+            color: theme.palette.primary.main,
+            transform: 'rotate(-10deg)',
+          }}
+        />
       </Box>
       <Typography variant="body2" color="text.secondary">
         {text}
@@ -388,34 +390,70 @@ const PricingPage: React.FC = () => {
 
       {/* FAQ SECTION */}
       <PageSection>
-        <Typography variant="h3" textAlign="center" gutterBottom>
-          {pricingPageContent.faqSection.heading}
-        </Typography>
-        <Box maxWidth={800} mx="auto">
-          {pricingPageContent.faqSection.items.map((faq, index) => (
-            <Accordion
-              key={index}
-              sx={{
-                transition: 'all 0.3s ease',
-                '&:hover': { boxShadow: theme.shadows[2] },
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls={`faq-content-${index}`}
-                id={`faq-header-${index}`}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+            p: { xs: 2, md: 3 },
+            borderRadius: 2,
+            backgroundColor: alpha(theme.palette.background.default, 0.7),
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: theme.shadows[3],
+          }}
+        >
+          <Typography
+            variant="h3"
+            textAlign="center"
+            gutterBottom
+            sx={{ color: theme.palette.text.primary }}
+          >
+            {pricingPageContent.faqSection.heading}
+          </Typography>
+          <GoldCard
+            sx={{
+              p: { xs: 3, md: 4 },
+              borderRadius: 4,
+              width: '100%',
+              maxWidth: 800,
+              backgroundColor: alpha(theme.palette.background.paper, 0.95),
+              boxShadow: theme.shadows[8],
+              textAlign: 'left',
+            }}
+          >
+            {pricingPageContent.faqSection.items.map((faq, index) => (
+              <Accordion
+                key={index}
                 sx={{
-                  transition: 'background-color 0.3s ease',
-                  '&:hover': { backgroundColor: alpha(theme.palette.primary.light, 0.2) },
+                  mb: 3,
+                  boxShadow: 'none',
+                  '&:before': { display: 'none' },
+                  backgroundColor: 'transparent',
                 }}
               >
-                <Typography variant="h6">{faq.question}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography variant="body2">{faq.answer}</Typography>
-              </AccordionDetails>
-            </Accordion>
-          ))}
+                <AccordionSummary
+                  expandIcon={
+                    <ExpandMoreIcon
+                      sx={{ color: theme.palette.secondary.main, fontSize: '2rem' }}
+                    />
+                  }
+                  sx={{
+                    minHeight: 72,
+                    padding: { xs: 2, md: 3 },
+                    '& .MuiAccordionSummary-content': { my: 1, alignItems: 'center' },
+                    backgroundColor: alpha(theme.palette.primary.light, 0.1),
+                    borderRadius: 2,
+                  }}
+                >
+                  <Typography variant="h6">{faq.question}</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ p: { xs: 2, md: 3 } }}>
+                  <Typography variant="body2">{faq.answer}</Typography>
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </GoldCard>
         </Box>
       </PageSection>
 

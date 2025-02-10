@@ -48,7 +48,7 @@ const ServicesGrid = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const imageUrl = '/images/istockphoto-todo.jpg';
+  const imageUrl = '/images/istockphoto-glisten.jpg';
 
   useEffect(() => {
     const img = new Image();
@@ -70,6 +70,37 @@ const ServicesGrid = () => {
         overflow: 'hidden',
       }}
     >
+      {/* Blurred Background Image (if loaded) */}
+      {imageLoaded && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundImage: `url(${imageUrl})`, // Apply image here
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(12px)', // Increase blur intensity
+            zIndex: 0, // Below the overlay
+          }}
+        />
+      )}
+      {/* Overlay (if loaded) */}
+      {imageLoaded && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: alpha(theme.palette.primary.dark, 0.4), // Lighter overlay to keep the background visible
+            zIndex: 1,
+          }}
+        />
+      )}
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
         <Typography
           variant="h2"
@@ -79,7 +110,7 @@ const ServicesGrid = () => {
             ...styles.pageTitle,
             color: 'white', // Make the title white
             mb: SPACING.large,
-            fontWeight: 'bold',
+            fontWeight: 700,
             textShadow: '0 4px 8px rgba(0, 0, 0, 0.8)', // Strong shadow for better legibility
           }}
         >
