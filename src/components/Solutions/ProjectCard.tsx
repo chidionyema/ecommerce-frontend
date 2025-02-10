@@ -73,7 +73,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
           {/* Header Section with Image */}
           <Box
             sx={{
-              height: '60%', // Increased header height to show more of the image
+              height: '55%', // Reduced from 60% to 55%
               width: '100%',
               borderRadius: 1,
               overflow: 'hidden',
@@ -81,7 +81,6 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
               mb: SPACING.medium,
             }}
           >
-            {/* Image in Header Section */}
             {imageLoaded && (
               <Box
                 component="img"
@@ -94,7 +93,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                   position: 'absolute',
                   top: 0,
                   left: 0,
-                  zIndex: 0, // Ensure it stays behind the content
+                  zIndex: 0,
                 }}
               />
             )}
@@ -108,12 +107,12 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
-                backgroundColor: alpha(theme.palette.background.paper, 0.7), // Added opacity for contrast
+                backgroundColor: alpha(theme.palette.background.paper, 0.7),
                 px: 2,
                 py: 1,
                 borderRadius: 4,
                 boxShadow: theme.shadows[2],
-                zIndex: 1, // Above the background image
+                zIndex: 1,
               }}
             >
               {project.icon ? (
@@ -130,9 +129,15 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
             </Box>
           </Box>
 
-          <CardContent sx={{ px: 0, pb: 0, height: '40%', display: 'flex', flexDirection: 'column' }}>
+          <CardContent sx={{ 
+            px: 0, 
+            pb: 0, 
+            height: '45%', // Increased from 40% to 45%
+            display: 'flex', 
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}>
             <Box sx={{ mb: SPACING.small }}>
-              {/* Increased header size */}
               <Typography variant="h5" component="h2" fontWeight={800} gutterBottom sx={{ fontSize: '2rem' }}>
                 {project.name}
               </Typography>
@@ -153,7 +158,6 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
               )}
             </Box>
 
-            {/* Technology Icons */}
             {project.technologies && (
               <Box sx={{ mb: SPACING.medium }}>
                 <Typography variant="caption" fontWeight={700} display="block" mb={1}>
@@ -189,10 +193,9 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
               </Box>
             )}
 
-            {/* Description */}
             <Box
               sx={{
-                flex: 1,
+                height: 80, // Fixed height for description scroll area
                 overflowY: 'auto',
                 pr: 1,
                 mb: SPACING.medium,
@@ -205,30 +208,34 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
             >
               <Typography variant="body2">{truncatedDescription}</Typography>
             </Box>
-          </CardContent>
 
-          {/* CTA Button - Positioned at the bottom */}
-          <Box sx={{ pt: SPACING.medium }}>
-            <Button
-              component={NextLink}
-              href={`/projects/${project.id}`}
-              fullWidth
-              endIcon={<ArrowRightAlt />}
-              sx={{
-                bgcolor: 'primary.main',
-                color: 'primary.contrastText',
-                py: 1.5,
-                fontWeight: 700,
-                borderRadius: 2,
-                '&:hover': {
-                  bgcolor: 'primary.dark',
-                  transform: 'scale(1.03)',
-                },
-              }}
-            >
-              Explore Case Study
-            </Button>
-          </Box>
+            <Box sx={{ 
+              pt: SPACING.medium,
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginTop: 'auto'
+            }}>
+              <Button
+                component={NextLink}
+                href={`/projects/${project.id}`}
+                endIcon={<ArrowRightAlt />}
+                sx={{
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
+                  py: 1.5,
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                    transform: 'scale(1.03)',
+                  },
+                }}
+              >
+                Explore Case Study
+              </Button>
+            </Box>
+          </CardContent>
         </GoldCard>
       </Box>
     </Box>

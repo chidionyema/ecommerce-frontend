@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useCallback } from 'react';
 import {
   useTheme,
@@ -8,35 +10,77 @@ import {
   Typography,
   InputAdornment,
   Container,
-  Grid,
+  Divider,
+  Fab,
+  Stack,
   alpha,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Divider,
-  Fab,
-  Stack,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from '@mui/material';
 import { Person, Email, Phone, ChatBubbleOutline, Headset, KeyboardArrowUp } from '@mui/icons-material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useRouter } from 'next/navigation';
 import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import GoldCard from '../components/GoldCard';
-import { getSharedStyles, SPACING } from '../utils/sharedStyles';
+import { getSharedStyles } from '../utils/sharedStyles';
+import * as yup from 'yup';
 
-// Define FormData interface
 interface FormData {
   name: string;
   email: string;
-  phone: string;
-  message: string;
+  phone?: string;  // Make phone optional
+  message?: string;  // Make message optional
 }
 
+const validationSchema: yup.ObjectSchema<FormData> = yup.object().shape({
+  name: yup.string()
+    .required('Name is required')
+    .min(2, 'Name must be at least 2 characters')
+    .max(100, 'Name cannot exceed 100 characters'),
+  email: yup.string()
+    .required('Email is required')
+    .email('Invalid email format'),
+  phone: yup.string()
+    .optional()  // No need to require phone
+    .matches(
+      /^(\+?\d{1,3}[- ]?)?\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}$/,
+      'Invalid phone number format (e.g. +1 555-123-4567)'
+    )
+    .max(20, 'Phone number cannot exceed 20 characters'),
+  message: yup.string()
+    .optional()  // No need to require message
+    .max(500, 'Message cannot exceed 500 characters'),
+});
+
+const faqItems = [
+  {
+    question: "What services do you offer?",
+    answer: "We provide comprehensive technology consulting services including digital transformation strategy, cloud solutions, software development, and IT infrastructure optimization."
+  },
+  {
+    question: "How quickly can I get a tech roadmap?",
+    answer: "We typically deliver initial roadmaps within 24-48 hours of receiving your project details. Complex projects may require additional time for thorough analysis."
+  },
+  {
+    question: "What industries do you specialize in?",
+    answer: "We have expertise across multiple sectors including healthcare, finance, e-commerce, and manufacturing. Our solutions are tailored to meet industry-specific challenges."
+  },
+  {
+    question: "What are your security standards?",
+    answer: "We adhere to ISO 27001 standards and implement end-to-end encryption for all client communications. Regular security audits ensure continuous protection of your data."
+  }
+];
+
 const Contact: React.FC = () => {
+  const router = useRouter();
   const theme = useTheme();
   const styles = getSharedStyles(theme);
-
-  // Extract background color from the theme for consistency
   const navBackgroundColor = alpha(theme.palette.background.default, 0.7);
 
   const [formData, setFormData] = useState<FormData>({
@@ -50,18 +94,43 @@ const Contact: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Form validation and submission logic
-  const handleSubmit = useCallback((event: React.FormEvent) => {
+  const handleSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
+    setErrors({});
 
-    // Simulate a form submission delay
-    setLoading(true);
+    try {
+      await validationSchema.validate(formData, { abortEarly: false });
+      setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true); // Show success page
-    }, 2000);
-  }, []);
+      setTimeout(() => {
+        setLoading(false);
+        setSuccess(true);
+        setFormData({ name: '', email: '', phone: '', message: '' });
+      }, 2000);
+
+    } catch (validationError: any) {
+      if (validationError instanceof yup.ValidationError) {
+        const validationErrors: Partial<Record<keyof FormData, string>> = {};
+        validationError.inner.forEach((err: yup.ValidationError) => {
+          if (err.path) {
+            validationErrors[err.path as keyof FormData] = err.message;
+          }
+        });
+        setErrors(validationErrors);
+      } else {
+        setErrors({ form: 'An unexpected error occurred. Please try again.' });
+        console.error("Form submission error:", validationError);
+      }
+    }
+  }, [formData]);
+
+  const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value,
+    }));
+  }, [setFormData]);
 
   if (success) {
     return (
@@ -72,13 +141,25 @@ const Contact: React.FC = () => {
         subtitle="We’ll be in touch shortly."
       >
         <Box sx={{ mt: 4 }}>
-          <Typography variant="body1" sx={{ mb: 3, color: theme.palette.primary.contrastText }}>
+          <Typography 
+            variant="body1" 
+            role="alert"
+            aria-live="assertive"
+            sx={{
+              mb: 3,
+              color: theme.palette.success.contrastText,
+              backgroundColor: theme.palette.success.main,
+              p: 3,
+              borderRadius: 2,
+              textAlign: 'center'
+            }}
+          >
             Thank you for your message. We have received it and will get back to you as soon as possible.
           </Typography>
           <Button
             variant="contained"
             color="secondary"
-            onClick={() => (window.location.href = '/')}
+            onClick={() => router.push('/')}
             sx={{
               textTransform: 'none',
               fontWeight: 'bold',
@@ -96,6 +177,20 @@ const Contact: React.FC = () => {
       </ConsistentPageLayout>
     );
   }
+
+  const textFieldStyles = {
+    '& .MuiInputBase-root': {
+      borderRadius: 2,
+      height: { xs: '54px', md: '60px' },
+      backgroundColor: 'white',
+      color: theme.palette.text.primary,
+      transition: theme.transitions.create(['border-color', 'box-shadow']),
+    },
+    '& .Mui-focused': {
+      borderColor: `${theme.palette.secondary.main} !important`,
+      boxShadow: `0 0 0 2px ${alpha(theme.palette.secondary.main, 0.2)}`,
+    },
+  };
 
   return (
     <>
@@ -117,7 +212,7 @@ const Contact: React.FC = () => {
               py: { xs: 3, md: 5 },
             }}
           >
-            {/* Left-side Contact Information */}
+            {/* Contact Information Section */}
             <Box
               sx={{
                 display: 'flex',
@@ -125,7 +220,7 @@ const Contact: React.FC = () => {
                 gap: 3,
                 p: { xs: 2, md: 3 },
                 borderRadius: 2,
-                backgroundColor: navBackgroundColor, // Consistent with nav background color
+                backgroundColor: navBackgroundColor,
                 boxShadow: theme.shadows[3],
                 textAlign: { xs: 'center', md: 'left' },
               }}
@@ -154,30 +249,45 @@ const Contact: React.FC = () => {
               >
                 We’d love to hear about your projects and challenges. Contact us to explore how our tailored tech solutions can accelerate your business.
               </Typography>
-              <Divider sx={{ my: 2, borderColor: theme.palette.divider }} />
-              {/* Contact list items */}
+              <Divider sx={{ my: 2, borderColor: alpha(theme.palette.divider, 0.2) }} />
               <List>
                 <ListItem>
                   <ListItemIcon>
                     <Phone sx={{ color: theme.palette.text.secondary }} />
                   </ListItemIcon>
-                  <ListItemText primary="+1 (555) 123-4567" />
+                  <ListItemText
+                    primary="+1 (555) 123-4567"
+                    primaryTypographyProps={{ 
+                      sx: { 
+                        color: theme.palette.text.primary,
+                        fontWeight: 500 
+                      } 
+                    }}
+                  />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
                     <Email sx={{ color: theme.palette.text.secondary }} />
                   </ListItemIcon>
-                  <ListItemText primary="contact@glustack.com" />
+                  <ListItemText
+                    primary="contact@techsolutions.com"
+                    primaryTypographyProps={{ 
+                      sx: { 
+                        color: theme.palette.text.primary,
+                        fontWeight: 500 
+                      } 
+                    }}
+                  />
                 </ListItem>
               </List>
             </Box>
 
-            {/* Right-side Contact Form */}
+            {/* Contact Form Section */}
             <Box
               sx={{
                 display: 'flex',
                 justifyContent: 'center',
-                alignItems: 'center', // Ensures the form is centered vertically
+                alignItems: 'center',
                 height: '100%',
                 width: '100%',
               }}
@@ -190,17 +300,13 @@ const Contact: React.FC = () => {
                   borderRadius: 4,
                   width: '100%',
                   height: 'auto',
-                  overflow: 'visible',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: theme.palette.background.paper, // White background for the form container
+                  backgroundColor: alpha(theme.palette.background.paper, 0.9),
                   boxShadow: theme.shadows[3],
                 }}
               >
                 <Typography
                   variant="h4"
+                  component="h1"
                   align="center"
                   sx={{
                     fontWeight: 700,
@@ -211,24 +317,15 @@ const Contact: React.FC = () => {
                   Get a Custom Tech Roadmap in 24 Hours
                 </Typography>
                 <Stack spacing={4} sx={{ width: '100%' }}>
-                  {/* Form Fields with White Background */}
                   <TextField
                     fullWidth
                     label="Full Name *"
                     name="name"
-                    sx={{
-                      '& .MuiInputBase-root': {
-                        borderRadius: 2,
-                        height: { xs: '54px', md: '60px' },
-                        backgroundColor: theme.palette.background.paper, // White background for input fields
-                      },
-                      '& .Mui-focused .MuiInputBase-root': {
-                        backgroundColor: theme.palette.background.paper, // White background when focused
-                      },
-                      '& .Mui-focused': {
-                        borderColor: theme.palette.secondary.main,
-                      },
-                    }}
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    error={!!errors.name}
+                    helperText={errors.name}
+                    sx={textFieldStyles}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -237,23 +334,16 @@ const Contact: React.FC = () => {
                       ),
                     }}
                   />
+
                   <TextField
                     fullWidth
                     label="Email *"
                     name="email"
-                    sx={{
-                      '& .MuiInputBase-root': {
-                        borderRadius: 2,
-                        height: { xs: '54px', md: '60px' },
-                        backgroundColor: theme.palette.background.paper, // White background for input fields
-                      },
-                      '& .Mui-focused .MuiInputBase-root': {
-                        backgroundColor: theme.palette.background.paper, // White background when focused
-                      },
-                      '& .Mui-focused': {
-                        borderColor: theme.palette.secondary.main,
-                      },
-                    }}
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                    sx={textFieldStyles}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -262,23 +352,16 @@ const Contact: React.FC = () => {
                       ),
                     }}
                   />
+
                   <TextField
                     fullWidth
                     label="Phone Number"
                     name="phone"
-                    sx={{
-                      '& .MuiInputBase-root': {
-                        borderRadius: 2,
-                        height: { xs: '54px', md: '60px' },
-                        backgroundColor: theme.palette.background.paper, // White background for input fields
-                      },
-                      '& .Mui-focused .MuiInputBase-root': {
-                        backgroundColor: theme.palette.background.paper, // White background when focused
-                      },
-                      '& .Mui-focused': {
-                        borderColor: theme.palette.secondary.main,
-                      },
-                    }}
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    error={!!errors.phone}
+                    helperText={errors.phone}
+                    sx={textFieldStyles}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -287,24 +370,23 @@ const Contact: React.FC = () => {
                       ),
                     }}
                   />
+
                   <TextField
                     fullWidth
                     label="Message"
                     name="message"
                     multiline
                     rows={4}
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    error={!!errors.message}
+                    helperText={errors.message || `${formData.message?.length || 0}/500`}
                     sx={{
+                      ...textFieldStyles,
                       '& .MuiInputBase-root': {
-                        borderRadius: 2,
+                        ...textFieldStyles['& .MuiInputBase-root'],
                         height: { xs: '150px', md: '200px' },
-                        backgroundColor: theme.palette.background.paper, // White background for input fields
-                      },
-                      '& .Mui-focused .MuiInputBase-root': {
-                        backgroundColor: theme.palette.background.paper, // White background when focused
-                      },
-                      '& .Mui-focused': {
-                        borderColor: theme.palette.secondary.main,
-                      },
+                      }
                     }}
                     InputProps={{
                       startAdornment: (
@@ -314,6 +396,7 @@ const Contact: React.FC = () => {
                       ),
                     }}
                   />
+
                   <Button
                     type="submit"
                     fullWidth
@@ -345,12 +428,93 @@ const Contact: React.FC = () => {
             </Box>
           </Box>
         </Container>
+
+        {/* Enhanced FAQ Section */}
+        <Container maxWidth="lg" sx={{ py: 8, px: { xs: 2, sm: 4 } }}>
+          <Typography variant="h2" component="h2" sx={{ 
+            mb: 6, 
+            textAlign: 'center',
+            fontWeight: 800,
+            color: theme.palette.primary.main,
+            fontSize: { xs: '2.5rem', md: '3rem' },
+            letterSpacing: '-0.5px'
+          }}>
+            Frequently Asked Questions
+          </Typography>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center',
+            width: '100%'
+          }}>
+            <GoldCard sx={{ 
+              p: { xs: 3, md: 4 },
+              borderRadius: 4,
+              width: '100%',
+              maxWidth: 1000,
+              backgroundColor: alpha(theme.palette.background.paper, 0.95),
+              boxShadow: theme.shadows[8]
+            }}>
+              {faqItems.map((item, index) => (
+                <Accordion 
+                  key={index}
+                  sx={{
+                    mb: 3,
+                    boxShadow: 'none',
+                    '&:before': { display: 'none' },
+                    backgroundColor: 'transparent',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)'
+                    }
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ 
+                      color: theme.palette.secondary.main,
+                      fontSize: '2rem'
+                    }}/>}
+                    sx={{
+                      minHeight: 72,
+                      padding: { xs: 2, md: 3 },
+                      '& .MuiAccordionSummary-content': { 
+                        my: 1,
+                        alignItems: 'center'
+                      },
+                      backgroundColor: alpha(theme.palette.primary.light, 0.1),
+                      borderRadius: 2,
+                    }}
+                  >
+                    <Typography variant="h5" sx={{ 
+                      fontWeight: 600,
+                      color: theme.palette.text.primary,
+                      fontSize: { xs: '1.2rem', md: '1.4rem' }
+                    }}>
+                      {item.question}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ p: { xs: 2, md: 3 } }}>
+                    <Typography variant="body1" sx={{ 
+                      color: theme.palette.text.secondary,
+                      lineHeight: 1.7,
+                      pl: 2,
+                      fontSize: { xs: '1rem', md: '1.1rem' }
+                    }}>
+                      {item.answer}
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+              ))}
+            </GoldCard>
+          </Box>
+        </Container>
+
+        <BackToTopButton />
       </ConsistentPageLayout>
     </>
   );
 };
 
-// BackToTopButton with updated styling
 const BackToTopButton = () => {
   const theme = useTheme();
   return (
