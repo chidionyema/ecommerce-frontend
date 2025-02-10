@@ -141,8 +141,8 @@ const Contact: React.FC = () => {
         subtitle="We’ll be in touch shortly."
       >
         <Box sx={{ mt: 4 }}>
-          <Typography
-            variant="body1"
+          <Typography 
+            variant="body1" 
             role="alert"
             aria-live="assertive"
             sx={{
@@ -257,11 +257,11 @@ const Contact: React.FC = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary="+1 (555) 123-4567"
-                    primaryTypographyProps={{
-                      sx: {
+                    primaryTypographyProps={{ 
+                      sx: { 
                         color: theme.palette.text.primary,
-                        fontWeight: 500
-                      }
+                        fontWeight: 500 
+                      } 
                     }}
                   />
                 </ListItem>
@@ -271,18 +271,18 @@ const Contact: React.FC = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary="contact@techsolutions.com"
-                    primaryTypographyProps={{
-                      sx: {
+                    primaryTypographyProps={{ 
+                      sx: { 
                         color: theme.palette.text.primary,
-                        fontWeight: 500
-                      }
+                        fontWeight: 500 
+                      } 
                     }}
                   />
                 </ListItem>
               </List>
             </Box>
 
-            {/* Contact Form Section */}
+            {/* Contact Form Section */}  
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' } }}>
               <GoldCard
                 component="form"
@@ -294,7 +294,6 @@ const Contact: React.FC = () => {
                   height: 'auto',
                   backgroundColor: alpha(theme.palette.background.paper, 0.9),
                   boxShadow: theme.shadows[3],
-                  textAlign: { xs: 'center', md: 'left' }, // Added for mobile centering
                 }}
               >
                 <Typography
@@ -422,12 +421,12 @@ const Contact: React.FC = () => {
           </Box>
         </Container>
 
-
+       
         {/* Enhanced FAQ Section */}
         <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' } }}>
-          <Typography variant="h2" component="h2" sx={{
-            mb: 6,
-            textAlign: { xs: 'center', md: 'center' }, // Added to ensure heading is centered on mobile
+          <Typography variant="h2" component="h2" sx={{ 
+            mb: 6, 
+            textAlign: 'center',
             fontWeight: 800,
             color: theme.palette.primary.main,
             fontSize: { xs: '2.5rem', md: '3rem' },
@@ -435,23 +434,22 @@ const Contact: React.FC = () => {
           }}>
             Frequently Asked Questions
           </Typography>
-
-          <Box sx={{
-            display: 'flex',
+          
+          <Box sx={{ 
+            display: 'flex', 
             justifyContent: 'center',
             width: '100%'
           }}>
-            <GoldCard sx={{
+            <GoldCard sx={{ 
               p: { xs: 3, md: 4 },
               borderRadius: 4,
               width: '100%',
               maxWidth: 1000,
               backgroundColor: alpha(theme.palette.background.paper, 0.95),
-              boxShadow: theme.shadows[8],
-              textAlign: { xs: 'center', md: 'left' }, // Added for mobile centering
+              boxShadow: theme.shadows[8]
             }}>
               {faqItems.map((item, index) => (
-                <Accordion
+                <Accordion 
                   key={index}
                   sx={{
                     mb: 3,
@@ -465,14 +463,14 @@ const Contact: React.FC = () => {
                   }}
                 >
                   <AccordionSummary
-                    expandIcon={<ExpandMoreIcon sx={{
+                    expandIcon={<ExpandMoreIcon sx={{ 
                       color: theme.palette.secondary.main,
                       fontSize: '2rem'
-                    }} />}
+                    }}/>}
                     sx={{
                       minHeight: 72,
                       padding: { xs: 2, md: 3 },
-                      '& .MuiAccordionSummary-content': {
+                      '& .MuiAccordionSummary-content': { 
                         my: 1,
                         alignItems: 'center'
                       },
@@ -480,7 +478,7 @@ const Contact: React.FC = () => {
                       borderRadius: 2,
                     }}
                   >
-                    <Typography variant="h5" sx={{
+                    <Typography variant="h5" sx={{ 
                       fontWeight: 600,
                       color: theme.palette.text.primary,
                       fontSize: { xs: '1.2rem', md: '1.4rem' }
@@ -489,7 +487,7 @@ const Contact: React.FC = () => {
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails sx={{ p: { xs: 2, md: 3 } }}>
-                    <Typography variant="body1" sx={{
+                    <Typography variant="body1" sx={{ 
                       color: theme.palette.text.secondary,
                       lineHeight: 1.7,
                       pl: 2,

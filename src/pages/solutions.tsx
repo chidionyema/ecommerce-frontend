@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme, Typography, Grid, Box, Container } from '@mui/material';
+import { useTheme, Typography, Grid, Box, Container, useMediaQuery } from '@mui/material'; // Import useMediaQuery
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import ProjectCard from '../components/Solutions/ProjectCard';
 import { cvProjects } from '../data/cvProjects';
@@ -17,6 +17,7 @@ const Solutions: React.FC = () => {
   const renderProjectCard = (project: typeof cvProjects[0]) => (
     <ProjectCard project={project} />
   );
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Use useMediaQuery to detect mobile
 
   return (
     <ConsistentPageLayout
@@ -82,12 +83,11 @@ const Solutions: React.FC = () => {
               project && typeof project.id === 'string' && project.id.trim() !== ''
           )}
           renderItem={(project) => (
-            <Grid item sx={{ m: SPACING.medium }}>
-              <ProjectCard project={project} />
-            </Grid>
+            // Removed Grid item wrapper here, ProjectCard is now direct child of CardGrid
+            <ProjectCard project={project} />
           )}
           spacing={SPACING.medium}
-          sx={{ mx: 'auto' }} // ADDED THIS LINE TO CENTER CardGrid
+          sx={{ mx: 'auto' }}
         />
       </PageSection>
 
@@ -158,6 +158,14 @@ const Solutions: React.FC = () => {
           </Typography>
         </Container>
       </PageSection>
+       {/* Services Grid Section */}
+       <ServicesGrid />
+
+      {/* Why Choose Us Section */}
+      <WhyChooseUs />
+
+      {/* Testimonials Section */}
+      <TestimonialsSection />
     </ConsistentPageLayout>
   );
 };
