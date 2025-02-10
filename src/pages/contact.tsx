@@ -291,7 +291,8 @@ const Contact: React.FC = () => {
                 p: { xs: 2, md: 3 },
                 borderRadius: 2,
                 backgroundColor: navBackgroundColor,
-                 alignItems: 'center',
+                alignItems: 'center',
+                justifyContent: 'center',
                 boxShadow: theme.shadows[3],
                 textAlign: { xs: 'center', md: 'left' },
               }}
@@ -445,7 +446,8 @@ const Contact: React.FC = () => {
                 p: { xs: 2, md: 3 },
                 borderRadius: 2,
                 backgroundColor: navBackgroundColor,
-                 alignItems: 'center',
+                alignItems: 'center',
+                justifyContent: 'center',
                 boxShadow: theme.shadows[3],
                 textAlign: { xs: 'center', md: 'left' },
               }}

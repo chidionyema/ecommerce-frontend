@@ -63,24 +63,13 @@ const ServicesGrid = () => {
       sx={{
         width: '100%',
         py: SPACING.large,
-        backgroundColor: theme.palette.background.paper, // Use theme's paper background
+        backgroundImage: imageLoaded ? `url(${imageUrl})` : 'none', // Set the image as background
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      {/* Overlay to ensure text visibility */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)', // Strong overlay for contrast
-          zIndex: 1,
-        }}
-      />
-
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
         <Typography
           variant="h2"
@@ -105,15 +94,17 @@ const ServicesGrid = () => {
                 title={service.title}
                 color={theme.palette.primary.main}
                 sx={{
-                  backgroundColor: alpha(theme.palette.background.default, 0.9), // Adjust to default background with opacity
-                  boxShadow: '0 16px 32px rgba(0, 0, 0, 0.5)', // Strong shadow
+                  backgroundColor: alpha(theme.palette.background.default, 0.8), // Increased opacity for better contrast
+                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.7)', // Strong shadow for higher contrast
                   borderRadius: 3, // Slightly increase border radius
                   padding: SPACING.medium,
+                  fontWeight: 700,
+                  color: theme.palette.text.primary,
                   zIndex: 2, // Ensure cards are on top
-                  border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`, // Add subtle border for better definition
+                  border: `1px solid ${alpha(theme.palette.common.white, 0.3)}`, // Add subtle border for better definition
                   ':hover': {
                     transform: 'translateY(-5px)',
-                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)', // Increase hover shadow
+                    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)', // Stronger hover shadow
                   },
                 }}
               >
@@ -122,8 +113,8 @@ const ServicesGrid = () => {
                   textAlign="center"
                   mt={SPACING.small}
                   sx={{
-                    color: theme.palette.text.primary, // High contrast text
-                    fontWeight: 'bold', // Make content bold
+                    fontWeight: 700,
+                    color: theme.palette.text.primary,
                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7)', // Strong shadow for better readability
                   }}
                 >

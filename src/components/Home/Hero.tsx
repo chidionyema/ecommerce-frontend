@@ -11,7 +11,6 @@ import {
   Container,
   useMediaQuery,
 } from '@mui/material';
-import { motion } from 'framer-motion';
 import { SiAmazonaws, SiMicrosoftazure, SiGooglecloud, SiKubernetes, SiNvidia } from 'react-icons/si';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import PageHeader from '../Shared/PageHeader';
@@ -40,7 +39,7 @@ export const HeroSection = () => {
 
   return (
     <PageHeader
-      title="**AI-Powered Cloud Solutions for Startups**"
+      title="AI-Powered Cloud Solutions for Startups"
       subtitle="Accelerate growth with enterprise-grade technology and expert guidance."
       sx={{
         backgroundImage: imageLoaded ? `url(${imageUrl})` : 'none',
