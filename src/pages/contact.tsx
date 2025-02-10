@@ -13,6 +13,7 @@ import {
   Divider,
   Fab,
   Stack,
+  Grid,
   alpha,
   List,
   ListItem,
@@ -24,6 +25,8 @@ import {
 } from '@mui/material';
 import { Person, Email, Phone, ChatBubbleOutline, Headset, KeyboardArrowUp } from '@mui/icons-material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { SPACING } from '../utils/sharedStyles'; // Adjust the path according to your project structure
+
 import { useRouter } from 'next/navigation';
 import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
@@ -75,6 +78,24 @@ const faqItems = [
     question: "What are your security standards?",
     answer: "We adhere to ISO 27001 standards and implement end-to-end encryption for all client communications. Regular security audits ensure continuous protection of your data."
   }
+];
+
+const testimonials = [
+  {
+    id: 1,
+    name: 'John Doe',
+    role: 'CEO, TechCorp',
+    content: 'Their strategy transformed our entire approach.',
+    avatar: '/avatar1.jpg',
+  },
+  {
+    id: 2,
+    name: 'Jane Smith',
+    role: 'CTO, InnovateX',
+    content: 'Precision execution that elevated our tech stack.',
+    avatar: '/avatar2.jpg',
+  },
+  // Add more testimonials here
 ];
 
 const Contact: React.FC = () => {
@@ -307,7 +328,6 @@ const Contact: React.FC = () => {
                   height: 'auto',
                   backgroundColor: alpha(theme.palette.background.paper, 0.9),
                   boxShadow: theme.shadows[3],
-                 // textAlign: { xs: 'center', md: 'left' },
                 }}
               >
                 <Typography
@@ -435,26 +455,42 @@ const Contact: React.FC = () => {
           </Box>
         </Container>
 
+        {/* Testimonials Section */}
+        <Box sx={{ py: SPACING.large, backgroundColor: alpha(theme.palette.background.paper, 0.9) }}>
+          <Container maxWidth="lg">
+            <Typography variant="h2" component="h2" align="center" sx={{ mb: 6, fontWeight: 800 }}>
+              What Our Clients Say
+            </Typography>
 
-        {/* Enhanced FAQ Section */}
-     
-        <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 3,
-                p: { xs: 2, md: 3 },
-                borderRadius: 2,
-                backgroundColor: navBackgroundColor,
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: theme.shadows[3],
-                textAlign: { xs: 'center', md: 'left' },
-              }}
-            >
+            <Grid container spacing={SPACING.medium} justifyContent="center">
+              {testimonials.map((testimonial, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <GoldCard sx={{ p: 3, boxShadow: theme.shadows[4], borderRadius: 2 }}>
+                    <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 2 }}>
+                      "{testimonial.content}"
+                    </Typography>
+                    <Typography variant="h6">{testimonial.name}</Typography>
+                    <Typography variant="body2" color="text.secondary">{testimonial.role}</Typography>
+                  </GoldCard>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        </Box>
 
-
-<Typography variant="h2" component="h2" sx={{
+        {/* FAQ Section */}
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
+          p: { xs: 2, md: 3 },
+          borderRadius: 2,
+          backgroundColor: navBackgroundColor,
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: theme.shadows[3],
+        }}>
+          <Typography variant="h2" component="h2" sx={{
             mb: 6,
             textAlign: { xs: 'center', md: 'center' },
             fontWeight: 800,
@@ -465,68 +501,40 @@ const Contact: React.FC = () => {
             Frequently Asked Questions
           </Typography>
 
-            <GoldCard sx={{
-              p: { xs: 3, md: 4 },
-              borderRadius: 4,
-              width: '100%',
-              maxWidth: 1000,
-              backgroundColor: alpha(theme.palette.background.paper, 0.95),
-              boxShadow: theme.shadows[8],
-              textAlign: { xs: 'center', md: 'left' },
-            }}>
-              {faqItems.map((item, index) => (
-                <Accordion
-                  key={index}
+          <GoldCard sx={{
+            p: { xs: 3, md: 4 },
+            borderRadius: 4,
+            width: '100%',
+            maxWidth: 1000,
+            backgroundColor: alpha(theme.palette.background.paper, 0.95),
+            boxShadow: theme.shadows[8],
+            textAlign: { xs: 'center', md: 'left' },
+          }}>
+            {faqItems.map((item, index) => (
+              <Accordion key={index} sx={{ mb: 3, boxShadow: 'none', '&:before': { display: 'none' }, backgroundColor: 'transparent' }}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.secondary.main, fontSize: '2rem' }} />}
                   sx={{
-                    mb: 3,
-                    boxShadow: 'none',
-                    '&:before': { display: 'none' },
-                    backgroundColor: 'transparent',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      transform: 'translateY(-2px)'
-                    }
+                    minHeight: 72,
+                    padding: { xs: 2, md: 3 },
+                    '& .MuiAccordionSummary-content': { my: 1, alignItems: 'center' },
+                    backgroundColor: alpha(theme.palette.primary.light, 0.1),
+                    borderRadius: 2,
                   }}
                 >
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon sx={{
-                      color: theme.palette.secondary.main,
-                      fontSize: '2rem'
-                    }} />}
-                    sx={{
-                      minHeight: 72,
-                      padding: { xs: 2, md: 3 },
-                      '& .MuiAccordionSummary-content': {
-                        my: 1,
-                        alignItems: 'center'
-                      },
-                      backgroundColor: alpha(theme.palette.primary.light, 0.1),
-                      borderRadius: 2,
-                    }}
-                  >
-                    <Typography variant="h5" sx={{
-                      fontWeight: 600,
-                      color: theme.palette.text.primary,
-                      fontSize: { xs: '1.2rem', md: '1.4rem' }
-                    }}>
-                      {item.question}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails sx={{ p: { xs: 2, md: 3 } }}>
-                    <Typography variant="body1" sx={{
-                      color: theme.palette.text.secondary,
-                      lineHeight: 1.7,
-                      pl: 2,
-                      fontSize: { xs: '1rem', md: '1.1rem' }
-                    }}>
-                      {item.answer}
-                    </Typography>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </GoldCard>
-          </Box>
-      
+                  <Typography variant="h5" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
+                    {item.question}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ p: { xs: 2, md: 3 } }}>
+                  <Typography variant="body1" sx={{ color: theme.palette.text.secondary, lineHeight: 1.7, pl: 2 }}>
+                    {item.answer}
+                  </Typography>
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </GoldCard>
+        </Box>
 
         <BackToTopButton />
       </ConsistentPageLayout>

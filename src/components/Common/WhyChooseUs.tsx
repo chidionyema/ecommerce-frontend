@@ -196,7 +196,7 @@ const WhyChooseUs = () => {
         </Grid>
 
         <Box sx={{ textAlign: 'center', mt: SPACING.large }}>
-          <NextLink href="/contact" passHref legacyBehavior>
+          <NextLink href="/solutions" passHref legacyBehavior>
             <Button variant="contained" color="secondary" size="large" sx={styles.button}>
               Explore Our Services
             </Button>

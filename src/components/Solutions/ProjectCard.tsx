@@ -40,8 +40,8 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
   }, [imageUrl]);
 
   return (
-    <Box sx={{ m: 0.5, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Box sx={{ width: CARD_WIDTH, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <Box sx={{ m: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Box sx={{  m: 1, width: CARD_WIDTH, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <GoldCard
           href={`/projects/${project.id}`}
           sx={{
