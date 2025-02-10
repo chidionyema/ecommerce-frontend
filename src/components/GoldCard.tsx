@@ -31,9 +31,9 @@ const GoldCardContainer = styled(Card)(({ theme }) => ({
   borderRadius: 16,
   boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.5)}`,
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-  width: 350,
-  height: 400,
-  margin: '20px',
+  width: '100%',
+  height: 'auto',
+  margin: 0, 
   backdropFilter: 'blur(18px) saturate(180%)',
   border: `2px solid rgba(255, 255, 255, 0.1)`,
   '&:hover': {

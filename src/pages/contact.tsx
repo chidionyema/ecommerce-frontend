@@ -291,6 +291,7 @@ const Contact: React.FC = () => {
                 p: { xs: 2, md: 3 },
                 borderRadius: 2,
                 backgroundColor: navBackgroundColor,
+                 alignItems: 'center',
                 boxShadow: theme.shadows[3],
                 textAlign: { xs: 'center', md: 'left' },
               }}
@@ -305,7 +306,7 @@ const Contact: React.FC = () => {
                   height: 'auto',
                   backgroundColor: alpha(theme.palette.background.paper, 0.9),
                   boxShadow: theme.shadows[3],
-                  textAlign: { xs: 'center', md: 'left' },
+                 // textAlign: { xs: 'center', md: 'left' },
                 }}
               >
                 <Typography
@@ -444,6 +445,7 @@ const Contact: React.FC = () => {
                 p: { xs: 2, md: 3 },
                 borderRadius: 2,
                 backgroundColor: navBackgroundColor,
+                 alignItems: 'center',
                 boxShadow: theme.shadows[3],
                 textAlign: { xs: 'center', md: 'left' },
               }}
