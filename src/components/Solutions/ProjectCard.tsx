@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, CardContent, Button, useTheme, alpha, keyframes } from '@mui/material';
+import {
+  Box,
+  Typography,
+  CardContent,
+  Button,
+  useTheme,
+  alpha,
+  keyframes,
+} from '@mui/material';
 import NextLink from 'next/link';
 import { ArrowRightAlt } from '@mui/icons-material';
 import GoldCard from '../GoldCard';
@@ -26,8 +34,12 @@ interface Project {
 const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) => {
   const theme = useTheme();
   const { width: CARD_WIDTH, height: CARD_HEIGHT } = CARD_SIZES.xlarge;
+  // Ensure a description exists
+  const fullDescription = project.description || 'No description available';
   const truncatedDescription =
-    project.description.substring(0, 100) + (project.description.length > 100 ? '...' : '');
+    fullDescription.length > 100
+      ? fullDescription.substring(0, 100) + '...'
+      : fullDescription;
   const DefaultIcon = Code;
   const [imageLoaded, setImageLoaded] = useState(false);
   const imageUrl = '/images/istockphoto-todo.jpg';
@@ -41,7 +53,15 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
 
   return (
     <Box sx={{ m: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Box sx={{ m: 1, width: CARD_WIDTH, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Box
+        sx={{
+          m: 1,
+          width: CARD_WIDTH,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <GoldCard
           href={`/projects/${project.id}`}
           sx={{
@@ -67,7 +87,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                 animation: `${shineAnimation} 1.5s forwards`,
               },
             },
-            m: 2, // Adds margin around the card for consistency
+            m: 2, // Consistent outer margin for every card
             ...sx,
           }}
         >
@@ -130,21 +150,27 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
             </Box>
           </Box>
 
+          {/* Card Content */}
           <CardContent
             sx={{
-              px: 2, // Padding for content
-              pb: 2, // Bottom padding for content spacing
+              px: 2,
+              pb: 2,
               height: '65%',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between',
             }}
           >
+            {/* Title & Metrics */}
             <Box sx={{ mb: SPACING.small }}>
-              <Typography variant="h5" component="h2" fontWeight={800} gutterBottom sx={{ fontSize: '2rem' }}>
+              <Typography
+                variant="h5"
+                component="h2"
+                fontWeight={800}
+                gutterBottom
+                sx={{ fontSize: '2rem' }}
+              >
                 {project.name}
               </Typography>
-
               {project.metrics && (
                 <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                   {project.metrics.slice(0, 3).map((metric, index) => (
@@ -161,6 +187,7 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
               )}
             </Box>
 
+            {/* Technologies */}
             {project.technologies && (
               <Box sx={{ mb: SPACING.medium }}>
                 <Typography variant="caption" fontWeight={700} display="block" mb={1}>
@@ -196,9 +223,10 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
               </Box>
             )}
 
+            {/* Description */}
             <Box
               sx={{
-                height: 80, // Fixed height for description scroll area
+                minHeight: 80, // Ensures a consistent space for the description
                 overflowY: 'auto',
                 pr: 1,
                 mb: SPACING.medium,
@@ -212,14 +240,15 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
               <Typography variant="body2">{truncatedDescription}</Typography>
             </Box>
 
-            {/* Button Section */}
+            {/* Button Section - ONLY this part is changed */}
             <Box
               sx={{
-                pt: SPACING.medium,
-                width: '100%',
+                position: 'absolute',
+                bottom: SPACING.medium,
+                left: SPACING.medium,
+                right: SPACING.medium,
                 display: 'flex',
                 justifyContent: 'flex-end',
-                marginTop: 'auto', // Ensures the button is at the bottom
               }}
             >
               <Button
@@ -229,10 +258,10 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                 sx={{
                   bgcolor: 'primary.main',
                   color: 'primary.contrastText',
-                  py: 1.5,
+                  py: SPACING.small,
+                  px: SPACING.medium,
                   fontWeight: 700,
                   borderRadius: 2,
-                  px: 3, // Horizontal padding
                   '&:hover': {
                     bgcolor: 'primary.dark',
                     transform: 'scale(1.03)',

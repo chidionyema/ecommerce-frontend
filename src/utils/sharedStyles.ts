@@ -49,7 +49,7 @@ export const CARD_SIZES = {
   small: { width: 200, height: 250 },
   medium: { width: 300, height: 350 },
   large: { width: 400, height: 450 },
-  xlarge: { width: 400, height: 820 },
+  xlarge: { width: 450, height: 820 },
 };
 
 export const BUTTON_SIZES = {

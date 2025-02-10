@@ -94,8 +94,12 @@ const ResourcesPage: React.FC = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
 
-  const renderResourceCard = (resource: typeof freeResources[0] | typeof premiumResources[0]) => {
+  const renderResourceCard = (
+    resource: typeof freeResources[0] | typeof premiumResources[0]
+  ) => {
     const IconComponent = resource.icon;
+    // Determine if the resource is premium based on its path.
+    const isPremium = resource.path.startsWith('/premium-resources');
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -129,25 +133,29 @@ const ResourcesPage: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: theme.palette.mode === 'light'
-                  ? 'rgba(25, 118, 210, 0.08)'
-                  : 'rgba(144, 202, 249, 0.08)',
+                backgroundColor:
+                  theme.palette.mode === 'light'
+                    ? 'rgba(25, 118, 210, 0.08)'
+                    : 'rgba(144, 202, 249, 0.08)',
                 borderRadius: '16px',
                 width: 80,
                 height: 80,
                 mb: 3,
                 mx: 'auto',
-                border: `2px solid ${theme.palette.mode === 'light'
-                  ? 'rgba(25, 118, 210, 0.3)'
-                  : 'rgba(144, 202, 249, 0.3)'}`,
+                border: `2px solid ${
+                  theme.palette.mode === 'light'
+                    ? 'rgba(25, 118, 210, 0.3)'
+                    : 'rgba(144, 202, 249, 0.3)'
+                }`,
               }}
             >
               <IconComponent
                 sx={{
                   fontSize: 40,
-                  color: theme.palette.mode === 'light'
-                    ? theme.palette.primary.dark
-                    : theme.palette.primary.light,
+                  color:
+                    theme.palette.mode === 'light'
+                      ? theme.palette.primary.dark
+                      : theme.palette.primary.light,
                   transform: 'rotate(-10deg)',
                 }}
               />
@@ -176,11 +184,14 @@ const ResourcesPage: React.FC = () => {
             >
               {resource.summary}
             </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
               {resource.trending && (
                 <Chip label="Trending" color="primary" size="small" />
               )}
               <Chip label={resource.time} size="small" />
+              {isPremium && (
+                <Chip label="Subscription Required" color="error" size="small" />
+              )}
             </Box>
             <Button
               variant="contained"
@@ -197,7 +208,7 @@ const ResourcesPage: React.FC = () => {
                 fontSize: '1rem',
               }}
             >
-              {resource.title.includes('Premium') ? 'Access Premium Resource' : 'Access Free Resource'}
+              {isPremium ? 'Subscribe to Access' : 'Access Free Resource'}
             </Button>
           </Box>
         </Box>
@@ -234,7 +245,7 @@ const ResourcesPage: React.FC = () => {
             color="text.secondary"
             sx={{
               mb: SPACING.medium,
-              background: 'rgba(0, 0, 0, 0.5)',  // Adding overlay for better readability
+              background: 'rgba(0, 0, 0, 0.5)',
               color: 'white',
               padding: '10px 20px',
               borderRadius: '5px',
@@ -310,7 +321,7 @@ const ResourcesPage: React.FC = () => {
             color="text.secondary"
             sx={{
               mb: SPACING.large,
-              background: 'rgba(0, 0, 0, 0.5)',  // Adding overlay for better readability
+              background: 'rgba(0, 0, 0, 0.5)',
               color: 'white',
               padding: '10px 20px',
               borderRadius: '5px',
