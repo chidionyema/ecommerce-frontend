@@ -18,6 +18,8 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ redirectPath }) =
   const router = useRouter();
 
   const handleSubscribe = async (priceId: string) => {
+    // Get current path for post-purchase redirection
+    const redirectPath = window.location.pathname;
     // Ensure the user is logged in and we have a token before proceeding.
     if (!user || !token) {
       alert('You must be logged in to subscribe.');
