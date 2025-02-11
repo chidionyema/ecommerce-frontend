@@ -1,3 +1,4 @@
+// src/pages/resources.tsx
 import React from 'react';
 import {
   Box,
@@ -5,9 +6,9 @@ import {
   Button,
   useTheme,
   Container,
-  Grid,
   Chip,
 } from '@mui/material';
+import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -15,12 +16,16 @@ import {
   VpnKey,
   Code as CodeIcon,
   Security as SecurityIcon,
-  Storage as StorageIcon,
 } from '@mui/icons-material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import PageSection from '../components/PageSection';
 import CardGrid from '../components/CardGrid';
 import { CARD_STYLES, getSharedStyles, SPACING } from '../utils/sharedStyles';
+import { useAuth } from '../contexts/AuthContext';
+
+// ---------------------------
+// Resource data arrays
+// ---------------------------
 
 // Free Resources
 const freeResources = [
@@ -61,7 +66,8 @@ const premiumResources = [
   {
     id: 1,
     title: 'Cloud Mastery',
-    summary: 'Complete guide with scripts, code, and docs to master cloud infrastructure.',
+    summary:
+      'Complete guide with scripts, code, and docs to master cloud infrastructure.',
     icon: CloudIcon,
     path: '/premium-resources/cloud',
     downloads: '2.4K+',
@@ -71,7 +77,8 @@ const premiumResources = [
   {
     id: 2,
     title: 'Security Vaults',
-    summary: 'Full premium package with security vault setup scripts and complete documentation.',
+    summary:
+      'Full premium package with security vault setup scripts and complete documentation.',
     icon: VpnKey,
     path: '/premium-resources/security',
     downloads: '1.8K+',
@@ -81,7 +88,8 @@ const premiumResources = [
   {
     id: 3,
     title: 'Code Architect',
-    summary: 'Detailed code architecture patterns with production-ready examples.',
+    summary:
+      'Detailed code architecture patterns with production-ready examples.',
     icon: CodeIcon,
     path: '/premium-resources/architecture',
     downloads: '3.1K+',
@@ -90,16 +98,42 @@ const premiumResources = [
   },
 ];
 
+// ---------------------------
+// Main Component
+// ---------------------------
 const ResourcesPage: React.FC = () => {
   const theme = useTheme();
+  const router = useRouter();
+  const { user, isSubscribed } = useAuth();
   const styles = getSharedStyles(theme);
 
+  // This function will be called when a resource (card or button) is clicked.
+  // For premium resources, it will redirect to login/subscribe as needed.
+  const handleResourceClick = (resource: any) => {
+    const isPremium = resource.path.startsWith('/premium-resources');
+
+    if (!isPremium) {
+      router.push(resource.path);
+      return;
+    }
+
+    if (!user) {
+      router.push(`/login?redirect=${encodeURIComponent(resource.path)}`);
+    } else if (!isSubscribed) {
+      router.push(`/subscribe?redirect=${encodeURIComponent(resource.path)}`);
+    } else {
+      router.push(resource.path);
+    }
+  };
+
+  // Render a single resource card. The card uses framer-motion for animation
+  // and calls handleResourceClick on both the card container and its button.
   const renderResourceCard = (
     resource: typeof freeResources[0] | typeof premiumResources[0]
   ) => {
     const IconComponent = resource.icon;
-    // Determine if the resource is premium based on its path.
     const isPremium = resource.path.startsWith('/premium-resources');
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -107,9 +141,7 @@ const ResourcesPage: React.FC = () => {
         viewport={{ once: true }}
       >
         <Box
-          onClick={() => {
-            window.location.href = resource.path;
-          }}
+          onClick={() => handleResourceClick(resource)}
           sx={{
             background: theme.palette.mode === 'light' ? 'white' : '#28282a',
             display: 'flex',
@@ -190,15 +222,22 @@ const ResourcesPage: React.FC = () => {
               )}
               <Chip label={resource.time} size="small" />
               {isPremium && (
-                <Chip label="Subscription Required" color="error" size="small" />
+                <Chip
+                  label={isSubscribed ? 'Subscribed' : 'Subscription Required'}
+                  color={isSubscribed ? 'success' : 'error'}
+                  size="small"
+                />
               )}
             </Box>
             <Button
               variant="contained"
               color="primary"
               size="large"
-              component={NextLink}
-              href={resource.path}
+              // Stop propagation so that clicking the button doesn't trigger the card's onClick twice.
+              onClick={(e) => {
+                e.stopPropagation();
+                handleResourceClick(resource);
+              }}
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
@@ -208,7 +247,11 @@ const ResourcesPage: React.FC = () => {
                 fontSize: '1rem',
               }}
             >
-              {isPremium ? 'Subscribe to Access' : 'Access Free Resource'}
+              {isPremium
+                ? isSubscribed
+                  ? 'Access Resource'
+                  : 'Subscribe to Access'
+                : 'Access Free Resource'}
             </Button>
           </Box>
         </Box>
@@ -251,7 +294,9 @@ const ResourcesPage: React.FC = () => {
               borderRadius: '5px',
             }}
           >
-            Access production-ready code, comprehensive test scripts, and in-depth documentation. Perfect for developers and tech teams who want to hit the ground running.
+            Access production-ready code, comprehensive test scripts, and in-depth
+            documentation. Perfect for developers and tech teams who want to hit the
+            ground running.
           </Typography>
         </Container>
       </PageSection>
@@ -327,7 +372,10 @@ const ResourcesPage: React.FC = () => {
               borderRadius: '5px',
             }}
           >
-            Our free and premium resources are designed to save you time and help you deliver results faster. Each resource comes with complete code, test scripts, and documentation to ensure you're always prepared for success. Learn from industry experts, follow best practices, and ship your projects faster while saving on development costs.
+            Our free and premium resources are designed to save you time and help you deliver
+            results faster. Each resource comes with complete code, test scripts, and documentation
+            to ensure you're always prepared for success. Learn from industry experts, follow best
+            practices, and ship your projects faster while saving on development costs.
           </Typography>
         </Container>
       </PageSection>

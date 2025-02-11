@@ -1,7 +1,7 @@
 'use client';
 
 import Head from 'next/head';
-import { Box, Typography, useTheme, Divider } from '@mui/material'; // Removed Container
+import { Box, Typography, useTheme, Divider } from '@mui/material'; 
 import LandingPageLayout from '../components/Shared/LandingPageLayout';
 import TechnologyShowcase from '../components/Home/TechnologyShowcase';
 import ServicesGrid from '../components/Common/ServicesGrid';
