@@ -14,6 +14,8 @@ import GoldCard from '../GoldCard';
 import { CARD_SIZES, SPACING } from '../../utils/sharedStyles';
 import { technologyIconMap } from '../../data/cvProjects';
 import { Code } from 'lucide-react';
+import { GradientButton } from '../../components/GradientButton'; 
+
 
 const shineAnimation = keyframes`
   0% { left: -50%; }
@@ -251,25 +253,22 @@ const ProjectCard: React.FC<{ project: Project; sx?: any }> = ({ project, sx }) 
                 justifyContent: 'flex-end',
               }}
             >
-              <Button
-                component={NextLink}
+               <GradientButton
                 href={`/projects/${project.id}`}
+                label="Explore Case Study"
                 endIcon={<ArrowRightAlt />}
+                sizeVariant="medium"
                 sx={{
-                  bgcolor: 'primary.main',
-                  color: 'primary.contrastText',
                   py: SPACING.small,
                   px: SPACING.medium,
                   fontWeight: 700,
                   borderRadius: 2,
+                  // Remove background color overrides as the gradient is set in the component
                   '&:hover': {
-                    bgcolor: 'primary.dark',
                     transform: 'scale(1.03)',
                   },
                 }}
-              >
-                Explore Case Study
-              </Button>
+              />
             </Box>
           </CardContent>
         </GoldCard>

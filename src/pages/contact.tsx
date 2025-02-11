@@ -26,7 +26,7 @@ import {
 import { Person, Email, Phone, ChatBubbleOutline, Headset, KeyboardArrowUp } from '@mui/icons-material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { SPACING } from '../utils/sharedStyles'; // Adjust the path according to your project structure
-
+import { GradientButton } from '../components/GradientButton';
 import { useRouter } from 'next/navigation';
 import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
@@ -177,22 +177,12 @@ const Contact: React.FC = () => {
           >
             Thank you for your message. We have received it and will get back to you as soon as possible.
           </Typography>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => router.push('/')}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 'bold',
-              px: 4,
-              py: 1.5,
-              '&:hover': {
-                backgroundColor: theme.palette.secondary.dark,
-              },
-            }}
-          >
-            Back to Home
-          </Button>
+          <GradientButton
+          href="/"
+          label="Back to Home"
+          sizeVariant="medium"
+          sx={{ my: 2 }}
+        />
         </Box>
         <BackToTopButton />
       </ConsistentPageLayout>
@@ -430,18 +420,20 @@ const Contact: React.FC = () => {
                     variant="contained"
                     color="secondary"
                     disabled={loading}
-                    sx={{
+                    sx={(theme) => ({
                       py: 2.5,
                       fontWeight: 'bold',
                       fontSize: '1.2rem',
                       textTransform: 'none',
                       borderRadius: 2,
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                      boxShadow: theme.shadows[4],
                       transition: 'all 0.3s ease',
                       '&:hover': {
                         transform: 'translateY(-2px)',
-                        backgroundColor: theme.palette.secondary.dark,
+                        boxShadow: theme.shadows[6],
                       },
-                    }}
+                    })}
                   >
                     {loading ? (
                       <CircularProgress size={24} color="inherit" />

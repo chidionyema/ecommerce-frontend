@@ -427,12 +427,12 @@ const PricingPage: React.FC = () => {
                 key={index}
                 sx={{
                   mb: 3,
-                  boxShadow: 'none',
+                  boxShadow: 'none',  
                   '&:before': { display: 'none' },
                   backgroundColor: 'transparent',
                 }}
               >
-                <AccordionSummary
+                <AccordionSummary 
                   expandIcon={
                     <ExpandMoreIcon
                       sx={{ color: theme.palette.secondary.main, fontSize: '2rem' }}

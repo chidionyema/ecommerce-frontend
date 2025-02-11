@@ -15,7 +15,7 @@ export interface GradientButtonProps extends ButtonProps {
    */
   href: string;
   /**
-   * The button label.
+   * The button label.  
    */
   label: string;
   /**
