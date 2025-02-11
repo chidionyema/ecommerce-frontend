@@ -11,8 +11,9 @@ import {
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
-import { SPACING, getSharedStyles } from '../../utils/sharedStyles'; // Ensure path is correct
-import TechCard from '../Common/TechCard'; // Ensure path is correct
+import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
+import TechCard from '../Common/TechCard'; 
+import { GradientButton } from '../../components/GradientButton'
 
 // Define the type for a testimonial
 interface Testimonial {
@@ -189,9 +190,16 @@ const TestimonialsSection = () => {
         {!showAll && (
           <Box sx={{ textAlign: 'center', mt: SPACING.medium }}>
             <NextLink href="/contact" passHref legacyBehavior>
-              <Button variant="contained" color="secondary" sx={styles.button}>
-                View More
-              </Button>
+
+               <GradientButton
+                                        href="/contact"
+                                        label="View More"
+                                        sizeVariant="medium" // You can also set "small" or "large"
+                                        // Optional additional styles via sx:
+                                        sx={{
+                                          // Custom styles here (if needed)
+                                        }}
+                                      /> 
             </NextLink>
           </Box>
         )}

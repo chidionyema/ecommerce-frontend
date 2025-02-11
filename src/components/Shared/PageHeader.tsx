@@ -17,6 +17,7 @@ import {
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
 import { ArrowForward } from '@mui/icons-material';
+import { GradientButton } from '../../components/GradientButton';
 
 interface PageHeaderProps {
   title: string;
@@ -167,25 +168,15 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         >
           <Box sx={{ mt: 5 }}>
             <NextLink href="/contact" passHref legacyBehavior>
-              <Button
-                variant="contained"
-                color="secondary"
-                endIcon={<ArrowForward />}
-                sx={{
-                  borderRadius: 2,
-                  fontWeight: 700,
-                  textTransform: 'none',
-                  px: 4,
-                  py: 1.5,
-                  boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
-                  '&:hover': {
-                    backgroundColor: theme.palette.secondary.dark,
-                    transform: 'translateY(-2px)',
-                  },
-                }}
-              >
-                Get in Touch
-              </Button>
+            <GradientButton
+              href="/contact"
+              label="Get in Touch"
+              sizeVariant="medium" // You can also set "small" or "large"
+              // Optional additional styles via sx:
+              sx={{
+                // Custom styles here (if needed)
+              }}
+            />     
             </NextLink>
           </Box>
         </motion.div>

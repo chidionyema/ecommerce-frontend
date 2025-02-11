@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle, Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-react';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import NextLink from 'next/link';
+import { GradientButton } from '../../components/GradientButton'
 
 const WhyChooseUs = () => {
   const theme = useTheme();
@@ -197,9 +198,16 @@ const WhyChooseUs = () => {
 
         <Box sx={{ textAlign: 'center', mt: SPACING.large }}>
           <NextLink href="/solutions" passHref legacyBehavior>
-            <Button variant="contained" color="secondary" size="large" sx={styles.button}>
-              Explore Our Services
-            </Button>
+          
+              <GradientButton
+                          href="/contact"
+                          label="Explore Our Services"
+                          sizeVariant="medium" // You can also set "small" or "large"
+                          // Optional additional styles via sx:
+                          sx={{
+                            // Custom styles here (if needed)
+                          }}
+                        /> 
           </NextLink>
         </Box>
       </Container>
