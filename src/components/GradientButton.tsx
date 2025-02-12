@@ -1,8 +1,7 @@
-// src/components/GradientButton.tsx
 import React from 'react';
 import NextLink from 'next/link';
 import Button, { ButtonProps } from '@mui/material/Button';
-import { SxProps, Theme } from '@mui/material/styles';
+import { SxProps, Theme, useTheme } from '@mui/material/styles';
 
 export interface GradientButtonProps extends ButtonProps {
   /**
@@ -11,11 +10,11 @@ export interface GradientButtonProps extends ButtonProps {
    */
   sizeVariant?: 'small' | 'medium' | 'large';
   /**
-   * The URL to link to.
+   * The URL to link to.  
    */
   href: string;
   /**
-   * The button label.  
+   * The button label.
    */
   label: string;
   /**
@@ -24,7 +23,8 @@ export interface GradientButtonProps extends ButtonProps {
   sx?: SxProps<Theme>;
 }
 
-const sizeStyles = {
+// Define size styles explicitly
+const sizeStyles: Record<'small' | 'medium' | 'large', SxProps<Theme>> = {
   small: {
     px: 3,
     py: 1,
@@ -46,29 +46,32 @@ export const GradientButton: React.FC<GradientButtonProps> = ({
   sizeVariant = 'medium',
   href,
   label,
-  sx,
+  sx = {},
   ...props
 }) => {
+  const theme = useTheme(); // Use Material-UI theme
+
+  const defaultStyles: SxProps<Theme> = {
+    textTransform: 'none',
+    fontWeight: 600,
+    borderRadius: 2,
+    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+    boxShadow: theme.shadows[4],
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      transform: 'scale(1.02)',
+      boxShadow: theme.shadows[6],
+    },
+    ...sizeStyles[sizeVariant],
+  };
+
   return (
     <Button
       variant="contained"
       color="primary"
       component={NextLink}
       href={href}
-      sx={(theme) => ({
-        textTransform: 'none',
-        fontWeight: 600,
-        borderRadius: 2,
-        background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-        boxShadow: theme.shadows[4],
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          transform: 'scale(1.02)',
-          boxShadow: theme.shadows[6],
-        },
-        ...sizeStyles[sizeVariant],
-        ...sx,
-      })}
+      sx={{ ...defaultStyles, ...sx }} // Merging styles correctly
       {...props}
     >
       {label}
