@@ -142,9 +142,9 @@ const WhyChooseUs = () => {
                 icon={<reason.icon />}  // Pass the icon
               >
                 <Typography variant="body1" color="text.secondary" sx={{
-                    fontWeight: 700,
-                    color: theme.palette.text.primary,
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7)', 
+                  fontWeight: 700,
+                  color: theme.palette.text.primary,
+                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)', 
                   }}>
                   
                   

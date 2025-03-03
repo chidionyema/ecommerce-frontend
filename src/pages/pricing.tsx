@@ -38,7 +38,6 @@ import {
 } from '@mui/icons-material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import PageSection from '../components/PageSection';
-import GoldCard from '../components/GoldCard';
 import { CARD_STYLES, getSharedStyles, SPACING } from '../utils/sharedStyles';
 
 

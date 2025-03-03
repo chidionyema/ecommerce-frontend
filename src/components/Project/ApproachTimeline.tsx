@@ -1,92 +1,87 @@
+// components/Timeline/ApproachTimeline.tsx
 'use client';
 
-import {
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-} from '@mui/lab';
+import { Box, Typography, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
 import { GlassCard } from '../Theme/GlassCard';
 import { ApproachStep } from '../../types/project';
-import { useTheme } from '@mui/material/styles';
-import { Typography } from '@mui/material';
-
-const CustomTimelineDot = ({ index }: { index: number }) => {
-  const theme = useTheme();
-  return (
-    <TimelineDot
-      sx={{
-        bgcolor: 'transparent',
-        border: `2px solid ${theme.palette.secondary.main}`,
-        width: 48,
-        height: 48,
-        fontSize: '1rem',
-        fontWeight: 'bold',
-      }}
-    >
-      {index + 1}
-    </TimelineDot>
-  );
-};
 
 export const ApproachTimeline = ({ steps }: { steps: ApproachStep[] }) => {
-  return (
-    <Timeline sx={{ my: 4, position: 'relative' }}>
-      {steps.map((step, index) => (
-        <TimelineStep key={index} step={step} index={index} totalSteps={steps.length} />
-      ))}
-    </Timeline>
-  );
-};
-
-const TimelineStep = ({
-  step,
-  index,
-  totalSteps,
-}: {
-  step: ApproachStep;
-  index: number;
-  totalSteps: number;
-}) => {
   const theme = useTheme();
 
   return (
-    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-      <TimelineItem>
-        <TimelineSeparator>
-          <CustomTimelineDot index={index} />
-          {index < totalSteps - 1 && (
-            <TimelineConnector
-              sx={{
-                bgcolor: theme.palette.secondary.main,
-                height: 50,
-                width: 2,
-                ml: 'auto',
-              }}
-            />
-          )}
-        </TimelineSeparator>
-        <TimelineContent>
-          <GlassCard
-            sx={{
+    <Box sx={{
+      width: '100%',
+      display: 'grid',
+      gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+      gap: 4,
+      py: 4
+    }}>
+      {steps.map((step, index) => (
+        <motion.div 
+          key={index}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+        >
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%'
+          }}>
+            {/* Step Number */}
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              mb: 2
+            }}>
+              <Box sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                border: 2,
+                borderColor: 'secondary.main',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold',
+                fontSize: '1.1rem'
+              }}>
+                {index + 1}
+              </Box>
+            </Box>
+
+            {/* Step Card */}
+            <GlassCard sx={{
               p: 3,
-              mb: 3,
-              border: `1px solid ${theme.palette.divider}`,
-              backdropFilter: 'blur(4px)',
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
               transition: 'transform 0.3s ease',
-              '&:hover': { transform: 'translateY(-4px)' },
-            }}
-          >
-            <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold' }}>
-              {step.title}
-            </Typography>
-            <Typography variant="body2">{step.description}</Typography>
-          </GlassCard>
-        </TimelineContent>
-      </TimelineItem>
-    </motion.div>
+              '&:hover': {
+                transform: 'translateY(-4px)'
+              }
+            }}>
+              <Typography variant="h6" sx={{ 
+                mb: 1.5, 
+                fontWeight: 600,
+                color: theme.palette.text.primary
+              }}>
+                {step.title}
+              </Typography>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: theme.palette.text.secondary,
+                  lineHeight: 1.6
+                }}
+              >
+                {step.description}
+              </Typography>
+            </GlassCard>
+          </Box>
+        </motion.div>
+      ))}
+    </Box>
   );
 };

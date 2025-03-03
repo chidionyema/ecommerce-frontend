@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
   Typography,
   Grid,
   Avatar,
-  Button,
   useTheme,
   alpha,
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import NextLink from 'next/link';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import TechCard from '../Common/TechCard'; 
 import { GradientButton } from '../../components/GradientButton'
@@ -73,6 +71,15 @@ const TestimonialsSection = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
   const [showAll, setShowAll] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const imageUrl = '/images/istockphoto-1303809341-1024x1024.jpg';
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = imageUrl;
+    img.onload = () => setImageLoaded(true);
+    img.onerror = () => setImageLoaded(false);
+  }, [imageUrl]);
 
   return (
     <Box
@@ -84,7 +91,26 @@ const TestimonialsSection = () => {
         position: 'relative',
       }}
     >
-      {/* Background Image with Stronger Overlay */}
+      {/* Blurred Background Image (if loaded) */}
+      {imageLoaded && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundImage: `url(${imageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+            filter: 'blur(12px)', // Add blur
+            zIndex: 0,
+          }}
+        />
+      )}
+      
+      {/* Dark Overlay */}
       <Box
         sx={{
           position: 'absolute',
@@ -92,23 +118,12 @@ const TestimonialsSection = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundImage: 'url("/images/istockphoto-1303809341-1024x1024.jpg")',
-          backgroundColor: 'transparent',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
-          '&:before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-          },
+          backgroundColor: alpha(theme.palette.primary.dark, 0.4), // Semi-transparent overlay
+          zIndex: 1,
         }}
       />
 
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
         <Typography
           variant="h2"
           component="h2"
@@ -149,11 +164,9 @@ const TestimonialsSection = () => {
                   <Typography
                     variant="body1"
                     sx={{
-                      fontStyle: 'italic',
-                      mb: SPACING.small,
-                      color: 'white', // Ensure testimonial content is white for contrast
-                      textAlign: 'center',
-                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)', // Add subtle shadow to testimonial text
+                    fontWeight: 700,
+                    color: theme.palette.text.primary,
+                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)', 
                     }}
                   >
                     "{t.content}"
@@ -177,15 +190,14 @@ const TestimonialsSection = () => {
 
         {!showAll && (
           <Box sx={{ textAlign: 'center', mt: SPACING.medium }}>
-                    <GradientButton
-            href="/contact"
-            label="View More"
-            sizeVariant="medium"
-            sx={{
-              // Custom styles (if needed)
-            }}
-          />
-
+            <GradientButton
+              href="/contact"
+              label="View More"
+              sizeVariant="medium"
+              sx={{
+                // Custom styles (if needed)
+              }}
+            />
           </Box>
         )}
       </Container>

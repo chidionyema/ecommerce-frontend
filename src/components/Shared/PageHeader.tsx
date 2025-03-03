@@ -160,24 +160,83 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           </motion.div>
         )}
 
-        {/* CTA Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-        >
-          <Box sx={{ mt: 5 }}>
-                  <GradientButton
-          href="/contact"
-          label="Get in Touch"
-          sizeVariant="medium" // "small", "medium", or "large"
-          sx={{
-            // Optional additional styles here
-          }}
-        />
+      {/* CTA Button */}
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.4, duration: 0.6 }}
+>
+  <Box sx={{ 
+    mt: 6,
+    position: 'relative',
+    display: 'inline-block',
+    filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3))'
+  }}>
+    <GradientButton
+      href="/contact"
+      label="Get Started Now"
+      sizeVariant="large"
+      sx={{
+        fontSize: { xs: '1.3rem', md: '1.5rem' },
+        px: 8,
+        py: 3,
+        borderRadius: '50px',
+        fontWeight: 700,
+        letterSpacing: '0.5px',
+        background: `linear-gradient(
+          135deg,
+          ${theme.palette.success.main} 0%,
+          ${theme.palette.success.dark} 100%
+        )`,
+        color: theme.palette.common.white,
+        border: `2px solid ${alpha(theme.palette.common.white, 0.3)}`,
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-2px) scale(1.05)',
+          boxShadow: `0 8px 24px ${alpha(theme.palette.success.main, 0.4)}`,
+          background: `linear-gradient(
+            135deg,
+            ${theme.palette.success.dark} 0%,
+            ${theme.palette.success.main} 100%
+          )`,
+        },
+        '&:active': {
+          transform: 'scale(0.98)'
+        }
+      }}
+      endIcon={
+        <ArrowForward sx={{
+          fontSize: 28,
+          ml: 2,
+          color: theme.palette.common.white,
+          transition: 'transform 0.3s ease'
+        }} />
+      }
+    />
 
-          </Box>
-        </motion.div>
+    {/* Animated shine effect */}
+    <Box
+      sx={{
+        position: 'absolute',
+        top: 0,
+        left: '-100%',
+        width: '50%',
+        height: '100%',
+        background: `linear-gradient(
+          90deg,
+          transparent 0%,
+          ${alpha(theme.palette.common.white, 0.3)} 50%,
+          transparent 100%
+        )`,
+        animation: 'shine 2s infinite',
+        '@keyframes shine': {
+          '0%': { left: '-100%' },
+          '100%': { left: '150%' }
+        }
+      }}
+    />
+  </Box>
+</motion.div>
       </Container>
 
       {/* Solutions Section (unchanged) */}

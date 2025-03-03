@@ -540,9 +540,9 @@ const ResourcesPage: React.FC = () => {
 
   return (
     <ConsistentPageLayout
-      seoTitle="Technical Resources - Elite Code & Documentation"
+      seoTitle="Technical Resources - Production Grade Code & Documentation"
       seoDescription="Access premium production-ready code, test scripts, and comprehensive documentation to accelerate your development."
-      title="Elite Developer Resources"
+      title="Operational Developer Resources"
       subtitle="Production-ready code, scripts, and documentation to supercharge your projects"
     >
       {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
@@ -579,7 +579,7 @@ const ResourcesPage: React.FC = () => {
                     textShadow: '0 2px 10px rgba(0,0,0,0.1)',
                   }}
                 >
-                  Elite Resources for Modern Developers
+                  Production Grade  Resources for Modern Developers
                 </Typography>
                 <Typography
                   variant="h5"

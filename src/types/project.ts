@@ -18,6 +18,15 @@ export interface Project {
     lessonsLearned: string;
   }
 
+  // In types/index.ts
+export type CategoryFilter = 
+'all' | 
+'cloud' | 
+'devops' | 
+'fintech' | 
+'ecommerce' | 
+'media';
+
   // types/project.ts
 export interface ApproachStep {
   title: string;

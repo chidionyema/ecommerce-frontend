@@ -146,7 +146,7 @@ export const cvProjects: CVProject[] = [
     },
     metrics: [
       { label: 'Form Completion Time', value: '-50%', description: 'Faster digital process vs. paper forms' },
-      { label: 'Accessibility Score', value: 'WCAG 2.1 AA', description: 'Compliance rating achieved' },
+      { label: 'Accessibility Score', value: 'Government Digital Services (GDS)', description: 'Compliance rating achieved' },
       { label: 'Deployment Frequency', value: 'Weekly', description: 'Automated CI/CD pipeline' }
     ]
   },

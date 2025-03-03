@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   useTheme,
   TextField,
@@ -19,9 +19,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Paper,
   Avatar,
   useMediaQuery,
@@ -33,15 +30,10 @@ import {
   Person, 
   Email, 
   Phone, 
-  ChatBubbleOutline, 
-  Headset, 
   KeyboardArrowUp,
-  LocationOn,
-  AccessTime,
   Star,
-  CheckCircle as CheckCircleIcon
+  CheckCircle
 } from '@mui/icons-material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { SPACING } from '../utils/sharedStyles';
 import { GradientButton } from '../components/GradientButton';
 import { useRouter } from 'next/navigation';
@@ -50,15 +42,18 @@ import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import GoldCard from '../components/GoldCard';
 import { getSharedStyles } from '../utils/sharedStyles';
 import * as yup from 'yup';
+import FAQ from '../components/FAQ';
+import { 
+  faqItems, 
+  testimonials, 
+  contactInfoItems, 
+  heroSection, 
+  testimonialSection,
+  successPageData
+} from '../data/contactPageData';
 
-interface FormData {
-  name: string;
-  email: string;
-  phone?: string;
-  message?: string;
-}
-
-const validationSchema: yup.ObjectSchema<FormData> = yup.object().shape({
+// Form validation schema
+const validationSchema = yup.object().shape({
   name: yup.string()
     .required('Name is required')
     .min(2, 'Name must be at least 2 characters')
@@ -78,61 +73,21 @@ const validationSchema: yup.ObjectSchema<FormData> = yup.object().shape({
     .max(500, 'Message cannot exceed 500 characters'),
 });
 
-const faqItems = [
-  {
-    question: "What services do you offer?",
-    answer: "We provide comprehensive technology consulting services including digital transformation strategy, cloud solutions, software development, and IT infrastructure optimization."
-  },
-  {
-    question: "How quickly can I get a tech roadmap?",
-    answer: "We typically deliver initial roadmaps within 24-48 hours of receiving your project details. Complex projects may require additional time for thorough analysis."
-  },
-  {
-    question: "What industries do you specialize in?",
-    answer: "We have expertise across multiple sectors including healthcare, finance, e-commerce, and manufacturing. Our solutions are tailored to meet industry-specific challenges."
-  },
-  {
-    question: "What are your security standards?",
-    answer: "We adhere to ISO 27001 standards and implement end-to-end encryption for all client communications. Regular security audits ensure continuous protection of your data."
-  }
-];
+// Form data interface
+interface FormData {
+  name: string;
+  email: string;
+  phone?: string;
+  message?: string;
+}
 
-const testimonials = [
-  {
-    id: 1,
-    name: 'John Doe',
-    role: 'CEO, TechCorp',
-    content: 'Their strategic approach completely transformed our digital infrastructure, resulting in a 40% increase in operational efficiency within just three months.',
-    avatar: '/avatar1.jpg',
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    role: 'CTO, InnovateX',
-    content: 'The precision execution and attention to detail elevated our tech stack far beyond our expectations. Worth every penny of the investment.',
-    avatar: '/avatar2.jpg',
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: 'Michael Johnson',
-    role: 'VP of Technology, FutureTech',
-    content: 'From initial consultation to implementation, their team delivered exactly what we needed with remarkable professionalism and technical expertise.',
-    avatar: '/avatar3.jpg',
-    rating: 4,
-  },
-];
-
-const Contact: React.FC = () => {
+const Contact = () => {
   const router = useRouter();
   const theme = useTheme();
   const styles = getSharedStyles(theme);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
-  const navBackgroundColor = alpha(theme.palette.background.default, 0.8);
   
-  const [activeAccordion, setActiveAccordion] = useState<number | false>(false);
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -149,10 +104,7 @@ const Contact: React.FC = () => {
     setAnimateIn(true);
   }, []);
 
-  const handleAccordionChange = (panel: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-    setActiveAccordion(isExpanded ? panel : false);
-  };
-
+  // Form submission handler
   const handleSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
     setErrors({});
@@ -184,6 +136,7 @@ const Contact: React.FC = () => {
     }
   }, [formData]);
 
+  // Input change handler
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setFormData(prevState => ({
@@ -201,13 +154,14 @@ const Contact: React.FC = () => {
     }
   }, [setFormData, errors]);
 
+  // Success page
   if (success) {
     return (
       <ConsistentPageLayout
-        seoTitle="Thank You"
-        seoDescription="Thank you for contacting us!"
-        title="Message Sent!"
-        subtitle="We'll be in touch shortly."
+        seoTitle={successPageData.seoTitle}
+        seoDescription={successPageData.seoDescription}
+        title={successPageData.title}
+        subtitle={successPageData.subtitle}
       >
         <Zoom in={true} timeout={800}>
           <Box sx={{ 
@@ -241,7 +195,7 @@ const Contact: React.FC = () => {
                 textAlign: 'center'
               }}
             >
-              Thank You!
+              {successPageData.title}
             </Typography>
             <Typography
               variant="body1"
@@ -255,11 +209,11 @@ const Contact: React.FC = () => {
                 lineHeight: 1.6
               }}
             >
-              Your message has been successfully sent. We've received your inquiry and a member of our team will contact you within the next 24 hours.
+              {successPageData.message}
             </Typography>
             <GradientButton
               href="/"
-              label="Back to Home"
+              label={successPageData.buttonText}
               sizeVariant="large"
               sx={{ my: 2, px: 6 }}
             />
@@ -270,6 +224,7 @@ const Contact: React.FC = () => {
     );
   }
 
+  // TextField styling
   const textFieldStyles = {
     '& .MuiInputBase-root': {
       borderRadius: 2,
@@ -351,7 +306,7 @@ const Contact: React.FC = () => {
                   mb: 2,
                 }}
               >
-                Let's Build Something Amazing Together
+                {heroSection.title}
               </Typography>
               <Typography
                 variant="h5"
@@ -364,7 +319,7 @@ const Contact: React.FC = () => {
                   mb: 4,
                 }}
               >
-                Our expert team is ready to transform your ideas into reality with cutting-edge technology solutions
+                {heroSection.subtitle}
               </Typography>
             </Box>
           </Fade>
@@ -421,7 +376,9 @@ const Contact: React.FC = () => {
                       mr: 3
                     }}
                   >
-                    <Headset sx={{ fontSize: 28, color: theme.palette.primary.main }} />
+                    {React.createElement(heroSection.contactInfoIcon, { 
+                      sx: { fontSize: 28, color: theme.palette.primary.main } 
+                    })}
                   </Box>
                   <Box>
                     <Typography
@@ -433,7 +390,7 @@ const Contact: React.FC = () => {
                         color: theme.palette.text.primary,
                       }}
                     >
-                      Get in Touch
+                      {heroSection.contactInfoTitle}
                     </Typography>
                     <Typography
                       variant="body2"
@@ -442,7 +399,7 @@ const Contact: React.FC = () => {
                         mt: 0.5,
                       }}
                     >
-                      We respond within 24 hours
+                      {heroSection.contactInfoSubtitle}
                     </Typography>
                   </Box>
                 </Box>
@@ -461,137 +418,42 @@ const Contact: React.FC = () => {
                 <Divider sx={{ borderColor: alpha(theme.palette.divider, 0.1) }} />
 
                 <List disablePadding>
-                  <ListItem disableGutters sx={{ mb: 2 }}>
-                    <ListItemIcon sx={{ minWidth: 42 }}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: 36,
-                          height: 36,
-                          borderRadius: '50%',
-                          backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                  {contactInfoItems.map((item, index) => (
+                    <ListItem key={index} disableGutters sx={{ mb: index < contactInfoItems.length - 1 ? 2 : 0 }}>
+                      <ListItemIcon sx={{ minWidth: 42 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: 36,
+                            height: 36,
+                            borderRadius: '50%',
+                            backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                          }}
+                        >
+                          {React.createElement(item.icon, { 
+                            sx: { fontSize: 20, color: theme.palette.primary.main } 
+                          })}
+                        </Box>
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.primaryText}
+                        secondary={item.secondaryText}
+                        primaryTypographyProps={{
+                          variant: 'body2',
+                          color: theme.palette.text.secondary,
+                          fontWeight: 500,
+                          mb: 0.5
                         }}
-                      >
-                        <Phone sx={{ fontSize: 20, color: theme.palette.primary.main }} />
-                      </Box>
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Call Us"
-                      secondary="+1 (555) 123-4567"
-                      primaryTypographyProps={{
-                        variant: 'body2',
-                        color: theme.palette.text.secondary,
-                        fontWeight: 500,
-                        mb: 0.5
-                      }}
-                      secondaryTypographyProps={{
-                        variant: 'body1',
-                        color: theme.palette.text.primary,
-                        fontWeight: 600
-                      }}
-                    />
-                  </ListItem>
-
-                  <ListItem disableGutters sx={{ mb: 2 }}>
-                    <ListItemIcon sx={{ minWidth: 42 }}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: 36,
-                          height: 36,
-                          borderRadius: '50%',
-                          backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                        secondaryTypographyProps={{
+                          variant: 'body1',
+                          color: theme.palette.text.primary,
+                          fontWeight: 600
                         }}
-                      >
-                        <Email sx={{ fontSize: 20, color: theme.palette.primary.main }} />
-                      </Box>
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Email Us"
-                      secondary="contact@techsolutions.com"
-                      primaryTypographyProps={{
-                        variant: 'body2',
-                        color: theme.palette.text.secondary,
-                        fontWeight: 500,
-                        mb: 0.5
-                      }}
-                      secondaryTypographyProps={{
-                        variant: 'body1',
-                        color: theme.palette.text.primary,
-                        fontWeight: 600
-                      }}
-                    />
-                  </ListItem>
-
-                  <ListItem disableGutters sx={{ mb: 2 }}>
-                    <ListItemIcon sx={{ minWidth: 42 }}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: 36,
-                          height: 36,
-                          borderRadius: '50%',
-                          backgroundColor: alpha(theme.palette.primary.main, 0.15),
-                        }}
-                      >
-                        <LocationOn sx={{ fontSize: 20, color: theme.palette.primary.main }} />
-                      </Box>
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Our Location"
-                      secondary="1234 Tech Plaza, Suite 500, San Francisco, CA 94107"
-                      primaryTypographyProps={{
-                        variant: 'body2',
-                        color: theme.palette.text.secondary,
-                        fontWeight: 500,
-                        mb: 0.5
-                      }}
-                      secondaryTypographyProps={{
-                        variant: 'body1',
-                        color: theme.palette.text.primary,
-                        fontWeight: 600
-                      }}
-                    />
-                  </ListItem>
-
-                  <ListItem disableGutters>
-                    <ListItemIcon sx={{ minWidth: 42 }}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: 36,
-                          height: 36,
-                          borderRadius: '50%',
-                          backgroundColor: alpha(theme.palette.primary.main, 0.15),
-                        }}
-                      >
-                        <AccessTime sx={{ fontSize: 20, color: theme.palette.primary.main }} />
-                      </Box>
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Business Hours"
-                      secondary="Monday - Friday: 9AM - 6PM EST"
-                      primaryTypographyProps={{
-                        variant: 'body2',
-                        color: theme.palette.text.secondary,
-                        fontWeight: 500,
-                        mb: 0.5
-                      }}
-                      secondaryTypographyProps={{
-                        variant: 'body1',
-                        color: theme.palette.text.primary,
-                        fontWeight: 600
-                      }}
-                    />
-                  </ListItem>
+                      />
+                    </ListItem>
+                  ))}
                 </List>
               </Box>
             </Slide>
@@ -635,7 +497,9 @@ const Contact: React.FC = () => {
                         background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
                       }}
                     >
-                      <ChatBubbleOutline sx={{ fontSize: 40, color: 'white' }} />
+                      {React.createElement(heroSection.formIcon, { 
+                        sx: { fontSize: 40, color: 'white' } 
+                      })}
                     </Box>
                     <Typography
                       variant="h3"
@@ -648,7 +512,7 @@ const Contact: React.FC = () => {
                         mb: 1,
                       }}
                     >
-                      Get a Custom Tech Roadmap
+                      {heroSection.formTitle}
                     </Typography>
                     <Typography 
                       variant="body1" 
@@ -658,7 +522,7 @@ const Contact: React.FC = () => {
                         maxWidth: 500,
                       }}
                     >
-                      Fill out the form below and receive your personalized technology roadmap within 24 hours
+                      {heroSection.formSubtitle}
                     </Typography>
                   </Box>
 
@@ -747,7 +611,7 @@ const Contact: React.FC = () => {
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            <ChatBubbleOutline sx={{ color: theme.palette.primary.main }} />
+                         
                           </InputAdornment>
                         ),
                       }}
@@ -802,7 +666,7 @@ const Contact: React.FC = () => {
                 fontSize: { xs: '2.2rem', md: '2.8rem' }
               }}
             >
-              What Our Clients Say
+              {testimonialSection.title}
             </Typography>
             <Typography
               variant="body1"
@@ -815,12 +679,12 @@ const Contact: React.FC = () => {
                 fontSize: '1.1rem'
               }}
             >
-              Don't just take our word for it—hear from the businesses we've helped transform
+              {testimonialSection.subtitle}
             </Typography>
 
             <Grid container spacing={4} justifyContent="center">
               {testimonials.map((testimonial, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
+                <Grid item xs={12} sm={6} md={4} key={testimonial.id}>
                   <Zoom in={animateIn} style={{ transitionDelay: `${index * 150}ms` }}>
                     <Paper
                       elevation={4}
@@ -869,164 +733,74 @@ const Contact: React.FC = () => {
                         <Box>
                           <Typography variant="h6" sx={{ fontWeight: 700 }}>{testimonial.name}</Typography>
                           <Typography variant="body2" color="text.secondary">{testimonial.role}</Typography>
-                          </Box>
-                  </Box>
-                </Paper>
-              </Zoom>
+                        </Box>
+                      </Box>
+                    </Paper>
+                  </Zoom>
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
-      </Box>
+          </Box>
 
-      {/* FAQ Section */}
-      <Box sx={{ py: SPACING.large, mb: { xs: 8, md: 12 } }}>
-        <Typography
-          variant="h2"
-          component="h2"
-          align="center"
-          sx={{
-            mb: 2,
-            fontWeight: 800,
-            fontSize: { xs: '2.2rem', md: '2.8rem' }
-          }}
-        >
-          Frequently Asked Questions
-        </Typography>
-        <Typography
-          variant="body1"
-          align="center"
-          sx={{
-            color: theme.palette.text.secondary,
-            maxWidth: 800,
-            mx: 'auto',
-            mb: 8,
-            fontSize: '1.1rem'
-          }}
-        >
-          Find answers to common questions about our services and process
-        </Typography>
-
-        <Box
-          sx={{
-            maxWidth: 900,
-            mx: 'auto',
-            px: { xs: 2, sm: 4 },
-          }}
-        >
-          {faqItems.map((item, index) => (
-            <Accordion
-              key={index}
-              expanded={activeAccordion === index}
-              onChange={handleAccordionChange(index)}
-              sx={{
-                mb: 2,
-                borderRadius: 2,
-                backgroundColor: alpha(theme.palette.background.paper, 0.7),
-                backdropFilter: 'blur(10px)',
-                boxShadow: theme.shadows[2],
-                '&:before': {
-                  display: 'none',
-                },
-                '&.Mui-expanded': {
-                  boxShadow: theme.shadows[4],
-                },
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: theme.palette.primary.main }} />}
-                aria-controls={`faq-panel-${index}-content`}
-                id={`faq-panel-${index}-header`}
-                sx={{
-                  '& .MuiAccordionSummary-content': {
-                    my: 1,
-                  },
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 600,
-                    color: theme.palette.text.primary,
-                    transition: 'color 0.3s ease',
-                    '&:hover': {
-                      color: theme.palette.primary.light,
-                    }
-                  }}
-                >
-                  {item.question}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color: theme.palette.text.secondary,
-                    lineHeight: 1.7,
-                    fontSize: '1.05rem'
-                  }}
-                >
-                  {item.answer}
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-          ))}
-        </Box>
-      </Box>
-      <BackToTopButton />
-    </Container>
-  </ConsistentPageLayout>
-</>
-);
+          {/* FAQ Section */}
+          <FAQ items={faqItems} />
+          <BackToTopButton />
+        </Container>
+      </ConsistentPageLayout>
+    </>
+  );
 };
 
-const BackToTopButton: React.FC = () => {
-const theme = useTheme();
-const [isVisible, setIsVisible] = useState(false);
+// Back to Top Button Component
+const BackToTopButton = () => {
+  const theme = useTheme();
+  const [isVisible, setIsVisible] = useState(false);
 
-const handleScroll = () => {
-  const scrolled = document.documentElement.scrollTop;
-  if (scrolled > 300) {
-    setIsVisible(true);
-  } else {
-    setIsVisible(false);
-  }
-};
-
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth',
-  });
-};
-
-useEffect(() => {
-  window.addEventListener('scroll', handleScroll);
-  return () => {
-    window.removeEventListener('scroll', handleScroll);
+  const handleScroll = () => {
+    const scrolled = document.documentElement.scrollTop;
+    if (scrolled > 300) {
+      setIsVisible(true);
+    } else {
+      setIsVisible(false);
+    }
   };
-}, []);
 
-return (
-  <Zoom in={isVisible}>
-    <Fab
-      color="primary"
-      aria-label="Back to Top"
-      onClick={scrollToTop}
-      sx={{
-        position: 'fixed',
-        bottom: theme.spacing(4),
-        right: theme.spacing(4),
-        transition: 'transform 0.3s ease',
-        '&:hover': {
-          transform: 'scale(1.1)',
-        },
-        zIndex: 1100,
-        background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-      }}
-    >
-      <KeyboardArrowUp />
-    </Fab>
-  </Zoom>
-);
-}
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  return (
+    <Zoom in={isVisible}>
+      <Fab
+        color="primary"
+        aria-label="Back to Top"
+        onClick={scrollToTop}
+        sx={{
+          position: 'fixed',
+          bottom: theme.spacing(4),
+          right: theme.spacing(4),
+          transition: 'transform 0.3s ease',
+          '&:hover': {
+            transform: 'scale(1.1)',
+          },
+          zIndex: 1100,
+          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+        }}
+      >
+        <KeyboardArrowUp />
+      </Fab>
+    </Zoom>
+  );
+};
+
 export default Contact;
