@@ -123,21 +123,7 @@ const ServicesGrid = () => {
               <TechCard
                 icon={service.icon ? <service.icon /> : null}
                 title={service.title}
-                color={theme.palette.primary.main}
-                sx={{
-                  backgroundColor: alpha(theme.palette.background.default, 0.8), // Increased opacity for better contrast
-                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.7)', // Strong shadow for higher contrast
-                  borderRadius: 3, // Slightly increase border radius
-                  padding: SPACING.medium,
-                  fontWeight: 700,
-                  color: theme.palette.text.primary,
-                  zIndex: 2, // Ensure cards are on top
-                  border: `1px solid ${alpha(theme.palette.common.white, 0.3)}`, // Add subtle border for better definition
-                  ':hover': {
-                    transform: 'translateY(-5px)',
-                    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)', // Stronger hover shadow
-                  },
-                }}
+  
               >
                 <Typography
                   variant="body2"
@@ -146,7 +132,7 @@ const ServicesGrid = () => {
                   sx={{
                     fontWeight: 700,
                     color: theme.palette.text.primary,
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7)', // Strong shadow for better readability
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7)', 
                   }}
                 >
                   {service.content}

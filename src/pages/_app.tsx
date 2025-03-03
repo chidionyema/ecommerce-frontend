@@ -10,31 +10,33 @@ import { LazyMotion, domAnimation } from 'framer-motion';
 import { ThemeContextProvider } from '../theme/ThemeContext';
 import { AppThemeProvider } from '../theme/ThemeProvider';
 import GlobalLayout from '../layouts/GlobalLayout';
-import { AuthProvider } from '../contexts/AuthContext'; // Make sure this path is correct
+import { AuthProvider } from '../contexts/AuthContext';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 const AnalyticsProvider = dynamic(() => import('../components/AnalyticsProvider'), { ssr: false });
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <AnalyticsProvider>
-      <ThemeContextProvider>
-        <AppThemeProvider>
-          <CssBaseline />
-          <GlobalStyles />
-          {/* Wrap the entire app in AuthProvider */}
-          <AuthProvider>
-            <LazyMotion features={domAnimation}>
-              <ErrorBoundary>
-                <GlobalLayout>
-                  <Component {...pageProps} />
-                </GlobalLayout>
-                <ToastContainer />
-              </ErrorBoundary>
-            </LazyMotion>
-          </AuthProvider>
-        </AppThemeProvider>
-      </ThemeContextProvider>
-    </AnalyticsProvider>
+    <GoogleReCaptchaProvider reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}>
+      <AnalyticsProvider>
+        <ThemeContextProvider>
+          <AppThemeProvider>
+            <CssBaseline />
+            <GlobalStyles />
+            <AuthProvider>
+              <LazyMotion features={domAnimation}>
+                <ErrorBoundary>
+                  <GlobalLayout>
+                    <Component {...pageProps} />
+                  </GlobalLayout>
+                  <ToastContainer />
+                </ErrorBoundary>
+              </LazyMotion>
+            </AuthProvider>
+          </AppThemeProvider>
+        </ThemeContextProvider>
+      </AnalyticsProvider>
+    </GoogleReCaptchaProvider>
   );
 }
 

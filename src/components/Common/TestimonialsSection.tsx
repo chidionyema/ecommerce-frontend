@@ -92,7 +92,8 @@ const TestimonialsSection = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundImage: 'url("/images/istockphoto-1303809341-1024x1024.jpg")', // Ensure path is correct
+          backgroundImage: 'url("/images/istockphoto-1303809341-1024x1024.jpg")',
+          backgroundColor: 'transparent',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed',
@@ -103,7 +104,6 @@ const TestimonialsSection = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.7)', // Increase overlay opacity
           },
         }}
       />
@@ -135,18 +135,6 @@ const TestimonialsSection = () => {
                 <TechCard
                   icon={null}
                   title={t.name}
-                  sx={{
-                    backgroundColor: alpha(theme.palette.background.default, 0.9), // Matches the navbar background color
-                    boxShadow: '0 16px 32px rgba(0, 0, 0, 0.5)', // Strong shadow
-                    borderRadius: 3, // Slightly increase border radius
-                    padding: SPACING.medium,
-                    zIndex: 2, // Ensure cards are on top
-                    border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`, // Add subtle border for better definition
-                    ':hover': {
-                      transform: 'translateY(-5px)',
-                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)', // Increase hover shadow
-                    },
-                  }}
                 >
                   <Avatar
                     src={t.avatar}
@@ -189,18 +177,15 @@ const TestimonialsSection = () => {
 
         {!showAll && (
           <Box sx={{ textAlign: 'center', mt: SPACING.medium }}>
-            <NextLink href="/contact" passHref legacyBehavior>
+                    <GradientButton
+            href="/contact"
+            label="View More"
+            sizeVariant="medium"
+            sx={{
+              // Custom styles (if needed)
+            }}
+          />
 
-               <GradientButton
-                                        href="/contact"
-                                        label="View More"
-                                        sizeVariant="medium" // You can also set "small" or "large"
-                                        // Optional additional styles via sx:
-                                        sx={{
-                                          // Custom styles here (if needed)
-                                        }}
-                                      /> 
-            </NextLink>
           </Box>
         )}
       </Container>

@@ -4,7 +4,7 @@ import { Box, Container, Typography, Grid, useTheme, alpha } from '@mui/material
 import { useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
-import TechCard from '../Common/TechCard'; // Assuming TechCard doesn't take sx
+import TechCard from '../Common/TechCard'; 
 import { techIcons } from './tech-data';
 
 const TechnologyShowcase = () => {
@@ -13,7 +13,7 @@ const TechnologyShowcase = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { amount: 0.5, once: true });
   const [imageLoaded, setImageLoaded] = useState(false);
-  const imageUrl = '/images/istockphoto-digital.jpg'; // Replace with your actual image URL
+  const imageUrl = '/images/istockphoto-digital.jpg'; 
 
   useEffect(() => {
     const img = new Image();
@@ -114,22 +114,9 @@ const TechnologyShowcase = () => {
               <TechCard 
                 icon={tech.icon}
                 title={tech.title}
-                color={tech.color}
+               // color={tech.color}
                 index={index}
-                floatingVariants={styles.floatingAnimation}
-                // Apply necessary styles directly here to ensure visibility
-                sx={{ 
-                  backgroundColor: alpha(theme.palette.background.default, 0.95), // Matches nav background color
-                  boxShadow: '0 16px 32px rgba(0, 0, 0, 0.5)', // Strong shadow
-                  borderRadius: 3, // Slightly increase border radius
-                  padding: SPACING.medium,
-                  zIndex: 2, // Ensure cards are on top
-                  border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`, // Add subtle border for better definition
-                  ':hover': {
-                    transform: 'translateY(-5px)',
-                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)', // Increase hover shadow
-                  },
-                }} 
+               
               />
             </Grid>
           ))}

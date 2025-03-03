@@ -1,5 +1,5 @@
-// src/pages/register.tsx
-import React, { useState, useRef } from 'react';
+// src/pages/RegisterPage.tsx
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -8,12 +8,11 @@ import {
   Typography,
   useTheme,
   Link,
-  Grid, // Import Grid component
+  Grid,
 } from '@mui/material';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
-import ReCAPTCHA from 'react-google-recaptcha';
 import GoogleIcon from '@mui/icons-material/Google';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import MicrosoftIcon from '@mui/icons-material/Microsoft';
@@ -21,6 +20,7 @@ import { useAuth } from '../contexts/AuthContext';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import PageSection from '../components/PageSection';
 import { getSharedStyles, SPACING } from '../utils/sharedStyles';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 const RegisterPage: React.FC = () => {
   const theme = useTheme();
@@ -34,42 +34,48 @@ const RegisterPage: React.FC = () => {
   });
   const [error, setError] = useState('');
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
+  // Get the executeRecaptcha function.
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
   const styles = getSharedStyles(theme);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (formData.password!== formData.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    if (!captchaToken) {
-      setError('Please complete the CAPTCHA');
+    if (!executeRecaptcha) {
+      setError('Recaptcha not yet available');
       return;
     }
 
     try {
-      await register({...formData, captchaToken });
+      // Execute reCAPTCHA v3 with the "register" action.
+      const token = await executeRecaptcha('register');
+      setCaptchaToken(token);
+
+      if (!token) {
+        setError('CAPTCHA verification failed');
+        return;
+      }
+
+      // Call the register function. If registration fails, it will throw an error.
+      await register({ ...formData, captchaToken: token });
+      // On successful registration, redirect to login.
       router.push('/login');
     } catch (err: any) {
       setError(err.message || 'Failed to register');
-      // Reset CAPTCHA after submission
-      if (recaptchaRef.current) {
-        recaptchaRef.current.reset();
-        setCaptchaToken(null);
-      }
+      setCaptchaToken(null);
     }
-  };
-
-  const handleCaptchaChange = (token: string | null) => {
-    setCaptchaToken(token);
   };
 
   return (
@@ -92,7 +98,7 @@ const RegisterPage: React.FC = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 p: 4,
-                background: theme.palette.mode === 'light'? 'white': '#28282a',
+                background: theme.palette.mode === 'light' ? 'white' : '#28282a',
                 borderRadius: 4,
                 boxShadow: theme.shadows,
               }}
@@ -101,20 +107,34 @@ const RegisterPage: React.FC = () => {
                 component="h1"
                 variant="h5"
                 sx={{
-                ...styles.pageTitle,
+                  ...styles.pageTitle,
                   color: theme.palette.text.primary,
                   mb: SPACING.medium,
                 }}
               >
                 Sign up
               </Typography>
+
               {error && (
-                <Typography variant="body2" color="error" align="center" mb={2}>
-                  {error}
-                </Typography>
+                <Box
+                  sx={{
+                    width: '100%',
+                    p: 1.5,
+                    mb: 2,
+                    bgcolor: 'error.light',
+                    borderRadius: 1,
+                    border: '1px solid',
+                    borderColor: 'error.main',
+                  }}
+                >
+                  <Typography variant="body2" color="error" align="center">
+                    {error}
+                  </Typography>
+                </Box>
               )}
-              <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                <Grid container spacing={2}> {/* Wrap TextFields in Grid */}
+
+              <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
+                <Grid container spacing={2} sx={{ mb: 2 }}>
                   <Grid item xs={12}>
                     <TextField
                       required
@@ -168,92 +188,120 @@ const RegisterPage: React.FC = () => {
                   </Grid>
                 </Grid>
 
-                {/* CAPTCHA with instructions and accessibility link */}
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="body2" sx={{ mb: 1 }}>
-                    This site is protected by reCAPTCHA and the Google{' '}
-                    <Link href="https://policies.google.com/privacy">Privacy Policy</Link> and{' '}
-                    <Link href="https://policies.google.com/terms">Terms of Service</Link> apply.
-                  </Typography>
-                  <ReCAPTCHA
-                    ref={recaptchaRef}
-                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
-                    onChange={handleCaptchaChange}
-                  />
-                  <Typography variant="caption" sx={{ mt: 1 }}>
-                    If you have difficulty completing the CAPTCHA, you can try the{' '}
-                    <Link href="https://www.google.com/recaptcha/api2/demo" target="_blank" rel="noopener">
-                      audio challenge
-                    </Link>
-                  .
-                  </Typography>
-                </Box>
-
-                {/* Social media login buttons */}
-                <Box sx={{ mt: 2 }}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    color="primary"
-                    startIcon={<GoogleIcon />}
-                    onClick={() => loginWithProvider('google')}
-                    sx={{
-                      mb: 1,
-                      textTransform: 'none',
-                      fontWeight: 600,
-                    }}
-                  >
-                    Sign up with Google
-                  </Button>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    color="secondary"
-                    startIcon={<GitHubIcon />}
-                    onClick={() => loginWithProvider('github')}
-                    sx={{
-                      mb: 1,
-                      textTransform: 'none',
-                      fontWeight: 600,
-                    }}
-                  >
-                    Sign up with GitHub
-                  </Button>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    color="info"
-                    startIcon={<MicrosoftIcon />}
-                    onClick={() => loginWithProvider('microsoft')}
-                    sx={{
-                      textTransform: 'none',
-                      fontWeight: 600,
-                    }}
-                  >
-                    Sign up with Microsoft
-                  </Button>
-                </Box>
+                <Typography variant="caption" sx={{ mt: 1, textAlign: 'center' }}>
+                  This site is protected by reCAPTCHA and the Google{' '}
+                  <Link href="https://policies.google.com/privacy" target="_blank" rel="noopener">
+                    Privacy Policy
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="https://policies.google.com/terms" target="_blank" rel="noopener">
+                    Terms of Service
+                  </Link>{' '}
+                  apply.
+                </Typography>
 
                 <Button
                   type="submit"
                   fullWidth
                   variant="contained"
                   color="primary"
-                  sx={{ mt: 3, mb: 2, textTransform: 'none', fontWeight: 600 }}
+                  sx={{
+                    mt: 3,
+                    mb: 2,
+                    py: 1.5,
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    textTransform: 'none',
+                  }}
                 >
-                  Sign Up
+                  Create Account
                 </Button>
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <NextLink href="/login" passHref legacyBehavior>
-                    <Button
-                      component="a"
-                      variant="text"
-                      color="primary"
-                      sx={{ textTransform: 'none', fontWeight: 600 }}
-                    >
-                      Already have an account? Sign in
-                    </Button>
-                  </NextLink>
+
+                <Box sx={{ width: '100%', textAlign: 'center', my: 2 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Already have an account?{' '}
+                    <NextLink href="/login" passHref legacyBehavior>
+                      <Link sx={{ fontWeight: 600 }}>Sign in here</Link>
+                    </NextLink>
+                  </Typography>
+                </Box>
+
+                <Box sx={{ width: '100%', position: 'relative', mt: 2 }}>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      width: '100%',
+                      height: '1px',
+                      bgcolor: 'divider',
+                    }}
+                  />
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      position: 'relative',
+                      bgcolor: 'background.paper',
+                      px: 2,
+                      mx: 'auto',
+                      width: 'fit-content',
+                      color: 'text.secondary',
+                    }}
+                  >
+                    OR CONTINUE WITH
+                  </Typography>
+                </Box>
+
+                <Box sx={{ width: '100%', mt: 3 }}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="inherit"
+                    startIcon={<GoogleIcon />}
+                    onClick={() => loginWithProvider('google')}
+                    sx={{
+                      mb: 2,
+                      color: 'text.primary',
+                      borderColor: 'divider',
+                      '&:hover': { borderColor: 'action.active' },
+                      textTransform: 'none',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Google
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="inherit"
+                    startIcon={<GitHubIcon />}
+                    onClick={() => loginWithProvider('github')}
+                    sx={{
+                      mb: 2,
+                      color: 'text.primary',
+                      borderColor: 'divider',
+                      '&:hover': { borderColor: 'action.active' },
+                      textTransform: 'none',
+                      fontWeight: 600,
+                    }}
+                  >
+                    GitHub
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="inherit"
+                    startIcon={<MicrosoftIcon />}
+                    onClick={() => loginWithProvider('microsoft')}
+                    sx={{
+                      color: 'text.primary',
+                      borderColor: 'divider',
+                      '&:hover': { borderColor: 'action.active' },
+                      textTransform: 'none',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Microsoft
+                  </Button>
                 </Box>
               </Box>
             </Box>

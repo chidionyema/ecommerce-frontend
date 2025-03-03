@@ -42,6 +42,10 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
+  // Use NEXT_PUBLIC_BASE_URL from the environment.
+  // If not set, default to 'https://api.local.ritualworks.com'.
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://api.local.ritualworks.com';
+
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
@@ -50,10 +54,11 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const router = useRouter();
 
+  // Fetch the subscription status.
   const refreshSubscriptionStatus = useCallback(async () => {
     if (!user) return;
     try {
-      const res = await fetch('/api/Subscription/status');
+      const res = await fetch(`${baseUrl}/api/Subscription/status`);
       if (res.ok) {
         const data = await res.json();
         setIsSubscribed(data.isSubscribed);
@@ -66,19 +71,19 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
     } catch (error) {
       console.error('Error refreshing subscription status:', error);
     }
-  }, [user]);
+  }, [user, baseUrl]);
 
+  // Check for an active session.
   useEffect(() => {
     const checkAuth = async () => {
       setIsAuthLoading(true);
       try {
-        const res = await fetch('/api/auth/session');
+        const res = await fetch(`${baseUrl}/api/Authentication/verify-token`);
         if (res.ok) {
-          const session = await res.json();
-          if (session.user) {
-            setUser(session.user);
-            await refreshSubscriptionStatus();
-          }
+          const data = await res.json();
+          // Assuming your API returns an object with "user" and "isSubscribed" properties.
+          setUser(data.user);
+          setIsSubscribed(data.isSubscribed);
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
@@ -88,32 +93,34 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
     };
 
     checkAuth();
-  }, [refreshSubscriptionStatus]);
+  }, [refreshSubscriptionStatus, baseUrl]);
 
-  const login = useCallback(async ({ username, password }: { username: string; password: string; }) => {
-    setIsLoginLoading(true);
-    setLoginError(null);
-    try {
-      const result = await signIn('credentials', {
-        username,
-        password,
-        redirect: false,
-        callbackUrl: (router.query.redirect as string) || '/resources',
-      });
-      if (result?.error) {
-        setLoginError(result.error);
-      } else {
-        // Successful login, NextAuth.js handles the session.
+  // Login using credentials.
+  const login = useCallback(
+    async ({ username, password }: { username: string; password: string }) => {
+      setIsLoginLoading(true);
+      setLoginError(null);
+      try {
+        const result = await signIn('credentials', {
+          username,
+          password,
+          redirect: false,
+          callbackUrl: (router.query.redirect as string) || '/resources',
+        });
+        if (result?.error) {
+          setLoginError(result.error);
+        }
+      } catch (error) {
+        setLoginError('An unexpected error occurred during login.');
+        console.error('Login error:', error);
+      } finally {
+        setIsLoginLoading(false);
       }
-    } catch (error) {
-      setLoginError('An unexpected error occurred during login.');
-      console.error('Login error:', error);
-    } finally {
-      setIsLoginLoading(false);
-    }
-  }, [router]);
+    },
+    [router]
+  );
 
-  // Logout fixed: using two arguments, first the callback URL and second the options.
+  // Logout the user.
   const logout = useCallback(async () => {
     try {
       await signOut({ callbackUrl: '/login', redirect: true });
@@ -122,9 +129,10 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
     }
   }, []);
 
+  // Subscribe: create a checkout session.
   const subscribe = useCallback(async (priceId: string) => {
     try {
-      const res = await fetch('/api/Subscription/create-checkout-session', {
+      const res = await fetch(`${baseUrl}/api/Subscription/create-checkout-session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -132,7 +140,6 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
           redirectPath: router.asPath,
         }),
       });
-
       if (res.ok) {
         const { sessionId } = await res.json();
         const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
@@ -151,8 +158,9 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
       console.error('Error creating checkout session:', error);
       alert('Failed to start subscription. Please check your connection and try again.');
     }
-  }, [router]);
+  }, [router, baseUrl]);
 
+  // Register a new user.
   const register = useCallback(async (userData: {
     username: string;
     email: string;
@@ -160,27 +168,26 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
     confirmPassword: string;
     captchaToken: string;
   }) => {
-    try {
-      const res = await fetch('/api/Authentication/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
-      });
-
-      if (res.ok) {
-        router.push('/login');
-      } else {
-        const errorData = await res.json();
-        const errorMessage = errorData.message || 'Registration failed. Please try again.';
-        console.error('Registration failed:', errorData);
-        alert(errorMessage);
-      }
-    } catch (error) {
-      console.error('Registration error:', error);
-      alert('An unexpected error occurred during registration.');
+    // This function will throw an error if registration fails.
+    const res = await fetch(`${baseUrl}/api/Authentication/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      // Combine error messages if present, or use a fallback.
+      const errorMessage =
+        data.errors
+          ? Object.values(data.errors).flat().join(', ')
+          : data.message || 'Registration failed. Please try again.';
+      console.error('Registration failed:', data);
+      throw new Error(errorMessage);
     }
-  }, [router]);
+    return data;
+  }, [baseUrl]);
 
+  // Social login with a provider.
   const loginWithProvider = async (provider: string) => {
     try {
       const result = await signIn(provider, {
@@ -188,11 +195,9 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
       });
       if (result?.error) {
         console.error('Social login error:', result.error);
-        // Optionally display an error message
       }
     } catch (error) {
       console.error('Social login error:', error);
-      // Optionally display an error message
     }
   };
 

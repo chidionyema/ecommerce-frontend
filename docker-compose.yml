@@ -27,7 +27,7 @@ services:
     restart: "no"
     container_name: ecommerce-frontend-setup_https
 
-  qtrader:
+  gluestack:
     build:
       context: .
       dockerfile: Dockerfile
@@ -41,4 +41,4 @@ services:
       - ./certs:/app/certs:ro
     depends_on:
       - setup_https
-    container_name: ecommerce-frontend-qtrader
+    container_name: ecommerce-frontend-gluestack

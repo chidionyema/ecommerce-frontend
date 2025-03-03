@@ -33,7 +33,7 @@ export default function HomePage() {
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          gap: SPACING.large * 3, // Apply spacing between sections
+          gap: SPACING.large * 2, // Apply spacing between sections
           // Remove padding, let the sections handle their own padding
         }}
       >

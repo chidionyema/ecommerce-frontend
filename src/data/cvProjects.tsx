@@ -17,6 +17,7 @@ export interface CVProject {
   role: string;
   bannerText: string;
   icon: any;
+  tags?: string[];
   iconColor: string;
   clientName: string;
   challenges: string;

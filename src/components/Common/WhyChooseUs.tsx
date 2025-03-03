@@ -5,8 +5,6 @@ import {
   Box,
   Container,
   Typography,
-
-  Button,
   useTheme,
   alpha,
   Grid,
@@ -16,12 +14,14 @@ import { CheckCircle, Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import NextLink from 'next/link';
 import { GradientButton } from '../../components/GradientButton'
+import TechCard from './TechCard'; // Import TechCard
+
 
 const WhyChooseUs = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const imageUrl = '/images/istockphoto-globe.jpg';
+  const imageUrl = '/images/istockphoto-1303809341-1024x1024.jpg';
 
   useEffect(() => {
     const img = new Image();
@@ -85,15 +85,16 @@ const WhyChooseUs = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundImage: `url(${imageUrl})`, // Apply image here
+            backgroundImage: `url(${imageUrl})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            filter: 'blur(12px)', // Increase blur intensity
-            zIndex: 0, // Below the overlay
+            filter: 'blur(12px)',
+            zIndex: 0,
           }}
         />
       )}
-      {/* Overlay (if loaded) */}
+
+      {/* Overlay */}
       {imageLoaded && (
         <Box
           sx={{
@@ -102,11 +103,12 @@ const WhyChooseUs = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: alpha(theme.palette.primary.dark, 0.75), // Increase opacity
+            backgroundColor: alpha(theme.palette.primary.dark, 0.75),
             zIndex: 1,
           }}
         />
       )}
+
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
         <Typography
           variant="h2"
@@ -117,9 +119,9 @@ const WhyChooseUs = () => {
             color: imageLoaded ? 'white' : theme.palette.text.primary,
             mb: SPACING.medium,
             fontWeight: 700,
-            WebkitTextFillColor: 'white', // For Safari
-            WebkitTextStroke: imageLoaded ? '1px rgba(0, 0, 0, 0.5)' : 'none', // Stroke only if image loaded
-            textShadow: imageLoaded ? '0 4px 8px rgba(0, 0, 0, 0.7)' : 'none', // Increase shadow intensity
+             WebkitTextFillColor: 'white',
+            WebkitTextStroke: imageLoaded ? '1px rgba(0, 0, 0, 0.5)' : 'none',
+            textShadow: imageLoaded ? '0 4px 8px rgba(0, 0, 0, 0.7)' : 'none',
           }}
         >
           Why Partner with Us?
@@ -129,85 +131,40 @@ const WhyChooseUs = () => {
           container
           spacing={SPACING.medium}
           justifyContent="center"
-          alignItems="stretch" // Ensure all grid items stretch to the same height
+          alignItems="stretch"
         >
           {reasons.map((reason) => (
             <Grid item key={reason.id} xs={12} md={6}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  delay: reason.id * 0.1,
-                  duration: 0.4,
-                  ease: 'easeInOut',
-                }}
-                whileHover={{ scale: 1.03 }}
-                style={{ height: '100%' }}
+              {/* Use TechCard Here */}
+              <TechCard
+                title={reason.text}
+                index={reason.id - 1}  //  TechCard expects index to start at 0
+                icon={<reason.icon />}  // Pass the icon
               >
-                <Box
-                  sx={{
-                    p: SPACING.medium,
-                    borderRadius: 'md',
-                    boxShadow: theme.shadows[4], // Increase shadow intensity
-                    backgroundColor: alpha(theme.palette.background.default, 0.95), // Matches nav background color
-                    height: '100%', // Fill the available height
-                    minHeight: 300, // Ensure a consistent minimum height regardless of content
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      bgcolor: theme.palette.primary.light,
-                      color: theme.palette.primary.contrastText,
-                      borderRadius: '50%',
-                      width: 50,
-                      height: 50,
-                      mb: SPACING.small,
-                    }}
-                  >
-                    <reason.icon size={28} color={theme.palette.primary.main} />
-                  </Box>
-                  <Typography
-                    variant="h5"
-                    component="h3"
-                    sx={{
-                      fontWeight: 700,
-                      color: theme.palette.text.primary,
-                      mb: SPACING.small,
-                    }}
-                  >
-                    {reason.text}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    color="text.secondary"
-                    sx={{ flexGrow: 1 }} // Push description to take up available space
-                  >
-                    {reason.description}
-                  </Typography>
-                </Box>
-              </motion.div>
+                <Typography variant="body1" color="text.secondary" sx={{
+                    fontWeight: 700,
+                    color: theme.palette.text.primary,
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7)', 
+                  }}>
+                  
+                  
+                  {reason.description}
+                </Typography>
+              </TechCard>
             </Grid>
           ))}
         </Grid>
 
         <Box sx={{ textAlign: 'center', mt: SPACING.large }}>
           <NextLink href="/solutions" passHref legacyBehavior>
-          
+
               <GradientButton
                           href="/contact"
                           label="Explore Our Services"
-                          sizeVariant="medium" // You can also set "small" or "large"
-                          // Optional additional styles via sx:
+                          sizeVariant="medium"
                           sx={{
-                            // Custom styles here (if needed)
                           }}
-                        /> 
+                        />
           </NextLink>
         </Box>
       </Container>
