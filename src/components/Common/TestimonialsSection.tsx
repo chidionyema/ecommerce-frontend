@@ -11,7 +11,7 @@ import {
 import { motion } from 'framer-motion';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import TechCard from '../Common/TechCard'; 
-import { GradientButton } from '../../components/GradientButton'
+import { GradientButton } from '../../components/GradientButton';
 
 // Define the type for a testimonial
 interface Testimonial {
@@ -164,9 +164,9 @@ const TestimonialsSection = () => {
                   <Typography
                     variant="body1"
                     sx={{
-                    fontWeight: 700,
-                    color: theme.palette.text.primary,
-                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)', 
+                      fontWeight: 700,
+                      color: theme.palette.text.primary,
+                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)', 
                     }}
                   >
                     "{t.content}"

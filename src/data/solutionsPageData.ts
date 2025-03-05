@@ -28,7 +28,7 @@ export const solutionsPageData = {
     industries: [
         {
             title: "Finance",
-            icon: "/images/finance-icon.svg", // Replace with your actual paths
+            icon: "/images/healthcare-icon.svg", // Replace with your actual paths
             description: "Secure and scalable solutions for the financial sector.",
         },
         {

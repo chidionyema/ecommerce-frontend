@@ -1,3 +1,4 @@
+// pages/pricing.tsx
 import React, { useState } from 'react';
 import {
   Box,
@@ -11,10 +12,6 @@ import {
   AccordionDetails,
   Chip,
   alpha,
-  Theme,
-  Switch,
-  FormControlLabel,
-  Tooltip,
   Paper,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -32,196 +29,18 @@ import {
   Support as SupportIcon,
   Analytics as AnalyticsIcon,
   Speed as SpeedIcon,
-  Favorite as FavoriteIcon,
   ArrowForward as ArrowForwardIcon,
-  QuestionAnswer as QuestionAnswerIcon,
 } from '@mui/icons-material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
-import PageSection from '../components/PageSection';
-import { CARD_STYLES, getSharedStyles, SPACING } from '../utils/sharedStyles';
 
+import PageSection from '../components/PageSection'; // Corrected: Default import
+import { PageSectionProps } from '../components/PageSection'; 
+import { SPACING, getSharedStyles } from '../utils/sharedStyles';
 
-const pricingPageContent = {
-  hero: {
-    title: 'Flexible Pricing for Your Growing Startup',
-    subtitle:
-      'Choose the plan that best fits your needs and budget, and get access to expert technology solutions that drive measurable results.',
-    cta: 'Explore Our Plans',
-  },
-  pricingSection: {
-    heading: 'Our Flexible Pricing Plans',
-    description:
-      'Choose the plan that best fits your needs and unlock expert technology solutions designed to propel your business forward.',
-  },
-  guideSection: {
-    heading: 'Which Plan Is Right for You?',
-    description:
-      'Whether you need on‑demand advice, complete project delivery, or a long‑term strategic partner, we have a plan tailored for your business.',
-    items: [
-      {
-        title: 'Rapid Consultation (Hourly)',
-        description: 'Ideal for immediate expert guidance without long‑term commitments.',
-        icon: SpeedIcon,
-      },
-      {
-        title: 'Project Execution (Project‑Based)',
-        description:
-          'Best for organizations requiring comprehensive project delivery and dedicated support.',
-        icon: WorkIcon,
-      },
-      {
-        title: 'Strategic Partnership (Retainer)',
-        description: 'Perfect for businesses seeking continuous support and proactive strategy.',
-        icon: SupportIcon,
-      },
-    ],
-  },
-  faqSection: {
-    heading: 'Frequently Asked Questions',
-    items: [
-      {
-        question: 'What payment methods do you accept?',
-        answer:
-          'We accept major credit cards, bank transfers, and PayPal. Our transparent pricing means no hidden fees.',
-      },
-      {
-        question: 'Are there any long‑term contracts?',
-        answer:
-          'Our Hourly and Project‑Based plans are flexible with no long‑term commitments, while our Strategic Partnership plans involve tailored, longer‑term engagements.',
-      },
-      {
-        question: 'What does a custom quote include?',
-        answer:
-          'For our Project Execution plans, custom quotes are based on project scope, resource requirements, and timelines—ensuring a solution built just for you.',
-      },
-      {
-        question: 'How quickly can you start on my project?',
-        answer:
-          'For Rapid Consultation, we can typically schedule within 24-48 hours. For Project Execution, we\'ll provide a detailed timeline during our initial consultation based on your specific needs and our current capacity.',
-      },
-      {
-        question: 'Do you offer any refunds or guarantees?',
-        answer:
-          'We stand behind our work with a satisfaction guarantee. If you\'re not completely satisfied with our services, we\'ll work with you to make it right or provide a refund according to our terms of service.',
-      },
-    ],
-  },
-  comparisonSection: {
-    heading: 'Plan Comparison',
-    description: 'See how our plans stack up to find your perfect fit.',
-    features: [
-      { name: 'Response Time', consultation: '24-48 hours', project: 'As per schedule', retainer: 'Priority (same day)' },
-      { name: 'Team Size', consultation: '1 expert', project: 'Dedicated team', retainer: 'Full agency access' },
-      { name: 'Tech Stack Support', consultation: 'Specific focus', project: 'Project scope', retainer: 'Comprehensive' },
-      { name: 'Strategy Sessions', consultation: 'Optional', project: 'Included', retainer: 'Weekly' },
-      { name: 'Performance Reports', consultation: 'Not included', project: 'Project-based', retainer: 'Monthly' },
-    ]
-  },
-  testimonials: [
-    {
-      quote: "The Strategic Partnership plan revolutionized our approach to technology. We've seen a 43% increase in development efficiency since working with this team.",
-      author: "Sarah Johnson",
-      position: "CTO, GrowthTech Solutions",
-      planType: "retainer"
-    },
-    {
-      quote: "Their Project Execution plan delivered our e-commerce platform on time and under budget. The dedicated team approach made all the difference.",
-      author: "Michael Chen",
-      position: "Founder, Urban Retail",
-      planType: "project"
-    },
-    {
-      quote: "The Rapid Consultation option was exactly what we needed to solve our immediate challenges without a long-term commitment.",
-      author: "Jessica Rivera",
-      position: "Product Manager, LaunchPad Startups",
-      planType: "consultation"
-    }
-  ],
-  finalCta: {
-    heading: 'Ready to Accelerate Your Growth?',
-    description:
-      'Have questions or ready to get started? Contact us today to discover how our expert solutions can drive your business forward.',
-    cta: 'Get Your Free Consultation',
-  },
-};
+// Import the data objects from the data file
+import { pricingPageContent, plans } from '../data/pricingPageData';
 
-type Plan = {
-  type: string;
-  title: string;
-  tagline: string;
-  features: { icon: React.ElementType; text: string }[];
-  extraFeatures?: string[];
-  price: string;
-  annualPrice?: string;
-  cardStyle: { backgroundColor: string };
-  recommended?: boolean;
-  ctaText?: string;
-};
-
-const plans: Plan[] = [
-  {
-    type: 'consultation',
-    title: 'Rapid Consultation',
-    tagline: 'Get immediate expert advice when you need it most.',
-    features: [
-      { icon: AccessTime, text: 'On-Demand Expertise' },
-      { icon: EmojiEventsIcon, text: 'Real-Time Problem Solving' },
-      { icon: CalendarTodayIcon, text: 'Instant Scheduling' },
-    ],
-    extraFeatures: [
-      'No minimum commitment',
-      'Access to knowledge base',
-      'Email support',
-    ],
-    price: '$295/hr',
-    cardStyle: { backgroundColor: 'rgba(25, 118, 210, 0.05)' },
-    ctaText: 'Book Consultation',
-  },
-  {
-    type: 'project',
-    title: 'Project Execution',
-    tagline: 'End-to-end solutions for your complex initiatives.',
-    features: [
-      { icon: WorkIcon, text: 'Complete Project Delivery' },
-      { icon: GroupIcon, text: 'Dedicated Team Support' },
-      { icon: EmojiEventsIcon, text: 'Quality Assurance' },
-    ],
-    extraFeatures: [
-      'Dedicated project manager',
-      'Bi-weekly progress reports',
-      'Post-launch support (30 days)',
-    ],
-    price: 'Custom Quote',
-    cardStyle: { backgroundColor: 'rgba(0, 121, 107, 0.05)' },
-    ctaText: 'Request Quote',
-  },
-  {
-    type: 'retainer',
-    title: 'Strategic Partnership',
-    tagline: 'A long-term ally for continuous growth and innovation.',
-    features: [
-      { icon: GroupIcon, text: '24/7 Ongoing Support' },
-      { icon: InfoIcon, text: 'Tailored Technology Roadmap' },
-      { icon: EmojiEventsIcon, text: 'Monthly Performance Reviews' },
-    ],
-    extraFeatures: [
-      'Priority response times',
-      'Quarterly strategy sessions',
-      'Dedicated account executive',
-      'Technology trend briefings',
-    ],
-    price: 'Starting at $15k/mo',
-    annualPrice: 'Starting at $162k/yr',
-    cardStyle: { backgroundColor: 'rgba(63, 81, 181, 0.05)' },
-    recommended: true,
-    ctaText: 'Schedule Strategy Call',
-  },
-];
-
-const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({
-  icon: Icon,
-  text,
-}) => {
+const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon: Icon, text }) => {
   const theme = useTheme();
   return (
     <Box display="flex" alignItems="center" gap={2} my={2}>
@@ -237,13 +56,7 @@ const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({
           border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
         }}
       >
-        <Icon
-          sx={{
-            fontSize: 24,
-            color: theme.palette.primary.main,
-            transform: 'rotate(-10deg)',
-          }}
-        />
+        <Icon sx={{ fontSize: 24, color: theme.palette.primary.main, transform: 'rotate(-10deg)' }} />
       </Box>
       <Typography variant="body2" color="text.secondary">
         {text}
@@ -265,21 +78,21 @@ const ExtraFeatureItem: React.FC<{ text: string }> = ({ text }) => {
 };
 
 const renderPlanCard = (
-  plan: Plan,
+  plan: typeof plans[0],
   handlePlanClick: (type: string) => void,
-  theme: Theme,
+  theme: any,
   isAnnual: boolean
 ) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, delay: plan.type === 'consultation' ? 0 : plan.type === 'project' ? 0.1 : 0.2 }}
+    transition={{
+      duration: 0.5,
+      delay: plan.type === 'consultation' ? 0 : plan.type === 'project' ? 0.1 : 0.2,
+    }}
     viewport={{ once: true }}
     key={plan.type}
-    whileHover={{ 
-      y: -10,
-      transition: { duration: 0.3 } 
-    }}
+    whileHover={{ y: -10, transition: { duration: 0.3 } }}
   >
     <Paper
       elevation={plan.recommended ? 8 : 4}
@@ -292,10 +105,14 @@ const renderPlanCard = (
         p: 3,
         borderRadius: 4,
         position: 'relative',
-        background: plan.recommended 
-          ? `linear-gradient(145deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, ${theme.palette.mode === 'light' ? 'white' : '#28282a'} 100%)`
-          : theme.palette.mode === 'light' ? 'white' : '#28282a',
-        border: plan.recommended 
+        background: plan.recommended
+          ? `linear-gradient(145deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, ${
+              theme.palette.mode === 'light' ? 'white' : '#28282a'
+            } 100%)`
+          : theme.palette.mode === 'light'
+          ? 'white'
+          : '#28282a',
+        border: plan.recommended
           ? `2px solid ${alpha(theme.palette.primary.main, 0.3)}`
           : `1px solid ${alpha(theme.palette.divider, 0.2)}`,
         boxShadow: plan.recommended ? theme.shadows[8] : theme.shadows[4],
@@ -321,9 +138,8 @@ const renderPlanCard = (
           }}
         />
       )}
-      
       {plan.recommended && (
-        <Box 
+        <Box
           sx={{
             position: 'absolute',
             top: -50,
@@ -332,11 +148,10 @@ const renderPlanCard = (
             height: 100,
             bgcolor: alpha(theme.palette.primary.main, 0.1),
             borderRadius: '50%',
-            zIndex: 0
+            zIndex: 0,
           }}
         />
       )}
-      
       <Box position="relative" zIndex={1}>
         <Typography variant="h5" fontWeight="bold" mb={1}>
           {plan.title}
@@ -344,24 +159,21 @@ const renderPlanCard = (
         <Typography variant="subtitle1" mb={3} color="text.secondary">
           {plan.tagline}
         </Typography>
-        
         <Box sx={{ mb: 3 }}>
           <Typography variant="h4" fontWeight="bold" color="text.primary">
             {isAnnual && plan.annualPrice ? plan.annualPrice : plan.price}
           </Typography>
           {isAnnual && plan.annualPrice && (
-            <Typography variant="caption" color="success.main" sx={{ fontWeight: 'medium', display: 'block', mt: 0.5 }}>
+            <Typography variant="caption" color="success.main" sx={{ fontWeight: 'medium', mt: 0.5, display: 'block' }}>
               Save 10% with annual billing
             </Typography>
           )}
         </Box>
-        
         <Box sx={{ mb: 4 }}>
           {plan.features.map((feature, i) => (
             <FeatureItem key={i} icon={feature.icon} text={feature.text} />
           ))}
         </Box>
-        
         {plan.extraFeatures && (
           <Box sx={{ mb: 4 }}>
             <Typography variant="subtitle2" fontWeight="bold" mb={1.5} color="text.primary">
@@ -373,9 +185,8 @@ const renderPlanCard = (
           </Box>
         )}
       </Box>
-      
       <Button
-        variant={plan.recommended ? "contained" : "outlined"}
+        variant={plan.recommended ? 'contained' : 'outlined'}
         color="primary"
         onClick={() => handlePlanClick(plan.type)}
         sx={{
@@ -399,6 +210,35 @@ const renderPlanCard = (
   </motion.div>
 );
 
+// Custom section component for this specific page
+const CustomSection: React.FC<{
+  children: React.ReactNode;
+  id?: string;
+  sx?: any;
+  [key: string]: any;
+}> = ({ children, id, sx = [], ...props }) => {
+  const theme = useTheme();
+  return (
+    <Box
+      component="section"
+      id={id}
+      sx={[
+        { 
+          position: 'relative',
+          overflow: 'hidden',
+          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+          pt: { xs: 8, md: 12 },
+          pb: { xs: 12, md: 16 },
+        },
+        ...(Array.isArray(sx) ? sx : [sx])
+      ]}
+      {...props}
+    >
+      {children}
+    </Box>
+  );
+};
+
 const PricingPage: React.FC = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
@@ -415,20 +255,9 @@ const PricingPage: React.FC = () => {
   };
 
   return (
-    <ConsistentPageLayout
-      title={pricingPageContent.hero.title}
-      subtitle={pricingPageContent.hero.subtitle}
-    >
+    <ConsistentPageLayout title={pricingPageContent.hero.title} subtitle={pricingPageContent.hero.subtitle}>
       {/* HERO SECTION */}
-      <PageSection
-        sx={{
-          position: 'relative',
-          overflow: 'hidden',
-          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-          pt: { xs: 8, md: 12 },
-          pb: { xs: 12, md: 16 },
-        }}
-      >
+      <CustomSection>
         <Box
           sx={{
             position: 'absolute',
@@ -442,7 +271,6 @@ const PricingPage: React.FC = () => {
             backgroundSize: 'cover',
           }}
         />
-
         {/* Decorative shapes */}
         <Box
           sx={{
@@ -457,7 +285,6 @@ const PricingPage: React.FC = () => {
             opacity: 0.6,
           }}
         />
-        
         <Box
           sx={{
             position: 'absolute',
@@ -471,20 +298,15 @@ const PricingPage: React.FC = () => {
             opacity: 0.6,
           }}
         />
-        
         <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <Typography
               variant="h2"
               textAlign="center"
               gutterBottom
-              sx={{ 
-                fontWeight: 800, 
-                color: '#fff', 
+              sx={{
+                fontWeight: 800,
+                color: '#fff',
                 mb: 3,
                 fontSize: { xs: '2.5rem', md: '3.5rem' },
                 textShadow: '0 2px 10px rgba(0,0,0,0.2)',
@@ -493,17 +315,12 @@ const PricingPage: React.FC = () => {
               Pricing That Fuels <Box component="span" sx={{ color: alpha('#fff', 0.85) }}>Your Growth</Box>
             </Typography>
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
             <Typography
               variant="body1"
               textAlign="center"
-              sx={{ 
-                color: alpha('#fff', 0.85), 
+              sx={{
+                color: alpha('#fff', 0.85),
                 mb: 5,
                 fontSize: { xs: '1rem', md: '1.2rem' },
                 maxWidth: 700,
@@ -514,12 +331,7 @@ const PricingPage: React.FC = () => {
               {pricingPageContent.hero.subtitle}
             </Typography>
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}>
             <Box textAlign="center">
               <Button
                 variant="contained"
@@ -548,17 +360,12 @@ const PricingPage: React.FC = () => {
             </Box>
           </motion.div>
         </Container>
-      </PageSection>
+      </CustomSection>
 
       {/* PRICING PLANS SECTION */}
-      <PageSection id="pricing-plans" sx={{ py: { xs: 10, md: 12 } }}>
+      <CustomSection id="pricing-plans" sx={{ py: { xs: 10, md: 12 } }}>
         <Container>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
             <Typography
               variant="h3"
               textAlign="center"
@@ -570,9 +377,8 @@ const PricingPage: React.FC = () => {
                 fontSize: { xs: '2rem', md: '2.5rem' },
               }}
             >
-              Client Success Stories
+              {pricingPageContent.pricingSection.heading}
             </Typography>
-            
             <Typography
               variant="body1"
               textAlign="center"
@@ -584,29 +390,38 @@ const PricingPage: React.FC = () => {
                 fontSize: '1.1rem',
               }}
             >
-              Hear from our clients about how our flexible pricing models have helped them achieve their goals.
+              {pricingPageContent.pricingSection.description}
             </Typography>
           </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-          </motion.div>
+          <Grid container spacing={4}>
+            {plans.map((plan) => (
+              <Grid item xs={12} md={4} key={plan.type}>
+                {renderPlanCard(plan, handlePlanClick, theme, isAnnual)}
+              </Grid>
+            ))}
+          </Grid>
+          <Box textAlign="center" mt={4}>
+            <Button
+              variant="outlined"
+              onClick={() => setIsAnnual(!isAnnual)}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                borderRadius: 2,
+                px: 4,
+                py: 1.5,
+              }}
+            >
+              Toggle {isAnnual ? 'Monthly' : 'Annual'} Billing
+            </Button>
+          </Box>
         </Container>
-      </PageSection>
+      </CustomSection>
 
       {/* GUIDE SECTION */}
-      <PageSection sx={{ py: { xs: 10, md: 12 }, bgcolor: alpha(theme.palette.background.default, 0.6) }}>
+      <CustomSection sx={{ py: { xs: 10, md: 12 }, bgcolor: alpha(theme.palette.background.default, 0.6) }}>
         <Container>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
             <Typography
               variant="h3"
               textAlign="center"
@@ -634,19 +449,15 @@ const PricingPage: React.FC = () => {
               {pricingPageContent.guideSection.description}
             </Typography>
           </motion.div>
-          
           <Grid container spacing={4} sx={{ mt: 2 }}>
             {pricingPageContent.guideSection.items.map((item, index) => (
               <Grid item xs={12} md={4} key={index}>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
+                  viewport={{ once: true, margin: '-100px' }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
-                  whileHover={{ 
-                    y: -5,
-                    transition: { duration: 0.2 } 
-                  }}
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
                 >
                   <Paper
                     elevation={3}
@@ -654,7 +465,10 @@ const PricingPage: React.FC = () => {
                       p: 4,
                       borderRadius: 4,
                       height: '100%',
-                      background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.9)} 0%, ${alpha(theme.palette.background.paper, 0.7)} 100%)`,
+                      background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.9)} 0%, ${alpha(
+                        theme.palette.background.paper,
+                        0.7
+                      )} 100%)`,
                       backdropFilter: 'blur(10px)',
                       border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                     }}
@@ -672,9 +486,7 @@ const PricingPage: React.FC = () => {
                         boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.3)}`,
                       }}
                     >
-                      {item.icon && React.createElement(item.icon, {
-                        sx: { fontSize: 30, color: 'white' }
-                      })}
+                      {item.icon && React.createElement(item.icon, { sx: { fontSize: 30, color: 'white' } })}
                     </Box>
                     <Typography variant="h5" fontWeight="bold" mb={2}>
                       {item.title}
@@ -688,17 +500,12 @@ const PricingPage: React.FC = () => {
             ))}
           </Grid>
         </Container>
-      </PageSection>
+      </CustomSection>
 
       {/* FAQ SECTION */}
-      <PageSection sx={{ py: { xs: 10, md: 12 } }}>
+      <CustomSection sx={{ py: { xs: 10, md: 12 } }}>
         <Container>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
             <Typography
               variant="h3"
               textAlign="center"
@@ -712,7 +519,6 @@ const PricingPage: React.FC = () => {
             >
               {pricingPageContent.faqSection.heading}
             </Typography>
-            
             <Typography
               variant="body1"
               textAlign="center"
@@ -727,13 +533,7 @@ const PricingPage: React.FC = () => {
               Have questions? We've got answers to help you choose the right plan.
             </Typography>
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }}>
             <Box sx={{ maxWidth: 800, mx: 'auto' }}>
               {pricingPageContent.faqSection.items.map((faq, index) => (
                 <Accordion
@@ -752,26 +552,26 @@ const PricingPage: React.FC = () => {
                 >
                   <AccordionSummary
                     expandIcon={
-                      <ExpandMoreIcon sx={{ 
-                        color: theme.palette.primary.main,
-                        fontSize: '1.5rem',
-                        transition: 'transform 0.3s ease',
-                        transform: activeFaq === index ? 'rotate(180deg)' : 'rotate(0)',
-                      }} />
+                      <ExpandMoreIcon
+                        sx={{
+                          color: theme.palette.primary.main,
+                          fontSize: '1.5rem',
+                          transition: 'transform 0.3s ease',
+                          transform: activeFaq === index ? 'rotate(180deg)' : 'rotate(0)',
+                        }}
+                      />
                     }
                     sx={{
                       minHeight: 64,
                       px: 3,
                       py: 1,
-                      bgcolor: activeFaq === index 
-                        ? alpha(theme.palette.primary.light, 0.08)
-                        : theme.palette.background.paper,
+                      bgcolor: activeFaq === index ? alpha(theme.palette.primary.light, 0.08) : theme.palette.background.paper,
                     }}
                   >
-                    <Typography 
-                      variant="h6" 
-                      component="div" 
-                      sx={{ 
+                    <Typography
+                      variant="h6"
+                      component="div"
+                      sx={{
                         fontWeight: 600,
                         fontSize: '1.1rem',
                         color: activeFaq === index ? theme.palette.primary.main : theme.palette.text.primary,
@@ -780,7 +580,6 @@ const PricingPage: React.FC = () => {
                       {faq.question}
                     </Typography>
                   </AccordionSummary>
-                  
                   <AccordionDetails sx={{ px: 3, py: 2, bgcolor: alpha(theme.palette.background.paper, 0.5) }}>
                     <AnimatePresence>
                       {activeFaq === index && (
@@ -790,13 +589,7 @@ const PricingPage: React.FC = () => {
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.2 }}
                         >
-                          <Typography 
-                            variant="body1" 
-                            sx={{ 
-                              color: theme.palette.text.secondary,
-                              lineHeight: 1.7,
-                            }}
-                          >
+                          <Typography variant="body1" sx={{ color: theme.palette.text.secondary, lineHeight: 1.7 }}>
                             {faq.answer}
                           </Typography>
                         </motion.div>
@@ -808,13 +601,16 @@ const PricingPage: React.FC = () => {
             </Box>
           </motion.div>
         </Container>
-      </PageSection>
+      </CustomSection>
 
       {/* FINAL CTA SECTION */}
-      <PageSection 
-        sx={{ 
+      <CustomSection
+        sx={{
           py: { xs: 10, md: 14 },
-          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.9)} 0%, ${alpha(theme.palette.primary.main, 0.85)} 100%)`,
+          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.9)} 0%, ${alpha(
+            theme.palette.primary.main,
+            0.85
+          )} 100%)`,
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -832,7 +628,6 @@ const PricingPage: React.FC = () => {
             backgroundSize: 'cover',
           }}
         />
-        
         {/* Decorative elements */}
         <Box
           sx={{
@@ -846,7 +641,6 @@ const PricingPage: React.FC = () => {
             zIndex: 0,
           }}
         />
-        
         <Box
           sx={{
             position: 'absolute',
@@ -859,20 +653,14 @@ const PricingPage: React.FC = () => {
             zIndex: 0,
           }}
         />
-        
         <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
             <Typography
               variant="h2"
               textAlign="center"
-              sx={{ 
-                fontWeight: 800, 
-                color: '#fff', 
+              sx={{
+                fontWeight: 800,
+                color: '#fff',
                 mb: 3,
                 fontSize: { xs: '2.2rem', md: '3rem' },
                 textShadow: '0 2px 10px rgba(0,0,0,0.1)',
@@ -881,17 +669,11 @@ const PricingPage: React.FC = () => {
               {pricingPageContent.finalCta.heading}
             </Typography>
           </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.2 }}>
             <Typography
               variant="h6"
               textAlign="center"
-              sx={{ 
+              sx={{
                 color: alpha('#fff', 0.9),
                 mb: 6,
                 maxWidth: 700,
@@ -903,14 +685,7 @@ const PricingPage: React.FC = () => {
               {pricingPageContent.finalCta.description}
             </Typography>
           </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-center"
-          >
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.4 }}>
             <Box textAlign="center">
               <Button
                 variant="contained"
@@ -940,9 +715,9 @@ const PricingPage: React.FC = () => {
             </Box>
           </motion.div>
         </Container>
-      </PageSection>
+      </CustomSection>
     </ConsistentPageLayout>
   );
 };
 
-export default PricingPage
+export default PricingPage;

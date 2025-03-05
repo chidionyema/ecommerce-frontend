@@ -1,0 +1,109 @@
+/* ProductForm.module.css */
+.formContainer {
+    max-width: 800px;
+    padding: 24px;
+  }
+  
+  .formSection {
+    margin-bottom: 32px;
+  }
+  
+  .formHeader {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .fieldRow {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .fullWidth {
+    width: 100%;
+  }
+  
+  .halfWidth {
+    width: 48%;
+  }
+  
+  .label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: #2196f3;
+  }
+  
+  .errorText {
+    color: #d32f2f;
+    font-size: 0.75rem;
+    margin-top: 4px;
+  }
+  
+  .submitButton {
+    margin-top: 24px;
+    padding: 12px 24px;
+    background-color: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .submitButton:hover {
+    background-color: #0051cb;
+  }
+  
+  .submitButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .imagePreview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-top: 8px;
+  }
+  
+  .imagesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  
+  .imageContainer {
+    position: relative;
+  }
+  
+  .removeButton {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #d32f2f;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    border: none;
+  }

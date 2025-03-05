@@ -12,10 +12,11 @@ import { AppThemeProvider } from '../theme/ThemeProvider';
 import GlobalLayout from '../layouts/GlobalLayout';
 import { AuthProvider } from '../contexts/AuthContext';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import { SessionProvider } from 'next-auth/react';
 
 const AnalyticsProvider = dynamic(() => import('../components/AnalyticsProvider'), { ssr: false });
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps : { session, ...pageProps }}: AppProps) {
   return (
     <GoogleReCaptchaProvider reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}>
       <AnalyticsProvider>
@@ -23,6 +24,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           <AppThemeProvider>
             <CssBaseline />
             <GlobalStyles />
+            <SessionProvider session={session}>
             <AuthProvider>
               <LazyMotion features={domAnimation}>
                 <ErrorBoundary>
@@ -33,6 +35,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 </ErrorBoundary>
               </LazyMotion>
             </AuthProvider>
+            </SessionProvider>
           </AppThemeProvider>
         </ThemeContextProvider>
       </AnalyticsProvider>

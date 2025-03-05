@@ -13,9 +13,8 @@ import { motion } from 'framer-motion';
 import { CheckCircle, Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-react';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import NextLink from 'next/link';
-import { GradientButton } from '../../components/GradientButton'
+import { GradientButton } from '../../components/GradientButton';
 import TechCard from './TechCard'; // Import TechCard
-
 
 const WhyChooseUs = () => {
   const theme = useTheme();
@@ -119,7 +118,7 @@ const WhyChooseUs = () => {
             color: imageLoaded ? 'white' : theme.palette.text.primary,
             mb: SPACING.medium,
             fontWeight: 700,
-             WebkitTextFillColor: 'white',
+            WebkitTextFillColor: 'white',
             WebkitTextStroke: imageLoaded ? '1px rgba(0, 0, 0, 0.5)' : 'none',
             textShadow: imageLoaded ? '0 4px 8px rgba(0, 0, 0, 0.7)' : 'none',
           }}
@@ -145,9 +144,7 @@ const WhyChooseUs = () => {
                   fontWeight: 700,
                   color: theme.palette.text.primary,
                   textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)', 
-                  }}>
-                  
-                  
+                }}>
                   {reason.description}
                 </Typography>
               </TechCard>
@@ -157,14 +154,14 @@ const WhyChooseUs = () => {
 
         <Box sx={{ textAlign: 'center', mt: SPACING.large }}>
           <NextLink href="/solutions" passHref legacyBehavior>
-
-              <GradientButton
-                          href="/contact"
-                          label="Explore Our Services"
-                          sizeVariant="medium"
-                          sx={{
-                          }}
-                        />
+            <GradientButton
+              href="/contact"
+              label="Explore Our Services"
+              sizeVariant="medium"
+              sx={{
+                // Custom styles if needed
+              }}
+            />
           </NextLink>
         </Box>
       </Container>

@@ -8,6 +8,7 @@ import { SPACING } from '../utils/sharedStyles';
 interface CardGridProps {
   data: any[];
   renderItem: (item: any) => React.ReactNode;
+  emptyMessage?: React.ReactElement; 
   spacing?: number;
   gridProps?: object;
   sx?: SxProps;

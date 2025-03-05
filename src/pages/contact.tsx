@@ -51,6 +51,7 @@ import {
   testimonialSection,
   successPageData
 } from '../data/contactPageData';
+import { CheckCircleIcon } from 'lucide-react';
 
 // Form validation schema
 const validationSchema = yup.object().shape({
@@ -184,7 +185,14 @@ const Contact = () => {
                 mb: 4
               }}
             >
-              <CheckCircleIcon sx={{ fontSize: 80, color: theme.palette.success.main }} />
+             <CheckCircleIcon 
+    style={{ 
+      fontSize: 80, 
+      color: theme.palette.success.main,
+      width: '1.5em',  // Add explicit sizing
+      height: '1.5em'
+    }} 
+  />
             </Box>
             <Typography
               variant="h3"

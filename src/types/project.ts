@@ -8,7 +8,7 @@ export interface Project {
     teamSize: number;
     timeline: string;
     technologies: string[];
-    technologyIcons: string[];
+    technologyIcons?: Record<string, string>;
     role: string;
     clientName: string;
     challenges: string;

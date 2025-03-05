@@ -11,14 +11,14 @@ import {
     Analytics as AnalyticsIcon,
     Speed as SpeedIcon,
   } from '@mui/icons-material';
-  import { SvgIconTypeMap } from '@mui/material';
   import { OverridableComponent } from '@mui/material/OverridableComponent';
+  import { SvgIconTypeMap } from '@mui/material';
   
-  type MuiIcon = OverridableComponent<SvgIconTypeMap<{}, "svg">> & {
-      muiName: string;
-  }
+  export type MuiIcon = OverridableComponent<SvgIconTypeMap<{}, "svg">> & {
+    muiName: string;
+  };
   
-  interface PricingPageContent {
+  export interface PricingPageContent {
     hero: {
       title: string;
       subtitle: string;
@@ -67,7 +67,7 @@ import {
     };
   }
   
-  interface Plan {
+  export interface Plan {
     type: string;
     title: string;
     tagline: string;
@@ -151,37 +151,12 @@ import {
       heading: 'Plan Comparison',
       description: 'See how our plans stack up to find your perfect fit.',
       features: [
-        {
-          name: 'Response Time',
-          consultation: '24-48 hours',
-          project: 'As per schedule',
-          retainer: 'Priority (same day)',
-        },
-        {
-          name: 'Team Size',
-          consultation: '1 expert',
-          project: 'Dedicated team',
-          retainer: 'Full agency access',
-        },
-        {
-          name: 'Tech Stack Support',
-          consultation: 'Specific focus',
-          project: 'Project scope',
-          retainer: 'Comprehensive',
-        },
-        {
-          name: 'Strategy Sessions',
-          consultation: 'Optional',
-          project: 'Included',
-          retainer: 'Weekly',
-        },
-        {
-          name: 'Performance Reports',
-          consultation: 'Not included',
-          project: 'Project-based',
-          retainer: 'Monthly',
-        },
-      ],
+        { name: 'Response Time', consultation: '24-48 hours', project: 'As per schedule', retainer: 'Priority (same day)' },
+        { name: 'Team Size', consultation: '1 expert', project: 'Dedicated team', retainer: 'Full agency access' },
+        { name: 'Tech Stack Support', consultation: 'Specific focus', project: 'Project scope', retainer: 'Comprehensive' },
+        { name: 'Strategy Sessions', consultation: 'Optional', project: 'Included', retainer: 'Weekly' },
+        { name: 'Performance Reports', consultation: 'Not included', project: 'Project-based', retainer: 'Monthly' },
+      ]
     },
     testimonials: [
       {
@@ -204,7 +179,7 @@ import {
         author: 'Jessica Rivera',
         position: 'Product Manager, LaunchPad Startups',
         planType: 'consultation',
-      },
+      }
     ],
     finalCta: {
       heading: 'Ready to Accelerate Your Growth?',
@@ -273,3 +248,4 @@ import {
       ctaText: 'Schedule Strategy Call',
     },
   ];
+  

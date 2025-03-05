@@ -1,0 +1,51 @@
+/* styles/store/CheckoutPage.module.css (continued) */
+.summaryItemName {
+    font-size: 0.875rem;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .summaryItemPrice {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+  }
+  
+  .summaryDivider {
+    height: 1px;
+    background-color: #e5e7eb;
+    margin: 1.25rem 0;
+  }
+  
+  .summaryTotals {
+    font-size: 0.875rem;
+  }
+  
+  .summaryRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+  
+  .summaryRow span:first-child {
+    color: #6b7280;
+  }
+  
+  .summaryRow span:last-child {
+    color: #111827;
+    font-weight: 500;
+  }
+  
+  .summaryTotal {
+    font-size: 1rem;
+    font-weight: 600;
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .summaryTotal span {
+    color: #111827 !important;
+  }

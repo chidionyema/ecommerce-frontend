@@ -29,8 +29,8 @@ export default {
   },
 
   // Configure Next.js for static export
-  output: "export",
-  distDir: "out",
+ // output: "export",
+ // distDir: "out",
 
   // Images configuration
   images: {

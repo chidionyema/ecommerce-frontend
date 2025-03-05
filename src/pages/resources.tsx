@@ -1,3 +1,4 @@
+// pages/resources.tsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -9,9 +10,7 @@ import {
   Grid,
   Divider,
   Paper,
-  Badge,
   Avatar,
-  Tooltip,
   Rating,
   TextField,
   InputAdornment,
@@ -45,177 +44,22 @@ import { CARD_STYLES, getSharedStyles, SPACING } from '../utils/sharedStyles';
 import { useAuth } from '../contexts/AuthContext';
 import Confetti from 'react-confetti';
 
-// ---------------------------
-// Resource data arrays
-// ---------------------------
+// Import data from external file
+import {
+  freeResources,
+  premiumResources,
+  testimonials,
+  benefits,
+  stats,
+  filterOptions,
+  heroSection,
+  benefitsSection,
+  premiumSection,
+  testimonialSection,
+  freeResourcesSection,
+  ctaSection
+} from '../data/resourcesPageData';
 
-// Free Resources
-const freeResources = [
-  {
-    id: 1,
-    title: 'Basic Cloud Concepts',
-    summary: 'Introduction to cloud infrastructure and basic concepts.',
-    icon: CloudIcon,
-    path: '/free-resources/cloud',
-    downloads: '1.5K+',
-    trending: true,
-    time: '10 min read',
-    rating: 4.7,
-    reviewCount: 238,
-    lastUpdated: '2 weeks ago',
-    level: 'Beginner',
-    tags: ['Cloud', 'Infrastructure', 'Basics']
-  },
-  {
-    id: 2,
-    title: 'Basic Security Vaults',
-    summary: 'Learn the basics of securing your infrastructure with vaults.',
-    icon: VpnKey,
-    path: '/free-resources/security',
-    downloads: '1.2K+',
-    trending: true,
-    time: '12 min read',
-    rating: 4.5,
-    reviewCount: 186,
-    lastUpdated: '1 month ago',
-    level: 'Beginner',
-    tags: ['Security', 'Vaults', 'Protection']
-  },
-  {
-    id: 3,
-    title: 'Introduction to API Security',
-    summary: 'Learn how to secure APIs with best practices and minimal overhead.',
-    icon: SecurityIcon,
-    path: '/free-resources/api-security',
-    downloads: '1.1K+',
-    trending: false,
-    time: '15 min read',
-    rating: 4.6,
-    reviewCount: 159,
-    lastUpdated: '3 weeks ago',
-    level: 'Intermediate',
-    tags: ['API', 'Security', 'Best Practices']
-  },
-];
-
-// Premium Resources
-const premiumResources = [
-  {
-    id: 1,
-    title: 'Cloud Mastery',
-    summary:
-      'Complete guide with scripts, code, and docs to master cloud infrastructure.',
-    icon: CloudIcon,
-    path: '/premium-resources/cloud',
-    downloads: '2.4K+',
-    trending: true,
-    time: '18 min read',
-    rating: 4.9,
-    reviewCount: 342,
-    lastUpdated: '1 week ago',
-    level: 'Advanced',
-    tags: ['Cloud', 'Infrastructure', 'Complete']
-  },
-  {
-    id: 2,
-    title: 'Security Vaults',
-    summary:
-      'Full premium package with security vault setup scripts and complete documentation.',
-    icon: VpnKey,
-    path: '/premium-resources/security',
-    downloads: '1.8K+',
-    trending: true,
-    time: '25 min read',
-    rating: 4.8,
-    reviewCount: 275,
-    lastUpdated: '2 weeks ago',
-    level: 'Advanced',
-    tags: ['Security', 'Vaults', 'Premium']
-  },
-  {
-    id: 3,
-    title: 'Code Architect',
-    summary:
-      'Detailed code architecture patterns with production-ready examples.',
-    icon: CodeIcon,
-    path: '/premium-resources/architecture',
-    downloads: '3.1K+',
-    trending: false,
-    time: '30 min read',
-    rating: 4.9,
-    reviewCount: 425,
-    lastUpdated: '5 days ago',
-    level: 'Expert',
-    tags: ['Architecture', 'Patterns', 'Production']
-  },
-];
-
-// Testimonials
-const testimonials = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    role: "Senior Developer at TechCorp",
-    avatar: "https://i.pravatar.cc/150?img=1",
-    comment: "The premium resources saved our team weeks of development time. The code is clean, well-documented, and production-ready.",
-    resource: "Cloud Mastery",
-    rating: 5
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    role: "CTO at StartupX",
-    avatar: "https://i.pravatar.cc/150?img=2",
-    comment: "I've tried many resources, but these are exceptionally well-crafted. The Security Vaults package helped us pass our security audit with flying colors.",
-    resource: "Security Vaults",
-    rating: 5
-  },
-  {
-    id: 3,
-    name: "Emily Rodriguez",
-    role: "Lead Architect at EnterpriseY",
-    avatar: "https://i.pravatar.cc/150?img=3",
-    comment: "The Code Architect resource transformed how we approach our system design. Highly recommended for any serious development team.",
-    resource: "Code Architect",
-    rating: 5
-  }
-];
-
-// Benefits
-const benefits = [
-  {
-    title: "Time-Saving Solutions",
-    description: "Our production-ready resources cut development time by up to 70%",
-    icon: AccessTimeIcon
-  },
-  {
-    title: "Expert-Reviewed Code",
-    description: "All resources are vetted by industry experts and follow best practices",
-    icon: CheckCircleIcon
-  },
-  {
-    title: "Continuous Updates",
-    description: "Resources are regularly updated to match evolving industry standards",
-    icon: CloudIcon
-  },
-  {
-    title: "Comprehensive Support",
-    description: "Premium subscribers get dedicated email support from our experts",
-    icon: PersonOutlineIcon
-  }
-];
-
-// Stats
-const stats = [
-  { label: "Active Users", value: "10K+" },
-  { label: "Total Downloads", value: "50K+" },
-  { label: "Success Rate", value: "98%" },
-  { label: "Time Saved", value: "100K+ hrs" }
-];
-
-// ---------------------------
-// Main Component
-// ---------------------------
 const ResourcesPage: React.FC = () => {
   const theme = useTheme();
   const router = useRouter();
@@ -223,33 +67,24 @@ const ResourcesPage: React.FC = () => {
   const styles = getSharedStyles(theme);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [showConfetti, setShowConfetti] = useState(false);
   const [visibleTestimonials, setVisibleTestimonials] = useState(testimonials.slice(0, 1));
   const [testimonialIndex, setTestimonialIndex] = useState(0);
 
-  // Filter options
-  const filterOptions = [
-    { label: 'All', value: 'all' },
-    { label: 'Trending', value: 'trending' },
-    { label: 'Beginner', value: 'beginner' },
-    { label: 'Advanced', value: 'advanced' }
-  ];
-
-  // Function to filter resources based on search and filters
-  const getFilteredResources = (resources) => {
+  // Filter resources based on search term and active filter.
+  const getFilteredResources = (resources: any[]) => {
     return resources.filter(resource => {
-      // Search filter
-      const matchesSearch = searchTerm === '' || 
-        resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        resource.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (resource.tags && resource.tags.some(tag => 
-          tag.toLowerCase().includes(searchTerm.toLowerCase())
-        ));
-      
-      // Category filter
+    // In the getFilteredResources function
+    const matchesSearch =
+    searchTerm === '' ||
+    resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    resource.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (resource.tags &&
+      resource.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    ); // Add closing parenthesis and closing bracket here
       let matchesFilter = true;
       if (activeFilter === 'trending') {
         matchesFilter = resource.trending;
@@ -258,61 +93,51 @@ const ResourcesPage: React.FC = () => {
       } else if (activeFilter === 'advanced') {
         matchesFilter = resource.level === 'Advanced' || resource.level === 'Expert';
       }
-      
       return matchesSearch && matchesFilter;
     });
   };
 
-  // Rotate testimonials every 5 seconds
+  // Rotate testimonials every 5 seconds.
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setTestimonialIndex((prevIndex) => {
+      setTestimonialIndex(prevIndex => {
         const newIndex = (prevIndex + 1) % testimonials.length;
         setVisibleTestimonials([testimonials[newIndex]]);
         return newIndex;
       });
     }, 5000);
-
     return () => clearInterval(intervalId);
   }, []);
 
-  // Function to handle resource click
+  // Handle clicking on a resource.
   const handleResourceClick = (resource: any) => {
     const isPremium = resource.path.startsWith('/premium-resources');
-    
     if (!isPremium) {
       router.push(resource.path);
       return;
     }
-    
     if (!user) {
       router.push(`/login?redirect=${encodeURIComponent(resource.path)}`);
     } else if (!isSubscribed) {
       router.push(`/subscribe?redirect=${encodeURIComponent(resource.path)}`);
     } else {
-      // Show confetti for premium content access
+      // Show confetti when accessing premium content.
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
       router.push(resource.path);
     }
   };
 
-  // Render a single resource card
-  const renderResourceCard = (
-    resource: typeof freeResources[0] | typeof premiumResources[0]
-  ) => {
+  // Render a single resource card.
+  const renderResourceCard = (resource: any) => {
     const IconComponent = resource.icon;
     const isPremium = resource.path.startsWith('/premium-resources');
-    
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: Math.random() * 0.3 } }}
         viewport={{ once: true }}
-        whileHover={{ 
-          scale: 1.03,
-          transition: { duration: 0.2 } 
-        }}
+        whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
       >
         <Paper
           elevation={6}
@@ -326,23 +151,21 @@ const ResourcesPage: React.FC = () => {
             overflow: 'hidden',
             position: 'relative',
             transition: 'all 0.3s ease',
-            background: isPremium 
-              ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.primary.light, 0.2)} 100%)`
+            background: isPremium
+              ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(
+                  theme.palette.primary.light,
+                  0.2
+                )} 100%)`
               : theme.palette.background.paper,
-            border: isPremium 
+            border: isPremium
               ? `1px solid ${alpha(theme.palette.primary.main, 0.3)}`
               : `1px solid ${alpha(theme.palette.divider, 0.6)}`,
             '&:hover': {
-              boxShadow: isPremium 
-                ? `0 10px 30px ${alpha(theme.palette.primary.main, 0.15)}`
-                : theme.shadows[10],
-              borderColor: isPremium 
-                ? theme.palette.primary.main
-                : theme.palette.divider,
+              boxShadow: isPremium ? `0 10px 30px ${alpha(theme.palette.primary.main, 0.15)}` : theme.shadows[10],
+              borderColor: isPremium ? theme.palette.primary.main : theme.palette.divider,
             },
           }}
         >
-          {/* Top ribbon for premium resources */}
           {isPremium && (
             <Box
               sx={{
@@ -363,7 +186,6 @@ const ResourcesPage: React.FC = () => {
               PREMIUM
             </Box>
           )}
-
           <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Box
               sx={{
@@ -378,14 +200,13 @@ const ResourcesPage: React.FC = () => {
                 height: 90,
                 mb: 3,
                 mx: 'auto',
-                border: `2px solid ${isPremium
-                  ? alpha(theme.palette.primary.main, 0.3)
-                  : alpha(theme.palette.grey[500], 0.3)
+                border: `2px solid ${
+                  isPremium ? alpha(theme.palette.primary.main, 0.3) : alpha(theme.palette.grey[500], 0.3)
                 }`,
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'rotate(5deg)',
-                  backgroundColor: isPremium 
+                  backgroundColor: isPremium
                     ? alpha(theme.palette.primary.main, 0.15)
                     : alpha(theme.palette.grey[500], 0.15),
                 },
@@ -394,35 +215,33 @@ const ResourcesPage: React.FC = () => {
               <IconComponent
                 sx={{
                   fontSize: 45,
-                  color: isPremium
-                    ? theme.palette.primary.main
-                    : theme.palette.text.secondary,
+                  color: isPremium ? theme.palette.primary.main : theme.palette.text.secondary,
                 }}
               />
             </Box>
-            
             <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Chip 
-                label={resource.level} 
-                size="small" 
+              <Chip
+                label={resource.level}
+                size="small"
                 color={
-                  resource.level === 'Beginner' ? 'success' : 
-                  resource.level === 'Intermediate' ? 'info' : 
-                  'warning'
+                  resource.level === 'Beginner'
+                    ? 'success'
+                    : resource.level === 'Intermediate'
+                    ? 'info'
+                    : 'warning'
                 }
                 sx={{ mr: 1 }}
               />
               {resource.trending && (
-                <Chip 
+                <Chip
                   icon={<LocalOfferIcon fontSize="small" />}
-                  label="Trending" 
-                  color="error" 
-                  size="small" 
+                  label="Trending"
+                  color="error"
+                  size="small"
                   sx={{ fontWeight: 'bold' }}
                 />
               )}
             </Box>
-            
             <Typography
               variant="h5"
               component="h3"
@@ -436,20 +255,12 @@ const ResourcesPage: React.FC = () => {
             >
               {resource.title}
             </Typography>
-            
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-              <Rating 
-                value={resource.rating} 
-                precision={0.1} 
-                readOnly 
-                size="small" 
-                sx={{ mr: 1 }}
-              />
+              <Rating value={resource.rating} precision={0.1} readOnly size="small" sx={{ mr: 1 }} />
               <Typography variant="body2" color="text.secondary">
                 ({resource.reviewCount})
               </Typography>
             </Box>
-            
             <Typography
               variant="body1"
               sx={{
@@ -462,50 +273,29 @@ const ResourcesPage: React.FC = () => {
             >
               {resource.summary}
             </Typography>
-            
-            <Box sx={{ 
-              display: 'flex', 
-              flexWrap: 'wrap', 
-              justifyContent: 'center', 
-              gap: 1, 
-              mb: 2.5
-            }}>
-              {resource.tags.map(tag => (
-                <Chip 
-                  key={tag} 
-                  label={tag} 
-                  size="small" 
-                  variant="outlined" 
-                  sx={{ 
-                    fontSize: '0.7rem',
-                    borderRadius: '4px',
-                  }} 
-                />
-              ))}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 1, mb: 2.5 }}>
+            {resource.tags.map((tag: string) => (
+  <Chip key={tag} label={tag} size="small" variant="outlined" sx={{ fontSize: '0.7rem', borderRadius: '4px' }} />
+))}
             </Box>
-            
             <Divider sx={{ mb: 2.5 }} />
-            
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              mb: 3,
-              px: 1,
-              fontSize: '0.85rem',
-            }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3, px: 1, fontSize: '0.85rem' }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <DownloadIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
-                <Typography variant="body2" color="text.secondary">{resource.downloads}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {resource.downloads}
+                </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <AccessTimeIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
-                <Typography variant="body2" color="text.secondary">{resource.time}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {resource.time}
+                </Typography>
               </Box>
             </Box>
-            
             <Button
-              variant={isPremium ? "contained" : "outlined"}
-              color={isPremium ? "primary" : "primary"}
+              variant={isPremium ? 'contained' : 'outlined'}
+              color="primary"
               size="large"
               onClick={(e) => {
                 e.stopPropagation();
@@ -542,12 +332,12 @@ const ResourcesPage: React.FC = () => {
     <ConsistentPageLayout
       seoTitle="Technical Resources - Production Grade Code & Documentation"
       seoDescription="Access premium production-ready code, test scripts, and comprehensive documentation to accelerate your development."
-      title="Operational Developer Resources"
-      subtitle="Production-ready code, scripts, and documentation to supercharge your projects"
+      title={heroSection.title}
+      subtitle={heroSection.subtitle}
     >
       {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
-      
-      {/* Hero Banner Section with Search */}
+
+      {/* Hero Banner Section with Search & Filter */}
       <Box
         sx={{
           background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
@@ -562,11 +352,7 @@ const ResourcesPage: React.FC = () => {
         <Container maxWidth="lg">
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={7}>
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
+              <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
                 <Typography
                   variant="h1"
                   component="h1"
@@ -579,7 +365,7 @@ const ResourcesPage: React.FC = () => {
                     textShadow: '0 2px 10px rgba(0,0,0,0.1)',
                   }}
                 >
-                  Production Grade  Resources for Modern Developers
+                  {heroSection.title}
                 </Typography>
                 <Typography
                   variant="h5"
@@ -592,10 +378,9 @@ const ResourcesPage: React.FC = () => {
                     fontWeight: 400,
                   }}
                 >
-                  Accelerate your development with production-ready code, comprehensive documentation, and expert-crafted resources.
+                  {heroSection.subtitle}
                 </Typography>
-                
-                {/* Search and filter */}
+                {/* Search & Filter */}
                 <Box
                   sx={{
                     display: 'flex',
@@ -608,7 +393,7 @@ const ResourcesPage: React.FC = () => {
                   }}
                 >
                   <TextField
-                    placeholder="Search resources..."
+                    placeholder={heroSection.searchPlaceholder}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     variant="outlined"
@@ -639,7 +424,6 @@ const ResourcesPage: React.FC = () => {
                     }}
                     sx={{ flex: 3 }}
                   />
-                  
                   <Button
                     variant="contained"
                     color="secondary"
@@ -654,11 +438,10 @@ const ResourcesPage: React.FC = () => {
                     }}
                     onClick={() => router.push('/subscribe')}
                   >
-                    Get Premium
+                    {heroSection.getPremiumButtonText}
                   </Button>
                 </Box>
-                
-                {/* Filter chips */}
+                {/* Filter Chips */}
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 3 }}>
                   {filterOptions.map((option) => (
                     <Chip
@@ -666,42 +449,27 @@ const ResourcesPage: React.FC = () => {
                       label={option.label}
                       clickable
                       onClick={() => setActiveFilter(option.value)}
-                      color={activeFilter === option.value ? "secondary" : "default"}
-                      variant={activeFilter === option.value ? "filled" : "outlined"}
-                      sx={{ 
+                      color={activeFilter === option.value ? 'secondary' : 'default'}
+                      variant={activeFilter === option.value ? 'filled' : 'outlined'}
+                      sx={{
                         bgcolor: activeFilter === option.value ? 'secondary.main' : 'rgba(255,255,255,0.15)',
                         color: '#fff',
                         borderColor: 'rgba(255,255,255,0.3)',
                         '&:hover': {
                           bgcolor: activeFilter === option.value ? 'secondary.dark' : 'rgba(255,255,255,0.25)',
-                        }
+                        },
                       }}
                     />
                   ))}
                 </Box>
               </motion.div>
             </Grid>
-            
             <Grid item xs={12} md={5} sx={{ display: { xs: 'none', md: 'block' } }}>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <Box
-                  sx={{
-                    position: 'relative',
-                    height: 350,
-                  }}
-                >
-                  {/* Floating stats */}
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 0.3 }}>
+                <Box sx={{ position: 'relative', height: 350 }}>
+                  {/* Floating Stats */}
                   {stats.map((stat, index) => (
-                    <motion.div
-                      key={stat.label}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 + index * 0.2 }}
-                    >
+                    <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + index * 0.2 }}>
                       <Paper
                         elevation={6}
                         sx={{
@@ -717,9 +485,7 @@ const ResourcesPage: React.FC = () => {
                           left: index % 2 === 0 ? 40 : 200,
                           zIndex: 2,
                           transition: 'transform 0.3s ease',
-                          '&:hover': {
-                            transform: 'translateY(-5px)',
-                          },
+                          '&:hover': { transform: 'translateY(-5px)' },
                         }}
                       >
                         <Typography variant="h5" color="primary" fontWeight="bold" sx={{ mb: 0.5 }}>
@@ -736,8 +502,7 @@ const ResourcesPage: React.FC = () => {
             </Grid>
           </Grid>
         </Container>
-        
-        {/* Background elements */}
+        {/* Background Elements */}
         <Box
           sx={{
             position: 'absolute',
@@ -764,17 +529,12 @@ const ResourcesPage: React.FC = () => {
         />
       </Box>
 
-      {/* Stats for mobile */}
+      {/* Mobile Stats */}
       <Container maxWidth="sm" sx={{ display: { md: 'none' }, mb: 6 }}>
         <Grid container spacing={2}>
           {stats.map((stat) => (
             <Grid item xs={6} key={stat.label}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
                 <Paper
                   elevation={2}
                   sx={{
@@ -801,61 +561,22 @@ const ResourcesPage: React.FC = () => {
       <PageSection bgcolor="background.default">
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <Typography
-                variant="overline"
-                component="p"
-                sx={{
-                  color: theme.palette.primary.main,
-                  fontWeight: 600,
-                  letterSpacing: 1.2,
-                  mb: 1,
-                }}
-              >
-                WHY CHOOSE OUR RESOURCES
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+              <Typography variant="overline" component="p" sx={{ color: theme.palette.primary.main, fontWeight: 600, letterSpacing: 1.2, mb: 1 }}>
+                {benefitsSection.overline}
               </Typography>
-              
-              <Typography
-                variant="h3"
-                component="h2"
-                sx={{
-                  fontWeight: 700,
-                  mb: 2,
-                  fontSize: { xs: '1.75rem', md: '2.5rem' },
-                }}
-              >
-                Accelerate Your Development
+              <Typography variant="h3" component="h2" sx={{ fontWeight: 700, mb: 2, fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
+                {benefitsSection.title}
               </Typography>
-              
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                sx={{
-                  maxWidth: 700,
-                  mx: 'auto',
-                  mb: 5,
-                  fontSize: '1.1rem',
-                }}
-              >
-                Our resources are designed by industry experts to help you ship faster, reduce costs, and implement best practices from day one.
+              <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 700, mx: 'auto', mb: 5, fontSize: '1.1rem' }}>
+                {benefitsSection.subtitle}
               </Typography>
             </motion.div>
           </Box>
-          
           <Grid container spacing={4}>
             {benefits.map((benefit, index) => (
               <Grid item xs={12} sm={6} md={3} key={benefit.title}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: index * 0.1 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -904,55 +625,24 @@ const ResourcesPage: React.FC = () => {
       {/* Premium Resources Section */}
       <PageSection
         sx={{
-          background: `linear-gradient(to bottom, ${alpha(theme.palette.primary.dark, 0.05)}, ${alpha(theme.palette.background.default, 0.5)})`,
+          background: `linear-gradient(to bottom, ${alpha(theme.palette.primary.dark, 0.05)}, ${alpha(
+            theme.palette.background.default,
+            0.5
+          )})`,
         }}
       >
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <Typography
-                variant="overline"
-                component="p"
-                sx={{
-                  color: theme.palette.primary.main,
-                  fontWeight: 600,
-                  letterSpacing: 1.2,
-                  mb: 1,
-                }}
-              >
-                PREMIUM COLLECTION
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+              <Typography variant="overline" component="p" sx={{ color: theme.palette.primary.main, fontWeight: 600, letterSpacing: 1.2, mb: 1 }}>
+                {premiumSection.overline}
               </Typography>
-              
-              <Typography
-                variant="h3"
-                component="h2"
-                sx={{
-                  fontWeight: 700,
-                  mb: 2,
-                  fontSize: { xs: '1.75rem', md: '2.5rem' },
-                }}
-              >
-                Production-Ready Resources
+              <Typography variant="h3" component="h2" sx={{ fontWeight: 700, mb: 2, fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
+                {premiumSection.title}
               </Typography>
-              
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                sx={{
-                  maxWidth: 700,
-                  mx: 'auto',
-                  mb: 3,
-                  fontSize: '1.1rem',
-                }}
-              >
-                Access our comprehensive premium collection designed to save you weeks of development time with tested, documented, and optimized solutions.
+              <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 700, mx: 'auto', mb: 3, fontSize: '1.1rem' }}>
+                {premiumSection.subtitle}
               </Typography>
-              
               {!isSubscribed && (
                 <Button
                   variant="contained"
@@ -971,19 +661,15 @@ const ResourcesPage: React.FC = () => {
                     boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
                   }}
                 >
-                  Upgrade to Premium
+                  {premiumSection.upgradeButtonText}
                 </Button>
               )}
             </motion.div>
           </Box>
-          
           <CardGrid
             data={getFilteredResources(premiumResources)}
             renderItem={renderResourceCard}
-            sx={{ 
-              mx: 'auto', 
-              gap: { xs: 4, md: 6 } 
-            }}
+            sx={{ mx: 'auto', gap: { xs: 4, md: 6 } }}
             emptyMessage={
               <Paper
                 elevation={0}
@@ -996,82 +682,37 @@ const ResourcesPage: React.FC = () => {
                 }}
               >
                 <Typography variant="h6" color="text.secondary" mb={2}>
-                  No premium resources match your search criteria
+                  {freeResourcesSection.noResultsMessage}
                 </Typography>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => {
-                    setSearchTerm('');
-                    setActiveFilter('all');
-                  }}
-                >
-                  Reset Filters
+                <Button variant="outlined" color="primary" onClick={() => {
+                  setSearchTerm('');
+                  setActiveFilter('all');
+                }}>
+                  {freeResourcesSection.resetFiltersText}
                 </Button>
               </Paper>
             }
           />
         </Container>
       </PageSection>
-      
+
       {/* Testimonial Section */}
       <PageSection bgcolor="background.default">
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <Typography
-                variant="overline"
-                component="p"
-                sx={{
-                  color: theme.palette.primary.main,
-                  fontWeight: 600,
-                  letterSpacing: 1.2,
-                  mb: 1,
-                }}
-              >
-                SUCCESS STORIES
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+              <Typography variant="overline" component="p" sx={{ color: theme.palette.primary.main, fontWeight: 600, letterSpacing: 1.2, mb: 1 }}>
+                {testimonialSection.overline}
               </Typography>
-              
-              <Typography
-                variant="h3"
-                component="h2"
-                sx={{
-                  fontWeight: 700,
-                  mb: 2,
-                  fontSize: { xs: '1.75rem', md: '2.5rem' },
-                }}
-              >
-                What Developers Are Saying
+              <Typography variant="h3" component="h2" sx={{ fontWeight: 700, mb: 2, fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
+                {testimonialSection.title}
               </Typography>
             </motion.div>
           </Box>
-          
-          <Box
-            sx={{
-              position: 'relative',
-              maxWidth: 900,
-              mx: 'auto',
-              mb: 8,
-            }}
-          >
-            <Box
-              sx={{
-                position: 'absolute',
-                fontSize: '120px',
-                top: -40,
-                left: { xs: 0, md: -60 },
-                color: alpha(theme.palette.primary.main, 0.1),
-                zIndex: 0,
-              }}
-            >
+          <Box sx={{ position: 'relative', maxWidth: 900, mx: 'auto', mb: 8 }}>
+            <Box sx={{ position: 'absolute', fontSize: '120px', top: -40, left: { xs: 0, md: -60 }, color: alpha(theme.palette.primary.main, 0.1), zIndex: 0 }}>
               <FormatQuoteIcon fontSize="inherit" />
             </Box>
-            
             <AnimatePresence mode="wait">
               {visibleTestimonials.map((testimonial) => (
                 <motion.div
@@ -1092,37 +733,11 @@ const ResourcesPage: React.FC = () => {
                       zIndex: 1,
                     }}
                   >
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontSize: { xs: '1.1rem', md: '1.25rem' },
-                        fontStyle: 'italic',
-                        lineHeight: 1.7,
-                        mb: 4,
-                        color: theme.palette.text.primary,
-                      }}
-                    >
+                    <Typography variant="body1" sx={{ fontSize: { xs: '1.1rem', md: '1.25rem' }, fontStyle: 'italic', lineHeight: 1.7, mb: 4, color: theme.palette.text.primary }}>
                       "{testimonial.comment}"
                     </Typography>
-                    
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        flexDirection: { xs: 'column', sm: 'row' },
-                        gap: 2,
-                      }}
-                    >
-                      <Avatar
-                        src={testimonial.avatar}
-                        alt={testimonial.name}
-                        sx={{ 
-                          width: 60, 
-                          height: 60,
-                          border: `2px solid ${theme.palette.primary.main}`,
-                        }}
-                      />
-                      
+                    <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+                      <Avatar src={testimonial.avatar} alt={testimonial.name} sx={{ width: 60, height: 60, border: `2px solid ${theme.palette.primary.main}` }} />
                       <Box sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
                         <Typography variant="h6" fontWeight="bold" sx={{ mb: 0.5 }}>
                           {testimonial.name}
@@ -1132,30 +747,18 @@ const ResourcesPage: React.FC = () => {
                         </Typography>
                         <Rating value={testimonial.rating} readOnly size="small" />
                       </Box>
-                      
                       <Chip
                         label={`Used: ${testimonial.resource}`}
                         size="small"
                         color="primary"
-                        sx={{ 
-                          ml: { xs: 0, sm: 'auto' },
-                          mt: { xs: 1, sm: 0 },
-                        }}
+                        sx={{ ml: { xs: 0, sm: 'auto' }, mt: { xs: 1, sm: 0 } }}
                       />
                     </Box>
                   </Paper>
                 </motion.div>
               ))}
             </AnimatePresence>
-            
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                mt: 3,
-                gap: 1,
-              }}
-            >
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, gap: 1 }}>
               {testimonials.map((_, index) => (
                 <Box
                   key={index}
@@ -1167,9 +770,7 @@ const ResourcesPage: React.FC = () => {
                     width: 10,
                     height: 10,
                     borderRadius: '50%',
-                    backgroundColor: testimonialIndex === index
-                      ? theme.palette.primary.main
-                      : alpha(theme.palette.primary.main, 0.3),
+                    backgroundColor: testimonialIndex === index ? theme.palette.primary.main : alpha(theme.palette.primary.main, 0.3),
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
                   }}
@@ -1188,59 +789,22 @@ const ResourcesPage: React.FC = () => {
       >
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <Typography
-                variant="overline"
-                component="p"
-                sx={{
-                  color: theme.palette.primary.main,
-                  fontWeight: 600,
-                  letterSpacing: 1.2,
-                  mb: 1,
-                }}
-              >
-                FREE RESOURCES
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+              <Typography variant="overline" component="p" sx={{ color: theme.palette.primary.main, fontWeight: 600, letterSpacing: 1.2, mb: 1 }}>
+                {freeResourcesSection.overline}
               </Typography>
-              
-              <Typography
-                variant="h3"
-                component="h2"
-                sx={{
-                  fontWeight: 700,
-                  mb: 2,
-                  fontSize: { xs: '1.75rem', md: '2.5rem' },
-                }}
-              >
-                Get Started with Free Resources
+              <Typography variant="h3" component="h2" sx={{ fontWeight: 700, mb: 2, fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
+                {freeResourcesSection.title}
               </Typography>
-              
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                sx={{
-                  maxWidth: 700,
-                  mx: 'auto',
-                  mb: 5,
-                  fontSize: '1.1rem',
-                }}
-              >
-                Explore our collection of free resources to learn essential concepts and fundamental techniques.
+              <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 700, mx: 'auto', mb: 5, fontSize: '1.1rem' }}>
+                {freeResourcesSection.subtitle}
               </Typography>
             </motion.div>
           </Box>
-          
           <CardGrid
             data={getFilteredResources(freeResources)}
             renderItem={renderResourceCard}
-            sx={{ 
-              mx: 'auto', 
-              gap: { xs: 4, md: 6 } 
-            }}
+            sx={{ mx: 'auto', gap: { xs: 4, md: 6 } }}
             emptyMessage={
               <Paper
                 elevation={0}
@@ -1253,7 +817,7 @@ const ResourcesPage: React.FC = () => {
                 }}
               >
                 <Typography variant="h6" color="text.secondary" mb={2}>
-                  No free resources match your search criteria
+                  {freeResourcesSection.noResultsMessage}
                 </Typography>
                 <Button
                   variant="outlined"
@@ -1263,14 +827,14 @@ const ResourcesPage: React.FC = () => {
                     setActiveFilter('all');
                   }}
                 >
-                  Reset Filters
+                  {freeResourcesSection.resetFiltersText}
                 </Button>
               </Paper>
             }
           />
         </Container>
       </PageSection>
-      
+
       {/* CTA Section */}
       <PageSection
         sx={{
@@ -1284,12 +848,7 @@ const ResourcesPage: React.FC = () => {
       >
         <Container maxWidth="md">
           <Box sx={{ position: 'relative', zIndex: 2 }}>
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
               <Typography
                 variant="h2"
                 component="h2"
@@ -1303,9 +862,8 @@ const ResourcesPage: React.FC = () => {
                   textShadow: '0 2px 10px rgba(0,0,0,0.1)',
                 }}
               >
-                Ready to Accelerate Your Development?
+                {ctaSection.title}
               </Typography>
-              
               <Typography
                 variant="h5"
                 component="p"
@@ -1317,9 +875,8 @@ const ResourcesPage: React.FC = () => {
                   fontWeight: 400,
                 }}
               >
-                Get unlimited access to all premium resources and future updates with our subscription plans.
+                {ctaSection.subtitle}
               </Typography>
-              
               <Box
                 sx={{
                   display: 'flex',
@@ -1343,14 +900,11 @@ const ResourcesPage: React.FC = () => {
                     borderRadius: 3,
                     textTransform: 'none',
                     boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
-                    '&:hover': {
-                      boxShadow: '0 6px 20px rgba(0,0,0,0.4)',
-                    },
+                    '&:hover': { boxShadow: '0 6px 20px rgba(0,0,0,0.4)' },
                   }}
                 >
-                  Get Premium Access
+                  {ctaSection.premiumButtonText}
                 </Button>
-                
                 <Button
                   variant="outlined"
                   color="inherit"
@@ -1371,14 +925,12 @@ const ResourcesPage: React.FC = () => {
                     },
                   }}
                 >
-                  Explore Free Resources
+                  {ctaSection.freeButtonText}
                 </Button>
               </Box>
             </motion.div>
           </Box>
         </Container>
-        
-        {/* Background elements */}
         <Box
           sx={{
             position: 'absolute',

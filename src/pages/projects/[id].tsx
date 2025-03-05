@@ -73,7 +73,7 @@ const ProjectDetails = () => {
   
   // Find the project based on the URL parameter
   const project = useMemo(
-    () => cvProjects.find((p: Project) => p.id === projectId),
+    () => cvProjects.find(p => p.id === projectId),
     [projectId]
   );
 
@@ -107,15 +107,15 @@ const ProjectDetails = () => {
   }, [project]);
 
   // Handle tab changes
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
-
+// Handle tab changes
+const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  setActiveTab(newValue);
+};
   // Navigation handlers
-  const handleNavigateTo = (id) => {
-    router.push(`/projects/${id}`);
-  };
-
+// Navigation handlers
+const handleNavigateTo = (id: string) => {
+  router.push(`/projects/${id}`);
+};
   // Section heading style for consistency
   const sectionHeadingStyle = {
     fontWeight: 'bold',
@@ -128,17 +128,21 @@ const ProjectDetails = () => {
   };
 
   // Tab panel component for mobile view
-  const TabPanel = ({ children, value, index }) => (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`project-tabpanel-${index}`}
-      aria-labelledby={`project-tab-${index}`}
-    >
-      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
-    </div>
-  );
-
+// Tab panel component for mobile view
+const TabPanel = ({ children, value, index }: { 
+  children: React.ReactNode; 
+  value: number; 
+  index: number 
+}) => (
+  <div
+    role="tabpanel"
+    hidden={value !== index}
+    id={`project-tabpanel-${index}`}
+    aria-labelledby={`project-tab-${index}`}
+  >
+    {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+  </div>
+);
   // Loading state
   if (isLoading || !project) {
     return (
@@ -296,22 +300,7 @@ const ProjectDetails = () => {
                           boxShadow: theme.shadows[3],
                         }}
                       >
-                        <Box
-                          component="img"
-                          src={project.image || "/images/project-placeholder.jpg"}
-                          alt={project.name}
-                          sx={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            cursor: 'pointer',
-                            transition: 'transform 0.5s',
-                            '&:hover': {
-                              transform: 'scale(1.05)',
-                            },
-                          }}
-                          onClick={() => setIsImageOpen(true)}
-                        />
+                     
                       </Box>
                       
                       <Box sx={{ flex: 1 }}>
@@ -439,27 +428,35 @@ const ProjectDetails = () => {
                         Technologies:
                       </Typography>
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-                        {project.technologies?.map((tech, index) => {
-                          const techIcon = project.technologyIcons?.[tech];
-                          return (
-                            <Tooltip key={index} title={tech}>
-                              <Chip
-                                icon={techIcon ? <Box component="img" src={techIcon} sx={{ width: 20, height: 20 }} /> : null}
-                                label={tech}
-                                variant="outlined"
-                                size="small"
-                                sx={{
-                                  borderRadius: '12px',
-                                  borderColor: theme.palette.divider,
-                                  '&:hover': {
-                                    borderColor: theme.palette.primary.main,
-                                    backgroundColor: alpha(theme.palette.primary.main, 0.05),
-                                  },
-                                }}
-                              />
-                            </Tooltip>
-                          );
-                        })}
+                      {project.technologies?.map((tech, index) => {
+  let techIcon = undefined;
+  
+  // Handle tech icons whether they're an array or an object
+  if (project.technologyIcons && !Array.isArray(project.technologyIcons)) {
+    techIcon = (project.technologyIcons as Record<string, string>)[tech];
+  }
+  
+  return (
+    <Tooltip key={index} title={tech}>
+      <Chip
+        icon={techIcon ? (
+          <Box component="img" src={techIcon} sx={{ width: 20, height: 20 }} />
+        ) : undefined}
+        label={tech}
+        variant="outlined"
+        size="small"
+        sx={{
+          borderRadius: '12px',
+          borderColor: theme.palette.divider,
+          '&:hover': {
+            borderColor: theme.palette.primary.main,
+            backgroundColor: alpha(theme.palette.primary.main, 0.05),
+          },
+        }}
+      />
+    </Tooltip>
+  );
+})}
                       </Box>
                     </Box>
                   </Box>
@@ -851,7 +848,7 @@ const ProjectDetails = () => {
                 </IconButton>
                 <Box
                   component="img"
-                  src={project.image || "/images/project-placeholder.jpg"}
+                  src={ "/images/project-placeholder.jpg"}
                   alt={project.name}
                   sx={{
                     maxWidth: '90vw',

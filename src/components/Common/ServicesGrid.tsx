@@ -3,7 +3,7 @@ import { Box, Container, Typography, Grid, useTheme, alpha } from '@mui/material
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import TechCard from '../Common/TechCard';
 import {
-  Lightbulb,  // Example icons, adjust as needed
+  Lightbulb, 
   Wrench,
   Code,
   ShieldCheck,

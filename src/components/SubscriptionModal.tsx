@@ -1,4 +1,3 @@
-// src/components/SubscriptionModal.tsx
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { useRouter } from 'next/router';
@@ -9,18 +8,19 @@ import { useAuth } from '../contexts/AuthContext';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
 interface SubscriptionModalProps {
-  redirectPath: string;
+  redirectPath?: string;
 }
 
 const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ redirectPath }) => {
-  // Destructure both user and token from your auth context
+  // Use the properly typed token from AuthContext
   const { user, token } = useAuth();
   const router = useRouter();
 
   const handleSubscribe = async (priceId: string) => {
-    // Get current path for post-purchase redirection
-    const redirectPath = window.location.pathname;
-    // Ensure the user is logged in and we have a token before proceeding.
+    // Use the prop redirectPath if provided, otherwise use current path
+    const returnPath = redirectPath || window.location.pathname;
+    
+    // Ensure the user is logged in and we have a token before proceeding
     if (!user || !token) {
       alert('You must be logged in to subscribe.');
       router.push('/login');
@@ -35,7 +35,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ redirectPath }) =
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ priceId, redirectPath }),
+        body: JSON.stringify({ priceId, redirectPath: returnPath }),
       });
 
       if (!response.ok) {

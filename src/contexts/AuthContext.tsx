@@ -8,159 +8,143 @@ import React, {
   useCallback,
 } from 'react';
 import { useRouter } from 'next/router';
-import { signIn, signOut } from 'next-auth/react';
-import { loadStripe } from '@stripe/stripe-js';
-
-interface User {
-  id: string;
-  userName: string;
-  email: string;
-  isSubscribed: boolean;
-}
-
-type AuthContextType = {
-  user: User | null;
-  token: string | null;
-  isSubscribed: boolean;
-  login: (credentials: { username: string; password: string }) => Promise<void>;
-  register: (user: {
-    username: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    captchaToken: string;
-  }) => Promise<void>;
-  logout: () => Promise<void>;
-  subscribe: (priceId: string) => Promise<void>;
-  loginError: string | null;
-  isLoginLoading: boolean;
-  isAuthLoading: boolean;
-  refreshSubscriptionStatus: () => Promise<void>;
-  loginWithProvider: (provider: string) => Promise<void>;
-};
+import { 
+  verifyToken,
+  login as authLogin, 
+  register as authRegister, 
+  logout as authLogout,
+  loginWithProvider as authLoginWithProvider,
+} from '../lib/auth';
+import {
+  getSubscriptionStatus,
+  createCheckoutSession,
+  cancelSubscription,
+  getSubscriptionDetails,
+  updatePaymentMethod,
+} from '../lib/subscription';
+import { AuthContextType, User, SubscriptionDetails } from '../types/haworks.types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
-  // Use NEXT_PUBLIC_BASE_URL from the environment.
-  // If not set, default to 'https://api.local.ritualworks.com'.
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://api.local.ritualworks.com';
-
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
-  const [loginError, setLoginError] = useState<string | null>(null);
-  const [isLoginLoading, setIsLoginLoading] = useState<boolean>(false);
-  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+  const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetails | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
-  // Fetch the subscription status.
-  const refreshSubscriptionStatus = useCallback(async () => {
-    if (!user) return;
-    try {
-      const res = await fetch(`${baseUrl}/api/Subscription/status`);
-      if (res.ok) {
-        const data = await res.json();
-        setIsSubscribed(data.isSubscribed);
-        setUser((currentUser) =>
-          currentUser ? { ...currentUser, isSubscribed: data.isSubscribed } : null
-        );
-      } else {
-        console.error('Failed to refresh subscription status:', res.statusText);
-      }
-    } catch (error) {
-      console.error('Error refreshing subscription status:', error);
-    }
-  }, [user, baseUrl]);
-
-  // Check for an active session.
+  // Check authentication status on mount or route change
   useEffect(() => {
-    const checkAuth = async () => {
-      setIsAuthLoading(true);
+    const checkAuthStatus = async () => {
+      if (!isLoading) return; // Only run if we're in loading state
+      
       try {
-        const res = await fetch(`${baseUrl}/api/Authentication/verify-token`);
-        if (res.ok) {
-          const data = await res.json();
-          // Assuming your API returns an object with "user" and "isSubscribed" properties.
-          setUser(data.user);
-          setIsSubscribed(data.isSubscribed);
+        // Verify token with backend
+        const userData = await verifyToken();
+        
+        if (userData) {
+          setUser({
+            id: userData.userId,
+            userName: userData.userName,
+            email: userData.email || '',
+            isSubscribed: false, // Will be updated by refreshSubscriptionStatus
+          });
+          
+          // Refresh subscription status
+          await refreshSubscriptionStatus();
+        } else {
+          // No valid user data
+          setUser(null);
+          setIsSubscribed(false);
         }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
+      } catch (err) {
+        console.error('Auth check error:', err);
+        setUser(null);
+        setError('Authentication check failed');
       } finally {
-        setIsAuthLoading(false);
+        setIsLoading(false);
       }
     };
 
-    checkAuth();
-  }, [refreshSubscriptionStatus, baseUrl]);
+    checkAuthStatus();
+  }, [router.pathname]); // Re-run when route changes
 
-  // Login using credentials.
-  const login = useCallback(
-    async ({ username, password }: { username: string; password: string }) => {
-      setIsLoginLoading(true);
-      setLoginError(null);
-      try {
-        const result = await signIn('credentials', {
-          username,
-          password,
-          redirect: false,
-          callbackUrl: (router.query.redirect as string) || '/resources',
-        });
-        if (result?.error) {
-          setLoginError(result.error);
-        }
-      } catch (error) {
-        setLoginError('An unexpected error occurred during login.');
-        console.error('Login error:', error);
-      } finally {
-        setIsLoginLoading(false);
+  // Refresh subscription status
+  const refreshSubscriptionStatus = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      const data = await getSubscriptionStatus();
+      setIsSubscribed(data.isSubscribed);
+      
+      if (user) {
+        setUser(prev => prev ? { ...prev, isSubscribed: data.isSubscribed } : null);
       }
-    },
-    [router]
-  );
-
-  // Logout the user.
-  const logout = useCallback(async () => {
-    try {
-      await signOut({ callbackUrl: '/login', redirect: true });
-    } catch (error) {
-      console.error('Logout error:', error);
+    } catch (err) {
+      console.error('Failed to refresh subscription status:', err);
     }
-  }, []);
+  }, [user]);
 
-  // Subscribe: create a checkout session.
-  const subscribe = useCallback(async (priceId: string) => {
+  // Get detailed subscription information
+  const refreshSubscriptionDetails = useCallback(async () => {
+    if (!user || !isSubscribed) return;
+    
     try {
-      const res = await fetch(`${baseUrl}/api/Subscription/create-checkout-session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          priceId: priceId,
-          redirectPath: router.asPath,
-        }),
+      const details = await getSubscriptionDetails();
+      setSubscriptionDetails(details);
+    } catch (err) {
+      console.error('Failed to fetch subscription details:', err);
+    }
+  }, [user, isSubscribed]);
+
+  // Login handler
+  const login = useCallback(async (credentials: { username: string; password: string }) => {
+    setError(null);
+    setIsLoading(true);
+    
+    try {
+      const result = await authLogin(credentials);
+      
+      if (!result.success) {
+        // Fix: Use optional chaining to safely access the message property
+        const errorMessage = 'message' in result ? result.message : 'Login failed';
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      }
+      
+      // Verify token to get user data
+      const userData = await verifyToken();
+      if (!userData) {
+        setError('Failed to retrieve user data');
+        return { success: false, error: 'Failed to retrieve user data' };
+      }
+      
+      setUser({
+        id: userData.userId,
+        userName: userData.userName,
+        email: userData.email || '',
+        isSubscribed: false
       });
-      if (res.ok) {
-        const { sessionId } = await res.json();
-        const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
-        if (stripe) {
-          await stripe.redirectToCheckout({ sessionId });
-        } else {
-          console.error('Stripe failed to load');
-        }
-      } else {
-        const errorData = await res.json();
-        const errorMessage = errorData.message || 'Failed to create checkout session';
-        console.error('Subscription error:', errorData);
-        alert(errorMessage);
-      }
-    } catch (error) {
-      console.error('Error creating checkout session:', error);
-      alert('Failed to start subscription. Please check your connection and try again.');
+      
+      // Refresh subscription status
+      await refreshSubscriptionStatus();
+      
+      // Redirect to the target page or dashboard
+      const redirectUrl = router.query.callbackUrl as string || '/resources';
+      router.push(redirectUrl);
+      
+      return { success: true };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
     }
-  }, [router, baseUrl]);
+  }, [router, refreshSubscriptionStatus]);
 
-  // Register a new user.
+  // Register handler
   const register = useCallback(async (userData: {
     username: string;
     email: string;
@@ -168,52 +152,156 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
     confirmPassword: string;
     captchaToken: string;
   }) => {
-    // This function will throw an error if registration fails.
-    const res = await fetch(`${baseUrl}/api/Authentication/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      // Combine error messages if present, or use a fallback.
-      const errorMessage =
-        data.errors
-          ? Object.values(data.errors).flat().join(', ')
-          : data.message || 'Registration failed. Please try again.';
-      console.error('Registration failed:', data);
-      throw new Error(errorMessage);
-    }
-    return data;
-  }, [baseUrl]);
-
-  // Social login with a provider.
-  const loginWithProvider = async (provider: string) => {
+    setError(null);
+    setIsLoading(true);
+    
     try {
-      const result = await signIn(provider, {
-        callbackUrl: '/resources',
-      });
-      if (result?.error) {
-        console.error('Social login error:', result.error);
+      const result = await authRegister(userData);
+      
+      if (!result.success) {
+        // Fix: Ensure errorMessage is always a string by using nullish coalescing
+        const errorMessage = (
+          'errors' in result && result.errors && result.errors.length > 0
+            ? result.errors[0].message
+            : 'message' in result && result.message
+              ? result.message
+              : 'Registration failed'
+        );
+        setError(errorMessage);
+        return { success: false, errors: 'errors' in result ? result.errors : [{ message: errorMessage }] };
       }
-    } catch (error) {
-      console.error('Social login error:', error);
+      
+      // After successful registration, manually log in
+      await login({
+        username: userData.username,
+        password: userData.password
+      });
+      
+      // Redirect to welcome page
+      router.push('/welcome');
+      
+      return { success: true };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
+      return { 
+        success: false, 
+        errors: [{ message: errorMessage }]
+      };
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [login, router]);
 
-  const value: AuthContextType = {
+  // Logout handler
+  const logout = useCallback(async () => {
+    try {
+      await authLogout();
+      setUser(null);
+      setIsSubscribed(false);
+      setSubscriptionDetails(null);
+      router.push('/login');
+    } catch (err) {
+      console.error('Logout error:', err);
+      setError('Failed to log out properly');
+    }
+  }, [router]);
+
+  // Subscribe handler
+  const subscribe = useCallback(async (priceId: string) => {
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'You must be logged in to subscribe' 
+      };
+    }
+    
+    try {
+      return await createCheckoutSession(priceId, router.asPath);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to start subscription';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, [user, router]);
+
+  // Cancel subscription handler
+  const handleCancelSubscription = useCallback(async () => {
+    if (!user || !isSubscribed) {
+      return { 
+        success: false, 
+        error: 'No active subscription to cancel' 
+      };
+    }
+    
+    try {
+      const result = await cancelSubscription();
+      
+      if (result.success) {
+        await refreshSubscriptionDetails();
+      }
+      
+      return result;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to cancel subscription';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, [user, isSubscribed, refreshSubscriptionDetails]);
+
+  // Update payment method handler
+  const handleUpdatePaymentMethod = useCallback(async () => {
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'You must be logged in to update payment method' 
+      };
+    }
+    
+    try {
+      return await updatePaymentMethod();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update payment method';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, [user]);
+
+  // Social login handler
+  const loginWithProvider = useCallback(async (provider: string) => {
+    setError(null);
+    setIsLoading(true);
+    
+    try {
+      await authLoginWithProvider(provider);
+    } catch (err) {
+      console.error(`${provider} login error:`, err);
+      setError(`Failed to log in with ${provider}`);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Context value
+  const value = {
     user,
-    token,
     isSubscribed,
+    isAuthenticated: !!user,
+ 
+    isAuthLoading: isLoading, // Added missing isAuthLoading property
+    subscriptionDetails,
+    token: null, // This wasn't defined in the implementation but is in the type
     login,
     register,
     logout,
     subscribe,
-    loginError,
-    isLoginLoading,
-    isAuthLoading,
+    cancelSubscription: handleCancelSubscription,
+    updatePaymentMethod: handleUpdatePaymentMethod,
     refreshSubscriptionStatus,
+    refreshSubscriptionDetails,
     loginWithProvider,
+    isLoading,
+    error,
   };
 
   return (

@@ -1,22 +1,52 @@
-// Solutions.tsx
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTheme, Typography, Box, Container, useMediaQuery, Button, Fade, Grid, alpha } from '@mui/material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
-import ProjectCard, { ProjectGrid } from '../components/Solutions/ProjectCard'; // Make sure this path is correct
-import { cvProjects } from '../data/cvProjects'; //And this one
+import ProjectCard, { ProjectGrid } from '../components/Solutions/Projects/ProjectCard';
+import { cvProjects } from '../data/cvProjects';
 import PageSection from '../components/PageSection';
-import { SPACING, getSharedStyles } from '../utils/sharedStyles'; // And this one
+import { SPACING, getSharedStyles } from '../utils/sharedStyles';
 // Import the additional components
-import TestimonialsSection from '../components/Common/TestimonialsSection'; //And these
+import TestimonialsSection from '../components/Common/TestimonialsSection';
 import WhyChooseUs from '../components/Common/WhyChooseUs';
 // Additional imports for enhanced features
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { CategoryFilter } from '@/types/project'; // And this one if you have a types file.
 
-//import the data
-import { solutionsPageData } from '../data/solutionsPageData'; // Corrected import
+// Import the data
+import { solutionsPageData } from '../data/solutionsPageData';
 
+// Import Material-UI icons for industry section
+import CloudIcon from '@mui/icons-material/Cloud';
+import CodeIcon from '@mui/icons-material/Code';
+import StoreIcon from '@mui/icons-material/Store';
+import PermMediaIcon from '@mui/icons-material/PermMedia';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+
+// Define CategoryFilter type
+export type CategoryFilter = 'all' | 'cloud' | 'devops' | 'fintech' | 'ecommerce' | 'media';
+
+// Define the industry icon mapping type
+interface IconMapping {
+  [key: string]: JSX.Element;
+}
+
+// Map industry titles to icons
+const getIndustryIcon = (title: string): JSX.Element => {
+    const iconMap: IconMapping = {
+        "Finance": <AccountBalanceIcon sx={{ fontSize: 40 }} />,
+        "Healthcare": <HealthAndSafetyIcon sx={{ fontSize: 40 }} />,
+        "Retail": <ShoppingCartIcon sx={{ fontSize: 40 }} />,
+        "Cloud Services": <CloudIcon sx={{ fontSize: 40 }} />,
+        "DevOps": <CodeIcon sx={{ fontSize: 40 }} />,
+        "FinTech": <AttachMoneyIcon sx={{ fontSize: 40 }} />,
+        "E-commerce": <StoreIcon sx={{ fontSize: 40 }} />,
+        "Media": <PermMediaIcon sx={{ fontSize: 40 }} />
+    };
+    
+    return iconMap[title] || <CloudIcon sx={{ fontSize: 40 }} />;
+};
 
 const Solutions = () => {
     const theme = useTheme();
@@ -26,15 +56,12 @@ const Solutions = () => {
 
     // Animation states
     const [activeFilter, setActiveFilter] = useState<CategoryFilter>('all');
+    const [animate, setAnimate] = useState(false);
 
     // Explicitly type the categories array
     const categories: CategoryFilter[] = ['all', 'cloud', 'devops', 'fintech', 'ecommerce', 'media'];
 
-    const [animate, setAnimate] = useState(false);
-
-    // Category filters for projects
-
-    // Filtered projects
+    // Filter projects based on the active filter
     const filteredProjects = activeFilter === 'all'
         ? cvProjects.filter((project) =>
             project && typeof project.id === 'string' && project.id.trim() !== ''
@@ -89,7 +116,7 @@ const Solutions = () => {
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: 'url(/images/solutions-hero-bg.jpg) center center no-repeat',  //CHECK YOUR IMAGE PATH
+                        background: 'url(/images/solutions-hero-bg.jpg) center center no-repeat',
                         backgroundSize: 'cover',
                         opacity: 0.2,
                         zIndex: 1,
@@ -219,7 +246,7 @@ const Solutions = () => {
                 </Container>
             </PageSection>
 
-            {/* Our Featured Solutions Section - Enhanced */}
+            {/* Our Featured Solutions Section */}
             <PageSection
                 sx={{
                     background: theme.palette.mode === 'dark'
@@ -274,52 +301,81 @@ const Solutions = () => {
                     </Typography>
 
                     {/* Project Filters */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              gap: 1.5,
-              mb: 5,
-            }}
-          >
-            {categories.map((category) => (
-              <Button
-                key={category}
-                onClick={() => handleFilterChange(category)}
-                variant={activeFilter === category ? "contained" : "outlined"}
-                size="medium"
-                sx={{
-                  px: 2.5,
-                  py: 1,
-                  borderRadius: '30px',
-                  textTransform: 'capitalize',
-                  fontWeight: 500,
-                  transition: 'all 0.2s ease',
-                  backgroundColor: activeFilter === category
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                  color: activeFilter === category
-                    ? theme.palette.primary.contrastText
-                    : theme.palette.text.primary,
-                  borderColor: theme.palette.primary.main,
-                  '&:hover': {
-                    backgroundColor: activeFilter === category
-                      ? theme.palette.primary.dark
-                      : alpha(theme.palette.primary.main, 0.1),
-                    transform: 'translateY(-2px)',
-                  },
-                }}
-              >
-                {category === 'all' ? 'All Solutions' : category.charAt(0).toUpperCase() + category.slice(1)}
-              </Button>
-            ))}
-          </Box>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            justifyContent: 'center',
+                            gap: 1.5,
+                            mb: 5,
+                        }}
+                    >
+                        {categories.map((category) => (
+                            <Button
+                                key={category}
+                                onClick={() => handleFilterChange(category)}
+                                variant={activeFilter === category ? "contained" : "outlined"}
+                                size="medium"
+                                sx={{
+                                    px: 2.5,
+                                    py: 1,
+                                    borderRadius: '30px',
+                                    textTransform: 'capitalize',
+                                    fontWeight: 500,
+                                    transition: 'all 0.2s ease',
+                                    backgroundColor: activeFilter === category
+                                        ? theme.palette.primary.main
+                                        : 'transparent',
+                                    color: activeFilter === category
+                                        ? theme.palette.primary.contrastText
+                                        : theme.palette.text.primary,
+                                    borderColor: theme.palette.primary.main,
+                                    '&:hover': {
+                                        backgroundColor: activeFilter === category
+                                            ? theme.palette.primary.dark
+                                            : alpha(theme.palette.primary.main, 0.1),
+                                        transform: 'translateY(-2px)',
+                                    },
+                                }}
+                            >
+                                {category === 'all' ? 'All Solutions' : category.charAt(0).toUpperCase() + category.slice(1)}
+                            </Button>
+                        ))}
+                    </Box>
 
                     {/* Project Cards with Animation */}
                     <Fade in={animate} timeout={500}>
                         <Box>
-                            <ProjectGrid projects={filteredProjects}  spacing={4} />
+                            {filteredProjects.length > 0 ? (
+                                <ProjectGrid projects={filteredProjects} spacing={4} />
+                            ) : (
+                                <Box 
+                                    sx={{ 
+                                        textAlign: 'center', 
+                                        py: 8,
+                                        px: 3, 
+                                        borderRadius: '16px',
+                                        backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                                        border: `1px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
+                                    }}
+                                >
+                                    <Typography variant="h6" color="text.secondary" gutterBottom>
+                                        No solutions match your criteria
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Try adjusting your search terms or filters to find what you're looking for.
+                                    </Typography>
+                                    <Button
+                                        variant="outlined"
+                                        color="primary"
+                                        size="small"
+                                        onClick={() => handleFilterChange('all')}
+                                        sx={{ mt: 2 }}
+                                    >
+                                        Reset filters
+                                    </Button>
+                                </Box>
+                            )}
                         </Box>
                     </Fade>
 
@@ -353,7 +409,7 @@ const Solutions = () => {
                 </Container>
             </PageSection>
 
-            {/* Industries We Serve Section - Enhanced */}
+            {/* Industries We Serve Section */}
             <PageSection>
                 <Container maxWidth="lg">
                     <Box
@@ -443,13 +499,10 @@ const Solutions = () => {
                                                 backgroundColor: theme.palette.mode === 'dark'
                                                     ? alpha(theme.palette.primary.main, 0.1)
                                                     : alpha(theme.palette.primary.main, 0.08),
+                                                color: theme.palette.primary.main,
                                             }}
                                         >
-                                            <img
-                                                src={industry.icon}
-                                                alt={industry.title}
-                                                style={{ width: 40, height: 40 }}
-                                            />
+                                            {getIndustryIcon(industry.title)}
                                         </Box>
 
                                         <Typography
@@ -476,12 +529,11 @@ const Solutions = () => {
                 </Container>
             </PageSection>
 
-            {/* Testimonials Section */}
+            {/* Testimonials Section - Using the new implementation */}
             <TestimonialsSection />
 
-            {/* Why Choose Us Section */}
+            {/* Why Choose Us Section - Using the new implementation */}
             <WhyChooseUs />
-
         </ConsistentPageLayout>
     );
 };

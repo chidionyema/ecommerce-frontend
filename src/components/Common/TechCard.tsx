@@ -90,8 +90,14 @@ const NumberedCircle = ({ number, theme, accentColor }: { number: number; theme:
     );
 };
 
+// Define interface for the GlassBackdrop props
+interface GlassBackdropProps {
+    blurAmount?: string;
+    opacityLevel?: number;
+}
+
 // Glass effect backdrop with customizable blur and opacity
-const GlassBackdrop = styled(Box)(({ theme, blurAmount = GLASS_BLUR, opacityLevel = GLASS_OPACITY }) => ({
+const GlassBackdrop = styled(Box)<GlassBackdropProps>(({ theme, blurAmount = GLASS_BLUR, opacityLevel = GLASS_OPACITY }) => ({
     position: 'absolute',
     top: 0,
     left: 0,
@@ -142,8 +148,14 @@ const CategoryLabel = ({ category, theme }: { category: string; theme: any }) =>
     </Box>
 );
 
+// Define interface for StyledTechCard props
+interface StyledTechCardProps {
+    importance?: 'primary' | 'secondary' | 'tertiary';
+    accentColor?: string;
+}
+
 // Styled TechCard with premium glass morphism and depth effects
-const StyledTechCard = styled(motion.div)(({ theme, importance, accentColor }) => {
+const StyledTechCard = styled(motion.div)<StyledTechCardProps>(({ theme, importance, accentColor }) => {
     // Get the color based on importance
     const getImportanceStyles = () => {
         switch(importance) {
