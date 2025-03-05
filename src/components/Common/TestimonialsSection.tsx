@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Container,
@@ -6,12 +6,12 @@ import {
   Grid,
   Avatar,
   useTheme,
+  Button,
   alpha,
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import TechCard from '../Common/TechCard'; 
-import { GradientButton } from '../../components/GradientButton';
 
 // Define the type for a testimonial
 interface Testimonial {
@@ -71,55 +71,28 @@ const TestimonialsSection = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
   const [showAll, setShowAll] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const imageUrl = '/images/istockphoto-1303809341-1024x1024.jpg';
-
-  useEffect(() => {
-    const img = new Image();
-    img.src = imageUrl;
-    img.onload = () => setImageLoaded(true);
-    img.onerror = () => setImageLoaded(false);
-  }, [imageUrl]);
 
   return (
     <Box
       component="section"
       sx={{
         width: '100%',
-        py: SPACING.large,
-        overflow: 'hidden',
+        py: SPACING.large * 1.5,
+        background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${alpha(theme.palette.primary.main, 0.8)} 100%)`,
         position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      {/* Blurred Background Image (if loaded) */}
-      {imageLoaded && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundImage: `url(${imageUrl})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
-            filter: 'blur(12px)', // Add blur
-            zIndex: 0,
-          }}
-        />
-      )}
-      
-      {/* Dark Overlay */}
-      <Box
+      {/* Background pattern */}
+      <Box 
         sx={{
           position: 'absolute',
           top: 0,
           left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: alpha(theme.palette.primary.dark, 0.4), // Semi-transparent overlay
-          zIndex: 1,
+          right: 0,
+          bottom: 0,
+          opacity: 0.05,
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
         }}
       />
 
@@ -130,9 +103,13 @@ const TestimonialsSection = () => {
           align="center"
           sx={{
             ...styles.pageTitle,
-            color: 'white', // Ensure text is white for contrast
+            color: 'white',
             mb: SPACING.large,
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.7)', // Increase text shadow for better readability
+            fontWeight: 700,
+            textShadow: '0 4px 8px rgba(0, 0, 0, 0.7)',
+            [theme.breakpoints.down('sm')]: {
+              fontSize: '2rem', // Smaller font size on mobile
+            },
           }}
         >
           Client Success Stories
@@ -174,10 +151,10 @@ const TestimonialsSection = () => {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: 'white', // Ensure role is white for contrast
+                      color: 'white',
                       textAlign: 'center',
                       display: 'block',
-                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)', // Add subtle shadow to role text
+                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
                     }}
                   >
                     {t.role}
@@ -189,15 +166,40 @@ const TestimonialsSection = () => {
         </Grid>
 
         {!showAll && (
-          <Box sx={{ textAlign: 'center', mt: SPACING.medium }}>
-            <GradientButton
+          <Box sx={{ 
+            textAlign: 'center', 
+            mt: SPACING.medium,
+            [theme.breakpoints.down('sm')]: {
+              mt: 4, // Reduced margin on mobile
+            }
+          }}>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="large"
               href="/contact"
-              label="View More"
-              sizeVariant="medium"
               sx={{
-                // Custom styles (if needed)
+                px: 4,
+                py: 1.5,
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                borderRadius: 2,
+                textTransform: 'none',
+                boxShadow: `0 4px 14px ${alpha(theme.palette.secondary.main, 0.5)}`,
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: `0 6px 20px ${alpha(theme.palette.secondary.main, 0.6)}`,
+                },
+                transition: 'all 0.3s ease',
+                [theme.breakpoints.down('sm')]: {
+                  fontSize: '1rem', // Smaller font on mobile
+                  px: 3,
+                  py: 1.25,
+                }
               }}
-            />
+            >
+              View More
+            </Button>
           </Box>
         )}
       </Container>

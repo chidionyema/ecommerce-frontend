@@ -42,7 +42,8 @@ import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import GoldCard from '../components/GoldCard';
 import { getSharedStyles } from '../utils/sharedStyles';
 import * as yup from 'yup';
-import FAQ from '../components/FAQ';
+// Update the import path to use the common folder
+import FAQ from '../components/Common/FAQ';
 import { 
   faqItems, 
   testimonials, 
@@ -750,8 +751,14 @@ const Contact = () => {
             </Grid>
           </Box>
 
-          {/* FAQ Section */}
-          <FAQ items={faqItems} />
+          {/* FAQ Section - Using the reusable component */}
+          <FAQ 
+            items={faqItems} 
+            title="Frequently Asked Questions"
+            subtitle="Find answers to common questions about our services and solutions"
+            sx={{ mb: { xs: 8, md: 12 } }}
+          />
+          
           <BackToTopButton />
         </Container>
       </ConsistentPageLayout>

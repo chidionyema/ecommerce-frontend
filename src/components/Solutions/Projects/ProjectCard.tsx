@@ -1,64 +1,15 @@
+// ProjectCard.tsx - Modified to fix technology icons and CTA visibility
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  Box,
-  Typography,
-  CardContent,
-  Chip,
-  Tooltip,
-  useTheme,
-  alpha,
-  keyframes,
-  Collapse,
-  Grid,
-  Skeleton,
-  Badge,
-} from '@mui/material';
-import { ArrowRightAlt, ExpandMore, ExpandLess, Info, Star, TouchApp } from '@mui/icons-material';
+import { Box, Typography, CardContent, Chip, Tooltip, useTheme, alpha, Collapse, Grid, Skeleton, Badge } from '@mui/material';
+import { ArrowRightAlt, ExpandMore, ExpandLess, Star, TouchApp } from '@mui/icons-material';
 import GoldCard from '../../GoldCard';
 import { Code } from 'lucide-react';
 import { GradientButton } from '../../../components/GradientButton';
-import { motion } from 'framer-motion'; // For ultra-modern animations
-import { useRouter } from 'next/router';
-// Enhanced animations
-const shineAnimation = keyframes`
-  0% { left: -100%; }
-  20% { left: 100%; }
-  100% { left: 100%; }
-`;
+import { motion } from 'framer-motion';
+import { createStyles, CARD_SIZES, hexToRgb } from './ProjectCardStyles';
 
-
-const floatAnimation = keyframes`
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-`;
-
-// Improved glowing effect
-const glowAnimation = keyframes`
-  0% { box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.5), 0 0 20px rgba(var(--primary-rgb), 0.3); }
-  50% { box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.8), 0 0 40px rgba(var(--primary-rgb), 0.5); }
-  100% { box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.5), 0 0 20px rgba(var(--primary-rgb), 0.3); }
-`;
-
-// Optimized card sizes with responsive values
-const CARD_SIZES = {
-  xlarge: {
-    width: { xs: '320px', sm: '340px', md: '360px' },
-    height: { xs: '460px', sm: '470px', md: '480px' },
-  }
-};
-
-// Enhanced spacing system for better visual hierarchy
-const SPACING = {
-  xsmall: 0.75,
-  small: 1.5,
-  medium: 2.5,
-  large: 3.5,
-  xlarge: 5,
-};
-
-// Type definitions
-interface Project {
+// Simple Project type (only what's needed)
+export interface Project {
   id: string;
   name: string;
   description: string;
@@ -69,20 +20,29 @@ interface Project {
   technologies: string[];
   featured?: boolean;
   imageUrl?: string;
-  brandColor?: string; // Added for brand cohesion
+  brandColor?: string;
+  tags?: string[];
+  background?: string; // For gradient background
 }
 
 interface ProjectCardProps {
   project: Project;
   sx?: any;
   gridSpacing?: number;
-  delay?: number; // For staggered animations
+  delay?: number;
 }
 
+interface ProjectGridProps {
+  projects: Project[];
+  spacing?: number;
+  animate?: boolean;
+}
+
+// Main component with focus on marketing and presentation
 const ProjectCard: React.FC<ProjectCardProps> = ({ 
   project, 
   sx,
-  gridSpacing = 4, // Increased default spacing
+  gridSpacing = 4,
   delay = 0
 }) => {
   const theme = useTheme();
@@ -94,10 +54,15 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   const [hovering, setHovering] = useState(false);
   const [visible, setVisible] = useState(false);
   
+  // Use correct default image path
+  const imageUrl = project.imageUrl || '/images/istockphoto-todo.jpg';
+  
+  // Get all styles from the style creator function
+  const styles = createStyles(theme);
+  
   // Custom brand colors with fallback to theme colors
   const brandColor = project.brandColor || theme.palette.primary.main;
   const brandColorLight = alpha(brandColor, 0.2);
-  const brandColorMedium = alpha(brandColor, 0.5);
   
   // CSS variable for animations
   useEffect(() => {
@@ -105,14 +70,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       const rgbColor = hexToRgb(brandColor);
       cardRef.current.style.setProperty('--primary-rgb', rgbColor);
     }
-  }, [brandColor, cardRef]);
+  }, [brandColor]);
 
   // Progressive loading with IntersectionObserver
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Add slight delay for staggered effect
           setTimeout(() => {
             setVisible(true);
             observer.disconnect();
@@ -129,18 +93,33 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     return () => observer.disconnect();
   }, [delay]);
   
-  // Handle image loading with progress tracking
+  // Handle image loading - with better fallback handling
   useEffect(() => {
-    if (project.imageUrl) {
-      const img = new Image();
-      img.src = project.imageUrl || '/images/istockphoto-todo.jpg';
-      img.onload = () => setImageLoaded(true);
-    } else {
-      setImageLoaded(true);
-    }
-  }, [project.imageUrl]);
-  
-  const router = useRouter();
+    // Always show loading state briefly for UX consistency
+    const timer = setTimeout(() => {
+      // If using a background gradient with no image, just mark as loaded
+      if (project.background && !project.imageUrl) {
+        setImageLoaded(true);
+        return;
+      }
+      
+      // If we have an image URL, try to load it
+      if (imageUrl) {
+        const img = new Image();
+        img.src = imageUrl;
+        img.onload = () => setImageLoaded(true);
+        img.onerror = () => {
+          console.error(`Failed to load image: ${imageUrl}`);
+          setImageLoaded(true); // Still mark as loaded to avoid endless loading state
+        };
+      } else {
+        // No image or background, just mark as loaded
+        setImageLoaded(true);
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [imageUrl, project.background]);
 
   // Handle card expansion
   const toggleExpand = (e: React.MouseEvent) => {
@@ -149,22 +128,28 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     setExpanded(!expanded);
   };
 
-  // Convert hex to rgb for CSS variables
-  const hexToRgb = (hex: string) => { // Add parameter type
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-      ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
-      : '75, 123, 236';
+  // A helper function to safely render the project icon
+  const renderIcon = () => {
+    try {
+      if (project.icon) {
+        return <project.icon size={24} color={project.iconColor || brandColor} />;
+      }
+      return <DefaultIcon size={24} color={brandColor} />;
+    } catch (error) {
+      console.error('Error rendering icon:', error);
+      return <DefaultIcon size={24} color={brandColor} />;
+    }
   };
 
   return (
     <Grid item xs={12} sm={6} md={4} lg={4} sx={{ 
-      p: SPACING.medium,
+      p: 2.5,
       display: 'flex', 
       justifyContent: 'center',
       mx: 'auto',
       my: 2 
     }}>
+      {/* Main card container with animations */}
       <Box 
         ref={cardRef}
         component={motion.div}
@@ -175,45 +160,23 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           ease: [0.25, 0.1, 0.25, 1.0],
           delay: delay * 0.1
         }}
-        sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center',
-          height: '100%',
-          width: '100%',
-          transform: hovering ? 'scale(1.03)' : 'scale(1)',
-          transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          animation: hovering ? `${floatAnimation} 4s ease-in-out infinite` : 'none',
-          cursor: 'pointer',
-          position: 'relative',
-          filter: 'drop-shadow(0 4px 20px rgba(0,0,0,0.1))',
-          '--primary-rgb': hexToRgb(brandColor),
-        }}
+        sx={styles.cardContainer(hovering, brandColor)}
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.98 }}
       >
-        {/* Improved clickable indicator that appears on hover */}
+        {/* "Explore Case Study" badge - Always visible now */}
         <Badge
           badgeContent={
             <Box
               component={motion.div}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={hovering ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0.9, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                bgcolor: alpha(brandColor, 0.95),
-                color: '#fff',
-                px: 1.8,
-                py: 0.8,
-                borderRadius: '30px',
-                fontSize: '0.85rem',
-                fontWeight: 'bold',
-                boxShadow: `0 2px 15px ${alpha(theme.palette.common.black, 0.35)}`,
-                backdropFilter: 'blur(8px)',
+                ...styles.badgeContent(brandColor),
+                opacity: 1, // Always visible
               }}
             >
               <TouchApp sx={{ fontSize: '1.1rem', mr: 0.7 }} />
@@ -221,86 +184,26 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
             </Box>
           }
           sx={{
-            '& .MuiBadge-badge': {
-              top: 25,
-              right: 25,
-              opacity: hovering ? 1 : 0,
-              transition: 'opacity 0.3s ease',
-              zIndex: 20,
-            },
+            ...styles.badge(hovering),
+            opacity: 1, // Always visible
           }}
         >
+          {/* Card component */}
           <GoldCard
             href={`/projects/${project.id}`}
             sx={{
-              width: CARD_WIDTH,
-              height: expanded ? 'auto' : CARD_HEIGHT,
-              p: 2,
-              position: 'relative',
-              overflow: 'hidden',
-              cursor: 'pointer !important',
-        // Add pointer event prioritization
-              '& *': {
-                pointerEvents: 'none !important'
-              },
-              '& a, & button': {
-                pointerEvents: 'all !important'
-              },
-              transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              boxShadow: hovering 
-                ? `0 25px 50px -10px ${alpha(theme.palette.common.black, 0.3)}, 0 10px 20px -5px ${alpha(theme.palette.common.black, 0.2)}`
-                : `0 8px 20px -5px ${alpha(theme.palette.common.black, 0.15)}`,
-              borderRadius: '24px',
-              animation: project.featured 
-                ? `${glowAnimation} 3s infinite ease-in-out` 
-                : 'none',
-              '&:hover': {
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: '-100%',
-                  width: '70%',
-                  height: '100%',
-                  background: `linear-gradient(90deg, transparent, ${alpha(
-                    theme.palette.common.white,
-                    0.35
-                  )}, transparent)`,
-                  transform: 'skewX(-25deg)',
-                  animation: `${shineAnimation} 1.5s ease-in-out`,
-                  zIndex: 1,
-                },
-              },
-              border: project.featured ? `1px solid ${alpha(brandColor, 0.3)}` : 'none',
-              maxWidth: '100%',
-              mx: 'auto',
-              ...sx,
+              ...styles.card(hovering, expanded, CARD_HEIGHT, project.featured, brandColor),
+              ...sx
             }}
           >
-            {/* Enhanced featured badge */}
+            {/* Featured badge */}
             {project.featured && (
               <Box
                 component={motion.div}
                 initial={{ x: 50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                sx={{
-                  position: 'absolute',
-                  top: 20,
-                  right: 20,
-                  zIndex: 10,
-                  background: `linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 180, 0, 0.95))`,
-                  color: '#000',
-                  borderRadius: '30px',
-                  px: 2.2,
-                  py: 0.8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.8,
-                  boxShadow: `0 4px 15px ${alpha(theme.palette.common.black, 0.3)}`,
-                  backdropFilter: 'blur(5px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                }}
+                sx={styles.featuredBadge}
               >
                 <Star sx={{ fontSize: '1.2rem' }} />
                 <Typography variant="caption" fontWeight={800} sx={{ fontSize: '0.9rem' }}>
@@ -309,30 +212,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               </Box>
             )}
 
-            {/* Enhanced Header with Image & Client Info */}
-            <Box
-              sx={{
-                height: '40%',
-                width: '100%',
-                overflow: 'hidden',
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'flex-end',
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  background: hovering 
-                    ? 'linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.65))' 
-                    : 'linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.75))',
-                  transition: 'all 0.5s ease',
-                  zIndex: 1,
-                }
-              }}
-            >
+            {/* Image section */}
+            <Box sx={styles.imageContainer(hovering)}>
+              {/* Loading state */}
               {!imageLoaded && (
                 <Box sx={{ width: '100%', height: '100%', position: 'relative' }}>
                   <Skeleton 
@@ -347,7 +229,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                       left: 0
                     }} 
                   />
-                  {/* Loading indicator */}
                   <Box
                     sx={{
                       position: 'absolute',
@@ -368,99 +249,62 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                         borderRadius: '50%',
                         border: `3px solid ${alpha(brandColor, 0.2)}`,
                         borderTop: `3px solid ${brandColor}`,
-                        animation: `spin 1s linear infinite`,
+                        animation: 'spin 1s linear infinite',
                         '@keyframes spin': {
-                          '0%': {
-                            transform: 'rotate(0deg)',
-                          },
-                          '100%': {
-                            transform: 'rotate(360deg)',
-                          },
-                        },
+                          '0%': { transform: 'rotate(0deg)' },
+                          '100%': { transform: 'rotate(360deg)' },
+                        }
                       }}
                     />
-                    <Typography 
-                      variant="caption" 
-                      sx={{ 
-                        color: brandColor,
-                        fontWeight: 600 
-                      }}
-                    >
+                    <Typography variant="caption" sx={{ color: brandColor, fontWeight: 600 }}>
                       Loading project...
                     </Typography>
                   </Box>
                 </Box>
               )}
               
+              {/* Background container */}
               {imageLoaded && (
                 <Box
-                  component={motion.img}
-                  initial={{ scale: 1.1, filter: 'blur(10px)' }}
-                  animate={{ scale: 1, filter: 'blur(0px)' }}
-                  transition={{ duration: 0.8 }}
-                  src={project.imageUrl || "/images/istockphoto-todo.jpg"}
-                  alt={project.name}
                   sx={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     zIndex: 0,
+                    background: project.background || 'transparent',
                     filter: hovering ? 'contrast(1.1) brightness(1.05)' : 'contrast(1.05) brightness(0.95)',
-                    transition: 'transform 0.7s ease-in-out, filter 0.5s ease',
-                    transform: hovering ? 'scale(1.08)' : 'scale(1.01)',
-                  }}
-                />
-              )}
-              
-              {/* Client info with brand color integration */}
-              <Box 
-                sx={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  p: 2.8,
-                  background: 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  zIndex: 2,
-                }}
-              >
-                <Box
-                  component={motion.div}
-                  whileHover={{ 
-                    rotate: [0, -10, 0, 10, 0],
-                    transition: { duration: 0.5 }
-                  }}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: alpha(theme.palette.background.paper, 0.85),
-                    p: 1.3,
-                    borderRadius: '50%',
-                    width: 48,
-                    height: 48,
-                    backdropFilter: 'blur(10px)',
-                    border: `2px solid ${alpha(brandColor, 0.6)}`,
-                    boxShadow: `0 5px 15px ${alpha(theme.palette.common.black, 0.25)}`,
-                    transition: 'all 0.4s ease',
-                    transform: hovering ? 'scale(1.15)' : 'scale(1)',
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.85)}, ${alpha(theme.palette.background.paper, 0.95)})`,
+                    transition: 'filter 0.5s ease',
                   }}
                 >
-                  {project.icon ? (
-                    <project.icon
-                      size={24}
-                      color={project.iconColor || brandColor}
+                  {/* If no background gradient is specified, use the image */}
+                  {!project.background && (
+                    <Box
+                      component="img"
+                      src={imageUrl}
+                      alt={project.name}
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                        transition: 'transform 0.7s ease-in-out',
+                        transform: hovering ? 'scale(1.08)' : 'scale(1.01)',
+                      }}
                     />
-                  ) : (
-                    <DefaultIcon size={24} color={brandColor} />
                   )}
+                </Box>
+              )}
+              
+              {/* Client info */}
+              <Box sx={styles.clientInfoBox}>
+                <Box
+                  component={motion.div}
+                  whileHover={{ rotate: [0, -10, 0, 10, 0], transition: { duration: 0.5 } }}
+                  sx={styles.iconBox(hovering, brandColor)}
+                >
+                  {renderIcon()}
                 </Box>
                 <Typography 
                   variant="body1" 
@@ -481,72 +325,28 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               </Box>
             </Box>
 
-            {/* Main Content */}
-            <CardContent
-              sx={{
-                px: 3.8,
-                py: 3.5,
-                height: '60%',
-                display: 'flex',
-                flexDirection: 'column',
-                '&:last-child': { pb: 3.5 },
-                position: 'relative',
-                zIndex: 2,
-                bgcolor: alpha(theme.palette.background.paper, 0.98),
-              }}
-            >
-              {/* Project Title with brand accent */}
+            {/* Content section */}
+            <CardContent sx={styles.cardContent}>
+              {/* Project title */}
               <Typography
                 variant="h5"
                 component={motion.h2}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                fontWeight={800}
-                sx={{ 
-                  fontSize: '1.7rem', 
-                  mb: SPACING.medium,
-                  lineHeight: 1.2,
-                  position: 'relative',
-                  display: 'inline-block',
-                  color: theme.palette.text.primary,
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    left: 0,
-                    bottom: -12,
-                    width: hovering ? '90px' : '60px',
-                    height: '5px',
-                    background: `linear-gradient(90deg, ${brandColor}, ${theme.palette.secondary.main})`,
-                    borderRadius: '3px',
-                    transition: 'width 0.4s ease',
-                  }
-                }}
+                sx={styles.projectTitle(hovering, brandColor)}
               >
                 {project.name}
               </Typography>
 
-              {/* Enhanced Metrics Display with brand colors */}
-              {project.metrics && (
+              {/* Key metrics */}
+              {project.metrics && project.metrics.length > 0 && (
                 <Box 
                   component={motion.div}
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  sx={{ 
-                    display: 'flex', 
-                    flexWrap: 'wrap', 
-                    gap: 2.8,
-                    mb: SPACING.medium,
-                    background: alpha(theme.palette.background.default, 0.7),
-                    p: 2.2,
-                    borderRadius: 3.5,
-                    border: `1px solid ${alpha(brandColor, 0.15)}`,
-                    backdropFilter: 'blur(8px)',
-                    boxShadow: `inset 0 0 15px ${alpha(brandColor, 0.08)}`,
-                    transition: 'all 0.4s ease',
-                    transform: hovering ? 'translateY(-3px)' : 'translateY(0)',
-                  }}
+                  sx={styles.metricsBox(hovering, brandColor)}
                 >
                   {project.metrics.slice(0, 3).map((metric, index) => (
                     <Tooltip 
@@ -558,40 +358,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                     >
                       <Box 
                         component={motion.div}
-                        whileHover={{ 
-                          scale: 1.08,
-                          transition: { duration: 0.2 }
-                        }}
-                        sx={{ 
-                          display: 'flex', 
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          flex: 1,
-                          p: 1,
-                          transition: 'all 0.4s ease',
-                          transform: hovering ? 'scale(1.05)' : 'scale(1)',
-                          position: 'relative',
-                          '&::after': index < 2 ? {
-                            content: '""',
-                            position: 'absolute',
-                            right: -10,
-                            top: '25%',
-                            height: '50%',
-                            width: '1px',
-                            background: alpha(theme.palette.divider, 0.5),
-                          } : {},
-                        }}
+                        whileHover={{ scale: 1.08, transition: { duration: 0.2 } }}
+                        sx={styles.metricItem(hovering, index)}
                       >
                         <Typography 
                           variant="h6" 
-                          fontWeight={800} 
-                          sx={{ 
-                            fontSize: '1.45rem',
-                            lineHeight: 1.2,
-                            background: `linear-gradient(90deg, ${brandColor}, ${theme.palette.secondary.main})`,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                          }}
+                          sx={styles.metricValue(brandColor)}
                         >
                           {metric.value}
                         </Typography>
@@ -614,33 +386,22 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 </Box>
               )}
 
-              {/* Ultra-modern Technologies display */}
+              {/* Technology stack - Updated to always show technology chips */}
               <Box 
                 component={motion.div}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                sx={{ 
-                  mb: SPACING.medium, 
-                  p: 2.2,
-                  borderRadius: 3,
-                  background: hovering 
-                    ? alpha(brandColorLight, 0.7)
-                    : alpha(brandColorLight, 0.4),
-                  border: `1px solid ${alpha(brandColor, 0.25)}`,
-                  transition: 'all 0.3s ease',
+                sx={{
+                  mt: 2.5,
+                  p: 1.5,
+                  borderRadius: theme.shape.borderRadius,
+                  bgcolor: alpha(brandColor, 0.08),
+                  border: `1px solid ${alpha(brandColor, 0.12)}`,
                   position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '2px',
-                    background: `linear-gradient(90deg, ${brandColor}, transparent)`,
-                    zIndex: 1,
-                  },
+                  display: 'block', // Always display
+                  opacity: 1, // Full opacity
+                  visibility: 'visible'
                 }}
               >
                 <Typography 
@@ -666,29 +427,20 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                       borderRadius: '50%',
                       bgcolor: brandColor,
                       display: 'inline-block',
-                      boxShadow: `0 0 8px ${brandColorMedium}`,
+                      boxShadow: `0 0 8px ${alpha(brandColor, 0.5)}`,
                     }}
                   />
                   Technology Stack
                 </Typography>
-                <Box sx={{ 
-                  display: 'flex', 
-                  gap: 1.2, 
+                
+                <Box sx={{
+                  ...styles.techContainer(expanded, brandColorLight),
+                  // Override any styles that might hide this based on hover
+                  display: 'flex',
                   flexWrap: 'wrap',
-                  maxHeight: expanded ? '300px' : '70px',
-                  overflow: expanded ? 'visible' : 'hidden',
-                  transition: 'max-height 0.5s ease',
-                  position: 'relative',
-                  '&::after': !expanded ? {
-                    content: '""',
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: '25px',
-                    background: `linear-gradient(to top, ${alpha(brandColorLight, 0.9)}, transparent)`,
-                    pointerEvents: 'none',
-                  } : {},
+                  gap: '8px',
+                  opacity: 1,
+                  visibility: 'visible',
                 }}>
                   {project.technologies.map((tech, index) => (
                     <Chip
@@ -699,53 +451,23 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ duration: 0.3, delay: index * 0.05 + 0.3 }}
                       size="small"
-                      sx={{ 
-                        height: '32px',
-                        borderRadius: '8px',
-                        transition: 'all 0.3s ease',
-                        mb: 1,
-                        background: `linear-gradient(120deg, ${alpha(brandColor, 0.15)}, ${alpha(brandColor, 0.25)})`,
-                        border: `1px solid ${alpha(brandColor, 0.35)}`,
-                        '&:hover': {
-                          transform: 'translateY(-3px) scale(1.05)',
-                          boxShadow: `0 5px 15px ${alpha(brandColor, 0.3)}`,
-                          background: `linear-gradient(120deg, ${alpha(brandColor, 0.25)}, ${alpha(brandColor, 0.4)})`,
-                        },
-                        '& .MuiChip-label': { 
-                          px: 1.8,
-                          fontSize: '0.88rem',
-                          fontWeight: 600,
-                          color: theme.palette.mode === 'dark' ? '#fff' : theme.palette.text.primary,
-                        } 
+                      sx={{
+                        ...styles.techChip(brandColor),
+                        display: 'inline-flex', // Always visible
+                        opacity: 1, // Full opacity
                       }}
                     />
                   ))}
                 </Box>
                 
-                {/* Show more/less toggle for technologies */}
+                {/* Expand/collapse toggle */}
                 {project.technologies.length > 5 && (
                   <Box
                     onClick={toggleExpand}
                     component={motion.div}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mt: 1.5,
-                      gap: 0.8,
-                      cursor: 'pointer',
-                      color: brandColor,
-                      fontWeight: 600,
-                      fontSize: '0.85rem',
-                      borderRadius: 2,
-                      py: 0.8,
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        background: alpha(brandColor, 0.1),
-                      }
-                    }}
+                    sx={styles.expandButton(brandColor)}
                   >
                     {expanded ? (
                       <>
@@ -762,7 +484,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 )}
               </Box>
 
-              {/* Improved Description Display */}
+              {/* Project description */}
               <Box
                 component={motion.div}
                 initial={{ y: 20, opacity: 0 }}
@@ -773,12 +495,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   <Typography 
                     variant="body2" 
                     color="text.secondary" 
-                    sx={{ 
-                      fontSize: '0.98rem',
-                      mb: SPACING.medium,
-                      lineHeight: 1.75,
-                      pr: 0.5,
-                    }}
+                    sx={styles.description}
                   >
                     {project.description || 'No description available'}
                   </Typography>
@@ -788,24 +505,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   <Typography 
                     variant="body2" 
                     color="text.secondary" 
-                    sx={{ 
-                      fontSize: '0.98rem',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      mb: SPACING.medium,
-                      lineHeight: 1.75,
-                      pr: 0.5,
-                    }}
+                    sx={styles.truncatedDescription}
                   >
                     {project.description || 'No description available'}
                   </Typography>
                 )}
               </Box>
 
-              {/* Ultra-modern CTA Button with brand colors */}
+              {/* CTA button - Updated to always be visible */}
               <Box
                 component={motion.div}
                 initial={{ y: 20, opacity: 0 }}
@@ -818,43 +525,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   justifyContent: 'center',
                   width: '100%',
                   position: 'relative',
+                  opacity: 1, // Always visible
                 }}
               >
-                {/* Interactive floating elements for visual interest */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: '-5px',
-                    left: '15%',
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    backgroundColor: alpha(brandColor, 0.6),
-                    boxShadow: `0 0 12px ${alpha(brandColor, 0.4)}`,
-                    animation: 'float 3s ease-in-out infinite alternate',
-                    '@keyframes float': {
-                      '0%': { transform: 'translateY(0px)' },
-                      '100%': { transform: 'translateY(-15px)' },
-                    },
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    bottom: '10px',
-                    right: '20%',
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    backgroundColor: alpha(theme.palette.secondary.main, 0.5),
-                    boxShadow: `0 0 12px ${alpha(theme.palette.secondary.main, 0.4)}`,
-                    animation: 'float2 4s ease-in-out infinite alternate',
-                    '@keyframes float2': {
-                      '0%': { transform: 'translateY(0px) translateX(0px)' },
-                      '100%': { transform: 'translateY(-10px) translateX(10px)' },
-                    },
-                  }}
-                />
+                {/* Floating elements for visual interest */}
+                <Box sx={styles.floatingElement1(brandColor)} />
+                <Box sx={styles.floatingElement2(theme.palette.secondary.main)} />
                 
                 <GradientButton
                   href={`/projects/${project.id}`}
@@ -870,53 +546,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   }
                   sizeVariant="medium"
                   sx={{
-                    py: 1.8,
-                    px: 3.8,
-                    width: '100%',
-                    maxWidth: '250px',
-                    fontWeight: 800,
-                    borderRadius: 10,
-                    fontSize: '1.05rem',
-                    letterSpacing: '0.6px',
-                    transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    background: `linear-gradient(90deg, ${brandColor}, ${alpha(theme.palette.secondary.main, 0.9)})`,
-                    boxShadow: hovering 
-                      ? `0 10px 30px -8px ${alpha(brandColor, 0.7)}, 0 6px 15px -5px ${alpha(theme.palette.common.black, 0.2)}` 
-                      : `0 8px 20px -5px ${alpha(brandColor, 0.5)}, 0 3px 10px -5px ${alpha(theme.palette.common.black, 0.1)}`,
-                    transform: hovering ? 'translateY(-5px)' : 'translateY(0)',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                      background: 'linear-gradient(rgba(255,255,255,0.25), rgba(255,255,255,0))',
-                      opacity: hovering ? 1 : 0.5,
-                      transition: 'opacity 0.4s ease',
-                      zIndex: 0,
-                    },
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: '-100%',
-                      width: '70%',
-                      height: '100%',
-                      background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.common.white, 0.4)}, transparent)`,
-                      transform: 'skewX(-25deg)',
-                      transition: 'all 0.7s ease',
-                      animation: hovering ? `${shineAnimation} 1.5s infinite ease-in-out` : 'none',
-                      zIndex: 1,
-                    },
-                    '& .MuiButton-startIcon, & .MuiButton-endIcon': {
-                      zIndex: 2,
-                    },
-                    '& .MuiTouchRipple-root': {
-                      zIndex: 1,
-                    },
+                    ...styles.ctaButton(hovering, brandColor),
+                    opacity: 1, // Always visible
+                    visibility: 'visible', // Ensure it's always visible
+                    transform: 'translateY(0)', // Prevent any transform that might hide it
                   }}
                 />
               </Box>
@@ -928,18 +561,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   );
 };
 
-// Optimized ProjectGrid component for better responsiveness and spacing
-interface ProjectGridProps {
-  projects: Project[];
-  spacing?: number;
-  animate?: boolean; // Enable/disable animations
-}
-
+// Grid component to display multiple projects
 export const ProjectGrid: React.FC<ProjectGridProps> = ({ 
   projects,
   spacing = 4,
   animate = true,
 }) => {
+  const theme = useTheme();
+  
   return (
     <Grid 
       container 
@@ -952,12 +581,9 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({
         mt: 3,
         mb: 5,
         width: '100%',
-        // Remove horizontal padding from container
         '& > .MuiGrid-item': {
-          // Remove manual padding-top
           paddingTop: '0 !important',
-          // Add proper spacing
-          padding: theme => theme.spacing(spacing / 2)
+          padding: theme.spacing(spacing / 2)
         }
       }}
     >
@@ -973,8 +599,10 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({
   );
 };
 
-// Preview component for demonstrating the ProjectCard with sample data
+// Preview component for testing
 export const ProjectCardPreview = () => {
+  const theme = useTheme();
+  
   const sampleProject: Project = {
     id: 'sample-project',
     name: 'AI-Powered Portfolio Analytics Dashboard',
@@ -989,12 +617,14 @@ export const ProjectCardPreview = () => {
     ],
     technologies: ['React', 'TypeScript', 'Node.js', 'GraphQL', 'TensorFlow', 'AWS', 'Material UI', 'D3.js'],
     featured: true,
-    imageUrl: '/images/istockphoto-todo.jpg',
+    imageUrl: '/images/istockphoto-todo.jpg',  // Updated to use the correct image path
     brandColor: '#4A90E2',
+    // Example of using a gradient background - commented out to show the image
+    // background: 'linear-gradient(135deg, #1a237e, #283593)'
   };
 
   return (
-    <Box sx={{ p: 4, bgcolor: '#f5f5f5' }}>
+    <Box sx={{ p: 4, bgcolor: alpha(theme.palette.background.default, 0.6) }}>
       <Typography variant="h4" gutterBottom fontWeight={700} sx={{ mb: 4, textAlign: 'center' }}>
         Project Card Preview
       </Typography>

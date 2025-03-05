@@ -8,6 +8,7 @@ import ServicesGrid from '../components/Common/ServicesGrid';
 import TestimonialsSection from '../components/Common/TestimonialsSection';
 import WhyChooseUs from '../components/Common/WhyChooseUs';
 import Hero from '../components/Home/Hero';
+import CTASection from '../components/Home/CTASection';
 import { SPACING } from '../utils/sharedStyles';
 
 export default function HomePage() {
@@ -41,6 +42,7 @@ export default function HomePage() {
         <WhyChooseUs />
         <ServicesGrid />
         <TestimonialsSection />
+        <CTASection /> 
       </Box>
     </div>
   );

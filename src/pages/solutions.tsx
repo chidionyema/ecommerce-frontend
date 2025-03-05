@@ -5,9 +5,9 @@ import ProjectCard, { ProjectGrid } from '../components/Solutions/Projects/Proje
 import { cvProjects } from '../data/cvProjects';
 import PageSection from '../components/PageSection';
 import { SPACING, getSharedStyles } from '../utils/sharedStyles';
-// Import the additional components
-import TestimonialsSection from '../components/Common/TestimonialsSection';
-import WhyChooseUs from '../components/Common/WhyChooseUs';
+
+// Import FAQ component
+import FAQ from '../components/Common/FAQ';
 // Additional imports for enhanced features
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
@@ -47,6 +47,30 @@ const getIndustryIcon = (title: string): JSX.Element => {
     
     return iconMap[title] || <CloudIcon sx={{ fontSize: 40 }} />;
 };
+
+// Sample FAQ items for the Solutions page
+const solutionsFaqItems = [
+  {
+    question: "How do you approach new solution development?",
+    answer: "We follow a comprehensive process that begins with understanding your business needs and challenges. Our team conducts thorough research, creates a strategic roadmap, develops prototypes, and iteratively refines the solution based on feedback. Throughout development, we maintain open communication and ensure that the final product aligns perfectly with your business objectives."
+  },
+  {
+    question: "Can you customize solutions for specific industry requirements?",
+    answer: "Absolutely. We specialize in developing tailored solutions that address the unique challenges of different industries. Our team has extensive experience across various sectors including finance, healthcare, retail, and more. We incorporate industry-specific compliance requirements, workflows, and best practices to ensure our solutions are perfectly aligned with your specific needs."
+  },
+  {
+    question: "What technologies do you typically use for solution development?",
+    answer: "We utilize a wide range of cutting-edge technologies based on the specific requirements of each project. Our technology stack includes cloud platforms (AWS, Azure, GCP), modern frontend frameworks (React, Angular, Vue), robust backend solutions (Node.js, .NET, Python), and database technologies (SQL, NoSQL). We select the most appropriate technologies to ensure optimal performance, scalability, and maintainability."
+  },
+  {
+    question: "How do you ensure security in your solutions?",
+    answer: "Security is paramount in all our solutions. We implement industry-standard security practices including encryption, secure authentication methods, regular vulnerability assessments, and adherence to compliance standards such as GDPR, HIPAA, and PCI DSS where applicable. Our development process incorporates security at every stage, not just as an afterthought."
+  },
+  {
+    question: "Do you provide support after the solution is deployed?",
+    answer: "Yes, we offer comprehensive post-deployment support and maintenance services. This includes monitoring system performance, addressing any issues that arise, implementing updates, and making enhancements as your business evolves. We offer various support packages tailored to different needs, from basic technical support to full managed services."
+  }
+];
 
 const Solutions = () => {
     const theme = useTheme();
@@ -529,11 +553,29 @@ const Solutions = () => {
                 </Container>
             </PageSection>
 
-            {/* Testimonials Section - Using the new implementation */}
-            <TestimonialsSection />
-
-            {/* Why Choose Us Section - Using the new implementation */}
-            <WhyChooseUs />
+            {/* FAQ Section - Added to the Solutions page */}
+            <PageSection
+                sx={{
+                    background: theme.palette.mode === 'dark'
+                        ? 'linear-gradient(to bottom, #1a1a1a, #121212)'
+                        : 'linear-gradient(to bottom, #f8f9fa, #f5f7fa)',
+                    py: 8,
+                    borderRadius: { md: '20px' },
+                    mx: { md: 4 },
+                    mb: { xs: 8, md: 12 },
+                    boxShadow: theme.palette.mode === 'dark'
+                        ? 'none'
+                        : '0 10px 40px rgba(0, 0, 0, 0.04)',
+                }}
+            >
+                <FAQ 
+                    items={solutionsFaqItems} 
+                    title="Solutions FAQ"
+                    subtitle="Answers to common questions about our enterprise solutions"
+                    fullWidth={false}
+                    containerProps={{ maxWidth: "lg" }}
+                />
+            </PageSection>
         </ConsistentPageLayout>
     );
 };

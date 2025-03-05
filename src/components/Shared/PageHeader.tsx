@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
-import { ArrowForward } from '@mui/icons-material'; 
+import { ArrowForward } from '@mui/icons-material';
 import { GradientButton } from '../../components/GradientButton';
 
 interface PageHeaderProps {
@@ -71,10 +71,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         alignItems: 'center',
         overflow: 'hidden',
         ...sx,
-        backgroundColor: theme.palette.primary.main, // Fallback color
+        backgroundColor: theme.palette.primary.main,
       }}
     >
-      {/* Background Image with Blur and Fade Transition */}
+      {/* Background Image */}
       <Box
         sx={{
           position: 'absolute',
@@ -92,7 +92,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         }}
       />
 
-      {/* Overlay with Reduced Opacity */}
+      {/* Overlay */}
       <Box
         sx={{
           position: 'absolute',
@@ -100,12 +100,12 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundColor: alpha(theme.palette.primary.dark, 0.2),
+          backgroundColor: alpha(theme.palette.primary.dark, 0.3),
           zIndex: 1,
         }}
       />
 
-      {/* Main Content Container */}
+      {/* Content Container */}
       <Container
         sx={{
           position: 'relative',
@@ -160,86 +160,76 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           </motion.div>
         )}
 
-      {/* CTA Button */}
-<motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ delay: 0.4, duration: 0.6 }}
->
-  <Box sx={{ 
-    mt: 6,
-    position: 'relative',
-    display: 'inline-block',
-    filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3))'
-  }}>
-    <GradientButton
-      href="/contact"
-      label="Get Started Now"
-      sizeVariant="large"
-      sx={{
-        fontSize: { xs: '1.3rem', md: '1.5rem' },
-        px: 8,
-        py: 3,
-        borderRadius: '50px',
-        fontWeight: 700,
-        letterSpacing: '0.5px',
-        background: `linear-gradient(
-          135deg,
-          ${theme.palette.success.main} 0%,
-          ${theme.palette.success.dark} 100%
-        )`,
-        color: theme.palette.common.white,
-        border: `2px solid ${alpha(theme.palette.common.white, 0.3)}`,
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          transform: 'translateY(-2px) scale(1.05)',
-          boxShadow: `0 8px 24px ${alpha(theme.palette.success.main, 0.4)}`,
-          background: `linear-gradient(
-            135deg,
-            ${theme.palette.success.dark} 0%,
-            ${theme.palette.success.main} 100%
-          )`,
-        },
-        '&:active': {
-          transform: 'scale(0.98)'
-        }
-      }}
-      endIcon={
-        <ArrowForward sx={{
-          fontSize: 28,
-          ml: 2,
-          color: theme.palette.common.white,
-          transition: 'transform 0.3s ease'
-        }} />
-      }
-    />
-
-    {/* Animated shine effect */}
-    <Box
-      sx={{
-        position: 'absolute',
-        top: 0,
-        left: '-100%',
-        width: '50%',
-        height: '100%',
-        background: `linear-gradient(
-          90deg,
-          transparent 0%,
-          ${alpha(theme.palette.common.white, 0.3)} 50%,
-          transparent 100%
-        )`,
-        animation: 'shine 2s infinite',
-        '@keyframes shine': {
-          '0%': { left: '-100%' },
-          '100%': { left: '150%' }
-        }
-      }}
-    />
-  </Box>
-</motion.div>
+        {/* GluStack CTA Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+        >
+          <Box sx={{ 
+            mt: 6,
+            position: 'relative',
+            display: 'inline-block',
+          }}>
+            <Button
+              component={NextLink}
+              href="/contact"
+              variant="contained"
+              endIcon={
+                <ArrowForward sx={{
+                  fontSize: { xs: 20, md: 24 },
+                  ml: { xs: 1, md: 1.5 },
+                  color: '#FFFFFF',
+                }} />
+              }
+              sx={{
+                fontSize: { xs: '1rem', md: '1.25rem' },
+                fontWeight: 600,
+                px: { xs: 3, md: 5 },
+                py: { xs: 1.5, md: 2 },
+                borderRadius: '8px',
+                textTransform: 'none',
+                
+                // Tech-appropriate colors
+                backgroundColor: '#4F46E5', // Indigo color common in tech UIs
+                color: '#FFFFFF',
+                
+                // Clean, minimal styling
+                border: 'none',
+                
+                // Subtle shadow for depth
+                boxShadow: '0 4px 12px rgba(79, 70, 229, 0.4)',
+                
+                // Smooth transitions
+                transition: 'all 0.2s ease',
+                
+                // Hover state
+                '&:hover': {
+                  backgroundColor: '#4338CA',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 16px rgba(79, 70, 229, 0.5)',
+                },
+                
+                // Active state
+                '&:active': {
+                  backgroundColor: '#4338CA',
+                  transform: 'translateY(0)',
+                  boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)',
+                },
+                
+                // Override Material UI styles
+                '&.MuiButton-root': {
+                  textTransform: 'none',
+                }
+              }}
+            >
+              Get Started Now
+            </Button>
+          </Box>
+        </motion.div>
       </Container>
 
-      {/* Solutions Section (unchanged) */}
+      {/* Solutions Section */}
       {solutions && solutions.length > 0 && (
         <Box
           component="section"
@@ -250,7 +240,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             borderTop: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
           }}
         >
-          {/* ... rest of solutions section ... */}
+          {/* Solutions content */}
         </Box>
       )}
     </Box>

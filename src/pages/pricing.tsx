@@ -1,4 +1,5 @@
-// pages/pricing.tsx
+'use client';
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -33,8 +34,6 @@ import {
 } from '@mui/icons-material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 
-import PageSection from '../components/PageSection'; // Corrected: Default import
-import { PageSectionProps } from '../components/PageSection'; 
 import { SPACING, getSharedStyles } from '../utils/sharedStyles';
 
 // Import the data objects from the data file
@@ -77,140 +76,141 @@ const ExtraFeatureItem: React.FC<{ text: string }> = ({ text }) => {
   );
 };
 
+// Updated renderPlanCard function with flex layout for consistent heights
 const renderPlanCard = (
   plan: typeof plans[0],
   handlePlanClick: (type: string) => void,
   theme: any,
   isAnnual: boolean
 ) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{
-      duration: 0.5,
-      delay: plan.type === 'consultation' ? 0 : plan.type === 'project' ? 0.1 : 0.2,
-    }}
-    viewport={{ once: true }}
-    key={plan.type}
-    whileHover={{ y: -10, transition: { duration: 0.3 } }}
-  >
-    <Paper
-      elevation={plan.recommended ? 8 : 4}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        height: '100%',
-        minHeight: 520,
-        p: 3,
-        borderRadius: 4,
-        position: 'relative',
-        background: plan.recommended
-          ? `linear-gradient(145deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, ${
-              theme.palette.mode === 'light' ? 'white' : '#28282a'
-            } 100%)`
-          : theme.palette.mode === 'light'
-          ? 'white'
-          : '#28282a',
-        border: plan.recommended
-          ? `2px solid ${alpha(theme.palette.primary.main, 0.3)}`
-          : `1px solid ${alpha(theme.palette.divider, 0.2)}`,
-        boxShadow: plan.recommended ? theme.shadows[8] : theme.shadows[4],
-        overflow: 'hidden',
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  <Box sx={{ flex: 1, height: '100%' }}>
+    <motion.div
+      style={{ height: '100%', display: 'flex' }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.5,
+        delay: plan.type === 'consultation' ? 0 : plan.type === 'project' ? 0.1 : 0.2,
       }}
+      viewport={{ once: true }}
+      whileHover={{ y: -10, transition: { duration: 0.3 } }}
+      key={plan.type}
     >
-      {plan.recommended && (
-        <Chip
-          label="Most Popular"
-          size="small"
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            zIndex: 1,
-            fontSize: '0.8rem',
-            px: 1,
-            fontWeight: 600,
-            bgcolor: alpha(theme.palette.primary.main, 0.1),
-            color: theme.palette.primary.main,
-            boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.25)}`,
-          }}
-        />
-      )}
-      {plan.recommended && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: -50,
-            right: -50,
-            width: 100,
-            height: 100,
-            bgcolor: alpha(theme.palette.primary.main, 0.1),
-            borderRadius: '50%',
-            zIndex: 0,
-          }}
-        />
-      )}
-      <Box position="relative" zIndex={1}>
-        <Typography variant="h5" fontWeight="bold" mb={1}>
-          {plan.title}
-        </Typography>
-        <Typography variant="subtitle1" mb={3} color="text.secondary">
-          {plan.tagline}
-        </Typography>
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" fontWeight="bold" color="text.primary">
-            {isAnnual && plan.annualPrice ? plan.annualPrice : plan.price}
+      <Paper
+        elevation={plan.recommended ? 8 : 4}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          p: 3,
+          borderRadius: 4,
+          position: 'relative',
+          background: plan.recommended
+            ? `linear-gradient(145deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, ${
+                theme.palette.mode === 'light' ? 'white' : '#28282a'
+              } 100%)`
+            : theme.palette.mode === 'light'
+            ? 'white'
+            : '#28282a',
+          border: plan.recommended
+            ? `2px solid ${alpha(theme.palette.primary.main, 0.3)}`
+            : `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+          boxShadow: plan.recommended ? theme.shadows[8] : theme.shadows[4],
+          overflow: 'hidden',
+          transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+        }}
+      >
+        {plan.recommended && (
+          <Chip
+            label="Most Popular"
+            size="small"
+            sx={{
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              zIndex: 1,
+              fontSize: '0.8rem',
+              px: 1,
+              fontWeight: 600,
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
+              color: theme.palette.primary.main,
+              boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.25)}`,
+            }}
+          />
+        )}
+        {plan.recommended && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: -50,
+              right: -50,
+              width: 100,
+              height: 100,
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
+              borderRadius: '50%',
+              zIndex: 0,
+            }}
+          />
+        )}
+        <Box position="relative" zIndex={1} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h5" fontWeight="bold" mb={1}>
+            {plan.title}
           </Typography>
-          {isAnnual && plan.annualPrice && (
-            <Typography variant="caption" color="success.main" sx={{ fontWeight: 'medium', mt: 0.5, display: 'block' }}>
-              Save 10% with annual billing
+          <Typography variant="subtitle1" mb={3} color="text.secondary">
+            {plan.tagline}
+          </Typography>
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h4" fontWeight="bold" color="text.primary">
+              {isAnnual && plan.annualPrice ? plan.annualPrice : plan.price}
             </Typography>
-          )}
-        </Box>
-        <Box sx={{ mb: 4 }}>
-          {plan.features.map((feature, i) => (
-            <FeatureItem key={i} icon={feature.icon} text={feature.text} />
-          ))}
-        </Box>
-        {plan.extraFeatures && (
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="subtitle2" fontWeight="bold" mb={1.5} color="text.primary">
-              Also includes:
-            </Typography>
-            {plan.extraFeatures.map((feature, i) => (
-              <ExtraFeatureItem key={i} text={feature} />
+            {isAnnual && plan.annualPrice && (
+              <Typography variant="caption" color="success.main" sx={{ fontWeight: 'medium', mt: 0.5, display: 'block' }}>
+                Save 10% with annual billing
+              </Typography>
+            )}
+          </Box>
+          <Box sx={{ mb: 4, flex: '1 0 auto' }}>
+            {plan.features.map((feature, i) => (
+              <FeatureItem key={i} icon={feature.icon} text={feature.text} />
             ))}
           </Box>
-        )}
-      </Box>
-      <Button
-        variant={plan.recommended ? 'contained' : 'outlined'}
-        color="primary"
-        onClick={() => handlePlanClick(plan.type)}
-        sx={{
-          mt: 2,
-          textTransform: 'none',
-          fontWeight: 600,
-          borderRadius: 2,
-          px: 4,
-          py: 1.5,
-          transition: 'all 0.3s ease',
-          boxShadow: plan.recommended ? theme.shadows[3] : 'none',
-          ...(plan.recommended && {
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-          }),
-        }}
-        endIcon={<ArrowForwardIcon />}
-      >
-        {plan.ctaText || 'Select Plan'}
-      </Button>
-    </Paper>
-  </motion.div>
+          {plan.extraFeatures && (
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="subtitle2" fontWeight="bold" mb={1.5} color="text.primary">
+                Also includes:
+              </Typography>
+              {plan.extraFeatures.map((feature, i) => (
+                <ExtraFeatureItem key={i} text={feature} />
+              ))}
+            </Box>
+          )}
+        </Box>
+        <Button
+          variant={plan.recommended ? 'contained' : 'outlined'}
+          color="primary"
+          onClick={() => handlePlanClick(plan.type)}
+          sx={{
+            mt: 2,
+            textTransform: 'none',
+            fontWeight: 600,
+            borderRadius: 2,
+            px: 4,
+            py: 1.5,
+            transition: 'all 0.3s ease',
+            boxShadow: plan.recommended ? theme.shadows[3] : 'none',
+            ...(plan.recommended && {
+              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+            }),
+          }}
+          endIcon={<ArrowForwardIcon />}
+        >
+          {plan.ctaText || 'Select Plan'}
+        </Button>
+      </Paper>
+    </motion.div>
+  </Box>
 );
 
-// Custom section component for this specific page
 const CustomSection: React.FC<{
   children: React.ReactNode;
   id?: string;
@@ -223,14 +223,14 @@ const CustomSection: React.FC<{
       component="section"
       id={id}
       sx={[
-        { 
+        {
           position: 'relative',
           overflow: 'hidden',
           background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
           pt: { xs: 8, md: 12 },
           pb: { xs: 12, md: 16 },
         },
-        ...(Array.isArray(sx) ? sx : [sx])
+        ...(Array.isArray(sx) ? sx : [sx]),
       ]}
       {...props}
     >
@@ -393,13 +393,26 @@ const PricingPage: React.FC = () => {
               {pricingPageContent.pricingSection.description}
             </Typography>
           </motion.div>
-          <Grid container spacing={4}>
+          
+          {/* Updated Grid container with consistent height styling */}
+          <Grid 
+            container 
+            spacing={4} 
+            alignItems="stretch" 
+            sx={{ 
+              '& .MuiGrid-item': { 
+                display: 'flex', 
+                height: { xs: 'auto', md: '100%' } 
+              } 
+            }}
+          >
             {plans.map((plan) => (
               <Grid item xs={12} md={4} key={plan.type}>
                 {renderPlanCard(plan, handlePlanClick, theme, isAnnual)}
               </Grid>
             ))}
           </Grid>
+          
           <Box textAlign="center" mt={4}>
             <Button
               variant="outlined"

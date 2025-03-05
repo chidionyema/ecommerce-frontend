@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Container,
@@ -8,26 +8,15 @@ import {
   useTheme,
   alpha,
   Grid,
+  Button,
 } from '@mui/material';
-import { motion } from 'framer-motion';
-import { CheckCircle, Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-react';
+import { Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-react';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
-import NextLink from 'next/link';
-import { GradientButton } from '../../components/GradientButton';
-import TechCard from './TechCard'; // Import TechCard
+import TechCard from '../Common/TechCard';
 
 const WhyChooseUs = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const imageUrl = '/images/istockphoto-1303809341-1024x1024.jpg';
-
-  useEffect(() => {
-    const img = new Image();
-    img.src = imageUrl;
-    img.onload = () => setImageLoaded(true);
-    img.onerror = () => setImageLoaded(false);
-  }, [imageUrl]);
 
   // Benefit-oriented reasons
   const reasons = [
@@ -66,47 +55,24 @@ const WhyChooseUs = () => {
       component="section"
       sx={{
         width: '100%',
-        py: SPACING.large * 2,
-        backgroundImage: imageLoaded ? `url(${imageUrl})` : 'none',
-        backgroundColor: !imageLoaded ? theme.palette.background.default : 'transparent',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        py: SPACING.large * 1.5,
+        background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${alpha(theme.palette.primary.main, 0.8)} 100%)`,
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      {/* Blurred Background Image (if loaded) */}
-      {imageLoaded && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundImage: `url(${imageUrl})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            filter: 'blur(12px)',
-            zIndex: 0,
-          }}
-        />
-      )}
-
-      {/* Overlay */}
-      {imageLoaded && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: alpha(theme.palette.primary.dark, 0.75),
-            zIndex: 1,
-          }}
-        />
-      )}
+      {/* Background pattern */}
+      <Box 
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0.05,
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
+        }}
+      />
 
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
         <Typography
@@ -115,12 +81,13 @@ const WhyChooseUs = () => {
           align="center"
           sx={{
             ...styles.pageTitle,
-            color: imageLoaded ? 'white' : theme.palette.text.primary,
+            color: 'white',
             mb: SPACING.medium,
             fontWeight: 700,
-            WebkitTextFillColor: 'white',
-            WebkitTextStroke: imageLoaded ? '1px rgba(0, 0, 0, 0.5)' : 'none',
-            textShadow: imageLoaded ? '0 4px 8px rgba(0, 0, 0, 0.7)' : 'none',
+            textShadow: '0 4px 8px rgba(0, 0, 0, 0.7)',
+            [theme.breakpoints.down('sm')]: {
+              fontSize: '2rem', // Smaller font size on mobile
+            },
           }}
         >
           Why Partner with Us?
@@ -130,39 +97,86 @@ const WhyChooseUs = () => {
           container
           spacing={SPACING.medium}
           justifyContent="center"
-          alignItems="stretch"
         >
           {reasons.map((reason) => (
-            <Grid item key={reason.id} xs={12} md={6}>
-              {/* Use TechCard Here */}
+            <Grid 
+              item 
+              key={reason.id} 
+              xs={12} 
+              md={6}
+              sx={{
+                display: 'flex',
+                alignItems: 'stretch'
+              }}
+            >
               <TechCard
                 title={reason.text}
-                index={reason.id - 1}  //  TechCard expects index to start at 0
-                icon={<reason.icon />}  // Pass the icon
+                index={reason.id - 1}
+                icon={<reason.icon />}
+                sx={{
+                  height: '100%', // Make card full height of its grid item
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  width: '100%'
+                }}
               >
-                <Typography variant="body1" color="text.secondary" sx={{
-                  fontWeight: 700,
-                  color: theme.palette.text.primary,
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)', 
-                }}>
-                  {reason.description}
-                </Typography>
+                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                  <Typography 
+                    variant="body1" 
+                    sx={{
+                      flexGrow: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mt: 1,
+                      fontWeight: 500,
+                      color: alpha(theme.palette.text.primary, 0.9),
+                      textAlign: 'center'
+                    }}
+                  >
+                    {reason.description}
+                  </Typography>
+                </Box>
               </TechCard>
             </Grid>
           ))}
         </Grid>
 
-        <Box sx={{ textAlign: 'center', mt: SPACING.large }}>
-          <NextLink href="/solutions" passHref legacyBehavior>
-            <GradientButton
-              href="/contact"
-              label="Explore Our Services"
-              sizeVariant="medium"
-              sx={{
-                // Custom styles if needed
-              }}
-            />
-          </NextLink>
+        <Box sx={{ 
+          textAlign: 'center', 
+          mt: SPACING.large,
+          [theme.breakpoints.down('sm')]: {
+            mt: 4, // Reduced margin on mobile
+          }
+        }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="large"
+            href="/solutions"
+            sx={{
+              px: 4,
+              py: 1.5,
+              fontSize: '1.1rem',
+              fontWeight: 600,
+              borderRadius: 2,
+              textTransform: 'none',
+              boxShadow: `0 4px 14px ${alpha(theme.palette.secondary.main, 0.5)}`,
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: `0 6px 20px ${alpha(theme.palette.secondary.main, 0.6)}`,
+              },
+              transition: 'all 0.3s ease',
+              [theme.breakpoints.down('sm')]: {
+                fontSize: '1rem', // Smaller font on mobile
+                px: 3,
+                py: 1.25,
+              }
+            }}
+          >
+            Explore Our Services
+          </Button>
         </Box>
       </Container>
     </Box>
