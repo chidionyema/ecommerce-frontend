@@ -1,6 +1,6 @@
 'use client';
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 
 import { useParams, useRouter } from 'next/navigation';
