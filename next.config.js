@@ -75,8 +75,9 @@ const nextConfig = {
         crypto: false,
         zlib: false,
         querystring: false,
-        buffer: require.resolve('buffer/'),
-        util: require.resolve('util/')
+        // Use the correct formats for polyfills
+        buffer: false,
+        util: false
       };
 
       // Add polyfills
@@ -92,23 +93,6 @@ const nextConfig = {
     if (process.env.NODE_ENV === 'production') {
       config.cache = false;
     }
-
-    // Fix CSS processing
-    config.module.rules.push({
-      test: /\.css$/,
-      use: [
-        'style-loader',
-        {
-          loader: 'css-loader',
-          options: {
-            url: {
-              filter: (url) => !url.startsWith('/_next/static/media')
-            }
-          }
-        },
-        'postcss-loader'
-      ]
-    });
 
     return config;
   },
