@@ -3,7 +3,7 @@ export const config = {
     runtime: 'edge',
   };
   
-  export default async function handler(req) {
+  export default async function handler(req: { method: string; json: () => any; }) {
     if (req.method !== 'POST') {
       return new Response(
         JSON.stringify({ error: 'Method not allowed' }),
