@@ -7,10 +7,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
  * @param {NextApiRequest} req - The Next.js API request
  * @param {NextApiResponse} res - The Next.js API response
  */
-async function authService(req, res) {
+export default async function authService(req: NextApiRequest, res: NextApiResponse) {
   // Only allow specific methods
   const allowedMethods = ['GET', 'POST', 'OPTIONS'];
-  if (!allowedMethods.includes(req.method)) {
+  if (!allowedMethods.includes(req.method || '')) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -24,16 +24,24 @@ async function authService(req, res) {
   try {
     // Get the backend API URL from environment variables
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://api.yourbackend.com';
-    const authEndpoint = `${backendUrl}/auth${req.url.split('auth-service')[1] || ''}`;
+    
+    // THIS IS THE KEY FIX: Safely handle undefined req.url
+    if (!req.url) {
+      console.error('Request URL is undefined in auth-service');
+      return res.status(400).json({ error: 'Invalid request URL' });
+    }
+    
+    const urlPath = req.url.split('auth-service')[1] || '';
+    const authEndpoint = `${backendUrl}/auth${urlPath}`;
 
     // Prepare headers for the backend request
-    const headers = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
     // Forward authorization header if present
     if (req.headers.authorization) {
-      headers.Authorization = req.headers.authorization;
+      headers.Authorization = req.headers.authorization.toString();
     }
 
     // Forward the request to the backend
@@ -49,7 +57,7 @@ async function authService(req, res) {
     // Forward the response from the backend
     return res.status(response.status).json(data);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Auth service error:', error);
     return res.status(500).json({ 
       error: 'Internal Server Error',
@@ -59,5 +67,3 @@ async function authService(req, res) {
     });
   }
 }
-
-export default authService;

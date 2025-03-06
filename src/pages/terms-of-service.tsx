@@ -10,41 +10,69 @@ const TermsOfService = () => {
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Safe scrollToElement function with client-side check
+  const scrollToElement = (elementId: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (typeof document !== 'undefined' && elementId) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
   };
 
   useEffect(() => {
-    document.title = "Terms of Service - Gluestack";
-    const metaTags = [
-      { name: "description", content: "Our comprehensive Terms of Service outline the rules and guidelines for using our professional technical services." },
-      { property: "og:title", content: "Terms of Service - Gluestack" },
-      { property: "og:description", content: "Review our terms of service for using Gluestack's technical solutions." }
-    ];
+    // Only execute browser-specific code on the client side
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      document.title = "Terms of Service - Gluestack";
+      const metaTags = [
+        { name: "description", content: "Our comprehensive Terms of Service outline the rules and guidelines for using our professional technical services." },
+        { property: "og:title", content: "Terms of Service - Gluestack" },
+        { property: "og:description", content: "Review our terms of service for using Gluestack's technical solutions." }
+      ];
 
-    const createdMetaTags: HTMLElement[] = [];
-    metaTags.forEach(tag => {
-      const meta = document.createElement('meta');
-      Object.entries(tag).forEach(([key, value]) => meta.setAttribute(key, value));
-      document.head.appendChild(meta);
-      createdMetaTags.push(meta);
-    });
+      const createdMetaTags: HTMLMetaElement[] = [];
+      metaTags.forEach(tag => {
+        const meta = document.createElement('meta');
+        Object.entries(tag).forEach(([key, value]) => meta.setAttribute(key, value));
+        document.head.appendChild(meta);
+        createdMetaTags.push(meta);
+      });
 
-    const canonical = document.createElement('link');
-    canonical.rel = 'canonical';
-    canonical.href = window.location.href;
-    document.head.appendChild(canonical);
+      const canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      canonical.href = window.location.href;
+      document.head.appendChild(canonical);
 
-    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
-    window.addEventListener('scroll', handleScroll);
+      const handleScroll = () => setShowScrollTop(window.scrollY > 400);
+      window.addEventListener('scroll', handleScroll);
 
-    return () => {
-      createdMetaTags.forEach(meta => document.head.removeChild(meta));
-      document.head.removeChild(canonical);
-      window.removeEventListener('scroll', handleScroll);
-    };
+      return () => {
+        // Safe cleanup - check if elements exist before removing
+        createdMetaTags.forEach(meta => {
+          if (document.head.contains(meta)) {
+            document.head.removeChild(meta);
+          }
+        });
+        
+        if (document.head.contains(canonical)) {
+          document.head.removeChild(canonical);
+        }
+        
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }
+    
+    // Default return for server-side
+    return () => {};
   }, []);
 
 
@@ -222,7 +250,7 @@ const TermsOfService = () => {
               Terms of Service
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              Effective Date: {new Date().toLocaleDateString()}
+              Effective Date: {typeof Date !== 'undefined' ? new Date().toLocaleDateString() : ''}
             </Typography>
           </Box>
         </motion.div>
@@ -255,11 +283,8 @@ const TermsOfService = () => {
                 <Grid item xs={12} sm={6} key={section.id}>
                   <motion.div whileHover={{ scale: 1.02 }}>
                     <Link
-                      href={`#${section.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth' });
-                      }}
+                      href={section.id ? `#${section.id}` : '#'}
+                      onClick={scrollToElement(section.id)}
                       sx={{
                         display: 'block',
                         p: 2,

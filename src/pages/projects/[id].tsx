@@ -116,7 +116,11 @@ const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
 };
   // Navigation handlers
 // Navigation handlers
-const handleNavigateTo = (id: string) => {
+const handleNavigateTo = (id: string | undefined) => {
+  if (!id) {
+    console.error('Attempted to navigate to undefined project ID');
+    return; // Exit early if id is undefined
+  }
   router.push(`/projects/${id}`);
 };
   // Section heading style for consistency

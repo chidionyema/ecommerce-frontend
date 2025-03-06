@@ -10,22 +10,49 @@ const PrivacyPolicy = () => {
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
   useEffect(() => {
-    document.title = "Privacy Policy - Gluestack";
-    const metaDescription = document.createElement('meta');
-    metaDescription.name = "description";
-    metaDescription.content = "Read our comprehensive Privacy Policy to understand how Gluestack collects, uses, and protects your information.";
-    document.head.appendChild(metaDescription);
+    // Only run browser-specific code on the client side
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      // Document manipulations
+      document.title = "Privacy Policy - Gluestack";
+      const metaDescription = document.createElement('meta');
+      metaDescription.name = "description";
+      metaDescription.content = "Read our comprehensive Privacy Policy to understand how Gluestack collects, uses, and protects your information.";
+      document.head.appendChild(metaDescription);
 
-    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
-    window.addEventListener('scroll', handleScroll);
+      // Event listeners
+      const handleScroll = () => setShowScrollTop(window.scrollY > 400);
+      window.addEventListener('scroll', handleScroll);
+      
+      // Cleanup function
+      return () => {
+        if (document.head.contains(metaDescription)) {
+          document.head.removeChild(metaDescription);
+        }
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }
     
-    return () => {
-      document.head.removeChild(metaDescription);
-      window.removeEventListener('scroll', handleScroll);
-    };
+    // Default return for server-side
+    return () => {};
   }, []);
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Safe scrollToTop function with client-side check
+  const scrollToTop = () => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Safe scrollToElement function with client-side check
+  const scrollToElement = (elementId) => (e) => {
+    e.preventDefault();
+    if (typeof document !== 'undefined' && elementId) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   const sections = [
     {
@@ -143,7 +170,7 @@ const PrivacyPolicy = () => {
               Privacy Policy
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              Effective Date: {new Date().toLocaleDateString()}
+              Effective Date: {typeof Date !== 'undefined' ? new Date().toLocaleDateString() : ''}
             </Typography>
           </Box>
         </motion.div>
@@ -176,11 +203,8 @@ const PrivacyPolicy = () => {
                 <Grid item xs={12} sm={6} key={section.id}>
                   <motion.div whileHover={{ scale: 1.02 }}>
                     <Link
-                      href={`#${section.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth' });
-                      }}
+                      href={section.id ? `#${section.id}` : '#'}
+                      onClick={scrollToElement(section.id)}
                       sx={{
                         display: 'block',
                         p: 2,
