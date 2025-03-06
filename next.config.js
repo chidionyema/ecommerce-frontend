@@ -61,7 +61,33 @@ const nextConfig = {
 
   webpack: (config) => {
     const isProduction = process.env.NODE_ENV === 'production';
-    config.cache = isProduction ? { type: 'filesystem' } : false;
+    
+    // For Cloudflare, we need to limit the cache size
+    if (isProduction) {
+      config.cache = {
+        type: 'filesystem',
+        buildDependencies: {
+          config: [__filename]
+        },
+        cacheDirectory: '.next/cache',
+        maxMemoryGenerations: 1,
+        compression: 'gzip'
+      };
+    } else {
+      config.cache = false;
+    }
+
+    // Optimize module loading
+    config.optimization = {
+      ...config.optimization,
+      moduleIds: 'deterministic',
+      chunkIds: 'deterministic',
+      splitChunks: {
+        chunks: 'all',
+        maxInitialRequests: 25,
+        minSize: 20000
+      }
+    };
 
     config.module.rules.push({
       test: /\.css$/,
@@ -86,7 +112,10 @@ const nextConfig = {
     esmExternals: true,
     optimizeCss: process.env.NODE_ENV === 'production',
     scrollRestoration: true
-  }
+  },
+  
+  // Add swcMinify for better optimization
+  swcMinify: true
 };
 
-export default nextConfig;
+module.exports = nextConfig;
