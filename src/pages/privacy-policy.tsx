@@ -44,7 +44,8 @@ const PrivacyPolicy = () => {
   };
 
   // Safe scrollToElement function with client-side check
-  const scrollToElement = (elementId) => (e) => {
+   // Safe scrollToElement function with client-side check
+   const scrollToElement = (elementId: string) => (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     if (typeof document !== 'undefined' && elementId) {
       const element = document.getElementById(elementId);
