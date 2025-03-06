@@ -1051,6 +1051,11 @@ const ResourcesPage: React.FC = () => {
         </Container>
         <BackgroundCircle size={300} position={{ top: '20%', right: '10%' }} opacity={0.03} />
         <BackgroundCircle size={250} position={{ bottom: '10%', left: '5%' }} opacity={0.05} />
+        <Box sx={{ 
+  height: { xs: 80, md: 120 }, 
+  background: 'transparent',
+  pointerEvents: 'none' 
+}} />
       </PageSection>
     </ConsistentPageLayout>
   );

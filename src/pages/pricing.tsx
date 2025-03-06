@@ -42,7 +42,7 @@ import { pricingPageContent, plans } from '../data/pricingPageData';
 const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon: Icon, text }) => {
   const theme = useTheme();
   return (
-    <Box display="flex" alignItems="center" gap={2} my={2}>
+    <Box display="flex" alignItems="flex-start" gap={2} my={2}>
       <Box
         sx={{
           display: 'flex',
@@ -52,6 +52,7 @@ const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon
           borderRadius: '16px',
           width: 40,
           height: 40,
+          minWidth: 40, // Add minWidth to prevent icon from shrinking
           border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
         }}
       >
@@ -67,8 +68,14 @@ const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon
 const ExtraFeatureItem: React.FC<{ text: string }> = ({ text }) => {
   const theme = useTheme();
   return (
-    <Box display="flex" alignItems="center" gap={1.5} my={1.5}>
-      <CheckCircleIcon fontSize="small" sx={{ color: theme.palette.success.main }} />
+    <Box display="flex" alignItems="flex-start" gap={1.5} my={1.5}>
+      <CheckCircleIcon 
+        fontSize="small" 
+        sx={{ 
+          color: theme.palette.success.main,
+          mt: 0.5, // Align icon with text when text wraps
+        }} 
+      />
       <Typography variant="body2" color="text.secondary">
         {text}
       </Typography>
@@ -76,16 +83,26 @@ const ExtraFeatureItem: React.FC<{ text: string }> = ({ text }) => {
   );
 };
 
-// Updated renderPlanCard function with flex layout for consistent heights
+// Updated renderPlanCard function with FORCIBLY EQUAL HEIGHT
 const renderPlanCard = (
   plan: typeof plans[0],
   handlePlanClick: (type: string) => void,
   theme: any,
   isAnnual: boolean
 ) => (
-  <Box sx={{ flex: 1, height: '100%' }}>
+  <Box sx={{ 
+    display: 'flex', 
+    flexDirection: 'column', 
+    height: '100%',
+    width: '100%'
+  }}>
     <motion.div
-      style={{ height: '100%', display: 'flex' }}
+      style={{ 
+        display: 'flex', 
+        flexDirection: 'column',
+        height: '100%',
+        width: '100%'
+      }}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{
@@ -102,6 +119,7 @@ const renderPlanCard = (
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
+          height: '100%',
           p: 3,
           borderRadius: 4,
           position: 'relative',
@@ -152,60 +170,78 @@ const renderPlanCard = (
             }}
           />
         )}
-        <Box position="relative" zIndex={1} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h5" fontWeight="bold" mb={1}>
-            {plan.title}
-          </Typography>
-          <Typography variant="subtitle1" mb={3} color="text.secondary">
-            {plan.tagline}
-          </Typography>
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h4" fontWeight="bold" color="text.primary">
-              {isAnnual && plan.annualPrice ? plan.annualPrice : plan.price}
+        <Box 
+          position="relative" 
+          zIndex={1} 
+          sx={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            height: '100%',
+          }}
+        >
+          <Box>
+            <Typography variant="h5" fontWeight="bold" mb={1}>
+              {plan.title}
             </Typography>
-            {isAnnual && plan.annualPrice && (
-              <Typography variant="caption" color="success.main" sx={{ fontWeight: 'medium', mt: 0.5, display: 'block' }}>
-                Save 10% with annual billing
+            <Typography variant="subtitle1" mb={3} color="text.secondary">
+              {plan.tagline}
+            </Typography>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h4" fontWeight="bold" color="text.primary">
+                {isAnnual && plan.annualPrice ? plan.annualPrice : plan.price}
               </Typography>
-            )}
+              {isAnnual && plan.annualPrice && (
+                <Typography variant="caption" color="success.main" sx={{ fontWeight: 'medium', mt: 0.5, display: 'block' }}>
+                  Save 10% with annual billing
+                </Typography>
+              )}
+            </Box>
           </Box>
-          <Box sx={{ mb: 4, flex: '1 0 auto' }}>
+          
+          <Box sx={{ 
+            mb: 3,
+            flex: '1 0 auto',
+            height: { xs: 'auto', md: '250px' }, // FIXED HEIGHT - crucial for consistency
+            overflow: 'auto' // Allow scrolling if content is too much
+          }}>
             {plan.features.map((feature, i) => (
               <FeatureItem key={i} icon={feature.icon} text={feature.text} />
             ))}
+            
+            {plan.extraFeatures && (
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="subtitle2" fontWeight="bold" mb={1.5} color="text.primary">
+                  Also includes:
+                </Typography>
+                {plan.extraFeatures.map((feature, i) => (
+                  <ExtraFeatureItem key={i} text={feature} />
+                ))}
+              </Box>
+            )}
           </Box>
-          {plan.extraFeatures && (
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="subtitle2" fontWeight="bold" mb={1.5} color="text.primary">
-                Also includes:
-              </Typography>
-              {plan.extraFeatures.map((feature, i) => (
-                <ExtraFeatureItem key={i} text={feature} />
-              ))}
-            </Box>
-          )}
+          
+          <Button
+            variant={plan.recommended ? 'contained' : 'outlined'}
+            color="primary"
+            onClick={() => handlePlanClick(plan.type)}
+            sx={{
+              mt: 'auto',
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: 2,
+              px: 4,
+              py: 1.5,
+              transition: 'all 0.3s ease',
+              boxShadow: plan.recommended ? theme.shadows[3] : 'none',
+              ...(plan.recommended && {
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+              }),
+            }}
+            endIcon={<ArrowForwardIcon />}
+          >
+            {plan.ctaText || 'Select Plan'}
+          </Button>
         </Box>
-        <Button
-          variant={plan.recommended ? 'contained' : 'outlined'}
-          color="primary"
-          onClick={() => handlePlanClick(plan.type)}
-          sx={{
-            mt: 2,
-            textTransform: 'none',
-            fontWeight: 600,
-            borderRadius: 2,
-            px: 4,
-            py: 1.5,
-            transition: 'all 0.3s ease',
-            boxShadow: plan.recommended ? theme.shadows[3] : 'none',
-            ...(plan.recommended && {
-              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-            }),
-          }}
-          endIcon={<ArrowForwardIcon />}
-        >
-          {plan.ctaText || 'Select Plan'}
-        </Button>
       </Paper>
     </motion.div>
   </Box>
@@ -394,20 +430,26 @@ const PricingPage: React.FC = () => {
             </Typography>
           </motion.div>
           
-          {/* Updated Grid container with consistent height styling */}
+          {/* FIXED: Grid container with consistent height handling */}
           <Grid 
             container 
             spacing={4} 
-            alignItems="stretch" 
             sx={{ 
-              '& .MuiGrid-item': { 
-                display: 'flex', 
-                height: { xs: 'auto', md: '100%' } 
-              } 
+              display: 'flex',
+              alignItems: 'stretch',
             }}
           >
             {plans.map((plan) => (
-              <Grid item xs={12} md={4} key={plan.type}>
+              <Grid 
+                item 
+                xs={12} 
+                md={4} 
+                key={plan.type} 
+                sx={{ 
+                  display: 'flex',
+                  height: '100%',
+                }}
+              >
                 {renderPlanCard(plan, handlePlanClick, theme, isAnnual)}
               </Grid>
             ))}
@@ -478,6 +520,8 @@ const PricingPage: React.FC = () => {
                       p: 4,
                       borderRadius: 4,
                       height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
                       background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.9)} 0%, ${alpha(
                         theme.palette.background.paper,
                         0.7
