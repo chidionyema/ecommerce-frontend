@@ -1,4 +1,4 @@
-
+export const runtime = 'experimental-edge';
 
 export async function GET(request, { params }) {
     const { id } = params;
