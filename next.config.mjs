@@ -48,7 +48,7 @@ const nextConfig = {
     ];
   },
 
-  utput: 'export',
+  output: 'export',
   distDir: 'out',
 
   images: {
