@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { GetStaticProps, GetStaticPaths } from 'next';
+import { GetServerSideProps } from 'next';
 import { AlertCircle, CheckCircle, ShoppingBag } from 'lucide-react';
 import MainLayout from '../../../components/layouts/MainLayout';
 import ProductDetail from '../../../components/catalog/ProductDetail';
@@ -36,10 +36,10 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
 
   // Validate product data is available
   useEffect(() => {
-    if (!product && !router.isFallback) {
+    if (!product) {
       setError('Product information could not be loaded');
     }
-  }, [product, router.isFallback]);
+  }, [product]);
 
   // Clear feedback after a timeout
   useEffect(() => {
@@ -89,7 +89,7 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
         price: product.unitPrice,
         image: product.contents?.[0]?.url || '/images/placeholder.png',
         quantity,
-        isSubscription: product.isSubscription || false // Add the isSubscription property
+        isSubscription: product.isSubscription || false
       });
       
       setFeedback({
@@ -126,16 +126,8 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
     }
   };
 
-  // If the page is loading via client-side navigation
-  if (router.isFallback) {
-    return (
-      <MainLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <ProductSkeleton />
-        </div>
-      </MainLayout>
-    );
-  }
+  // We don't need the fallback check anymore since we're using SSR
+  // The page will only render once the data is available
 
   return (
     <MainLayout>
@@ -168,12 +160,7 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
               name: product.name,
               image: product.contents?.map(c => c.url) || [],
               description: product.description,
-            //  sku: product.sku,
               mpn: product.id,
-             // brand: {
-             //   '@type': 'Brand',
-             //   name: product.brandName || 'Your Store'
-            //  },
               offers: {
                 '@type': 'Offer',
                 url: `https://yourstore.com/store/products/${product.id}`,
@@ -239,8 +226,8 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
   );
 }
 
-// Replace getServerSideProps with getStaticProps
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+// Replace getStaticProps with getServerSideProps
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const { id } = params || {};
   const sanitizedId = sanitizeInput(id as string);
   
@@ -265,9 +252,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       props: {
         product,
         relatedProducts
-      },
-      // Enable ISR - revalidate pages periodically
-      revalidate: 3600 // Regenerate page after 1 hour (3600 seconds)
+      }
     };
   } catch (error) {
     console.error('Error fetching product details:', error);
@@ -275,34 +260,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     // Return 404 for non-existent or inaccessible products
     return {
       notFound: true
-    };
-  }
-};
-
-// Add getStaticPaths to tell Next.js which pages to pre-generate at build time
-export const getStaticPaths: GetStaticPaths = async () => {
-  try {
-    // Get the most popular/important products to pre-render
-    const featuredProducts = await productService.getFeaturedProducts(20);
-    
-    // Create paths for pre-rendering
-    const paths = featuredProducts.map(product => ({
-      params: { id: product.id }
-    }));
-    
-    return {
-      paths,
-      // 'blocking' means pages not generated at build time will be server-rendered on first request
-      // then cached for subsequent requests
-      // You could also use 'true' for a faster initial load with client-side fallback
-      fallback: 'blocking'
-    };
-  } catch (error) {
-    console.error('Error generating product paths:', error);
-    
-    return {
-      paths: [],
-      fallback: 'blocking'
     };
   }
 };
