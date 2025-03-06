@@ -1,21 +1,19 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-// Define the routes you want to include.
-// This is a basic example; you may need to customize it.
 const routesConfig = {
   version: 1,
   include: ['/*'],
   exclude: []
 };
 
-// Define the path to your .next folder
-const outputDir = path.join(__dirname, '.next');
+const outputDir = path.join(process.cwd(), '.next');
 
-// Write the _routes.json file
-fs.writeFileSync(
-  path.join(outputDir, '_routes.json'),
-  JSON.stringify(routesConfig, null, 2)
-);
+if (!fs.existsSync(outputDir)) {
+  console.error('Error: Output directory .next does not exist.');
+  process.exit(1);
+}
 
-console.log('_routes.json generated in', outputDir);
+const routesPath = path.join(outputDir, '_routes.json');
+fs.writeFileSync(routesPath, JSON.stringify(routesConfig, null, 2));
+console.log(`_routes.json generated in ${outputDir}`);
