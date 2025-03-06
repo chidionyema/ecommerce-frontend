@@ -1,17 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Output type for optimal Cloudflare Pages compatibility
+  // Core configuration for Cloudflare deployment
   output: 'standalone',
+  swcMinify: true,
+  serverExternalPackages: ['stripe', 'micro'],
   
-  // Enable build cache
+  // Optimized build settings
   distDir: '.next',
-  generateBuildId: async () => {
-    return 'build-' + new Date().getTime();
-  },
-  
-  // Image optimization config
+  staticPageGenerationTimeout: 180,
+  productionBrowserSourceMaps: false,
+
+  // Image handling configuration
   images: {
-    unoptimized: true, // Required for Cloudflare Pages
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
@@ -25,7 +26,7 @@ const nextConfig = {
     ]
   },
 
-  // Security headers
+  // Security headers configuration
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
@@ -34,21 +35,22 @@ const nextConfig = {
         : 'https://api.local.ritualworks.com');
 
     const cspDirectives = [
-      "default-src 'self'",
-      `script-src 'self' ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''} ` +
-        "https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
+      `default-src 'self'`,
+      `script-src 'self' ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''}`
+        + ` https://apis.google.com https://js.stripe.com`
+        + ` https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
       `style-src 'self' ${!isProduction ? "'unsafe-inline'" : ''} https://fonts.googleapis.com`,
-      "img-src 'self' data: https://*.stripe.com https://www.google.com/recaptcha/",
-      `connect-src 'self' ${apiUrl} ${!isProduction ? "http://localhost:3000 ws://localhost:3000" : ''} ` +
-        "https://checkout.stripe.com https://api.ritualworks.com",
-      "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://stripe.com",
-      "font-src 'self' https://fonts.gstatic.com",
-      "form-action 'self'",
-      "frame-ancestors 'none'"
+      `img-src 'self' data: https://*.stripe.com https://www.google.com/recaptcha/`,
+      `connect-src 'self' ${apiUrl} ${!isProduction ? 'http://localhost:3000 ws://localhost:3000' : ''}`
+        + ` https://checkout.stripe.com https://api.ritualworks.com`,
+      `frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://stripe.com`,
+      `font-src 'self' https://fonts.gstatic.com`,
+      `form-action 'self'`,
+      `frame-ancestors 'none'`
     ];
 
     if (!isProduction) {
-      cspDirectives.push("report-uri /api/csp-report");
+      cspDirectives.push('report-uri /api/csp-report');
     }
 
     return [
@@ -60,47 +62,39 @@ const nextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {
             key: 'Content-Security-Policy',
-            value: cspDirectives.join('; ').replace(/\s+/g, ' ').trim()
+            value: cspDirectives
+              .join('; ')
+              .replace(/\s+/g, ' ')
+              .trim()
           }
         ]
       }
     ];
   },
 
-  // Webpack configuration with improved chunk splitting
+  // Optimized Webpack configuration
   webpack: (config, { isServer }) => {
-    // Add Node.js polyfills and fallbacks for client-side
     if (!isServer) {
       config.resolve.fallback = {
-        ...config.resolve.fallback,
         fs: false,
         path: false,
-        os: false,
-        net: false,
-        tls: false,
         http: false,
         https: false,
         stream: false,
-        crypto: false,
-        zlib: false,
-        querystring: false,
-        buffer: false,
-        util: false
+        crypto: false
       };
-      
-      // Improve chunk splitting to reduce bundle size
+
       config.optimization.splitChunks = {
         chunks: 'all',
         maxInitialRequests: Infinity,
         minSize: 20000,
-        maxSize: 20000000, // 20MB max chunk size (below Cloudflare's 25MB limit)
+        maxSize: 20000000,
         cacheGroups: {
           vendor: {
             test: /[\\/]node_modules[\\/]/,
             name(module) {
-              // Get the package name
-              const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-              return `npm.${packageName.replace('@', '')}`;
+              const match = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/);
+              return match ? `npm.${match[1].replace('@', '')}` : 'vendor';
             },
             priority: 10,
           },
@@ -113,48 +107,22 @@ const nextConfig = {
       };
     }
 
-    // Handle edge runtime issues with certain packages
-    if (isServer) {
-      // Exclude problematic packages from the server bundle when using edge runtime
-      const edgeRuntime = process.env.NEXT_RUNTIME === 'edge';
-      if (edgeRuntime) {
-        config.externals = [...(config.externals || []),
-          'stripe',
-          'micro',
-          'raw-body',
-          'iconv-lite',
-          'safer-buffer'
-        ];
-      }
-    }
-
     return config;
   },
 
-  // Experimental features
+  // Experimental features (carefully selected)
   experimental: {
-    esmExternals: true,
-    optimizeCss: true, // Always optimize CSS
+    optimizeCss: true,
     scrollRestoration: true,
-    swcMinify: true, // Use SWC minifier for better performance
-    turbotrace: {
-      logLevel: 'error'
-    },
-    serverComponentsExternalPackages: ['stripe', 'micro'],
+    esmExternals: true
   },
-  
-  // Configure how Next.js handles environment variables
+
+  // Environment configuration
   env: {
     NEXT_PUBLIC_APP_ENV: process.env.NODE_ENV || 'development',
   },
-  
-  // Increase timeout for builds to prevent timeouts on Cloudflare
-  staticPageGenerationTimeout: 180, // in seconds
-  
-  // Improve production performance
-  productionBrowserSourceMaps: false,
-  
-  // Configure redirects if needed
+
+  // Empty redirects by default
   async redirects() {
     return [];
   }
