@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Required for Cloudflare Pages in production
@@ -59,8 +62,18 @@ const nextConfig = {
     ];
   },
 
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     const isProduction = process.env.NODE_ENV === 'production';
+    
+    // Fallback for fs module to prevent client-side bundling errors
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        os: false
+      };
+    }
     
     // Fixed: Using proper cache configuration or disabling it
     if (isProduction) {
@@ -91,6 +104,31 @@ const nextConfig = {
     esmExternals: true,
     optimizeCss: process.env.NODE_ENV === 'production',
     scrollRestoration: true
+  },
+
+  // Route configuration generation
+  async afterBuild({ dir }) {
+    const routesConfig = {
+      version: 1,
+      include: ['/*'],
+      exclude: []
+    };
+
+    try {
+      const outputDir = path.join(dir, '.next');
+      const routesPath = path.join(outputDir, '_routes.json');
+
+      // Ensure .next directory exists
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+      }
+
+      // Write routes configuration
+      fs.writeFileSync(routesPath, JSON.stringify(routesConfig, null, 2));
+      console.log(`_routes.json generated in ${outputDir}`);
+    } catch (error) {
+      console.error('Failed to generate routes configuration:', error);
+    }
   }
 };
 
