@@ -169,8 +169,12 @@ const additionalPlans = [
     ctaText: 'See Value Comparison'
   }
 ];
+interface FeatureItemProps {
+  icon: React.ElementType;
+  text: string;
+}
 
-const FeatureItem = ({ icon: Icon, text }) => {
+const FeatureItem = ({ icon: Icon, text }: FeatureItemProps) => {
   const theme = useTheme();
   return (
     <Box display="flex" alignItems="flex-start" gap={2} my={2}>
@@ -196,7 +200,11 @@ const FeatureItem = ({ icon: Icon, text }) => {
   );
 };
 
-const ExtraFeatureItem = ({ text }) => {
+interface ExtraFeatureItemProps {
+  text: string;
+}
+
+const ExtraFeatureItem = ({ text }: ExtraFeatureItemProps) => {
   const theme = useTheme();
   return (
     <Box display="flex" alignItems="flex-start" gap={1.5} my={1.5}>
