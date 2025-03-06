@@ -3,20 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-"scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "prebuild": "npm run clean",
-  "preview": "serve out",
-  "clean": "rm -rf .next/ out/",
-  "analyze": "cross-env ANALYZE=true next build",
-  "deploy": "wrangler pages deploy out",
-  "deploy:ci": "npm run build && npm run deploy",
-  "dev:cf": "wrangler pages dev out --live",
-  "dev:fullstack": "concurrently \"npm run dev\" \"npm run dev:cf\"",
-  "start": "node server.js",
-  "start:server": "server.ts"
-},
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "prebuild": "npm run clean",
+    "preview": "serve out",
+    "clean": "rm -rf .next/ out/",
+    "analyze": "cross-env ANALYZE=true next build",
+    "deploy": "wrangler pages deploy out",
+    "deploy:ci": "npm run build && npm run deploy",
+    "dev:cf": "wrangler pages dev out --live",
+    "dev:fullstack": "concurrently \"npm run dev\" \"npm run dev:cf\"",
+    "start": "node server.js",
+    "start:server": "server.ts"
+  },
   "engines": {
     "node": ">=20.9.0"
   },
@@ -45,6 +45,7 @@
     "feather-icons": "^4.29.2",
     "framer-motion": "10.16.5",
     "ga-4-react": "0.1.281",
+    "jsonschema": "^1.5.0",
     "lodash": "^4.17.21",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "0.473.0",
