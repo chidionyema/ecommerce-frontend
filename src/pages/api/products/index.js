@@ -1,15 +1,15 @@
-// File: app/api/products/route.js
-export const runtime = 'edge';
-import { NextResponse } from 'next/server';
+// File: /pages/api/products/index.js
+import { NextApiRequest, NextApiResponse } from 'next';
 
 const API_BASE_URL = process.env.API_BASE_URL || 'https://api.haworks.com';
 
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const page = searchParams.get('page') || 1;
-  const pageSize = searchParams.get('pageSize') || 10;
-  const category = searchParams.get('category');
-  const search = searchParams.get('search');
+export default async function handler(req, res) {
+  // Only allow GET requests
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { page = 1, pageSize = 10, category, search } = req.query;
   
   let url = `${API_BASE_URL}/api/products?page=${page}&pageSize=${pageSize}`;
   
@@ -21,7 +21,6 @@ export async function GET(request) {
       headers: {
         'Content-Type': 'application/json',
       },
-      next: { revalidate: 60 }, // Cache for 60 seconds
     });
     
     if (!response.ok) {
@@ -29,12 +28,9 @@ export async function GET(request) {
     }
     
     const data = await response.json();
-    return NextResponse.json(data);
+    return res.status(200).json(data);
   } catch (error) {
     console.error('Error fetching products:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch products' },
-      { status: 500 }
-    );
+    return res.status(500).json({ error: 'Failed to fetch products' });
   }
 }
