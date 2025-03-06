@@ -2,7 +2,13 @@
 const nextConfig = {
   // Output type for optimal Cloudflare Pages compatibility
   output: 'standalone',
-
+  
+  // Enable build cache
+  distDir: '.next',
+  generateBuildId: async () => {
+    return 'build-' + new Date().getTime();
+  },
+  
   // Image optimization config
   images: {
     unoptimized: true, // Required for Cloudflare Pages
@@ -61,7 +67,7 @@ const nextConfig = {
     ];
   },
 
-  // Webpack configuration with polyfills for client-side
+  // Webpack configuration with improved chunk splitting
   webpack: (config, { isServer }) => {
     // Add Node.js polyfills and fallbacks for client-side
     if (!isServer) {
@@ -81,18 +87,76 @@ const nextConfig = {
         buffer: false,
         util: false
       };
+      
+      // Improve chunk splitting to reduce bundle size
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        maxInitialRequests: Infinity,
+        minSize: 20000,
+        maxSize: 20000000, // 20MB max chunk size (below Cloudflare's 25MB limit)
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name(module) {
+              // Get the package name
+              const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+              return `npm.${packageName.replace('@', '')}`;
+            },
+            priority: 10,
+          },
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+        },
+      };
     }
 
-    // Webpack caching is now enabled (removed explicit disabling)
+    // Handle edge runtime issues with certain packages
+    if (isServer) {
+      // Exclude problematic packages from the server bundle when using edge runtime
+      const edgeRuntime = process.env.NEXT_RUNTIME === 'edge';
+      if (edgeRuntime) {
+        config.externals = [...(config.externals || []),
+          'stripe',
+          'micro',
+          'raw-body',
+          'iconv-lite',
+          'safer-buffer'
+        ];
+      }
+    }
 
     return config;
   },
 
-  // Experimental features - removed the invalid 'runtime' option
+  // Experimental features
   experimental: {
     esmExternals: true,
-    optimizeCss: process.env.NODE_ENV === 'production',
-    scrollRestoration: true
+    optimizeCss: true, // Always optimize CSS
+    scrollRestoration: true,
+    swcMinify: true, // Use SWC minifier for better performance
+    turbotrace: {
+      logLevel: 'error'
+    },
+    serverComponentsExternalPackages: ['stripe', 'micro'],
+  },
+  
+  // Configure how Next.js handles environment variables
+  env: {
+    NEXT_PUBLIC_APP_ENV: process.env.NODE_ENV || 'development',
+  },
+  
+  // Increase timeout for builds to prevent timeouts on Cloudflare
+  staticPageGenerationTimeout: 180, // in seconds
+  
+  // Improve production performance
+  productionBrowserSourceMaps: false,
+  
+  // Configure redirects if needed
+  async redirects() {
+    return [];
   }
 };
 
