@@ -48,10 +48,8 @@ const nextConfig = {
     ];
   },
 
-  // We need to disable static exports completely since you have server components
-  // and getServerSideProps that can't be statically exported
-  output: 'standalone', // Change from 'export' to 'standalone'
-  distDir: '.next',     // Use standard .next directory
+  utput: 'export',
+  distDir: 'out',
 
   images: {
     unoptimized: isProduction,
