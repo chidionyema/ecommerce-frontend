@@ -1,5 +1,7 @@
 // File: pages/api/auth/[...nextauth].ts
-export const runtime = 'experimental-edge';
+
+// Remove any runtime declaration from this file
+// export const runtime = 'edge';  // Remove this line
 
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
