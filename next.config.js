@@ -91,11 +91,8 @@ const nextConfig = {
     return config;
   },
 
-  // Experimental features
+  // Experimental features - removed the invalid 'runtime' option
   experimental: {
-    // Disable edge runtime for problematic pages
-    runtime: 'nodejs',
-    // Other experimental features
     esmExternals: true,
     optimizeCss: process.env.NODE_ENV === 'production',
     scrollRestoration: true
