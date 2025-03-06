@@ -14,6 +14,7 @@ import {
   register as authRegister, 
   logout as authLogout,
   loginWithProvider as authLoginWithProvider,
+  type UserData,
 } from '../lib/auth';
 import {
   getSubscriptionStatus,
@@ -41,12 +42,13 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
       
       try {
         // Verify token with backend
-        const userData = await verifyToken();
+        const tokenResult = await verifyToken();
         
-        if (userData) {
+        if (tokenResult.valid) {
+          const userData = tokenResult.user;
           setUser({
-            id: userData.userId,
-            userName: userData.userName,
+            id: userData.id,
+            userName: userData.username,
             email: userData.email || '',
             isSubscribed: false, // Will be updated by refreshSubscriptionStatus
           });
@@ -107,22 +109,22 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
       const result = await authLogin(credentials);
       
       if (!result.success) {
-        // Fix: Use optional chaining to safely access the message property
-        const errorMessage = 'message' in result ? result.message : 'Login failed';
+        const errorMessage = result.error?.message || 'Login failed';
         setError(errorMessage);
         return { success: false, error: errorMessage };
       }
       
       // Verify token to get user data
-      const userData = await verifyToken();
-      if (!userData) {
+      const tokenResult = await verifyToken();
+      if (!tokenResult.valid) {
         setError('Failed to retrieve user data');
         return { success: false, error: 'Failed to retrieve user data' };
       }
       
+      const userData = tokenResult.user;
       setUser({
-        id: userData.userId,
-        userName: userData.userName,
+        id: userData.id,
+        userName: userData.username,
         email: userData.email || '',
         isSubscribed: false
       });
@@ -159,16 +161,16 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
       const result = await authRegister(userData);
       
       if (!result.success) {
-        // Fix: Ensure errorMessage is always a string by using nullish coalescing
-        const errorMessage = (
-          'errors' in result && result.errors && result.errors.length > 0
-            ? result.errors[0].message
-            : 'message' in result && result.message
-              ? result.message
-              : 'Registration failed'
-        );
+        const errorMessage = result.error?.message || 
+          (result.error?.errors && result.error.errors.length > 0 
+            ? result.error.errors[0].message 
+            : 'Registration failed');
+        
         setError(errorMessage);
-        return { success: false, errors: 'errors' in result ? result.errors : [{ message: errorMessage }] };
+        return { 
+          success: false, 
+          errors: result.error?.errors || [{ message: errorMessage }] 
+        };
       }
       
       // After successful registration, manually log in
@@ -287,8 +289,7 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
     user,
     isSubscribed,
     isAuthenticated: !!user,
- 
-    isAuthLoading: isLoading, // Added missing isAuthLoading property
+    isAuthLoading: isLoading,
     subscriptionDetails,
     token: null, // This wasn't defined in the implementation but is in the type
     login,

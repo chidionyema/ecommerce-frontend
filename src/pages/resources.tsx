@@ -59,9 +59,16 @@ import {
   ctaSection
 } from '../data/resourcesPageData';
 
-// Reusable components to reduce repetition
-const SectionHeader = ({ overline, title, subtitle, button = null }) => {
-  const theme = useTheme();
+interface SectionHeaderProps {
+  overline?: string;
+  title: string;
+  subtitle?: string;
+  button?: React.ReactNode | null;
+}
+
+
+  const SectionHeader = ({ overline, title, subtitle, button = null }: SectionHeaderProps) => {
+    const theme = useTheme();
   
   return (
     <Box sx={{ textAlign: 'center', mb: 6 }}>
@@ -116,9 +123,13 @@ const SectionHeader = ({ overline, title, subtitle, button = null }) => {
   );
 };
 
-const EmptyResults = ({ message, resetAction, resetText }) => {
+interface EmptyResultsProps {
+  message: string;
+  resetAction: () => void;
+  resetText: string;
+}
+const EmptyResults = ({ message, resetAction, resetText }: EmptyResultsProps) => {
   const theme = useTheme();
-  
   return (
     <Paper
       elevation={0}
@@ -140,7 +151,24 @@ const EmptyResults = ({ message, resetAction, resetText }) => {
   );
 };
 
-const BackgroundCircle = ({ size, position, opacity }) => (
+
+interface BackgroundCircleProps {
+  size: number;
+  position: React.CSSProperties;
+  opacity: number;
+}
+
+interface StatItemProps {
+  stat: {
+    value: string;
+    label: string;
+  };
+  index: number;
+  mobile?: boolean;
+}
+
+
+const BackgroundCircle = ({ size, position, opacity }: BackgroundCircleProps) => (
   <Box
     sx={{
       position: 'absolute',
@@ -176,7 +204,7 @@ const ResourcesPage: React.FC = () => {
   };
 
   // Filter resources based on search term and active filter
-  const getFilteredResources = (resources) => {
+  const getFilteredResources = (resources: Resource[]) => {
     return resources.filter(resource => {
       const matchesSearch =
         searchTerm === '' ||
@@ -212,8 +240,24 @@ const ResourcesPage: React.FC = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+
+  interface Resource {
+    id: string;
+    path: string;
+    title: string;
+    summary: string;
+    tags: string[];
+    icon: React.ElementType;
+    level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+    trending: boolean;
+    rating: number;
+    reviewCount: number;
+    downloads: string;
+    time: string;
+    // Add any other properties your resources might have
+  }
   // Handle clicking on a resource
-  const handleResourceClick = (resource) => {
+  const handleResourceClick = (resource: Resource) => {
     const isPremium = resource.path.startsWith('/premium-resources');
     
     if (!isPremium) {
@@ -234,7 +278,7 @@ const ResourcesPage: React.FC = () => {
   };
 
   // Render a single resource card
-  const renderResourceCard = (resource) => {
+  const renderResourceCard = (resource: Resource) => {
     const IconComponent = resource.icon;
     const isPremium = resource.path.startsWith('/premium-resources');
     
@@ -441,7 +485,7 @@ const ResourcesPage: React.FC = () => {
   };
 
   // Stat item component
-  const StatItem = ({ stat, index, mobile = false }) => {
+  const StatItem = ({ stat, index, mobile = false }: StatItemProps) => {
     const motionProps = mobile 
       ? {
           initial: { opacity: 0, y: 20 },

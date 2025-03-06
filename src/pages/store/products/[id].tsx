@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { GetServerSideProps } from 'next';
+import { GetStaticProps, GetStaticPaths } from 'next';
 import { AlertCircle, CheckCircle, ShoppingBag } from 'lucide-react';
 import MainLayout from '../../../components/layouts/MainLayout';
 import ProductDetail from '../../../components/catalog/ProductDetail';
@@ -59,10 +59,7 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
     }
   };
 
-  /// In pages/store/products/[id].tsx
-// Update the handleAddToCart function
-
-const handleAddToCart = () => {
+  const handleAddToCart = () => {
     setError(null);
     
     // Validate product is available
@@ -242,8 +239,9 @@ const handleAddToCart = () => {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id } = context.params || {};
+// Replace getServerSideProps with getStaticProps
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const { id } = params || {};
   const sanitizedId = sanitizeInput(id as string);
   
   try {
@@ -267,7 +265,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         product,
         relatedProducts
-      }
+      },
+      // Enable ISR - revalidate pages periodically
+      revalidate: 3600 // Regenerate page after 1 hour (3600 seconds)
     };
   } catch (error) {
     console.error('Error fetching product details:', error);
@@ -275,6 +275,34 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // Return 404 for non-existent or inaccessible products
     return {
       notFound: true
+    };
+  }
+};
+
+// Add getStaticPaths to tell Next.js which pages to pre-generate at build time
+export const getStaticPaths: GetStaticPaths = async () => {
+  try {
+    // Get the most popular/important products to pre-render
+    const featuredProducts = await productService.getFeaturedProducts(20);
+    
+    // Create paths for pre-rendering
+    const paths = featuredProducts.map(product => ({
+      params: { id: product.id }
+    }));
+    
+    return {
+      paths,
+      // 'blocking' means pages not generated at build time will be server-rendered on first request
+      // then cached for subsequent requests
+      // You could also use 'true' for a faster initial load with client-side fallback
+      fallback: 'blocking'
+    };
+  } catch (error) {
+    console.error('Error generating product paths:', error);
+    
+    return {
+      paths: [],
+      fallback: 'blocking'
     };
   }
 };

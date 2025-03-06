@@ -1,7 +1,7 @@
 'use client';
 
 import React, { ReactElement, ReactNode, useRef, useState } from 'react';
-import { Typography, useTheme, alpha, Box } from '@mui/material';
+import { Typography, useTheme, alpha, Box, type SxProps, type Theme } from '@mui/material';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { styled } from '@mui/system';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -15,7 +15,7 @@ export interface TechCardProps {
   title: string;
   index?: number;
   children?: ReactNode;
-  sx?: any;
+  sx?: SxProps<Theme>; // Using the Material-UI Theme type
   accentColor?: string;
   category?: string;
   importance?: 'primary' | 'secondary' | 'tertiary';
@@ -24,7 +24,11 @@ export interface TechCardProps {
 }
 
 // Enhanced NumberedCircle with interactive elements
-const NumberedCircle = ({ number, theme, accentColor }: { number: number; theme: any; accentColor?: string }) => {
+const NumberedCircle = ({ number, theme, accentColor }: { 
+  number: number; 
+  theme: Theme;
+  accentColor?: string;
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   
   return (
@@ -100,7 +104,7 @@ interface GlassBackdropProps {
 
 // Glass effect backdrop with customizable blur and opacity
 const GlassBackdrop = styled(Box, {
-  shouldForwardProp: (prop) => !['blurAmount', 'opacityLevel'].includes(prop)
+  shouldForwardProp: (prop) => !['blurAmount', 'opacityLevel'].includes(prop as string)
 })<GlassBackdropProps>(({ theme, blurAmount = GLASS_BLUR, opacityLevel = GLASS_OPACITY }) => ({
   position: 'absolute',
   top: 0,
@@ -130,7 +134,7 @@ const ShineEffect = styled(motion.div)({
 });
 
 // Category label component
-const CategoryLabel = ({ category, theme }: { category: string; theme: any }) => (
+const CategoryLabel = ({ category, theme }: { category: string; theme: Theme }) => (
   <Box
     sx={{
       position: 'absolute',
@@ -160,7 +164,7 @@ interface StyledTechCardProps {
 
 // Styled TechCard with premium glass morphism and depth effects
 const StyledTechCard = styled(motion.div, {
-  shouldForwardProp: (prop) => !['importance', 'accentColor'].includes(prop)
+  shouldForwardProp: (prop) => !['importance', 'accentColor'].includes(prop as string)
 })<StyledTechCardProps>(({ theme, importance, accentColor }) => {
   // Get the color based on importance
   const getImportanceStyles = () => {
@@ -188,16 +192,16 @@ const StyledTechCard = styled(motion.div, {
   
   return {
     position: 'relative',
-    padding: theme.spacing(5), // More luxurious padding
-    borderRadius: 24, // Modern rounded corners
+    padding: theme.spacing(5),
+    borderRadius: 24,
     height: '100%',
-    background: 'transparent', // Transparent background for glass effect
+    background: 'transparent',
     border: `${importanceStyles.borderWidth}px solid ${
       theme.palette.mode === 'light'
         ? alpha(accentColor || theme.palette.primary.light, 0.2)
         : alpha(accentColor || theme.palette.primary.dark, 0.3)
     }`,
-    transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)', // Premium animation curve
+    transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
@@ -205,7 +209,7 @@ const StyledTechCard = styled(motion.div, {
     width: '100%',
     overflow: 'hidden',
     boxShadow: importanceStyles.boxShadow,
-    transform: importance === 'primary' ? 'scale(1.05)' : 'scale(1)', // Primary cards slightly larger
+    transform: importance === 'primary' ? 'scale(1.05)' : 'scale(1)',
     '&:hover': {
       transform: `translateY(-12px) ${importance === 'primary' ? 'scale(1.07)' : 'scale(1.02)'}`,
       boxShadow: theme.palette.mode === 'light' 
@@ -259,7 +263,7 @@ const TechCard: React.FC<TechCardProps> = ({
       y: 0, 
       scale: 1,
       transition: { 
-        delay: (index ?? 0) * 0.15, 
+        delay: index * 0.15, 
         type: 'spring', 
         stiffness: 80, 
         damping: 20 
@@ -278,7 +282,7 @@ const TechCard: React.FC<TechCardProps> = ({
       opacity: 1, 
       y: 0,
       transition: { 
-        delay: (index ?? 0) * 0.15 + 0.2,
+        delay: index * 0.15 + 0.2,
         duration: 0.5
       } 
     }
@@ -307,13 +311,13 @@ const TechCard: React.FC<TechCardProps> = ({
       whileTap="tap"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      sx={sx}
+      style={sx as any} // Use style prop instead of sx for the motion.div
       {...rest}
     >
       {/* Glass morphism backdrop */}
       <GlassBackdrop 
-        blurAmount={isHovered ? '16px' : GLASS_BLUR}
-        opacityLevel={isHovered ? GLASS_OPACITY + 0.03 : GLASS_OPACITY} 
+        blurAmount={isHovered ? '16px' : blurAmount || GLASS_BLUR}
+        opacityLevel={isHovered ? (opacityLevel || GLASS_OPACITY) + 0.03 : opacityLevel || GLASS_OPACITY} 
       />
       
       {/* Shine effect for light mode */}

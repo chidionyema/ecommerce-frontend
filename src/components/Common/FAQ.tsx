@@ -9,35 +9,28 @@ import {
   AccordionDetails,
   Container,
   alpha,
-  useTheme
+  useTheme,
+  type ContainerProps,
+  type SxProps,
+  type Theme
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-/**
- * FAQ Item interface
- * @typedef {Object} FAQItem
- * @property {string} question - The question text
- * @property {string} answer - The answer text
- * @property {string} [id] - Optional unique identifier
- */
+interface FAQItem {
+  question: string;
+  answer: string;
+  id?: string;
+}
 
-/**
- * FAQ Props interface
- * @typedef {Object} FAQProps
- * @property {Array<FAQItem>} items - Array of FAQ items to display
- * @property {string} [title] - Optional section title
- * @property {string} [subtitle] - Optional section subtitle
- * @property {Object} [sx] - Optional MUI sx prop for additional styling
- * @property {boolean} [fullWidth] - Whether to use full width container
- * @property {Object} [containerProps] - Additional props for Container component
- */
+interface FAQProps {
+  items: FAQItem[];
+  title?: string;
+  subtitle?: string;
+  sx?: SxProps<Theme>;
+  fullWidth?: boolean;
+  containerProps?: ContainerProps;
+}
 
-/**
- * Reusable FAQ component that displays a list of questions and answers in an accordion layout
- * Can be used on any page that requires an FAQ section
- * 
- * @param {FAQProps} props - Component props
- */
 const FAQ = ({
   items,
   title = "Frequently Asked Questions",
@@ -45,15 +38,14 @@ const FAQ = ({
   sx = {},
   fullWidth = false,
   containerProps = {}
-}) => {
+}: FAQProps) => {
   const theme = useTheme();
-  const [expanded, setExpanded] = useState(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
 
-  const handleChange = (panel) => (event, isExpanded) => {
+  const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : null);
   };
 
-  // Generate unique IDs if not provided
   const faqItems = items.map((item, index) => ({
     ...item,
     id: item.id || `faq-item-${index}`
@@ -115,11 +107,11 @@ const FAQ = ({
             overflow: 'hidden'
           }}
         >
-          {faqItems.map((faq, index) => (
+          {faqItems.map((faq) => (
             <Accordion
               key={faq.id}
               expanded={expanded === faq.id}
-              onChange={handleChange(faq.id)}
+              onChange={handleChange(faq.id!)}
               disableGutters
               elevation={0}
               sx={{

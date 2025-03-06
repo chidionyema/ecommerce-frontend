@@ -11,10 +11,23 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestCo
  * - Ensures runtime validation of environment variables
  */
 const validateEnv = () => {
-  if (!process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === 'production') {
-    console.error('Missing required environment variable: NEXT_PUBLIC_API_URL');
-    throw new Error('Configuration error');
-  }
+    // During build time, Next.js runs the code in a Node.js context
+    // We can use this to check if we're in the build process
+    const isBuildProcess = process.env.NODE_ENV === 'production' && 
+                           typeof window === 'undefined' && 
+                           process.env.NEXT_PHASE === 'phase-production-build';
+    
+    // Skip strict validation during build time
+    if (isBuildProcess) {
+      console.warn('Environment validation skipped during build process');
+      return;
+    }
+    
+    // For runtime in production, enforce the environment variable
+    if (!process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === 'production') {
+      console.error('Missing required environment variable: NEXT_PUBLIC_API_URL');
+      throw new Error('Configuration error');
+    }
 };
 validateEnv();
 
@@ -123,16 +136,12 @@ api.interceptors.request.use(
       });
     }
 
-    // Immutable config update
-    const newConfig = {
-      ...config,
-      headers: {
-        ...config.headers,
-        'X-CSRF-Token': csrfToken,
-      },
-    };
+    // Properly set the CSRF token using the headers.set() method
+    if (config.headers) {
+      config.headers.set('X-CSRF-Token', csrfToken);
+    }
 
-    return newConfig;
+    return config;
   },
   (error) => {
     // Enhanced error transformation
