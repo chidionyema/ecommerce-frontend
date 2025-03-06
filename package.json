@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "build:cloudflare": "next build && cp _routes.json .next/ && cp _redirects .next/static/"
+    "build:cloudflare": "next build && cp _routes.json .next/ && (test -f _redirects && cp _redirects .next/static/ || true)"
   },
   "engines": {
     "node": ">=20.9.0"
