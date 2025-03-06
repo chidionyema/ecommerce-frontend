@@ -1,4 +1,4 @@
-// File: /pages/api/products/[id].js
+// [id].js
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const API_BASE_URL = process.env.API_BASE_URL || 'https://api.haworks.com';
