@@ -159,7 +159,7 @@ const getStyles = (theme: Theme) => ({
     overflow: 'hidden',
     paddingBottom: SPACING.large * 2,
   },
-  backgroundImage: (imageLoaded, imageUrl) => ({
+  backgroundImage: (imageLoaded: boolean, imageUrl: string) => ({
     position: 'absolute',
     top: 0,
     left: 0,
@@ -174,7 +174,7 @@ const getStyles = (theme: Theme) => ({
     willChange: 'opacity',
     filter: 'brightness(0.7)', // Darkened the image slightly
   }),
-  gradientOverlay: (imageLoaded, theme) => ({
+  gradientOverlay: (imageLoaded: boolean, theme: Theme) => ({
     position: 'absolute',
     top: 0,
     left: 0,

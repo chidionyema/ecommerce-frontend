@@ -473,7 +473,7 @@ const PricingPage: React.FC = () => {
         </Container>
       </CustomSection>
 
-      {/* GUIDE SECTION */}
+      {/* GUIDE SECTION - COMPLETELY FIXED WITH ABSOLUTE HEIGHTS */}
       <CustomSection sx={{ py: { xs: 10, md: 12 }, bgcolor: alpha(theme.palette.background.default, 0.6) }}>
         <Container>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
@@ -504,10 +504,32 @@ const PricingPage: React.FC = () => {
               {pricingPageContent.guideSection.description}
             </Typography>
           </motion.div>
-          <Grid container spacing={4} sx={{ mt: 2 }}>
+          
+          {/* FIXED WITH ABSOLUTE POSITIONING */}
+          <Grid 
+            container 
+            spacing={4} 
+            sx={{ 
+              display: 'flex',
+              alignItems: 'stretch',
+            }}
+          >
             {pricingPageContent.guideSection.items.map((item, index) => (
-              <Grid item xs={12} md={4} key={index}>
+              <Grid 
+                item 
+                xs={12} 
+                md={4} 
+                key={index} 
+                sx={{ 
+                  display: 'flex',
+                  height: { md: '420px' }, // FIXED ABSOLUTE HEIGHT
+                }}
+              >
                 <motion.div
+                  style={{ 
+                    width: '100%',
+                    height: '100%'
+                  }}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-100px' }}
@@ -519,6 +541,7 @@ const PricingPage: React.FC = () => {
                     sx={{
                       p: 4,
                       borderRadius: 4,
+                      width: '100%',
                       height: '100%',
                       display: 'flex',
                       flexDirection: 'column',
@@ -528,6 +551,7 @@ const PricingPage: React.FC = () => {
                       )} 100%)`,
                       backdropFilter: 'blur(10px)',
                       border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                      position: 'relative', // Important for absolute positioning
                     }}
                   >
                     <Box
@@ -548,9 +572,17 @@ const PricingPage: React.FC = () => {
                     <Typography variant="h5" fontWeight="bold" mb={2}>
                       {item.title}
                     </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                      {item.description}
-                    </Typography>
+                    <Box 
+                      sx={{
+                        overflow: 'auto',
+                        flex: 1,
+                        maxHeight: 'calc(100% - 150px)', // Fixed content area
+                      }}
+                    >
+                      <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                        {item.description}
+                      </Typography>
+                    </Box>
                   </Paper>
                 </motion.div>
               </Grid>
