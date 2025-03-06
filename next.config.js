@@ -2,7 +2,7 @@
 const nextConfig = {
   // Output type for optimal Cloudflare Pages compatibility
   output: 'standalone',
-  
+
   // Image optimization config
   images: {
     unoptimized: true, // Required for Cloudflare Pages
@@ -26,7 +26,7 @@ const nextConfig = {
       (isProduction
         ? 'https://api.ritualworks.com'
         : 'https://api.local.ritualworks.com');
-    
+
     const cspDirectives = [
       "default-src 'self'",
       `script-src 'self' ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''} ` +
@@ -40,11 +40,11 @@ const nextConfig = {
       "form-action 'self'",
       "frame-ancestors 'none'"
     ];
-    
+
     if (!isProduction) {
       cspDirectives.push("report-uri /api/csp-report");
     }
-    
+
     return [
       {
         source: '/(.*)',
@@ -82,12 +82,9 @@ const nextConfig = {
         util: false
       };
     }
-    
-    // Disable webpack cache for Cloudflare builds
-    if (process.env.NODE_ENV === 'production') {
-      config.cache = false;
-    }
-    
+
+    // Webpack caching is now enabled (removed explicit disabling)
+
     return config;
   },
 
