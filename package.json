@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cloudflare": "npx @cloudflare/next-on-pages --experimental-minify"
+    "build:cloudflare": "npx @cloudflare/next-on-pages"
   },
   "engines": {
     "node": ">=20.9.0"
