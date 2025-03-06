@@ -1,0 +1,49 @@
+// File: wrangler.toml
+
+name = "ecommerce-auth"
+main = "src/worker.js"
+compatibility_date = "2023-12-01"
+
+# Set environment variables as needed
+[vars]
+NEXT_PUBLIC_BASE_URL = "https://api.local.ritualworks.com"
+
+# Routes for your worker - handle only auth routes
+[[routes]]
+pattern = "*/api/auth/*"
+script = "src/worker.js"
+
+# Include the JWT secret and other sensitive info as encrypted secrets
+# Run `wrangler secret put JWT_SECRET` to set these
+
+# Define a KV namespace for session storage if needed
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "your-kv-namespace-id"
+preview_id = "your-preview-kv-namespace-id"
+
+# Worker script to proxy auth requests to a Node.js environment
+// File: src/worker.js
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    
+    // Check if the request is for an auth route
+    if (url.pathname.startsWith('/api/auth/')) {
+      // Get auth backend URL from environment variables or hard-coded
+      const authBackendUrl = env.AUTH_BACKEND_URL || 'https://your-auth-service.example.com';
+      
+      // Forward the request to your Node.js auth service
+      const authUrl = new URL(url.pathname, authBackendUrl);
+      
+      // Clone the request with the new URL
+      const authRequest = new Request(authUrl, request);
+      
+      // Forward the request to your auth backend
+      return fetch(authRequest);
+    }
+    
+    // For non-auth routes, return a 404
+    return new Response('Not found', { status: 404 });
+  },
+};
