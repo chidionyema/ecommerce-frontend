@@ -1,5 +1,6 @@
 // next.config.mjs
-import { withCloudflarePages } from '@cloudflare/next-on-pages';
+import pkg from '@cloudflare/next-on-pages';
+const { withCloudflarePages } = pkg;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
