@@ -6,16 +6,8 @@
 "scripts": {
   "dev": "next dev",
   "build": "next build",
-  "prebuild": "npm run clean",
-  "preview": "serve out",
-  "clean": "rm -rf .next/ out/",
-  "analyze": "cross-env ANALYZE=true next build",
-  "deploy": "wrangler pages deploy out",
-  "deploy:ci": "npm run build && npm run deploy",
-  "dev:cf": "wrangler pages dev out --live",
-  "dev:fullstack": "concurrently \"npm run dev\" \"npm run dev:cf\"",
-  "start": "node server.js",
-  "start:server": "server.ts"
+  "start": "next start",
+  "clean": "rm -rf .next/ out/"
 },
   "engines": {
     "node": ">=20.9.0"
