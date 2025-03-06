@@ -3,16 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-"scripts": {
-  "dev": "next dev",
-  "build": "next build && node generateRoutes.cjs",
-  "start": "next start",
-  "clean": "rm -rf .next/ out/"
-},
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build && node generateRoutes.cjs",
+    "start": "next start",
+    "clean": "rm -rf .next/ out/"
+  },
   "engines": {
     "node": ">=20.9.0"
   },
   "dependencies": {
+    "@cloudflare/next-on-pages": "^1.13.8",
     "@emailjs/browser": "^4.4.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
