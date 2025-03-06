@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Required for Cloudflare Pages in production
+  // Platform-agnostic configuration with Cloudflare compatibility
   output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
-
+  
+  // Image optimization config
   images: {
-    unoptimized: true,
+    unoptimized: true, // Required for Cloudflare Pages
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
@@ -18,6 +19,7 @@ const nextConfig = {
     ]
   },
 
+  // Security headers
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
@@ -59,6 +61,7 @@ const nextConfig = {
     ];
   },
 
+  // Polyfills for client-side
   webpack: (config, { isServer }) => {
     // Add Node.js polyfills and fallbacks for client-side
     if (!isServer) {
@@ -88,7 +91,9 @@ const nextConfig = {
     return config;
   },
 
+  // Experimental features
   experimental: {
+    // Remove runtime configuration
     esmExternals: true,
     optimizeCss: process.env.NODE_ENV === 'production',
     scrollRestoration: true

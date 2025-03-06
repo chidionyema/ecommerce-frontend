@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/generate-routes.js",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "build:cloudflare": "npx @cloudflare/next-on-pages"
+    "build:cloudflare": "next build && cp _routes.json .next/"
   },
   "engines": {
     "node": ">=20.9.0"

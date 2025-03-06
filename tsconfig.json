@@ -41,7 +41,7 @@
     "out/types/**/*.ts",
     "src/types/types.d.ts",
     ".next/types/**/*.ts"
-  ],
+, "src/pages/store/products/index.js", "src/pages/store/products/[id].js"  ],
   "exclude": [
     "node_modules"
   ]

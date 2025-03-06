@@ -1,9 +1,10 @@
 // File: pages/store/products/[id].tsx
-export const runtime = 'experimental-edge';
+// REMOVED: export const runtime = 'experimental-edge';
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { GetServerSideProps } from 'next';
+import { GetStaticProps, GetStaticPaths } from 'next'; // Changed from GetServerSideProps
 import { AlertCircle, CheckCircle, ShoppingBag } from 'lucide-react';
 import MainLayout from '../../../components/layouts/MainLayout';
 import ProductDetail from '../../../components/catalog/ProductDetail';
@@ -11,7 +12,6 @@ import { productService } from '../../../services/product.service';
 import { useCheckout } from '../../../contexts/CheckoutContext';
 import { ProductDto } from '../../../types/haworks.types';
 import ErrorBoundary from '../../../components/Common/ErrorBoundary';
-
 import ProductSkeleton from '../../../components/catalog/ProductSkeleton';
 
 interface ProductDetailPageProps {
@@ -34,6 +34,17 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{message: string, type: 'success' | 'error'} | null>(null);
   const [quantity, setQuantity] = useState(1);
+
+  // Show a loading state while the page is being generated statically
+  if (router.isFallback) {
+    return (
+      <MainLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <ProductSkeleton />
+        </div>
+      </MainLayout>
+    );
+  }
 
   // Validate product data is available
   useEffect(() => {
@@ -126,9 +137,6 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
       });
     }
   };
-
-  // We don't need the fallback check anymore since we're using SSR
-  // The page will only render once the data is available
 
   return (
     <MainLayout>
@@ -227,8 +235,8 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
   );
 }
 
-// Replace getStaticProps with getServerSideProps
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+// Replace getServerSideProps with getStaticProps for better performance with ISR
+export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { id } = params || {};
   const sanitizedId = sanitizeInput(id as string);
   
@@ -253,7 +261,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       props: {
         product,
         relatedProducts
-      }
+      },
+      // Enable Incremental Static Regeneration
+      revalidate: 60 // Regenerate page at most once every 60 seconds
     };
   } catch (error) {
     console.error('Error fetching product details:', error);
@@ -263,4 +273,14 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       notFound: true
     };
   }
+};
+
+// Add getStaticPaths
+export const getStaticPaths: GetStaticPaths = async () => {
+  // You can pre-render popular products here if you want
+  // For this example, we'll generate all pages on-demand
+  return {
+    paths: [],
+    fallback: 'blocking' // Use blocking fallback for better SEO
+  };
 };
