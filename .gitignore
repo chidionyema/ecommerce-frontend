@@ -21,3 +21,16 @@ build/
 # OS-specific files
 .DS_Store
 Thumbs.db.next/cache/
+# Cloudflare build output
+.vercel/
+.cloudflare/
+
+# Dependencies
+node_modules/
+
+# Build output
+
+
+# Cache directories
+.npm
+.cache
