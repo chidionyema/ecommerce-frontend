@@ -1,4 +1,5 @@
 // File: app/api/products/route.js
+export const runtime = 'edge';
 import { NextResponse } from 'next/server';
 
 const API_BASE_URL = process.env.API_BASE_URL || 'https://api.haworks.com';

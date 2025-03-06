@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { NextApiRequest, NextApiResponse } from "next";
 
 // pages/api/csp-report.ts
