@@ -1,7 +1,3 @@
-// next.config.mjs
-import pkg from '@cloudflare/next-on-pages';
-const { withCloudflarePages } = pkg;
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Required for Cloudflare Pages in production
@@ -93,4 +89,4 @@ const nextConfig = {
   }
 };
 
-export default withCloudflarePages(nextConfig);
+export default nextConfig;
