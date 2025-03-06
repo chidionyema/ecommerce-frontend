@@ -85,17 +85,18 @@ const BenefitItem = ({ icon, text }: BenefitItemProps) => {
         display: 'flex',
         alignItems: 'center',
         gap: 2,
-        backgroundColor: alpha(theme.palette.background.paper, 0.3), // Increased opacity for better visibility
+        backgroundColor: alpha(theme.palette.background.paper, 0.6), // Increased opacity for better visibility
         p: 2,
         borderRadius: 2,
-        border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`, // Increased border visibility
+        border: `1px solid ${alpha(theme.palette.common.white, 0.3)}`,
         height: '100%',
-        backdropFilter: 'blur(5px)', // Added backdrop blur for better text contrast
+        backdropFilter: 'blur(8px)', // Increased blur for better text contrast
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Added shadow for depth and visibility
       }}
     >
       <Box
         sx={{
-          backgroundColor: alpha(theme.palette.secondary.main, 0.3), // Increased opacity
+          backgroundColor: alpha(theme.palette.secondary.main, 0.4), // Increased opacity
           borderRadius: '50%',
           p: 1,
           display: 'flex',
@@ -106,9 +107,9 @@ const BenefitItem = ({ icon, text }: BenefitItemProps) => {
       </Box>
       <Typography 
         variant="body1" 
-        fontWeight={600} // Increased from 500 to 600
+        fontWeight={700} // Increased from 600 to 700 for better visibility
         color="white"
-        sx={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }} // Added text shadow
+        sx={{ textShadow: '0 2px 4px rgba(0,0,0,0.7)' }} // Enhanced text shadow
       >
         {text}
       </Typography>
@@ -135,13 +136,13 @@ const TechLogo = ({ Icon, name, color }: TechLogoProps) => (
     <Icon
       color={color}
       size={30}
-      style={{ filter: 'drop-shadow(0 3px 5px rgba(0,0,0,0.5))' }} // Enhanced shadow
+      style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.7))' }} // Enhanced shadow
     />
     <Typography 
       variant="caption" 
       color="white" 
-      fontWeight={600} // Increased from 500 to 600
-      sx={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }} // Added text shadow
+      fontWeight={700} // Increased from 600 to 700
+      sx={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }} // Enhanced text shadow
     >
       {name}
     </Typography>
@@ -169,10 +170,10 @@ const getStyles = (theme: Theme) => ({
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     zIndex: 0,
-    opacity: imageLoaded ? 0.9 : 0, // Slightly reduced opacity for better overlay effect
+    opacity: imageLoaded ? 1 : 0, // Full visibility
     transition: 'opacity 0.5s ease',
     willChange: 'opacity',
-    filter: 'brightness(0.7)', // Darkened the image slightly
+    filter: 'blur(1px)', // Kept the subtle blur
   }),
   gradientOverlay: (imageLoaded: boolean, theme: Theme) => ({
     position: 'absolute',
@@ -183,10 +184,10 @@ const getStyles = (theme: Theme) => ({
     background: imageLoaded
       ? `linear-gradient(
           to bottom,
-          ${alpha(theme.palette.primary.dark, 0.95)} 10%, 
-          ${alpha(theme.palette.primary.dark, 0.75)} 50%,
-          ${alpha(theme.palette.primary.dark, 0.85)} 100%
-        )` // Increased overlay opacity for better text contrast
+          ${alpha(theme.palette.primary.dark, 0.4)} 0%, 
+          ${alpha(theme.palette.primary.dark, 0.3)} 50%,
+          ${alpha(theme.palette.primary.dark, 0.5)} 100%
+        )` // Adjusted opacity values for better readability
       : 'transparent',
     zIndex: 1,
     transition: 'opacity 0.3s ease',
@@ -199,50 +200,51 @@ const getStyles = (theme: Theme) => ({
     textAlign: 'center',
   },
   eyebrowChip: {
-    backgroundColor: alpha(theme.palette.secondary.main, 0.3), // Increased opacity
+    backgroundColor: alpha(theme.palette.secondary.main, 0.5), // Increased opacity
     color: 'white',
     fontWeight: 'bold',
     mb: 3,
-    border: `1px solid ${alpha(theme.palette.secondary.main, 0.7)}`, // Increased border opacity
+    border: `1px solid ${alpha(theme.palette.secondary.main, 0.8)}`, // Increased border opacity
     px: 2,
     py: 1,
     '& .MuiChip-label': {
       px: 1,
       fontSize: '0.9rem',
     },
-    textShadow: '0 1px 2px rgba(0,0,0,0.5)', // Added text shadow
+    textShadow: '0 2px 3px rgba(0,0,0,0.7)', // Enhanced text shadow
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)', // Added shadow for visibility
   },
   headline: {
     fontSize: { xs: '2.5rem', sm: '3.2rem', md: '4rem' },
     lineHeight: 1.2,
     fontWeight: 800,
     mb: 3,
-    textShadow: '0 2px 15px rgba(0, 0, 0, 0.8), 0 4px 10px rgba(0, 0, 0, 0.4)', // Enhanced text shadow
+    textShadow: '0 3px 15px rgba(0, 0, 0, 0.9), 0 5px 12px rgba(0, 0, 0, 0.5)', // Enhanced text shadow
     maxWidth: '900px',
     mx: 'auto',
-    letterSpacing: '-0.01em', // Slightly tightened letter spacing
+    letterSpacing: '-0.01em',
   },
   subheadline: {
     fontSize: { xs: '1.2rem', sm: '1.4rem', md: '1.6rem' },
-    fontWeight: 500, // Increased from 400 to 500
+    fontWeight: 600, // Increased from 500 to 600
     lineHeight: 1.5,
     mb: 5,
-    opacity: 1, // Changed from 0.9 to 1
+    opacity: 1,
     maxWidth: '800px',
     mx: 'auto',
-    textShadow: '0 1px 8px rgba(0, 0, 0, 0.6)', // Added stronger text shadow
+    textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)', // Enhanced text shadow
   },
   primaryButton: {
     px: 4,
     py: 1.5,
     fontSize: '1.1rem',
-    fontWeight: 600,
+    fontWeight: 700, // Increased from 600 to 700
     borderRadius: 2,
     textTransform: 'none',
-    boxShadow: `0 4px 14px ${alpha(theme.palette.secondary.main, 0.7)}`, // Increased shadow opacity
+    boxShadow: `0 4px 14px ${alpha(theme.palette.secondary.main, 0.8)}, 0 2px 6px rgba(0, 0, 0, 0.3)`, // Enhanced shadow
     '&:hover': {
       transform: 'translateY(-2px)',
-      boxShadow: `0 6px 20px ${alpha(theme.palette.secondary.main, 0.8)}`,
+      boxShadow: `0 6px 20px ${alpha(theme.palette.secondary.main, 0.9)}, 0 3px 8px rgba(0, 0, 0, 0.4)`,
     },
     transition: 'all 0.3s ease',
   },
@@ -250,25 +252,27 @@ const getStyles = (theme: Theme) => ({
     px: 4,
     py: 1.5,
     fontSize: '1.1rem',
-    fontWeight: 600,
+    fontWeight: 700, // Increased from 600 to 700
     borderRadius: 2,
     textTransform: 'none',
     borderWidth: 2,
-    borderColor: alpha(theme.palette.common.white, 0.5), // Increased from 0.3 to 0.5
+    borderColor: alpha(theme.palette.common.white, 0.7), // Increased from 0.5 to 0.7
     color: theme.palette.common.white,
+    backgroundColor: alpha(theme.palette.common.black, 0.2), // Added slight background tint
     '&:hover': {
       borderColor: theme.palette.common.white,
-      backgroundColor: alpha(theme.palette.common.white, 0.2), // Increased from 0.15 to 0.2
+      backgroundColor: alpha(theme.palette.common.white, 0.3), // Increased from 0.2 to 0.3
     },
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)', // Added subtle shadow
+    boxShadow: '0 3px 8px rgba(0, 0, 0, 0.3)', // Enhanced shadow
   },
   techSection: {
     p: { xs: 2, sm: 3 },
     borderRadius: 2,
-    backgroundColor: alpha(theme.palette.background.paper, 0.25), // Increased from 0.1 to 0.25
-    border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`, // Increased from 0.1 to 0.2
-    backdropFilter: 'blur(8px)', // Added backdrop blur
+    backgroundColor: alpha(theme.palette.background.paper, 0.5), // Increased from 0.25 to 0.5
+    border: `1px solid ${alpha(theme.palette.common.white, 0.3)}`, // Increased from 0.2 to 0.3
+    backdropFilter: 'blur(8px)', // Increased blur
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)', // Added shadow for visibility
   }
 });
 
@@ -309,8 +313,19 @@ export const HeroSection = () => {
             <Typography variant="h1" component="h1" color="white" sx={styles.headline}>
               Skip Trial &amp; Error with{' '}
               <Box component="span" sx={{ 
-                color: theme.palette.secondary.light, // Changed from secondary.main to secondary.light
-                textShadow: '0 2px 8px rgba(0, 0, 0, 0.7)' // Added separate shadow for highlight text
+                color: theme.palette.secondary.light,
+                textShadow: '0 3px 10px rgba(0, 0, 0, 0.8)', // Enhanced shadow for highlight text
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-2px',
+                  left: 0,
+                  width: '100%',
+                  height: '4px',
+                  backgroundColor: alpha(theme.palette.secondary.main, 0.7), // Added underline highlight
+                  borderRadius: '2px',
+                }
               }}>
                 Production-Ready
               </Box>{' '}
@@ -372,9 +387,9 @@ export const HeroSection = () => {
                 textAlign="center"
                 mb={2}
                 sx={{ 
-                  opacity: 0.9, // Increased from 0.7 to 0.9
-                  fontWeight: 500, // Added font weight
-                  textShadow: '0 1px 2px rgba(0,0,0,0.4)' // Added text shadow
+                  opacity: 1, // Increased from 0.9 to 1
+                  fontWeight: 600, // Increased from 500 to 600
+                  textShadow: '0 2px 4px rgba(0,0,0,0.6)' // Enhanced text shadow
                 }}
               >
                 Expertise with leading technologies:

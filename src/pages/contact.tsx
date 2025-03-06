@@ -334,16 +334,17 @@ const Contact = () => {
           </Fade>
 
           <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 1.5fr' },
-              gap: { xs: 6, md: 8 },
-              width: '100%',
-              maxWidth: 1400,
-              mx: 'auto',
-              mb: { xs: 8, md: 12 },
-            }}
-          >
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1.5fr' },
+            gap: { xs: 6, md: 8 },
+            width: '100%',
+            maxWidth: 1400,
+            mx: 'auto',
+            mb: { xs: 8, md: 12 },
+            alignItems: 'stretch', // Add this to make children equal height
+          }}
+        >
             {/* Contact Information Section */}
             <Slide direction="right" in={animateIn} timeout={800}>
               <Box
@@ -358,7 +359,7 @@ const Contact = () => {
                     : alpha(theme.palette.background.paper, 0.9),
                   backdropFilter: 'blur(8px)',
                   boxShadow: theme.shadows[6],
-                  height: 'fit-content',
+                  height: '100%',
                   position: 'relative',
                   overflow: 'hidden',
                   '&::before': {
@@ -469,7 +470,7 @@ const Contact = () => {
 
             {/* Contact Form Section */}
             <Slide direction="left" in={animateIn} timeout={800}>
-              <Box>
+            <Box sx={{ height: '100%' }}>
                 <GoldCard
                   component="form"
                   onSubmit={handleSubmit}
@@ -477,7 +478,7 @@ const Contact = () => {
                     p: { xs: 4, sm: 5, md: 6 },
                     borderRadius: 4,
                     width: '100%',
-                    height: 'auto',
+                    height: '100%', 
                     backgroundColor: alpha(theme.palette.background.paper, 0.9),
                     backdropFilter: 'blur(8px)',
                     boxShadow: theme.shadows[8],

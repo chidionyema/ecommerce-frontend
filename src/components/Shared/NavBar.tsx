@@ -2,7 +2,7 @@
 
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   AppBar,
   Toolbar,
@@ -19,6 +19,9 @@ import {
   Fade,
   Tooltip,
   AppBarProps,
+  LinearProgress,
+  CircularProgress,
+  Skeleton,
 } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { Menu, Close, Home, Book, Paid, Email, KeyboardArrowDown } from '@mui/icons-material';
@@ -63,9 +66,55 @@ const StyledAppBar = styled(AppBar, {
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 }));
 
-// --- Brand Logo Component ---
+// Custom progress bar for page transitions
+const StyledProgressBar = styled(LinearProgress)(({ theme }) => ({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  height: 3,
+  zIndex: 2000,
+  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+  '& .MuiLinearProgress-bar': {
+    backgroundColor: theme.palette.primary.main,
+  },
+}));
+
+// --- Enhanced Brand Logo Component ---
 const BrandLogo = memo(() => {
   const theme = useTheme();
+  const [isHovered, setIsHovered] = useState(false);
+  const [isAnimated, setIsAnimated] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  // Animation on page load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAnimated(true);
+      
+      // Simulate full content load after animation completes
+      setTimeout(() => {
+        setIsLoaded(true);
+      }, 500);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  // Show skeleton while loading
+  if (!isLoaded) {
+    return (
+      <Stack direction="row" alignItems="center" spacing={1.5}>
+        <Skeleton variant="circular" width={36} height={36} 
+          sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.1) }}
+        />
+        <Skeleton variant="text" width={100} height={40} 
+          sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.1) }}
+        />
+      </Stack>
+    );
+  }
+  
   return (
     <Link href="/" passHref legacyBehavior>
       <Stack
@@ -74,50 +123,171 @@ const BrandLogo = memo(() => {
         spacing={1.5}
         sx={{
           textDecoration: 'none',
+          position: 'relative',
           '&:hover': { 
-            opacity: 0.9,
-            transform: 'translateY(-1px)',
-            transition: 'all 0.2s ease'
+            transform: 'translateY(-2px)',
           },
-          transition: 'all 0.2s ease'
+          transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
         component="a"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        <Cpu size={32} color={theme.palette.primary.main} />
-        <Typography
-          variant="h6"
-          component="div"
+        {/* Logo Icon with Animation */}
+        <Box 
           sx={{
-            fontFamily: "'Poppins', sans-serif",
-            fontWeight: 700,
-            color: theme.palette.text.primary,
-            fontSize: { xs: '1.5rem', md: '1.8rem' },
-            lineHeight: 1.2,
-            '& span': {
-              color: theme.palette.primary.main,
-              fontWeight: 700,
+            position: 'relative',
+            transform: isAnimated ? 'scale(1)' : 'scale(0.8)',
+            opacity: isAnimated ? 1 : 0,
+            transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease',
+          }}
+        >
+          <Cpu 
+            size={36} 
+            color={theme.palette.primary.main} 
+            style={{
+              filter: isHovered ? `drop-shadow(0 0 8px ${alpha(theme.palette.primary.main, 0.6)})` : 'none',
+              transform: isHovered ? 'rotate(15deg)' : 'rotate(0deg)',
+              transition: 'transform 0.3s ease, filter 0.3s ease'
+            }}
+          />
+          {/* Add a pulse effect behind the icon */}
+          {isHovered && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                animation: 'pulse 1.5s infinite',
+                '@keyframes pulse': {
+                  '0%': {
+                    transform: 'translate(-50%, -50%) scale(1)',
+                    opacity: 0.7,
+                  },
+                  '100%': {
+                    transform: 'translate(-50%, -50%) scale(1.8)',
+                    opacity: 0,
+                  },
+                },
+              }}
+            />
+          )}
+        </Box>
+
+        {/* Enhanced Typography */}
+        <Box
+          sx={{
+            overflow: 'hidden',
+            transform: isAnimated ? 'translateX(0)' : 'translateX(10px)',
+            opacity: isAnimated ? 1 : 0,
+            transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease',
+            transitionDelay: '0.1s',
+          }}
+        >
+          <Typography
+            variant="h5"
+            component="div"
+            sx={{
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: 800,
+              letterSpacing: '0.5px',
+              color: theme.palette.text.primary,
+              fontSize: { xs: '1.6rem', md: '1.9rem' },
+              lineHeight: 1.1,
+              position: 'relative',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                width: isHovered ? '100%' : '0%',
+                height: '6px',
+                bottom: 0,
+                left: 0,
+                background: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.2)} 0%, transparent 100%)`,
+                zIndex: -1,
+                transition: 'width 0.3s ease',
+              },
+            }}
+          >
+            {/* First part of logo with normal styling */}
+            <Box component="span" sx={{ 
+              display: 'inline-block',
               position: 'relative',
               '&::after': {
                 content: '""',
                 position: 'absolute',
-                width: '100%',
-                transform: 'scaleX(0)',
-                height: '2px',
-                bottom: 0,
-                left: 0,
+                width: '4px',
+                height: '4px',
+                borderRadius: '50%',
                 backgroundColor: theme.palette.primary.main,
-                transformOrigin: 'bottom right',
-                transition: 'transform 0.25s ease-out'
-              },
-              '&:hover::after': {
-                transform: 'scaleX(1)',
-                transformOrigin: 'bottom left'
+                bottom: 0,
+                right: '-2px',
+                opacity: isHovered ? 1 : 0,
+                transition: 'opacity 0.3s ease',
               }
-            },
-          }}
-        >
-          GLU<span>Stack</span>
-        </Typography>
+            }}>
+              GLU
+            </Box>
+            
+            {/* Highlighted part with gradient and underline effect */}
+            <Box 
+              component="span" 
+              sx={{
+                background: isHovered 
+                  ? `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`
+                  : theme.palette.primary.main,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                color: 'transparent',
+                fontWeight: 800,
+                position: 'relative',
+                transition: 'all 0.3s ease',
+                textShadow: isHovered ? `0 2px 10px ${alpha(theme.palette.primary.main, 0.4)}` : 'none',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  width: '100%',
+                  height: '2px',
+                  bottom: '2px',
+                  left: 0,
+                  background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                  transform: isHovered ? 'scaleX(1)' : 'scaleX(0)',
+                  transformOrigin: 'left',
+                  transition: 'transform 0.3s ease-out',
+                },
+              }}
+            >
+              Stack
+            </Box>
+          </Typography>
+        </Box>
+        
+        {/* Optional subtle tagline */}
+        {isHovered && (
+          <Fade in={isHovered} timeout={300}>
+            <Typography
+              variant="caption"
+              sx={{
+                position: 'absolute',
+                top: '100%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                color: alpha(theme.palette.text.secondary, 0.8),
+                fontStyle: 'italic',
+                fontSize: '0.7rem',
+                whiteSpace: 'nowrap',
+                mt: 0.5,
+              }}
+            >
+              modern tech stack
+            </Typography>
+          </Fade>
+        )}
       </Stack>
     </Link>
   );
@@ -129,12 +299,27 @@ BrandLogo.displayName = 'BrandLogo';
 interface NavItemProps {
   item: NavItemType;
   isActive: boolean;
+  isLoading?: boolean;
   onClick?: () => void;
 }
 
-// --- NavItem Component ---
-const NavItem = memo<NavItemProps>(({ item, isActive, onClick }) => {
+// --- NavItem Component with loading state ---
+const NavItem = memo<NavItemProps>(({ item, isActive, isLoading = false, onClick }) => {
   const theme = useTheme();
+  
+  if (isLoading) {
+    return (
+      <Skeleton 
+        variant="rounded" 
+        width={100} 
+        height={36} 
+        sx={{ 
+          borderRadius: 1,
+          backgroundColor: alpha(theme.palette.primary.main, 0.08)
+        }} 
+      />
+    );
+  }
   
   return (
     <Tooltip title={`View ${item.label}`} placement="bottom" arrow enterDelay={700}>
@@ -182,8 +367,23 @@ const NavItem = memo<NavItemProps>(({ item, isActive, onClick }) => {
 NavItem.displayName = 'NavItem';
 
 // --- MobileNavItem Component ---
-const MobileNavItem = memo<NavItemProps>(({ item, isActive, onClick }) => {
+const MobileNavItem = memo<NavItemProps>(({ item, isActive, isLoading = false, onClick }) => {
   const theme = useTheme();
+  
+  if (isLoading) {
+    return (
+      <Skeleton 
+        variant="rounded" 
+        width="100%" 
+        height={48} 
+        sx={{ 
+          borderRadius: 1,
+          backgroundColor: alpha(theme.palette.primary.main, 0.08) 
+        }} 
+      />
+    );
+  }
+  
   const Icon = item.icon;
   
   return (
@@ -225,11 +425,28 @@ MobileNavItem.displayName = 'MobileNavItem';
 // --- Define interface for GetStartedButton props ---
 interface GetStartedButtonProps {
   isMobile: boolean;
+  isLoading?: boolean;
 }
 
-// --- GetStarted Button with animated hover ---
-const GetStartedButton = memo<GetStartedButtonProps>(({ isMobile }) => {
+// --- GetStarted Button with animated hover and loading state ---
+const GetStartedButton = memo<GetStartedButtonProps>(({ isMobile, isLoading = false }) => {
   const theme = useTheme();
+  
+  if (isLoading) {
+    return (
+      <Skeleton 
+        variant="rounded" 
+        width={isMobile ? "100%" : 120} 
+        height={isMobile ? 48 : 40} 
+        sx={{ 
+          borderRadius: 2,
+          backgroundColor: alpha(theme.palette.primary.main, 0.2),
+          ml: isMobile ? 0 : 1,
+          mt: isMobile ? 2 : 0,
+        }} 
+      />
+    );
+  }
   
   return (
     <Button
@@ -284,16 +501,149 @@ const GetStartedButton = memo<GetStartedButtonProps>(({ isMobile }) => {
 
 GetStartedButton.displayName = 'GetStartedButton';
 
+// --- Loading Screen Component ---
+const LoadingOverlay = memo(() => {
+  const theme = useTheme();
+  
+  return (
+    <Box
+      sx={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: alpha(theme.palette.background.paper, 0.7),
+        backdropFilter: 'blur(4px)',
+        zIndex: 1999, // Just below AppBar
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'opacity 0.3s ease',
+      }}
+    >
+      <CircularProgress 
+        size={60} 
+        thickness={4} 
+        sx={{ 
+          color: theme.palette.primary.main,
+          mb: 3,
+        }} 
+      />
+      <Typography 
+        variant="h6" 
+        sx={{ 
+          fontWeight: 500, 
+          color: theme.palette.text.primary,
+          animation: 'fadeInOut 2s infinite',
+          '@keyframes fadeInOut': {
+            '0%': { opacity: 0.5 },
+            '50%': { opacity: 1 },
+            '100%': { opacity: 0.5 },
+          }
+        }}
+      >
+        Loading content...
+      </Typography>
+      <Typography 
+        variant="body2" 
+        sx={{ 
+          mt: 1,
+          color: alpha(theme.palette.text.secondary, 0.8),
+          maxWidth: 300,
+          textAlign: 'center',
+        }}
+      >
+        Please wait while we prepare your experience
+      </Typography>
+    </Box>
+  );
+});
+
+LoadingOverlay.displayName = 'LoadingOverlay';
+
 // --- NavBar Component ---
 const NavBar = () => {
   const theme = useTheme();
+  const router = useRouter();
+  const pathname = usePathname();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'), {
     noSsr: true, // Avoid server-side rendering mismatch
   });
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [transparent, setTransparent] = useState(false);
-  const pathname = usePathname();
+  
+  // Page loading state
+  const [isPageLoading, setIsPageLoading] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [progress, setProgress] = useState(0);
+  
+  // Simulate initial content loading (remove in production, detect real loading)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoad(false);
+    }, 1800); // 1.8 seconds for initial load
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  // Custom navigation state tracking for App Router
+  useEffect(() => {
+    let progressInterval: NodeJS.Timeout;
+    let currentPath = pathname;
+    
+    const handleStartNavigation = () => {
+      setIsPageLoading(true);
+      setProgress(0);
+      
+      // Simulate progress increasing
+      progressInterval = setInterval(() => {
+        setProgress((oldProgress) => {
+          // Slowly increase to 90% then wait for actual completion
+          const newProgress = Math.min(oldProgress + (Math.random() * 10), 90);
+          return newProgress;
+        });
+      }, 200);
+    };
+    
+    const handleCompleteNavigation = () => {
+      clearInterval(progressInterval);
+      setProgress(100);
+      
+      // Small delay before hiding the progress bar
+      setTimeout(() => {
+        setIsPageLoading(false);
+        setProgress(0);
+      }, 500);
+    };
+    
+    // Check for pathname changes to detect navigation
+    if (pathname !== currentPath) {
+      currentPath = pathname;
+      handleCompleteNavigation();
+    }
+    
+    // Use a MutationObserver to detect when the page is about to change
+    // This is a workaround for the lack of navigation events in App Router
+    const observer = new MutationObserver((mutations) => {
+      const isNavigating = document.documentElement.classList.contains('nprogress-busy');
+      if (isNavigating && !isPageLoading) {
+        handleStartNavigation();
+      }
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    
+    return () => {
+      clearInterval(progressInterval);
+      observer.disconnect();
+    };
+  }, [pathname, isPageLoading]);
 
   // Check if we're on the homepage to apply transparent navbar
   useEffect(() => {
@@ -341,6 +691,17 @@ const NavBar = () => {
 
   return (
     <>
+      {/* Show progress bar during page transitions */}
+      {isPageLoading && (
+        <StyledProgressBar 
+          variant="determinate" 
+          value={progress} 
+        />
+      )}
+      
+      {/* Initial page load overlay */}
+      {isInitialLoad && <LoadingOverlay />}
+      
       <StyledAppBar 
         position="fixed" 
         elevation={0} 
@@ -364,13 +725,17 @@ const NavBar = () => {
                         <NavItem 
                           item={item} 
                           isActive={pathname === item.path}
+                          isLoading={isInitialLoad}
                         />
                       </Box>
                     </Fade>
                   ))}
                   <Fade in={true} style={{ transitionDelay: `${NAV_ITEMS.length * 75}ms` }}>
                     <Box>
-                      <GetStartedButton isMobile={false} />
+                      <GetStartedButton 
+                        isMobile={false} 
+                        isLoading={isInitialLoad}
+                      />
                     </Box>
                   </Fade>
                 </Stack>
@@ -379,6 +744,7 @@ const NavBar = () => {
               <IconButton
                 edge="end"
                 onClick={handleOpenMenu}
+                disabled={isInitialLoad}
                 sx={{ 
                   color: theme.palette.text.primary,
                   transform: menuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -388,7 +754,11 @@ const NavBar = () => {
                   }
                 }}
               >
-                <Menu fontSize="large" />
+                {isInitialLoad ? (
+                  <CircularProgress size={24} thickness={4} color="inherit" />
+                ) : (
+                  <Menu fontSize="large" />
+                )}
               </IconButton>
             )}
           </Toolbar>
@@ -448,6 +818,7 @@ const NavBar = () => {
                   item={item}
                   isActive={pathname === item.path}
                   onClick={handleCloseMenu}
+                  isLoading={isInitialLoad && menuOpen}
                 />
               </Box>
             </Fade>
@@ -458,7 +829,10 @@ const NavBar = () => {
             style={{ transformOrigin: 'left', transitionDelay: `${NAV_ITEMS.length * 50 + 50}ms` }}
           >
             <Box>
-              <GetStartedButton isMobile={true} />
+              <GetStartedButton 
+                isMobile={true}
+                isLoading={isInitialLoad && menuOpen} 
+              />
             </Box>
           </Fade>
         </Stack>
