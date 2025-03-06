@@ -1,8 +1,4 @@
-name = "ecommerce-frontend"
-compatibility_date = "2023-12-01"
-
-[build]
-command = "npm run build"
+name = "test-ecommerce-frontend" # Use a slightly different name for testing
 
 [site]
 pages_build_output_dir = ".next"
