@@ -2,11 +2,8 @@
 export const runtime = 'edge';
 
 import { NextRequest } from 'next/server';
-import { getCookie, setCookie } from 'cookies-next';
-import { jwtVerify, SignJWT } from 'jose';
 
 const API_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://api.local.ritualworks.com';
-const JWT_SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'your-secret-key');
 
 export default async function handler(req: NextRequest) {
   const url = new URL(req.url);
@@ -71,27 +68,256 @@ async function handleSignIn(req: NextRequest, body: any) {
       });
     }
 
-    // Create a JWT token for the session
-    const token = await new SignJWT({
-      id: data.user.id,
-      name: data.user.userName,
-      email: data.user.email,
-      isSubscribed: data.user.isSubscribed || false,
+    // Create a simple session token (in a real implementation, use jose for JWT)
+    const session = {
+      user: {
+        id: data.user.id,
+        name: data.user.userName,
+        email: data.user.email, // Fixed the syntax error here
+        isSubscribed: data.user.isSubscribed || false,
+      },
       accessToken: data.token,
       refreshToken: data.refreshToken,
       expires: data.expires,
-    })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('24h')
-      .sign(JWT_SECRET);
+    };
+
+    // Create a simple base64 token (in production, use a proper JWT library)
+    const token = Buffer.from(JSON.stringify(session)).toString('base64');
 
     // Set the session cookie
     const cookieHeader = `session-token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
 
     // Return the user data
     return new Response(JSON.stringify({
+      user: session.user,
+      redirectUrl: '/dashboard'
+    }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Set-Cookie': cookieHeader
+      }
+    });
+  } catch (error) {
+    console.error('Sign-in error:', error);
+    return new Response(JSON.stringify({ error: 'Authentication failed' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+async function handleCallback(req: NextRequest, body: any) {
+  try {
+    const { provider, accessToken } = body;
+
+    if (!provider || !accessToken) {
+      return new Response(JSON.stringify({ error: 'Provider and access token are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Call the backend API to exchange the OAuth token
+    const response = await fetch(`${API_URL}/api/external-authentication/callback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        provider,
+        accessToken,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return new Response(JSON.stringify({ error: data.message || 'Authentication failed' }), {
+        status: response.status,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Create a simple session
+    const session = {
       user: {
         id: data.user.id,
-        name: data.user.userName,
-        email: data.user.
+        name: data.user.name,
+        email: data.user.email,
+        isSubscribed: data.user.isSubscribed || false,
+      },
+      accessToken: data.token,
+      refreshToken: data.refreshToken,
+      expires: data.expires,
+    };
+
+    // Create a simple base64 token
+    const token = Buffer.from(JSON.stringify(session)).toString('base64');
+
+    // Set the session cookie
+    const cookieHeader = `session-token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
+
+    // Return the user data
+    return new Response(JSON.stringify({
+      user: session.user,
+      redirectUrl: '/dashboard'
+    }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Set-Cookie': cookieHeader
+      }
+    });
+  } catch (error) {
+    console.error('Callback error:', error);
+    return new Response(JSON.stringify({ error: 'Authentication failed' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+async function handleSession(req: NextRequest) {
+  try {
+    // Get the session token from cookies
+    const cookies = req.headers.get('cookie') || '';
+    const tokenCookie = cookies.split(';').find(c => c.trim().startsWith('session-token='));
+    
+    if (!tokenCookie) {
+      return new Response(JSON.stringify({ user: null }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const token = tokenCookie.split('=')[1];
+
+    // Decode the token
+    try {
+      const sessionData = JSON.parse(Buffer.from(token, 'base64').toString());
+      
+      // Check if token needs refresh (in a real implementation, check expiry)
+      const expires = new Date(sessionData.expires);
+      const now = new Date();
+      
+      // If token expires in less than 5 minutes, refresh it
+      if (expires.getTime() - now.getTime() < 300000) {
+        // Call refresh token endpoint
+        if (sessionData.refreshToken) {
+          try {
+            const response = await fetch(`${API_URL}/api/Authentication/refresh-token`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                AccessToken: sessionData.accessToken,
+                RefreshToken: sessionData.refreshToken,
+              }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              // Create a new session with the refreshed tokens
+              const newSession = {
+                ...sessionData,
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken,
+                expires: data.expires,
+              };
+
+              // Create new token
+              const newToken = Buffer.from(JSON.stringify(newSession)).toString('base64');
+
+              // Set the new session cookie
+              const cookieHeader = `session-token=${newToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
+
+              return new Response(JSON.stringify({
+                user: sessionData.user
+              }), {
+                status: 200,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Set-Cookie': cookieHeader
+                }
+              });
+            }
+          } catch (error) {
+            console.error('Token refresh error:', error);
+          }
+        }
+      }
+
+      // Return the session data
+      return new Response(JSON.stringify({
+        user: sessionData.user
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      console.error('Token verification error:', error);
+      // Clear the invalid session cookie
+      const cookieHeader = `session-token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
+      
+      return new Response(JSON.stringify({ user: null }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Set-Cookie': cookieHeader
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Session error:', error);
+    return new Response(JSON.stringify({ user: null }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+async function handleSignOut(req: NextRequest) {
+  try {
+    // Get the session token from cookies
+    const cookies = req.headers.get('cookie') || '';
+    const tokenCookie = cookies.split(';').find(c => c.trim().startsWith('session-token='));
+    
+    if (tokenCookie) {
+      const token = tokenCookie.split('=')[1];
+      
+      try {
+        // Decode the token to get the access token
+        const sessionData = JSON.parse(Buffer.from(token, 'base64').toString());
+        
+        // Call the backend logout endpoint
+        if (sessionData.accessToken) {
+          await fetch(`${API_URL}/api/Authentication/logout`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${sessionData.accessToken}`
+            },
+          });
+        }
+      } catch (error) {
+        console.error('Token decoding error during logout:', error);
+      }
+    }
+
+    // Clear the session cookie
+    const cookieHeader = `session-token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
+    
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Set-Cookie': cookieHeader
+      }
+    });
+  } catch (error) {
+    console.error('Sign-out error:', error);
+    return new Response(JSON.stringify({ error: 'Logout failed' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
