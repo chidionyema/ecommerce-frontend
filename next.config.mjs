@@ -1,19 +1,18 @@
-// next.config.js
-const { withCloudflarePages } = require('@cloudflare/next-on-pages');
+// next.config.mjs
+import { withCloudflarePages } from '@cloudflare/next-on-pages';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Required for Cloudflare Pages in production
   output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
 
-  // Image configuration
   images: {
     unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'your-cdn.com' // Replace with your CDN or desired hostname
+        hostname: 'your-cdn.com'
       },
       {
         protocol: 'https',
@@ -22,11 +21,9 @@ const nextConfig = {
     ]
   },
 
-  // Header configuration
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
-    const apiUrl =
-      process.env.NEXT_PUBLIC_API_URL ||
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
       (isProduction
         ? 'https://api.ritualworks.com'
         : 'https://api.local.ritualworks.com');
@@ -65,14 +62,10 @@ const nextConfig = {
     ];
   },
 
-  // Custom Webpack configuration
   webpack: (config) => {
     const isProduction = process.env.NODE_ENV === 'production';
-
-    // Configure caching
     config.cache = isProduction ? { type: 'filesystem' } : false;
 
-    // Add CSS loaders (example)
     config.module.rules.push({
       test: /\.css$/,
       use: [
@@ -92,7 +85,6 @@ const nextConfig = {
     return config;
   },
 
-  // Experimental features
   experimental: {
     esmExternals: true,
     optimizeCss: process.env.NODE_ENV === 'production',
@@ -100,4 +92,4 @@ const nextConfig = {
   }
 };
 
-module.exports = withCloudflarePages(nextConfig);
+export default withCloudflarePages(nextConfig);
