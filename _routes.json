@@ -4,7 +4,15 @@
     "exclude": [
       "/_next/*",
       "/api/*",
-      "/static/*",
-      "/_vercel/*"
-    ]
+      "/static/*"
+    ],
+    "excludeFiles": [
+      "/404.html"
+    ],
+    "reroutes": {
+      "/*": {
+        "serve": "/index.html",
+        "status": 200
+      }
+    }
   }
