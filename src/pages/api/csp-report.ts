@@ -1,11 +1,49 @@
-export const runtime = 'experimental-edge';
-
-import { NextApiRequest, NextApiResponse } from "next";
-
-// pages/api/csp-report.ts
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (req.method === 'POST') {
-      console.error('CSP Violation:', req.body);
+// src/pages/api/csp-report.js
+export const config = {
+    runtime: 'edge',
+  };
+  
+  export default async function handler(req) {
+    if (req.method !== 'POST') {
+      return new Response(
+        JSON.stringify({ error: 'Method not allowed' }),
+        {
+          status: 405,
+          headers: {
+            'Content-Type': 'application/json',
+            'Allow': 'POST'
+          }
+        }
+      );
     }
-    res.status(200).send('');
+    
+    try {
+      // Get the report data
+      const reportData = await req.json();
+      
+      // In production, you would log this to a monitoring service
+      console.warn('CSP Violation:', JSON.stringify(reportData));
+      
+      return new Response(
+        JSON.stringify({ received: true }),
+        {
+          status: 204,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    } catch (error) {
+      console.error('Error processing CSP report:', error);
+      
+      return new Response(
+        JSON.stringify({ error: 'Failed to process report' }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    }
   }

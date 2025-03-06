@@ -1,6 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Required for Cloudflare Pages in production
@@ -63,24 +60,40 @@ const nextConfig = {
   },
 
   webpack: (config, { isServer }) => {
-    const isProduction = process.env.NODE_ENV === 'production';
-    
-    // Fallback for fs module to prevent client-side bundling errors
+    // Add Node.js polyfills and fallbacks for client-side
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
         path: false,
-        os: false
+        os: false,
+        net: false,
+        tls: false,
+        http: false,
+        https: false,
+        stream: false,
+        crypto: false,
+        zlib: false,
+        querystring: false,
+        buffer: require.resolve('buffer/'),
+        util: require.resolve('util/')
       };
+
+      // Add polyfills
+      config.plugins.push(
+        new config.webpack.ProvidePlugin({
+          Buffer: ['buffer', 'Buffer'],
+          process: 'process/browser'
+        })
+      );
     }
     
-    // Fixed: Using proper cache configuration or disabling it
-    if (isProduction) {
-      // Disable webpack cache entirely for Cloudflare builds
+    // Disable webpack cache for Cloudflare builds
+    if (process.env.NODE_ENV === 'production') {
       config.cache = false;
     }
 
+    // Fix CSS processing
     config.module.rules.push({
       test: /\.css$/,
       use: [
@@ -104,31 +117,6 @@ const nextConfig = {
     esmExternals: true,
     optimizeCss: process.env.NODE_ENV === 'production',
     scrollRestoration: true
-  },
-
-  // Route configuration generation
-  async afterBuild({ dir }) {
-    const routesConfig = {
-      version: 1,
-      include: ['/*'],
-      exclude: []
-    };
-
-    try {
-      const outputDir = path.join(dir, '.next');
-      const routesPath = path.join(outputDir, '_routes.json');
-
-      // Ensure .next directory exists
-      if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true });
-      }
-
-      // Write routes configuration
-      fs.writeFileSync(routesPath, JSON.stringify(routesConfig, null, 2));
-      console.log(`_routes.json generated in ${outputDir}`);
-    } catch (error) {
-      console.error('Failed to generate routes configuration:', error);
-    }
   }
 };
 
