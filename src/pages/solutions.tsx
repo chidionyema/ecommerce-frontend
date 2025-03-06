@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useTheme, Typography, Box, Container, Chip, useMediaQuery, Button, Grid, alpha, TextField, InputAdornment, IconButton, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { useTheme, Typography, Box, Container, Chip, useMediaQuery, Button, Grid, alpha, TextField, InputAdornment, IconButton, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import ProjectCard, { ProjectGrid } from '../components/Solutions/Projects/ProjectCard';
 import { cvProjects } from '../data/cvProjects';
@@ -19,6 +19,9 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import SchoolIcon from '@mui/icons-material/School';
+import WorkIcon from '@mui/icons-material/Work';
+import BuildIcon from '@mui/icons-material/Build';
 
 // Import the data
 import { solutionsPageData } from '../data/solutionsPageData';
@@ -42,9 +45,14 @@ export interface FilterCategory {
 // Define CategoryFilter type
 export type CategoryFilter = 'all' | 'cloud' | 'devops' | 'fintech' | 'ecommerce' | 'media';
 
+// Define SelectedFiltersType
+interface SelectedFiltersType {
+  [key: string]: string[];
+}
+
 // Map industry titles to icons
 const getIndustryIcon = (title: string): JSX.Element => {
-    const iconMap = {
+    const iconMap: Record<string, JSX.Element> = {
         "Finance": <AccountBalanceIcon sx={{ fontSize: 40 }} />,
         "Healthcare": <HealthAndSafetyIcon sx={{ fontSize: 40 }} />,
         "Retail": <ShoppingCartIcon sx={{ fontSize: 40 }} />,
@@ -52,33 +60,36 @@ const getIndustryIcon = (title: string): JSX.Element => {
         "DevOps": <CodeIcon sx={{ fontSize: 40 }} />,
         "FinTech": <AttachMoneyIcon sx={{ fontSize: 40 }} />,
         "E-commerce": <StoreIcon sx={{ fontSize: 40 }} />,
-        "Media": <PermMediaIcon sx={{ fontSize: 40 }} />
+        "Media": <PermMediaIcon sx={{ fontSize: 40 }} />,
+        "Education": <SchoolIcon sx={{ fontSize: 40 }} />,
+        "Manufacturing": <BuildIcon sx={{ fontSize: 40 }} />,
+        "Professional Services": <WorkIcon sx={{ fontSize: 40 }} />
     };
     
     return iconMap[title] || <CloudIcon sx={{ fontSize: 40 }} />;
 };
 
-// Sample FAQ items for the Solutions page
-const solutionsFaqItems = [
+// Sample FAQ items for the Case Studies page
+const caseStudiesFaqItems = [
   {
-    question: "How do you approach new solution development?",
-    answer: "We follow a comprehensive process that begins with understanding your business needs and challenges. Our team conducts thorough research, creates a strategic roadmap, develops prototypes, and iteratively refines the solution based on feedback. Throughout development, we maintain open communication and ensure that the final product aligns perfectly with your business objectives."
+    question: "How do you measure the success of your client projects?",
+    answer: "We measure success through several key metrics, including ROI, performance improvements, user adoption rates, and client satisfaction. Each case study documents concrete results such as cost reduction percentages, efficiency gains, revenue increases, or other measurable improvements that demonstrate the tangible value delivered to our clients."
   },
   {
-    question: "Can you customize solutions for specific industry requirements?",
-    answer: "Absolutely. We specialize in developing tailored solutions that address the unique challenges of different industries. Our team has extensive experience across various sectors including finance, healthcare, retail, and more. We incorporate industry-specific compliance requirements, workflows, and best practices to ensure our solutions are perfectly aligned with your specific needs."
+    question: "Do your case studies represent your typical client engagements?",
+    answer: "Our case studies showcase a diverse range of projects across different industries and technical challenges. While each client engagement is unique, these examples represent our typical approach to problem-solving, technical implementation, and client collaboration. They're selected to demonstrate both our technical capabilities and our ability to deliver measurable business results."
   },
   {
-    question: "What technologies do you typically use for solution development?",
-    answer: "We utilize a wide range of cutting-edge technologies based on the specific requirements of each project. Our technology stack includes cloud platforms (AWS, Azure, GCP), modern frontend frameworks (React, Angular, Vue), robust backend solutions (Node.js, .NET, Python), and database technologies (SQL, NoSQL). We select the most appropriate technologies to ensure optimal performance, scalability, and maintainability."
+    question: "Can I speak with the clients featured in your case studies?",
+    answer: "In many cases, yes. Subject to our clients' availability and with their prior permission, we can arrange reference calls with selected clients featured in our case studies. This allows you to hear firsthand about their experience working with us and the results achieved. Please contact us to discuss which reference clients would be most relevant to your needs."
   },
   {
-    question: "How do you ensure security in your solutions?",
-    answer: "Security is paramount in all our solutions. We implement industry-standard security practices including encryption, secure authentication methods, regular vulnerability assessments, and adherence to compliance standards such as GDPR, HIPAA, and PCI DSS where applicable. Our development process incorporates security at every stage, not just as an afterthought."
+    question: "What information is typically included in your case studies?",
+    answer: "Our case studies typically include the client's industry and background, the business challenges they faced, our approach to solving those challenges, the specific technologies and methodologies we used, the implementation process, and most importantly, the quantifiable results and benefits achieved. We focus on providing concrete metrics and outcomes whenever possible."
   },
   {
-    question: "Do you provide support after the solution is deployed?",
-    answer: "Yes, we offer comprehensive post-deployment support and maintenance services. This includes monitoring system performance, addressing any issues that arise, implementing updates, and making enhancements as your business evolves. We offer various support packages tailored to different needs, from basic technical support to full managed services."
+    question: "How long do typical projects take from start to finish?",
+    answer: "Project timelines vary significantly based on scope, complexity, and client requirements. Our case studies represent projects ranging from quick 2-3 month implementations to multi-year enterprise transformations. Each case study includes information about the project timeline, allowing you to understand our delivery capabilities for different types of engagements."
   }
 ];
 
@@ -88,22 +99,22 @@ const Solutions = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     // State for search and filtering
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedFilters, setSelectedFilters] = useState({});
-    const [sortValue, setSortValue] = useState('');
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [selectedFilters, setSelectedFilters] = useState<SelectedFiltersType>({});
+    const [sortValue, setSortValue] = useState<string>('');
     const [filteredProjects, setFilteredProjects] = useState(cvProjects);
 
     // Define filter categories
-    const filterCategories = [
+    const filterCategories: FilterCategory[] = [
         {
-            id: 'category',
-            label: 'Solution Category',
+            id: 'challenge',
+            label: 'Challenge Type',
             options: [
-                { id: 'cloud', label: 'Cloud' },
-                { id: 'devops', label: 'DevOps' },
-                { id: 'fintech', label: 'FinTech' },
-                { id: 'ecommerce', label: 'E-commerce' },
-                { id: 'media', label: 'Media' }
+                { id: 'migration', label: 'Migration & Modernization' },
+                { id: 'scalability', label: 'Scalability & Performance' },
+                { id: 'integration', label: 'Integration & APIs' },
+                { id: 'automation', label: 'Automation & DevOps' },
+                { id: 'security', label: 'Security & Compliance' }
             ],
             multiSelect: true
         },
@@ -120,7 +131,7 @@ const Solutions = () => {
             id: 'featured',
             label: 'Featured',
             options: [
-                { id: 'featured', label: 'Featured Solutions' }
+                { id: 'featured', label: 'Featured Case Studies' }
             ],
             multiSelect: false
         }
@@ -130,11 +141,13 @@ const Solutions = () => {
     const sortOptions = [
         { value: 'name_asc', label: 'Name (A-Z)' },
         { value: 'name_desc', label: 'Name (Z-A)' },
+        { value: 'recent', label: 'Most Recent' },
+        { value: 'impact', label: 'Highest Impact' },
         { value: 'featured', label: 'Featured First' }
     ];
 
     // Handle filter toggle
-    const handleFilterToggle = useCallback((categoryId, filterId) => {
+    const handleFilterToggle = useCallback((categoryId: string, filterId: string) => {
         setSelectedFilters((prev) => {
             const category = filterCategories.find((cat) => cat.id === categoryId);
             const isMultiSelect = category?.multiSelect !== false;
@@ -161,6 +174,81 @@ const Solutions = () => {
         });
     }, [filterCategories]);
 
+    // Handle sort change with proper type
+    const handleSortChange = (event: SelectChangeEvent<string>) => {
+        setSortValue(event.target.value);
+    };
+
+    // Extract timeline information to use for sorting by most recent
+    const getTimelineDate = (timeline: string): number => {
+        try {
+            // Try to extract the most recent date from timelines like "March 2023 – February 2024"
+            const dateMatch = timeline.match(/\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})\b/g);
+            if (dateMatch && dateMatch.length > 0) {
+                // Take the last match which is likely the end date
+                const lastDate = dateMatch[dateMatch.length - 1];
+                const [month, year] = lastDate.split(' ');
+                
+                const monthMap: Record<string, number> = {
+                    'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5,
+                    'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11
+                };
+                
+                return new Date(parseInt(year), monthMap[month], 1).getTime();
+            }
+            
+            // If no match, try to find any year
+            const yearMatch = timeline.match(/\d{4}/);
+            if (yearMatch) {
+                return new Date(parseInt(yearMatch[0]), 0, 1).getTime();
+            }
+        } catch (error) {
+            console.error("Error parsing timeline date:", error);
+        }
+        
+        // Default to oldest date if parsing fails
+        return 0;
+    };
+
+    // Extract impact value for sorting by impact
+    const getImpactValue = (project: typeof cvProjects[0]): number => {
+        try {
+            // Look for percentage improvements in the metrics
+            const percentageMetrics = project.metrics?.filter(m => 
+                m.value.includes('%') && !m.value.includes('-')
+            );
+            
+            if (percentageMetrics && percentageMetrics.length > 0) {
+                // Use the highest percentage as the impact score
+                const highestPercentage = Math.max(...percentageMetrics.map(m => {
+                    const match = m.value.match(/(\d+)%/);
+                    return match ? parseInt(match[1], 10) : 0;
+                }));
+                
+                return highestPercentage;
+            }
+            
+            // Alternative: check for cost savings or revenue increases
+            const costSavings = project.metrics?.find(m => 
+                m.value.includes('£') || m.value.includes('$') || m.description.toLowerCase().includes('cost')
+            );
+            
+            if (costSavings) {
+                return 50; // Assign a medium-high score for projects with cost savings
+            }
+            
+            // Check if "featured" is in tags
+            if (project.tags?.includes('featured')) {
+                return 40; // Assign a medium score for featured projects
+            }
+        } catch (error) {
+            console.error("Error calculating impact value:", error);
+        }
+        
+        // Default impact score
+        return 0;
+    };
+
     // Update filtered projects based on search, filters, and sort
     useEffect(() => {
         let result = [...cvProjects];
@@ -173,15 +261,15 @@ const Solutions = () => {
                     project.name.toLowerCase().includes(term) ||
                     project.clientName.toLowerCase().includes(term) ||
                     project.description.toLowerCase().includes(term) ||
-                    project.technologies.some(tech => tech.toLowerCase().includes(term))
+                    (project.technologies && project.technologies.some(tech => tech.toLowerCase().includes(term)))
             );
         }
 
-        // Filter by category
-        if (selectedFilters.category && selectedFilters.category.length > 0) {
+        // Filter by category/challenge
+        if (selectedFilters.challenge && selectedFilters.challenge.length > 0) {
             result = result.filter(project => 
                 project.tags?.some(tag => 
-                    selectedFilters.category.includes(tag.toLowerCase())
+                    selectedFilters.challenge.includes(tag.toLowerCase())
                 )
             );
         }
@@ -210,6 +298,22 @@ const Solutions = () => {
                 case 'name_desc':
                     result.sort((a, b) => b.name.localeCompare(a.name));
                     break;
+                case 'recent':
+                    // Sort by timeline information
+                    result.sort((a, b) => {
+                        const dateA = getTimelineDate(a.timeline);
+                        const dateB = getTimelineDate(b.timeline);
+                        return dateB - dateA; // Most recent first
+                    });
+                    break;
+                case 'impact':
+                    // Sort by our calculated impact value
+                    result.sort((a, b) => {
+                        const impactA = getImpactValue(a);
+                        const impactB = getImpactValue(b);
+                        return impactB - impactA; // Highest impact first
+                    });
+                    break;
                 case 'featured':
                     result.sort((a, b) => {
                         const aFeatured = a.tags?.includes('featured') ?? false;
@@ -229,13 +333,13 @@ const Solutions = () => {
 
     return (
         <ConsistentPageLayout
-            seoTitle="Enterprise Solutions | GLUStack"
-            seoDescription="Transform your business with custom-engineered technology solutions designed for enterprise-level challenges and growth."
-            seoKeywords="enterprise solutions, cloud architecture, DevOps, technical resources, custom technology"
-            title="Solutions"
-            subtitle="Engineered excellence for business growth"
+            seoTitle="Client Success Stories & Case Studies | GLUStack"
+            seoDescription="Explore our portfolio of successful client projects and learn how we've helped businesses across industries solve complex technical challenges."
+            seoKeywords="case studies, client success, project portfolio, technical solutions, business results"
+            title="Case Studies"
+            subtitle="Real results, real businesses"
         >
-            {/* More Concise Hero Banner */}
+            {/* Hero Banner */}
             <Box
                 sx={{
                     position: 'relative',
@@ -262,7 +366,7 @@ const Solutions = () => {
                                 mb: 2,
                             }}
                         >
-                            {solutionsPageData.hero.title}
+                            Our Client Success Stories
                         </Typography>
 
                         <Typography
@@ -274,13 +378,13 @@ const Solutions = () => {
                                 mb: 4,
                             }}
                         >
-                            {solutionsPageData.hero.subtitle}
+                            Discover how we've helped organizations overcome challenges and achieve measurable results
                         </Typography>
 
-                        {/* Simplified Search */}
+                        {/* Search and Sort */}
                         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                             <TextField
-                                placeholder="Search solutions, technologies, industries..."
+                                placeholder="Search case studies, industries, technologies..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 variant="outlined"
@@ -320,7 +424,7 @@ const Solutions = () => {
                                 <Select
                                     labelId="sort-select-label"
                                     value={sortValue}
-                                    onChange={(e) => setSortValue(e.target.value)}
+                                    onChange={handleSortChange}
                                     label="Sort By"
                                     sx={{
                                         backgroundColor: 'rgba(255,255,255,0.15)',
@@ -350,12 +454,12 @@ const Solutions = () => {
                 </Container>
             </Box>
 
-            {/* Filter Categories and Featured Solutions */}
+            {/* Filter Categories and Case Studies */}
             <PageSection>
                 <Container maxWidth="lg">
                     <Box sx={{ mb: 4 }}>
                         <Typography variant="h4" component="h2" align="center" sx={{ mb: 3 }}>
-                            Explore Our Solutions
+                            Explore Our Case Studies
                         </Typography>
                         
                         {/* Filter Chips */}
@@ -414,7 +518,7 @@ const Solutions = () => {
                                 }}
                             >
                                 <Typography variant="h6" color="text.secondary" gutterBottom>
-                                    No solutions match your criteria
+                                    No case studies match your criteria
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
                                     Try adjusting your search terms or filters to find what you're looking for.
@@ -436,7 +540,7 @@ const Solutions = () => {
                         )}
                     </Box>
 
-                    {/* Statistics Counter Section - Simplified */}
+                    {/* Statistics Counter Section */}
                     <Grid container spacing={3} sx={{ mb: 6 }}>
                         <Grid item xs={12} md={4}>
                             <Box sx={{ 
@@ -449,7 +553,7 @@ const Solutions = () => {
                                     {filteredProjects.length}
                                 </Typography>
                                 <Typography variant="subtitle1">
-                                    Total Solutions
+                                    Success Stories
                                 </Typography>
                             </Box>
                         </Grid>
@@ -499,13 +603,13 @@ const Solutions = () => {
                                 fontWeight: 600,
                             }}
                         >
-                            {solutionsPageData.showcaseSolutions.cta}
+                            Contact Us For Your Success Story
                         </Button>
                     </Box>
                 </Container>
             </PageSection>
 
-            {/* Industries Section - Simplified */}
+            {/* Industries Section */}
             <PageSection
                 sx={{
                     background: theme.palette.mode === 'dark'
@@ -518,7 +622,7 @@ const Solutions = () => {
             >
                 <Container maxWidth="lg">
                     <Typography variant="h4" component="h2" align="center" sx={{ mb: 4 }}>
-                        Industries We Empower
+                        Industries We've Transformed
                     </Typography>
 
                     <Grid container spacing={3} justifyContent="center">
@@ -566,9 +670,9 @@ const Solutions = () => {
             {/* FAQ Section */}
             <PageSection>
                 <FAQ 
-                    items={solutionsFaqItems} 
-                    title="Solutions FAQ"
-                    subtitle="Answers to common questions"
+                    items={caseStudiesFaqItems} 
+                    title="Case Studies FAQ"
+                    subtitle="Common questions about our client success stories"
                     fullWidth={false}
                     containerProps={{ maxWidth: "lg" }}
                 />

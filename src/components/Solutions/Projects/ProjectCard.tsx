@@ -1,14 +1,12 @@
-// ProjectCard.tsx - Modified to fix technology icons and CTA visibility
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Typography, CardContent, Chip, Tooltip, useTheme, alpha, Collapse, Grid, Skeleton, Badge } from '@mui/material';
-import { ArrowRightAlt, ExpandMore, ExpandLess, Star, TouchApp } from '@mui/icons-material';
+import { Box, Typography, CardContent, Chip, Tooltip, useTheme, alpha, Collapse } from '@mui/material';
+import { ArrowRightAlt, ExpandMore, ExpandLess, Star } from '@mui/icons-material';
 import GoldCard from '../../GoldCard';
 import { Code } from 'lucide-react';
 import { GradientButton } from '../../../components/GradientButton';
 import { motion } from 'framer-motion';
-import { createStyles, CARD_SIZES, hexToRgb } from './ProjectCardStyles';
 
-// Simple Project type (only what's needed)
+// Project type definition
 export interface Project {
   id: string;
   name: string;
@@ -22,49 +20,69 @@ export interface Project {
   imageUrl?: string;
   brandColor?: string;
   tags?: string[];
-  background?: string; // For gradient background
+  background?: string;
 }
 
+// Props interface for ProjectCard component
 interface ProjectCardProps {
   project: Project;
-  sx?: any;
-  gridSpacing?: number;
+  sx?: Record<string, any>;
   delay?: number;
 }
 
+// Props interface for ProjectGrid component
 interface ProjectGridProps {
   projects: Project[];
   spacing?: number;
   animate?: boolean;
 }
 
-// Main component with focus on marketing and presentation
+// Card size constants
+const CARD_SIZES = {
+  width: { xs: '320px', sm: '340px', md: '360px' },
+  height: { xs: '460px', sm: '470px', md: '480px' },
+};
+
+// Main component with improved readability and performance
 const ProjectCard: React.FC<ProjectCardProps> = ({ 
   project, 
-  sx,
-  gridSpacing = 4,
+  sx = {},
   delay = 0
 }) => {
   const theme = useTheme();
-  const cardRef = useRef<HTMLDivElement>(null); 
-  const { width: CARD_WIDTH, height: CARD_HEIGHT } = CARD_SIZES.xlarge;
+  const cardRef = useRef<HTMLDivElement>(null);
   const DefaultIcon = Code;
-  const [expanded, setExpanded] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [hovering, setHovering] = useState(false);
-  const [visible, setVisible] = useState(false);
+  const [expanded, setExpanded] = useState<boolean>(false);
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+  const [hovering, setHovering] = useState<boolean>(false);
+  const [visible, setVisible] = useState<boolean>(false);
   
   // Use correct default image path
-  const imageUrl = project.imageUrl || '/images/istockphoto-todo.jpg';
+  const imageUrl = project.imageUrl || '/images/placeholder.jpg';
   
-  // Get all styles from the style creator function
-  const styles = createStyles(theme);
-  
-  // Custom brand colors with fallback to theme colors
+  // Brand colors with fallback
   const brandColor = project.brandColor || theme.palette.primary.main;
   const brandColorLight = alpha(brandColor, 0.2);
   
-  // CSS variable for animations
+  // Animations and effects
+  const animations = {
+    float: `
+      @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+        100% { transform: translateY(0px); }
+      }
+    `,
+    shine: `
+      @keyframes shine {
+        0% { left: -100%; }
+        20% { left: 100%; }
+        100% { left: 100%; }
+      }
+    `,
+  };
+
+  // Set CSS variable for rgb color
   useEffect(() => {
     if (cardRef.current) {
       const rgbColor = hexToRgb(brandColor);
@@ -93,27 +111,23 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     return () => observer.disconnect();
   }, [delay]);
   
-  // Handle image loading - with better fallback handling
+  // Handle image loading
   useEffect(() => {
-    // Always show loading state briefly for UX consistency
     const timer = setTimeout(() => {
-      // If using a background gradient with no image, just mark as loaded
       if (project.background && !project.imageUrl) {
         setImageLoaded(true);
         return;
       }
       
-      // If we have an image URL, try to load it
       if (imageUrl) {
         const img = new Image();
         img.src = imageUrl;
         img.onload = () => setImageLoaded(true);
         img.onerror = () => {
           console.error(`Failed to load image: ${imageUrl}`);
-          setImageLoaded(true); // Still mark as loaded to avoid endless loading state
+          setImageLoaded(true);
         };
       } else {
-        // No image or background, just mark as loaded
         setImageLoaded(true);
       }
     }, 100);
@@ -121,18 +135,19 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     return () => clearTimeout(timer);
   }, [imageUrl, project.background]);
 
-  // Handle card expansion
-  const toggleExpand = (e: React.MouseEvent) => {
+  // Toggle expanded view
+  const toggleExpand = (e: React.MouseEvent<HTMLDivElement>): void => {
     e.preventDefault();
     e.stopPropagation();
     setExpanded(!expanded);
   };
 
-  // A helper function to safely render the project icon
-  const renderIcon = () => {
+  // Render icon with error handling
+  const renderIcon = (): React.ReactNode => {
     try {
       if (project.icon) {
-        return <project.icon size={24} color={project.iconColor || brandColor} />;
+        const Icon = project.icon;
+        return <Icon size={24} color={project.iconColor || brandColor} />;
       }
       return <DefaultIcon size={24} color={brandColor} />;
     } catch (error) {
@@ -141,494 +156,485 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     }
   };
 
+  // Convert hex to RGB for CSS variables
+  const hexToRgb = (hex: string): string => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+      : '75, 123, 236';
+  };
+
   return (
-    <Grid item xs={12} sm={6} md={4} lg={4} sx={{ 
-      p: 2.5,
-      display: 'flex', 
-      justifyContent: 'center',
-      mx: 'auto',
-      my: 2 
-    }}>
-      {/* Main card container with animations */}
-      <Box 
-        ref={cardRef}
-        component={motion.div}
-        initial={{ opacity: 0, y: 50 }}
-        animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-        transition={{ 
-          duration: 0.6, 
-          ease: [0.25, 0.1, 0.25, 1.0],
-          delay: delay * 0.1
+    <Box
+      ref={cardRef}
+      component={motion.div}
+      initial={{ opacity: 0, y: 30 }}
+      animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+      transition={{ 
+        duration: 0.5,
+        ease: "easeOut",
+        delay: delay * 0.1
+      }}
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        m: 2,
+        position: 'relative',
+        transition: 'transform 0.3s',
+        transform: hovering ? 'scale(1.02)' : 'scale(1)',
+      }}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+    >
+      <style>
+        {animations.float}
+        {animations.shine}
+      </style>
+      
+      <GoldCard
+        href={`/projects/${project.id}`}
+        sx={{
+          width: CARD_SIZES.width,
+          height: expanded ? 'auto' : CARD_SIZES.height,
+          p: 0,
+          overflow: 'hidden',
+          borderRadius: 3,
+          transition: 'all 0.3s ease',
+          boxShadow: hovering 
+            ? `0 20px 25px -15px ${alpha(theme.palette.common.black, 0.25)}`
+            : `0 10px 20px -10px ${alpha(theme.palette.common.black, 0.15)}`,
+          ...(project.featured && {
+            border: `1px solid ${alpha(brandColor, 0.3)}`,
+          }),
+          ...sx
         }}
-        sx={styles.cardContainer(hovering, brandColor)}
-        onMouseEnter={() => setHovering(true)}
-        onMouseLeave={() => setHovering(false)}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.98 }}
       >
-        {/* "Explore Case Study" badge - Always visible now */}
-        <Badge
-          badgeContent={
-            <Box
-              component={motion.div}
-              initial={{ opacity: 0.9, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-              sx={{
-                ...styles.badgeContent(brandColor),
-                opacity: 1, // Always visible
-              }}
-            >
-              <TouchApp sx={{ fontSize: '1.1rem', mr: 0.7 }} />
-              Explore Case Study
-            </Box>
-          }
-          sx={{
-            ...styles.badge(hovering),
-            opacity: 1, // Always visible
-          }}
-        >
-          {/* Card component */}
-          <GoldCard
-            href={`/projects/${project.id}`}
+        {/* Featured badge */}
+        {project.featured && (
+          <Box
+            component={motion.div}
+            initial={{ x: 30, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
             sx={{
-              ...styles.card(hovering, expanded, CARD_HEIGHT, project.featured, brandColor),
-              ...sx
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              zIndex: 10,
+              background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 160, 0, 0.9))',
+              color: '#000',
+              borderRadius: '20px',
+              px: 2,
+              py: 0.6,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.8,
+              boxShadow: `0 4px 10px ${alpha('#000', 0.2)}`,
             }}
           >
-            {/* Featured badge */}
-            {project.featured && (
-              <Box
-                component={motion.div}
-                initial={{ x: 50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                sx={styles.featuredBadge}
-              >
-                <Star sx={{ fontSize: '1.2rem' }} />
-                <Typography variant="caption" fontWeight={800} sx={{ fontSize: '0.9rem' }}>
-                  Featured Project
-                </Typography>
-              </Box>
-            )}
+            <Star sx={{ fontSize: '1rem' }} />
+            <Typography variant="caption" fontWeight={700} sx={{ fontSize: '0.8rem' }}>
+              Featured
+            </Typography>
+          </Box>
+        )}
 
-            {/* Image section */}
-            <Box sx={styles.imageContainer(hovering)}>
-              {/* Loading state */}
-              {!imageLoaded && (
-                <Box sx={{ width: '100%', height: '100%', position: 'relative' }}>
-                  <Skeleton 
-                    variant="rectangular" 
-                    width="100%" 
-                    height="100%" 
-                    animation="wave"
-                    sx={{ 
-                      bgcolor: alpha(brandColor, 0.15),
-                      position: 'absolute',
-                      top: 0,
-                      left: 0
-                    }} 
-                  />
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: 1.5,
-                      zIndex: 2,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: '50%',
-                        border: `3px solid ${alpha(brandColor, 0.2)}`,
-                        borderTop: `3px solid ${brandColor}`,
-                        animation: 'spin 1s linear infinite',
-                        '@keyframes spin': {
-                          '0%': { transform: 'rotate(0deg)' },
-                          '100%': { transform: 'rotate(360deg)' },
-                        }
-                      }}
-                    />
-                    <Typography variant="caption" sx={{ color: brandColor, fontWeight: 600 }}>
-                      Loading project...
-                    </Typography>
-                  </Box>
-                </Box>
-              )}
-              
-              {/* Background container */}
-              {imageLoaded && (
+        {/* Image/header section */}
+        <Box sx={{
+          height: '160px',
+          width: '100%',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Loading skeleton */}
+          {!imageLoaded && (
+            <Box sx={{ 
+              width: '100%', 
+              height: '100%', 
+              bgcolor: alpha(brandColor, 0.1),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Box
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  border: `3px solid ${alpha(brandColor, 0.2)}`,
+                  borderTop: `3px solid ${brandColor}`,
+                  animation: 'spin 1s linear infinite',
+                  '@keyframes spin': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg)' },
+                  }
+                }}
+              />
+            </Box>
+          )}
+          
+          {/* Background/image */}
+          {imageLoaded && (
+            <Box
+              sx={{
+                width: '100%',
+                height: '100%',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                background: project.background || 'transparent',
+                transition: 'transform 0.5s ease',
+                transform: hovering ? 'scale(1.05)' : 'scale(1)',
+              }}
+            >
+              {!project.background && (
                 <Box
+                  component="img"
+                  src={imageUrl}
+                  alt={project.name}
                   sx={{
                     width: '100%',
                     height: '100%',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    zIndex: 0,
-                    background: project.background || 'transparent',
-                    filter: hovering ? 'contrast(1.1) brightness(1.05)' : 'contrast(1.05) brightness(0.95)',
-                    transition: 'filter 0.5s ease',
-                  }}
-                >
-                  {/* If no background gradient is specified, use the image */}
-                  {!project.background && (
-                    <Box
-                      component="img"
-                      src={imageUrl}
-                      alt={project.name}
-                      sx={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        display: 'block',
-                        transition: 'transform 0.7s ease-in-out',
-                        transform: hovering ? 'scale(1.08)' : 'scale(1.01)',
-                      }}
-                    />
-                  )}
-                </Box>
-              )}
-              
-              {/* Client info */}
-              <Box sx={styles.clientInfoBox}>
-                <Box
-                  component={motion.div}
-                  whileHover={{ rotate: [0, -10, 0, 10, 0], transition: { duration: 0.5 } }}
-                  sx={styles.iconBox(hovering, brandColor)}
-                >
-                  {renderIcon()}
-                </Box>
-                <Typography 
-                  variant="body1" 
-                  fontWeight={800} 
-                  component={motion.div}
-                  initial={{ x: 20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  sx={{ 
-                    fontSize: '1.1rem',
-                    color: '#fff',
-                    textShadow: '0 2px 4px rgba(0,0,0,0.6)',
-                    letterSpacing: '0.4px',
-                  }}
-                >
-                  {project.clientName}
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Content section */}
-            <CardContent sx={styles.cardContent}>
-              {/* Project title */}
-              <Typography
-                variant="h5"
-                component={motion.h2}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                sx={styles.projectTitle(hovering, brandColor)}
-              >
-                {project.name}
-              </Typography>
-
-              {/* Key metrics */}
-              {project.metrics && project.metrics.length > 0 && (
-                <Box 
-                  component={motion.div}
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  sx={styles.metricsBox(hovering, brandColor)}
-                >
-                  {project.metrics.slice(0, 3).map((metric, index) => (
-                    <Tooltip 
-                      key={index} 
-                      title={metric.label} 
-                      arrow 
-                      placement="top"
-                      enterDelay={500}
-                    >
-                      <Box 
-                        component={motion.div}
-                        whileHover={{ scale: 1.08, transition: { duration: 0.2 } }}
-                        sx={styles.metricItem(hovering, index)}
-                      >
-                        <Typography 
-                          variant="h6" 
-                          sx={styles.metricValue(brandColor)}
-                        >
-                          {metric.value}
-                        </Typography>
-                        <Typography 
-                          variant="caption" 
-                          color="text.secondary" 
-                          sx={{ 
-                            fontSize: '0.82rem',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.8px',
-                            mt: 1,
-                            fontWeight: 600,
-                          }}
-                        >
-                          {metric.label.split(' ')[0]}
-                        </Typography>
-                      </Box>
-                    </Tooltip>
-                  ))}
-                </Box>
-              )}
-
-              {/* Technology stack - Updated to always show technology chips */}
-              <Box 
-                component={motion.div}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                sx={{
-                  mt: 2.5,
-                  p: 1.5,
-                  borderRadius: theme.shape.borderRadius,
-                  bgcolor: alpha(brandColor, 0.08),
-                  border: `1px solid ${alpha(brandColor, 0.12)}`,
-                  position: 'relative',
-                  display: 'block', // Always display
-                  opacity: 1, // Full opacity
-                  visibility: 'visible'
-                }}
-              >
-                <Typography 
-                  variant="caption" 
-                  fontWeight={700} 
-                  display="block" 
-                  mb={1.5}
-                  sx={{
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.8px',
-                    fontSize: '0.78rem',
-                    color: theme.palette.text.primary,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                  }}
-                >
-                  <Box 
-                    component="span" 
-                    sx={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: '50%',
-                      bgcolor: brandColor,
-                      display: 'inline-block',
-                      boxShadow: `0 0 8px ${alpha(brandColor, 0.5)}`,
-                    }}
-                  />
-                  Technology Stack
-                </Typography>
-                
-                <Box sx={{
-                  ...styles.techContainer(expanded, brandColorLight),
-                  // Override any styles that might hide this based on hover
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '8px',
-                  opacity: 1,
-                  visibility: 'visible',
-                }}>
-                  {project.technologies.map((tech, index) => (
-                    <Chip
-                      key={index}
-                      label={tech}
-                      component={motion.div}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 + 0.3 }}
-                      size="small"
-                      sx={{
-                        ...styles.techChip(brandColor),
-                        display: 'inline-flex', // Always visible
-                        opacity: 1, // Full opacity
-                      }}
-                    />
-                  ))}
-                </Box>
-                
-                {/* Expand/collapse toggle */}
-                {project.technologies.length > 5 && (
-                  <Box
-                    onClick={toggleExpand}
-                    component={motion.div}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    sx={styles.expandButton(brandColor)}
-                  >
-                    {expanded ? (
-                      <>
-                        <ExpandLess sx={{ fontSize: '1.2rem' }} />
-                        Show Less
-                      </>
-                    ) : (
-                      <>
-                        <ExpandMore sx={{ fontSize: '1.2rem' }} />
-                        Show All ({project.technologies.length}) Technologies
-                      </>
-                    )}
-                  </Box>
-                )}
-              </Box>
-
-              {/* Project description */}
-              <Box
-                component={motion.div}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-              >
-                <Collapse in={expanded} timeout="auto">
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={styles.description}
-                  >
-                    {project.description || 'No description available'}
-                  </Typography>
-                </Collapse>
-                
-                {!expanded && (
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={styles.truncatedDescription}
-                  >
-                    {project.description || 'No description available'}
-                  </Typography>
-                )}
-              </Box>
-
-              {/* CTA button - Updated to always be visible */}
-              <Box
-                component={motion.div}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                sx={{
-                  display: 'flex',
-                  mt: 'auto',
-                  pt: 1.8,
-                  justifyContent: 'center',
-                  width: '100%',
-                  position: 'relative',
-                  opacity: 1, // Always visible
-                }}
-              >
-                {/* Floating elements for visual interest */}
-                <Box sx={styles.floatingElement1(brandColor)} />
-                <Box sx={styles.floatingElement2(theme.palette.secondary.main)} />
-                
-                <GradientButton
-                  href={`/projects/${project.id}`}
-                  label="View Case Study"
-                  endIcon={
-                    <ArrowRightAlt 
-                      sx={{ 
-                        transition: 'transform 0.4s ease',
-                        transform: hovering ? 'translateX(6px)' : 'translateX(0)',
-                        fontSize: '1.4rem',
-                      }} 
-                    />
-                  }
-                  sizeVariant="medium"
-                  sx={{
-                    ...styles.ctaButton(hovering, brandColor),
-                    opacity: 1, // Always visible
-                    visibility: 'visible', // Ensure it's always visible
-                    transform: 'translateY(0)', // Prevent any transform that might hide it
+                    objectFit: 'cover',
                   }}
                 />
+              )}
+              
+              {/* Gradient overlay */}
+              <Box sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7))',
+                zIndex: 1,
+              }} />
+            </Box>
+          )}
+          
+          {/* Client info overlay */}
+          <Box sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            p: 2,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            zIndex: 2,
+            width: '100%',
+          }}>
+            <Box sx={{
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              bgcolor: alpha('#fff', 0.9),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+              border: `2px solid ${alpha(brandColor, 0.7)}`,
+            }}>
+              {renderIcon()}
+            </Box>
+            
+            <Typography 
+              variant="subtitle1"
+              sx={{
+                color: '#fff',
+                fontWeight: 700,
+                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+              }}
+            >
+              {project.clientName}
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Content section */}
+        <CardContent sx={{
+          p: 2.5,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}>
+          {/* Project title */}
+          <Typography
+            variant="h6"
+            component={motion.h2}
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            sx={{
+              fontSize: '1.2rem',
+              fontWeight: 700,
+              lineHeight: 1.3,
+              position: 'relative',
+              pb: 1.5,
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                left: 0,
+                bottom: 0,
+                width: hovering ? '70px' : '50px',
+                height: '3px',
+                bgcolor: brandColor,
+                transition: 'width 0.3s ease',
+                borderRadius: '2px',
+              }
+            }}
+          >
+            {project.name}
+          </Typography>
+
+          {/* Key metrics */}
+          {project.metrics && project.metrics.length > 0 && (
+            <Box 
+              sx={{
+                display: 'flex',
+                gap: 2,
+                justifyContent: 'space-between',
+                px: 1,
+                py: 1.5,
+                bgcolor: alpha(theme.palette.background.default, 0.5),
+                borderRadius: 1.5,
+                border: `1px solid ${alpha(brandColor, 0.1)}`,
+              }}
+            >
+              {project.metrics.slice(0, 3).map((metric, index) => (
+                <Tooltip 
+                  key={index} 
+                  title={metric.label} 
+                  arrow 
+                  placement="top"
+                >
+                  <Box 
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      flex: 1,
+                    }}
+                  >
+                    <Typography 
+                      variant="h6" 
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '1.2rem',
+                        color: brandColor,
+                      }}
+                    >
+                      {metric.value}
+                    </Typography>
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        fontSize: '0.7rem',
+                        textTransform: 'uppercase',
+                        fontWeight: 600,
+                        opacity: 0.7,
+                      }}
+                    >
+                      {metric.label.split(' ')[0]}
+                    </Typography>
+                  </Box>
+                </Tooltip>
+              ))}
+            </Box>
+          )}
+
+          {/* Project description */}
+          <Box>
+            <Collapse in={expanded} timeout="auto">
+              <Typography 
+                variant="body2" 
+                color="text.secondary" 
+                sx={{ fontSize: '0.9rem', lineHeight: 1.6 }}
+              >
+                {project.description}
+              </Typography>
+            </Collapse>
+            
+            {!expanded && (
+              <Typography 
+                variant="body2" 
+                color="text.secondary" 
+                sx={{
+                  fontSize: '0.9rem',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  lineHeight: 1.6,
+                }}
+              >
+                {project.description}
+              </Typography>
+            )}
+          </Box>
+
+          {/* Technology stack */}
+          <Box 
+            sx={{
+              mt: 1,
+              p: 1.5,
+              borderRadius: 1.5,
+              bgcolor: alpha(brandColor, 0.07),
+              border: `1px solid ${alpha(brandColor, 0.1)}`,
+            }}
+          >
+            <Typography 
+              variant="caption" 
+              fontWeight={600} 
+              display="block" 
+              mb={1}
+              sx={{
+                fontSize: '0.75rem',
+                color: theme.palette.text.secondary,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.8,
+              }}
+            >
+              <Box 
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  bgcolor: brandColor,
+                }}
+              />
+              TECHNOLOGIES
+            </Typography>
+            
+            <Box sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 0.7,
+              maxHeight: expanded ? '150px' : '70px',
+              overflow: expanded ? 'auto' : 'hidden',
+              position: 'relative',
+              '&::after': !expanded ? {
+                content: '""',
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: '25px',
+                background: `linear-gradient(to top, ${alpha(brandColorLight, 0.9)}, transparent)`,
+                pointerEvents: 'none',
+              } : {},
+            }}>
+              {project.technologies.map((tech, index) => (
+                <Chip
+                  key={index}
+                  label={tech}
+                  size="small"
+                  sx={{
+                    height: '24px',
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    bgcolor: alpha(brandColor, 0.12),
+                    color: theme.palette.text.primary,
+                    mb: 0.7,
+                    '& .MuiChip-label': { px: 1 },
+                  }}
+                />
+              ))}
+            </Box>
+            
+            {/* Show more/less button */}
+            {project.technologies.length > 5 && (
+              <Box
+                onClick={toggleExpand}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  mt: 1,
+                  color: brandColor,
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                }}
+              >
+                {expanded ? (
+                  <>
+                    <ExpandLess sx={{ fontSize: '1rem', mr: 0.5 }} />
+                    Show Less
+                  </>
+                ) : (
+                  <>
+                    <ExpandMore sx={{ fontSize: '1rem', mr: 0.5 }} />
+                    Show All ({project.technologies.length})
+                  </>
+                )}
               </Box>
-            </CardContent>
-          </GoldCard>
-        </Badge>
-      </Box>
-    </Grid>
+            )}
+          </Box>
+
+          {/* CTA button */}
+          <GradientButton
+            href={`/projects/${project.id}`}
+            label="View Case Study"
+            endIcon={
+              <ArrowRightAlt 
+                sx={{ 
+                  transition: 'transform 0.3s ease',
+                  transform: hovering ? 'translateX(4px)' : 'translateX(0)',
+                }} 
+              />
+            }
+            sizeVariant="medium"
+            sx={{
+              mt: 'auto',
+              py: 1.2,
+              fontWeight: 600,
+              borderRadius: 2,
+              background: `linear-gradient(90deg, ${brandColor}, ${alpha(brandColor, 0.8)})`,
+              boxShadow: hovering 
+                ? `0 8px 15px -5px ${alpha(brandColor, 0.5)}` 
+                : `0 5px 10px -5px ${alpha(brandColor, 0.3)}`,
+              transform: hovering ? 'translateY(-3px)' : 'translateY(0)',
+              transition: 'all 0.3s ease',
+            }}
+          />
+        </CardContent>
+      </GoldCard>
+    </Box>
   );
 };
 
-// Grid component to display multiple projects
+// ProjectGrid component with proper type definitions
 export const ProjectGrid: React.FC<ProjectGridProps> = ({ 
-  projects,
-  spacing = 4,
-  animate = true,
+  projects, 
+  spacing = 4, 
+  animate = true 
 }) => {
-  const theme = useTheme();
-  
   return (
-    <Grid 
-      container 
-      spacing={spacing}
-      component={motion.div}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
+    <Box 
       sx={{
-        mt: 3,
-        mb: 5,
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, 1fr)',
+          md: 'repeat(3, 1fr)',
+          lg: 'repeat(3, 1fr)',
+        },
+        gap: spacing,
         width: '100%',
-        '& > .MuiGrid-item': {
-          paddingTop: '0 !important',
-          padding: theme.spacing(spacing / 2)
-        }
+        mt: 4,
+        mb: 5,
       }}
     >
       {projects.map((project, index) => (
         <ProjectCard 
           key={project.id} 
           project={project} 
-          gridSpacing={spacing}
           delay={animate ? index : 0}
         />
       ))}
-    </Grid>
-  );
-};
-
-// Preview component for testing
-export const ProjectCardPreview = () => {
-  const theme = useTheme();
-  
-  const sampleProject: Project = {
-    id: 'sample-project',
-    name: 'AI-Powered Portfolio Analytics Dashboard',
-    description: 'Developed a comprehensive analytics platform for financial portfolio management with real-time data processing, advanced visualization, and AI-driven insights to optimize investment strategies.',
-    icon: Code,
-    iconColor: '#4A90E2',
-    clientName: 'FinTech Innovations',
-    metrics: [
-      { value: '67%', label: 'Performance Increase' },
-      { value: '12M', label: 'Data Points Processed' },
-      { value: '3.2s', label: 'Response Time' }
-    ],
-    technologies: ['React', 'TypeScript', 'Node.js', 'GraphQL', 'TensorFlow', 'AWS', 'Material UI', 'D3.js'],
-    featured: true,
-    imageUrl: '/images/istockphoto-todo.jpg',  // Updated to use the correct image path
-    brandColor: '#4A90E2',
-    // Example of using a gradient background - commented out to show the image
-    // background: 'linear-gradient(135deg, #1a237e, #283593)'
-  };
-
-  return (
-    <Box sx={{ p: 4, bgcolor: alpha(theme.palette.background.default, 0.6) }}>
-      <Typography variant="h4" gutterBottom fontWeight={700} sx={{ mb: 4, textAlign: 'center' }}>
-        Project Card Preview
-      </Typography>
-      <ProjectCard project={sampleProject} />
     </Box>
   );
 };
