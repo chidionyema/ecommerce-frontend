@@ -1,4 +1,7 @@
-name = "test-ecommerce-frontend" # Use a slightly different name for testing
+name = "ecommerce-frontend"
+
+[build]
+command = "npm run build"
 
 [site]
 pages_build_output_dir = ".next"
