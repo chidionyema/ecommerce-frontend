@@ -1,7 +1,0 @@
-name = "ecommerce-frontend"
-
-[build]
-command = "npm run build"
-
-[site]
-pages_build_output_dir = ".next"
