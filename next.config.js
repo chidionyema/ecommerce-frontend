@@ -75,18 +75,9 @@ const nextConfig = {
         crypto: false,
         zlib: false,
         querystring: false,
-        // Use the correct formats for polyfills
         buffer: false,
         util: false
       };
-
-      // Add polyfills
-      config.plugins.push(
-        new config.webpack.ProvidePlugin({
-          Buffer: ['buffer', 'Buffer'],
-          process: 'process/browser'
-        })
-      );
     }
     
     // Disable webpack cache for Cloudflare builds
