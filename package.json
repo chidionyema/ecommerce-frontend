@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cloudflare": "npx @cloudflare/next-on-pages"
+    "build:cloudflare": "npx @cloudflare/next-on-pages --verbose"
   },
   "engines": {
     "node": ">=20.9.0"
