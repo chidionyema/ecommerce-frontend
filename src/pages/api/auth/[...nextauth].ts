@@ -5,6 +5,15 @@ import { NextRequest } from 'next/server';
 
 const API_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://api.local.ritualworks.com';
 
+// Edge-compatible Base64 encoding/decoding
+function encodeBase64(data: string) {
+  return btoa(encodeURIComponent(data));
+}
+
+function decodeBase64(base64: string) {
+  return decodeURIComponent(atob(base64));
+}
+
 export default async function handler(req: NextRequest) {
   const url = new URL(req.url);
   const action = url.pathname.split('/').pop();
@@ -68,12 +77,12 @@ async function handleSignIn(req: NextRequest, body: any) {
       });
     }
 
-    // Create a simple session token (in a real implementation, use jose for JWT)
+    // Create a simple session object
     const session = {
       user: {
         id: data.user.id,
         name: data.user.userName,
-        email: data.user.email, // Fixed the syntax error here
+        email: data.user.email,
         isSubscribed: data.user.isSubscribed || false,
       },
       accessToken: data.token,
@@ -81,8 +90,8 @@ async function handleSignIn(req: NextRequest, body: any) {
       expires: data.expires,
     };
 
-    // Create a simple base64 token (in production, use a proper JWT library)
-    const token = Buffer.from(JSON.stringify(session)).toString('base64');
+    // Create a base64 token using edge-compatible methods
+    const token = encodeBase64(JSON.stringify(session));
 
     // Set the session cookie
     const cookieHeader = `session-token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
@@ -150,8 +159,8 @@ async function handleCallback(req: NextRequest, body: any) {
       expires: data.expires,
     };
 
-    // Create a simple base64 token
-    const token = Buffer.from(JSON.stringify(session)).toString('base64');
+    // Create a base64 token using edge-compatible methods
+    const token = encodeBase64(JSON.stringify(session));
 
     // Set the session cookie
     const cookieHeader = `session-token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
@@ -191,11 +200,11 @@ async function handleSession(req: NextRequest) {
 
     const token = tokenCookie.split('=')[1];
 
-    // Decode the token
+    // Decode the token using edge-compatible methods
     try {
-      const sessionData = JSON.parse(Buffer.from(token, 'base64').toString());
+      const sessionData = JSON.parse(decodeBase64(token));
       
-      // Check if token needs refresh (in a real implementation, check expiry)
+      // Check if token needs refresh
       const expires = new Date(sessionData.expires);
       const now = new Date();
       
@@ -225,7 +234,7 @@ async function handleSession(req: NextRequest) {
               };
 
               // Create new token
-              const newToken = Buffer.from(JSON.stringify(newSession)).toString('base64');
+              const newToken = encodeBase64(JSON.stringify(newSession));
 
               // Set the new session cookie
               const cookieHeader = `session-token=${newToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
@@ -286,7 +295,7 @@ async function handleSignOut(req: NextRequest) {
       
       try {
         // Decode the token to get the access token
-        const sessionData = JSON.parse(Buffer.from(token, 'base64').toString());
+        const sessionData = JSON.parse(decodeBase64(token));
         
         // Call the backend logout endpoint
         if (sessionData.accessToken) {

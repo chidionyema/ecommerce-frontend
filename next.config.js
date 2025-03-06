@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Platform-agnostic configuration with Cloudflare compatibility
-  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
+  // Output type for optimal Cloudflare Pages compatibility
+  output: 'standalone',
   
   // Image optimization config
   images: {
@@ -26,7 +26,7 @@ const nextConfig = {
       (isProduction
         ? 'https://api.ritualworks.com'
         : 'https://api.local.ritualworks.com');
-
+    
     const cspDirectives = [
       "default-src 'self'",
       `script-src 'self' ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''} ` +
@@ -40,11 +40,11 @@ const nextConfig = {
       "form-action 'self'",
       "frame-ancestors 'none'"
     ];
-
+    
     if (!isProduction) {
       cspDirectives.push("report-uri /api/csp-report");
     }
-
+    
     return [
       {
         source: '/(.*)',
@@ -61,7 +61,7 @@ const nextConfig = {
     ];
   },
 
-  // Polyfills for client-side
+  // Webpack configuration with polyfills for client-side
   webpack: (config, { isServer }) => {
     // Add Node.js polyfills and fallbacks for client-side
     if (!isServer) {
@@ -87,13 +87,15 @@ const nextConfig = {
     if (process.env.NODE_ENV === 'production') {
       config.cache = false;
     }
-
+    
     return config;
   },
 
   // Experimental features
   experimental: {
-    // Remove runtime configuration
+    // Disable edge runtime for problematic pages
+    runtime: 'nodejs',
+    // Other experimental features
     esmExternals: true,
     optimizeCss: process.env.NODE_ENV === 'production',
     scrollRestoration: true
