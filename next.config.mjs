@@ -1,11 +1,10 @@
-// next.config.mjs
 const isProduction = process.env.NODE_ENV === 'production';
 
 // Build the CSP dynamically
 const buildSecurityHeaders = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
     (isProduction ? 'https://api.ritualworks.com' : 'https://api.local.ritualworks.com');
-
+  
   const cspDirectives = [
     "default-src 'self'",
     `script-src 'self' ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''} ` +
@@ -19,11 +18,11 @@ const buildSecurityHeaders = () => {
     "form-action 'self'",
     "frame-ancestors 'none'"
   ];
-
+  
   if (!isProduction) {
     cspDirectives.push("report-uri /api/csp-report");
   }
-
+  
   return [
     { key: 'X-Frame-Options', value: 'DENY' },
     { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -37,6 +36,8 @@ const buildSecurityHeaders = () => {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  distDir: 'out', // This tells Next.js to build into the 'out' directory instead of '.next'
+  
   async headers() {
     return [
       {
@@ -45,7 +46,7 @@ const nextConfig = {
       }
     ];
   },
-
+  
   images: {
     unoptimized: isProduction,
     formats: ['image/avif', 'image/webp'],
@@ -60,7 +61,7 @@ const nextConfig = {
       }
     ]
   },
-
+  
   webpack: (config) => {
     // Simplified webpack cache config
     if (isProduction) {
@@ -68,7 +69,7 @@ const nextConfig = {
     } else {
       config.cache = false;
     }
-
+    
     config.module.rules.push({
       test: /\.css$/,
       use: [
@@ -84,10 +85,10 @@ const nextConfig = {
         'postcss-loader'
       ]
     });
-
+    
     return config;
   },
-
+  
   experimental: {
     esmExternals: true,
     optimizeCss: isProduction,
