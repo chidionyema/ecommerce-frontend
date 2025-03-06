@@ -1,8 +1,11 @@
+// next.config.js
+const { withCloudflarePages } = require('@cloudflare/next-on-pages');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Required for Cloudflare Pages
+  // Required for Cloudflare Pages in production
   output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
-  
+
   // Image configuration
   images: {
     unoptimized: true,
@@ -10,7 +13,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'your-cdn.com'
+        hostname: 'your-cdn.com' // Replace with your CDN or desired hostname
       },
       {
         protocol: 'https',
@@ -18,31 +21,34 @@ const nextConfig = {
       }
     ]
   },
-  
+
   // Header configuration
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
-      (isProduction ? 'https://api.ritualworks.com' : 'https://api.local.ritualworks.com');
-    
+    const apiUrl =
+      process.env.NEXT_PUBLIC_API_URL ||
+      (isProduction
+        ? 'https://api.ritualworks.com'
+        : 'https://api.local.ritualworks.com');
+
     const cspDirectives = [
       "default-src 'self'",
       `script-src 'self' ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''} ` +
-      "https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
+        "https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
       `style-src 'self' ${!isProduction ? "'unsafe-inline'" : ''} https://fonts.googleapis.com`,
       "img-src 'self' data: https://*.stripe.com https://www.google.com/recaptcha/",
       `connect-src 'self' ${apiUrl} ${!isProduction ? "http://localhost:3000 ws://localhost:3000" : ''} ` +
-      "https://checkout.stripe.com https://api.ritualworks.com",
+        "https://checkout.stripe.com https://api.ritualworks.com",
       "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://stripe.com",
       "font-src 'self' https://fonts.gstatic.com",
       "form-action 'self'",
       "frame-ancestors 'none'"
     ];
-    
+
     if (!isProduction) {
       cspDirectives.push("report-uri /api/csp-report");
     }
-    
+
     return [
       {
         source: '/(.*)',
@@ -58,18 +64,15 @@ const nextConfig = {
       }
     ];
   },
-  
-  // Webpack configuration
+
+  // Custom Webpack configuration
   webpack: (config) => {
     const isProduction = process.env.NODE_ENV === 'production';
-    
-    // Simple cache configuration
-    if (isProduction) {
-      config.cache = { type: 'filesystem' };
-    } else {
-      config.cache = false;
-    }
-    
+
+    // Configure caching
+    config.cache = isProduction ? { type: 'filesystem' } : false;
+
+    // Add CSS loaders (example)
     config.module.rules.push({
       test: /\.css$/,
       use: [
@@ -85,10 +88,10 @@ const nextConfig = {
         'postcss-loader'
       ]
     });
-    
+
     return config;
   },
-  
+
   // Experimental features
   experimental: {
     esmExternals: true,
@@ -97,4 +100,4 @@ const nextConfig = {
   }
 };
 
-export default nextConfig;
+module.exports = withCloudflarePages(nextConfig);
