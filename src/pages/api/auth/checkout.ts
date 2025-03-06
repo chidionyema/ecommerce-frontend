@@ -2,7 +2,7 @@
 import type { NextRequest } from 'next/server';
 
 // Add this line to specify Edge Runtime
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 export default async function handler(req: NextRequest) {
   if (req.method !== 'POST') {

@@ -1,5 +1,5 @@
 // File: pages/store/products/[id].tsx
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
