@@ -98,9 +98,11 @@ const nextConfig = {
         },
         vendor: {
           test: /[\\/]node_modules[\\/]/,
-          name(module) {
-            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-            return `vendor.${packageName.replace('@', '')}`;
+          name: function(module) {
+            // Fix for the error by safely checking for context and match
+            if (!module.context) return 'vendor';
+            const match = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/);
+            return match && match[1] ? `vendor.${match[1].replace('@', '')}` : 'vendor';
           },
           priority: 20
         },
