@@ -42,8 +42,9 @@ import PageSection from '../components/PageSection';
 import CardGrid from '../components/CardGrid';
 import { CARD_STYLES, getSharedStyles, SPACING } from '../utils/sharedStyles';
 import { useAuth } from '../contexts/AuthContext';
-import Confetti from 'react-confetti';
 
+// Add dynamic import at the top with other imports
+import dynamic from 'next/dynamic'
 // Import data from external file
 import {
   freeResources,
@@ -66,6 +67,14 @@ interface SectionHeaderProps {
   subtitle?: string;
   button?: React.ReactNode | null;
 }
+
+const Confetti = dynamic(
+  () => import('react-confetti'),
+  { 
+    ssr: false,
+    loading: () => null 
+  }
+);
 
 
   const SectionHeader = ({ overline, title, subtitle, button = null }: SectionHeaderProps) => {
@@ -543,7 +552,14 @@ const ResourcesPage: React.FC = () => {
       title={heroSection.title}
       subtitle={heroSection.subtitle}
     >
-      {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
+{showConfetti && (
+  <Confetti
+    recycle={false}
+    numberOfPieces={200}
+    width={typeof window !== 'undefined' ? window.innerWidth : 0}
+    height={typeof window !== 'undefined' ? window.innerHeight : 0}
+  />
+)}
 
       {/* Hero Banner Section with Search & Filter */}
       <Box
