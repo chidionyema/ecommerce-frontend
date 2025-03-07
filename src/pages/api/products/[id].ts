@@ -1,6 +1,6 @@
 // src/pages/api/products/[id].ts
 export const config = {
-  runtime: 'experimental-edge'
+  runtime: '  edge'
 };
 import { NextApiRequest, NextApiResponse } from 'next';
 
