@@ -11,10 +11,7 @@ import { ProductDto } from '../../../types/haworks.types';
 import ErrorBoundary from '../../../components/Common/ErrorBoundary';
 import ProductSkeleton from '../../../components/catalog/ProductSkeleton';
 
-export const config = {
-  runtime: 'edge',
-  regions: ['global']
-};
+
 
 interface ProductDetailPageProps {
   product: ProductDto;
