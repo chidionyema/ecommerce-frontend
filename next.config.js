@@ -11,24 +11,18 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'your-cdn.com'
-      },
-      {
-        protocol: 'https',
-        hostname: '*.stripe.com'
       }
     ],
-    // Limit maximum image size
-    deviceSizes: [640, 960, 1280],
     imageSizes: [16, 32, 48, 64]
   },
-
+  
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
       (isProduction
         ? 'https://api.ritualworks.com'
         : 'https://api.local.ritualworks.com');
-
+    
     const cspDirectives = [
       `default-src 'self'`,
       `script-src 'self' ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''} https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
@@ -40,11 +34,11 @@ const nextConfig = {
       `form-action 'self'`,
       `frame-ancestors 'none'`
     ];
-
+    
     if (!isProduction) {
       cspDirectives.push('report-uri /api/csp-report');
     }
-
+    
     return [
       {
         source: '/(.*)',
@@ -60,7 +54,7 @@ const nextConfig = {
       }
     ];
   },
-
+  
   webpack: (config, { dev, isServer }) => {
     // Node.js polyfills for client
     if (!isServer) {
@@ -73,13 +67,13 @@ const nextConfig = {
         crypto: false
       };
     }
-
+    
     // Null loader for problematic modules
     config.module.rules.push({
       test: /node_modules[\\\/](stripe|micro|iconv-lite|safer-buffer)[\\\/]/,
       use: 'null-loader',
     });
-
+    
     // Optimize chunks for Cloudflare Pages
     config.optimization = {
       minimize: true,
@@ -91,7 +85,7 @@ const nextConfig = {
         chunks: 'all',
         maxInitialRequests: 25,
         minSize: 20000,
-        maxSize: 20000000, // 20MB max chunk size
+        maxSize: 2000000, // Reduced from 20MB to 2MB
         cacheGroups: {
           default: false,
           vendors: false,
@@ -121,17 +115,21 @@ const nextConfig = {
         }
       }
     };
-
+    
     return config;
   },
-
-  // Remove experimental features to reduce build size
+  
+  // Fix for Edge Runtime warnings
   experimental: {
+    disableOptimizedLoading: true, // Added this to fix Edge Runtime warning
     optimizeCss: false
   },
+  
+  // Set React runtime to fix Edge compatibility
+  reactStrictMode: true,
   
   // Add output configuration for smaller files
   output: 'standalone'
 };
 
-module.exports = nextConfig;
+module.exports = nextConfig; 

@@ -1,6 +1,21 @@
 // src/middleware.js
 import { NextResponse } from 'next/server';
 
+// Specify NodeJS runtime instead of Edge
+export const config = {
+  runtime: 'nodejs',
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+  ],
+};
+
 // Basic security headers function
 function applySecurityHeaders(response) {
   // Security headers
@@ -27,17 +42,17 @@ function applySecurityHeaders(response) {
   return response;
 }
 
-// For Edge Runtime, use a simpler approach without Map
+// For NodeJS runtime, we can use a more efficient approach
 // This is a basic approximation - true rate limiting requires external storage
 function checkRateLimit(ip) {
-  // In Edge Runtime, we can't maintain state between requests
-  // So this is mostly a placeholder for when you implement a proper
-  // solution using KV, Durable Objects, or an external service
+  // In NodeJS runtime without persistence between requests
+  // This is mostly a placeholder for when you implement a proper
+  // solution using an external service
   return true;
 }
 
 // Main middleware function
-export async function middleware(request) {
+export default async function middleware(request) {
   // Get client IP
   const ip = request.headers.get('cf-connecting-ip') || 
              request.headers.get('x-forwarded-for') || 
@@ -58,17 +73,3 @@ export async function middleware(request) {
   // Apply security headers
   return applySecurityHeaders(response);
 }
-
-// Configure which paths this middleware runs on
-export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
-  ],
-};
