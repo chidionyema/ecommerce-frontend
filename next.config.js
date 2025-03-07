@@ -77,7 +77,7 @@ const nextConfig = {
     }
 
     if (!dev && !isServer) {
-      config.cache = false; // Disable cache for large chunk issues
+      config.cache = false;
     }
 
     config.module.rules.push({
@@ -87,35 +87,33 @@ const nextConfig = {
 
     config.optimization.splitChunks = {
       chunks: 'all',
-      minSize: 10000,
-      maxSize: 20000000,
       cacheGroups: {
-        framework: {
+        framework: {  // <--  FRAMEWORK CACHE GROUP - **UNCOMMENTED** for Test 7
           test: /[\\/]node_modules[\\/](react|react-dom|next|@next)[\\/]/,
           name: 'framework',
           priority: 40,
           enforce: true,
-        },
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name(module) {
-            if (!module.context) return 'vendor';
-            const match = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/);
-            return match && match[1] ? `vendor.${match[1].replace('@', '')}` : 'vendor';
-          },
-          priority: 20,
-        },
-        default: {
-          minChunks: 2,
-          priority: 10,
-          reuseExistingChunk: true,
-        },
+        },                      // <--  FRAMEWORK CACHE GROUP - **UNCOMMENTED** for Test 7
+        vendor: {              // <--  VENDOR CACHE GROUP - **COMMENTED OUT**
+          // test: /[\\/]node_modules[\\/]/,
+          // name(module) {
+          //   if (!module.context) return 'vendor';
+          //   const match = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/);
+          //   return match && match[1] ? `vendor.${match[1].replace('@', '')}` : 'vendor';
+          // },
+          // priority: 20,
+        },                     // <--  VENDOR CACHE GROUP - **COMMENTED OUT**
+        default: {             // <--  DEFAULT CACHE GROUP - **COMMENTED OUT**
+          // minChunks: 2,
+          // priority: 10,
+          // reuseExistingChunk: true,
+        },                    // <--  DEFAULT CACHE GROUP - **COMMENTED OUT**
       },
     };
 
-    if (!dev && !isServer) {
-      config.cache = false;
-    }
+    // if (!dev && !isServer) {
+    //   config.cache = false;
+    // }
 
     return config;
   },

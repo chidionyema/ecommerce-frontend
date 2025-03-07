@@ -1,11 +1,13 @@
 'use client';
 
 import React, { ReactElement, ReactNode, useRef, useState } from 'react';
-import { Typography, useTheme, Box, type SxProps, type Theme } from '@mui/material';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { styled } from '@mui/system';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { Typography, useTheme, Box } from '@mui/material';
+import { Theme, SxProps } from '@mui/material/styles';
 import { alpha } from '@mui/material/styles';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
+
+import { styled } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const GLASS_OPACITY = 0.07;
 const GLASS_BLUR = '12px';
@@ -22,6 +24,7 @@ export interface TechCardProps {
   blurAmount?: string;
   opacityLevel?: number;
 }
+
 
 const NumberedCircle = ({ number, theme, accentColor }: { 
   number: number; 

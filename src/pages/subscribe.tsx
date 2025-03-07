@@ -1,4 +1,5 @@
 // src/pages/subscribe.tsx
+'use client';
 import React, { useEffect, useState } from 'react';
 import {
   Box,

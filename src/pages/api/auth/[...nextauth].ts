@@ -1,5 +1,5 @@
 // Edge-compatible Auth API implementation
-export const runtime = 'edge';
+
 
 import { NextRequest } from 'next/server';
 

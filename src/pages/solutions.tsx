@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTheme, Typography, Box, Container, Chip, useMediaQuery, Button, Grid, alpha, TextField, InputAdornment, IconButton, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';

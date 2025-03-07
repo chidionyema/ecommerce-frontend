@@ -56,16 +56,7 @@ class MyDocument extends Document {
             httpEquiv="Referrer-Policy"
             content="strict-origin-when-cross-origin"
           />
-          {/*
-            Remove the following CSP meta tag.
-            It conflicts with the CSP header defined in next.config.js.
-          */}
-          {/*
-          <meta
-            httpEquiv="Content-Security-Policy"
-            content="default-src 'self' https://js.stripe.com https://www.google.com https://www.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.google.com https://www.googletagmanager.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.local.ritualworks.com; frame-src 'self' https://js.stripe.com https://www.google.com https://www.gstatic.com;"
-          />
-          */}
+     
         </Head>
         <body>
           <Main />

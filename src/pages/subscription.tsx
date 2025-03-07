@@ -1,4 +1,6 @@
-import { useState } from 'react';
+
+'use client';
+
 import Head from 'next/head';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 import PricingTable from '../components/subscription/PricingTable';
