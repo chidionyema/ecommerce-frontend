@@ -83,12 +83,10 @@ const nextConfig = {
         stream: false,
         crypto: false
       };
-
       config.optimization.splitChunks = {
         chunks: 'all',
-        maxInitialRequests: Infinity,
         minSize: 20000,
-        maxSize: 20000000,
+        maxSize: 25000000, // 25 MB maximum per chunk
         cacheGroups: {
           vendor: {
             test: /[\\/]node_modules[\\/]/,
@@ -96,19 +94,19 @@ const nextConfig = {
               const match = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/);
               return match ? `npm.${match[1].replace('@', '')}` : 'vendor';
             },
-            priority: 10,
+            priority: 10
           },
           default: {
             minChunks: 2,
             priority: -20,
-            reuseExistingChunk: true,
-          },
-        },
+            reuseExistingChunk: true
+          }
+        }
       };
     }
-
     return config;
   },
+
 
   // Experimental features (carefully selected)
   experimental: {
