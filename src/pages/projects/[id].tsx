@@ -1,8 +1,6 @@
 
 
-export const config = {
-   runtime: 'experimental-edge' 
-};
+
 
 import { useParams, useRouter } from 'next/navigation';
 import { useMemo, useRef, useState, useEffect } from 'react';

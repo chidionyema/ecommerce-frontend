@@ -1,7 +1,5 @@
 // File: pages/api/webhook.ts
-export const config = {
 
-  };
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';

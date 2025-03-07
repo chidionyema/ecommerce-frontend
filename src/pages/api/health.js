@@ -1,7 +1,5 @@
 // src/pages/api/health.js
-export const config = {
-,
-  };
+
   
   export default function handler(req) {
     return new Response(

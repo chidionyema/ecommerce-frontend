@@ -1,7 +1,4 @@
 // Edge-compatible Auth API implementation
-export const config = {
-   runtime: 'experimental-edge' 
-};
 
 import { NextRequest } from 'next/server';
 

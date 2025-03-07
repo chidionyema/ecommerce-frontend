@@ -1,7 +1,5 @@
 // src/pages/api/csp-report.ts
-export const config = {
 
-  };
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextRequest, NextResponse } from 'next/server';
