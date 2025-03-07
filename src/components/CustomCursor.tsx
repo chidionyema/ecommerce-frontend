@@ -1,3 +1,5 @@
+'use client';  // Add this at the top
+
 import React, { useEffect, useState } from 'react';
 
 const CustomCursor: React.FC = () => {

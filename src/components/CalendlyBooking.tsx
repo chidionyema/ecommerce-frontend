@@ -1,4 +1,5 @@
  // components/CalendlyBooking.tsx
+ 'use client';  // Add this at the top
 import { useState, useEffect, useCallback } from 'react';
 import { Box, Dialog, IconButton, CircularProgress } from '@mui/material';
 import { Close } from '@mui/icons-material';

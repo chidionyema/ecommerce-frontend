@@ -7,7 +7,6 @@ import { styled } from '@mui/system';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { alpha } from '@mui/material/styles';
 
-// Glass morphism effect constants
 const GLASS_OPACITY = 0.07;
 const GLASS_BLUR = '12px';
 
@@ -16,7 +15,7 @@ export interface TechCardProps {
   title: string;
   index?: number;
   children?: ReactNode;
-  sx?: SxProps<Theme>; // Using the Material-UI Theme type
+  sx?: SxProps<Theme>;
   accentColor?: string;
   category?: string;
   importance?: 'primary' | 'secondary' | 'tertiary';
@@ -24,7 +23,6 @@ export interface TechCardProps {
   opacityLevel?: number;
 }
 
-// Enhanced NumberedCircle with interactive elements
 const NumberedCircle = ({ number, theme, accentColor }: { 
   number: number; 
   theme: Theme;
@@ -55,7 +53,6 @@ const NumberedCircle = ({ number, theme, accentColor }: {
           overflow: 'hidden',
         }}
       >
-        {/* Subtle circular pulse animation */}
         <Box
           component={motion.div}
           animate={{
@@ -95,13 +92,11 @@ const NumberedCircle = ({ number, theme, accentColor }: {
   );
 };
 
-// Define interface for the GlassBackdrop props
 interface GlassBackdropProps {
   blurAmount?: string;
   opacityLevel?: number;
 }
 
-// Glass effect backdrop with customizable blur and opacity
 const GlassBackdrop = styled(Box, {
   shouldForwardProp: (prop) => !['blurAmount', 'opacityLevel'].includes(prop as string)
 })<GlassBackdropProps>(({ theme, blurAmount = GLASS_BLUR, opacityLevel = GLASS_OPACITY }) => ({
@@ -119,7 +114,6 @@ const GlassBackdrop = styled(Box, {
   zIndex: -1,
 }));
 
-// Shine effect for light mode cards
 const ShineEffect = styled(motion.div)({
   position: 'absolute',
   top: 0,
@@ -132,7 +126,6 @@ const ShineEffect = styled(motion.div)({
   zIndex: 1,
 });
 
-// Category label component
 const CategoryLabel = ({ category, theme }: { category: string; theme: Theme }) => (
   <Box
     sx={{
@@ -155,17 +148,14 @@ const CategoryLabel = ({ category, theme }: { category: string; theme: Theme }) 
   </Box>
 );
 
-// Define interface for StyledTechCard props
 interface StyledTechCardProps {
   importance?: 'primary' | 'secondary' | 'tertiary';
   accentColor?: string;
 }
 
-// Styled TechCard with premium glass morphism and depth effects
 const StyledTechCard = styled(motion.div, {
   shouldForwardProp: (prop) => !['importance', 'accentColor'].includes(prop as string)
 })<StyledTechCardProps>(({ theme, importance, accentColor }) => {
-  // Get the color based on importance
   const getImportanceStyles = () => {
     switch(importance) {
       case 'primary':
@@ -232,6 +222,9 @@ const StyledTechCard = styled(motion.div, {
     '&:hover::after': {
       height: '15px',
     },
+    '@media (maxWidth:599.95px)': { // Fixed media query syntax
+      padding: theme.spacing(3),
+    }
   };
 });
 
@@ -254,7 +247,6 @@ const TechCard: React.FC<TechCardProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
-  // Animation variants for better organization
   const cardVariants = {
     hidden: { opacity: 0, y: 80, scale: 0.8 },
     visible: { 
@@ -287,7 +279,6 @@ const TechCard: React.FC<TechCardProps> = ({
     }
   };
 
-  // Trigger shine effect on hover
   const triggerShine = () => {
     if (!isMobile && theme.palette.mode === 'light') {
       return {
@@ -310,16 +301,14 @@ const TechCard: React.FC<TechCardProps> = ({
       whileTap="tap"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      style={sx as any} // Use style prop instead of sx for the motion.div
+      sx={sx} // Corrected prop usage
       {...rest}
     >
-      {/* Glass morphism backdrop */}
       <GlassBackdrop 
         blurAmount={isHovered ? '16px' : blurAmount || GLASS_BLUR}
         opacityLevel={isHovered ? (opacityLevel || GLASS_OPACITY) + 0.03 : opacityLevel || GLASS_OPACITY} 
       />
       
-      {/* Shine effect for light mode */}
       {theme.palette.mode === 'light' && (
         <AnimatePresence>
           {isHovered && (
@@ -332,10 +321,8 @@ const TechCard: React.FC<TechCardProps> = ({
         </AnimatePresence>
       )}
       
-      {/* Category label if provided */}
       {category && <CategoryLabel category={category} theme={theme} />}
       
-      {/* Card content with animations */}
       <Box className="card-content" sx={{ transition: 'transform 0.5s ease', zIndex: 2 }}>
         {index > 0 && (
           <NumberedCircle number={index} theme={theme} accentColor={accentColor} />

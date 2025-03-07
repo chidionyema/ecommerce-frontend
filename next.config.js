@@ -1,11 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Core settings
   distDir: '.next',
-  staticPageGenerationTimeout: 180,
   productionBrowserSourceMaps: false,
+  staticPageGenerationTimeout: 180,
 
-  // Image configuration
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
@@ -20,7 +18,6 @@ const nextConfig = {
     ]
   },
 
-  // Security headers configuration
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
@@ -56,21 +53,18 @@ const nextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {
             key: 'Content-Security-Policy',
-            value: cspDirectives
-              .join('; ')
-              .replace(/\s+/g, ' ')
-              .trim()
+            value: cspDirectives.join('; ').replace(/\s+/g, ' ').trim(),
           }
         ]
       }
     ];
   },
 
-  // Webpack configuration optimized for Cloudflare
   webpack: (config, { dev, isServer }) => {
-    if (!dev && !isServer) {
-      config.cache = false; // Disable Webpack cache in production
+    if (isServer) {
+      config.output.globalObject = 'this';
     }
+
     if (!isServer) {
       config.resolve.fallback = {
         fs: false,
@@ -81,52 +75,51 @@ const nextConfig = {
         crypto: false
       };
     }
-    
-    // Prevent server-side errors by properly marking node modules for client-only use
-    config.module = config.module || {};
-    config.module.rules = config.module.rules || [];
-    
-    // Add a rule to handle certain packages as client-only
+
+    if (!dev && !isServer) {
+      config.cache = false; // Disable cache for large chunk issues
+    }
+
     config.module.rules.push({
       test: /node_modules[\\\/](stripe|micro|iconv-lite|safer-buffer)[\\\/]/,
       use: 'null-loader',
-      include: [/node_modules/],
-      exclude: [/[\\/]node_modules[\\/]next[\\/]/],
     });
-    
-    // Split chunks for both client and server
+
     config.optimization.splitChunks = {
       chunks: 'all',
       minSize: 10000,
-      maxSize: 20000000, // 20MB to be safe
+      maxSize: 20000000,
       cacheGroups: {
         framework: {
           test: /[\\/]node_modules[\\/](react|react-dom|next|@next)[\\/]/,
           name: 'framework',
           priority: 40,
+          enforce: true,
         },
         vendor: {
           test: /[\\/]node_modules[\\/]/,
-          name: function(module) {
-            // Safe check for context
+          name(module) {
             if (!module.context) return 'vendor';
             const match = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/);
             return match && match[1] ? `vendor.${match[1].replace('@', '')}` : 'vendor';
           },
-          priority: 20
+          priority: 20,
         },
         default: {
           minChunks: 2,
           priority: 10,
-          reuseExistingChunk: true
-        }
-      }
+          reuseExistingChunk: true,
+        },
+      },
     };
-    
+
+    if (!dev && !isServer) {
+      config.cache = false;
+    }
+
     return config;
   },
 
-  // Experimental features
   experimental: {
     optimizeCss: true
   }

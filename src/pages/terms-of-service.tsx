@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Mail, ChevronUp } from 'lucide-react';
 import { Container, Box, Typography, Button, Grid, Link, useTheme } from '@mui/material';
