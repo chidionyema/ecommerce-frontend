@@ -1,19 +1,19 @@
 'use client';
 
 import Head from 'next/head';
-import { Box, Typography, useTheme, Divider } from '@mui/material'; 
-import LandingPageLayout from '../components/Shared/LandingPageLayout';
-import TechnologyShowcase from '../components/Home/TechnologyShowcase';
-import ServicesGrid from '../components/Common/ServicesGrid';
-import TestimonialsSection from '../components/Common/TestimonialsSection';
-import WhyChooseUs from '../components/Common/WhyChooseUs';
-import Hero from '../components/Home/Hero';
-import CTASection from '../components/Home/CTASection';
+import { Box } from '@mui/material'; 
+import dynamic from 'next/dynamic';
 import { SPACING } from '../utils/sharedStyles';
 
-export default function HomePage() {
-  const theme = useTheme();
+// Dynamically import components to avoid SSR issues
+const TechnologyShowcase = dynamic(() => import('../components/Home/TechnologyShowcase'), { ssr: false });
+const ServicesGrid = dynamic(() => import('../components/Common/ServicesGrid'), { ssr: false });
+const TestimonialsSection = dynamic(() => import('../components/Common/TestimonialsSection'), { ssr: false });
+const WhyChooseUs = dynamic(() => import('../components/Common/WhyChooseUs'), { ssr: false });
+const Hero = dynamic(() => import('../components/Home/Hero'), { ssr: false });
+const CTASection = dynamic(() => import('../components/Home/CTASection'), { ssr: false });
 
+export default function HomePage() {
   return (
     <div>
       <Head>

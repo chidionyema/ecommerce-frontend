@@ -1,11 +1,15 @@
 'use client';
 
-import { Box, Container, Typography, Grid, useTheme, alpha, Button } from '@mui/material';
+import { Box, Container, Typography, Grid, useTheme, Button } from '@mui/material';
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
-import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
-import TechCard from '../Common/TechCard';
+import { useRef } from 'react';
+import { SPACING } from '../../utils/sharedStyles';
+import { alpha } from '@mui/material/styles';
+import dynamic from 'next/dynamic';
 import { SiAmazonaws, SiMicrosoftazure, SiDocker, SiKubernetes, SiTerraform, SiReact, SiNextdotjs, SiDotnet } from 'react-icons/si';
+
+// Dynamic import of TechCard to avoid SSR issues
+const TechCard = dynamic(() => import('../Common/TechCard'), { ssr: false });
 
 // Enhanced tech icons with enterprise-focused descriptions
 const enhancedTechIcons = [
@@ -61,7 +65,6 @@ const enhancedTechIcons = [
 
 const TechnologyShowcase = () => {
   const theme = useTheme();
-  const styles = getSharedStyles(theme);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
@@ -122,7 +125,6 @@ const TechnologyShowcase = () => {
               component="h2"
               align="center"
               sx={{
-                ...styles.pageTitle,
                 color: 'white',
                 mb: 2,
                 fontWeight: 700,
@@ -193,7 +195,7 @@ const TechnologyShowcase = () => {
                   <TechCard
                     icon={tech.icon}
                     title={tech.title}
-                    index={index}
+                    accentColor={tech.color}
                     sx={{
                       height: '100%', // Full height
                       display: 'flex',
