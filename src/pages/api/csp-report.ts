@@ -1,6 +1,6 @@
 // src/pages/api/csp-report.ts
 export const config = {
-     runtime: 'experimental-edge' 
+
   };
 
 import { NextApiRequest, NextApiResponse } from 'next';

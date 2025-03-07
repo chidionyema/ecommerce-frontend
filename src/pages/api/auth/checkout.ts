@@ -1,7 +1,5 @@
 // pages/api/auth/checkout.ts
-export const config = {
-     runtime: 'experimental-edge' 
-  };
+
 import type { NextRequest } from 'next/server';
 
 // Add this line to specify Edge Runtime
