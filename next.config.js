@@ -130,9 +130,9 @@ const nextConfig = {
       use: require.resolve('null-loader')
     });
 
-    // Using null-loader for large modules
+    // Using null-loader for specific large modules, but not framer-motion
     config.module.rules.push({
-      test: /node_modules[\\\/](stripe|micro|@stripe|react-confetti|framer-motion)/,
+      test: /node_modules[\\\/](stripe|micro|@stripe|react-confetti)/,
       use: 'null-loader',
     });
 
