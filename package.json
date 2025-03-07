@@ -7,10 +7,10 @@
     "dev:debug": "NODE_OPTIONS='--inspect' node -r ./path-guard.js ./node_modules/.bin/next dev",
     "dev:clean": "rm -rf .next && next dev",
     "build": "ANALYZE=true next build",
+    "build:cloudflare": "next build && npx @cloudflare/next-on-pages@1",
     "dev": "NODE_OPTIONS='--inspect' next dev",
     "start": "next start",
-    "lint": "next lint",
-    "build:cloudflare": "next build && cp _routes.json .next/"
+    "lint": "next lint"
   },
   "engines": {
     "node": ">=20.9.0"
