@@ -1,16 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Core configuration for Cloudflare deployment
-  output: 'standalone',
-  swcMinify: true,
-  serverExternalPackages: ['stripe', 'micro'],
+  // Change to export mode which is more compatible with Cloudflare
+  output: 'export',
   
-  // Optimized build settings
+  // Core settings
+  swcMinify: true,
   distDir: '.next',
   staticPageGenerationTimeout: 180,
   productionBrowserSourceMaps: false,
 
-  // Image handling configuration
+  // Image configuration
   images: {
     unoptimized: true,
     formats: ['image/avif', 'image/webp'],
@@ -72,8 +71,9 @@ const nextConfig = {
     ];
   },
 
-  // Optimized Webpack configuration
+  // Webpack configuration optimized for Cloudflare
   webpack: (config, { isServer }) => {
+    // Client-side configuration
     if (!isServer) {
       config.resolve.fallback = {
         fs: false,
@@ -83,46 +83,41 @@ const nextConfig = {
         stream: false,
         crypto: false
       };
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        minSize: 20000,
-        maxSize: 25000000, // 25 MB maximum per chunk
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name(module) {
-              const match = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/);
-              return match ? `npm.${match[1].replace('@', '')}` : 'vendor';
-            },
-            priority: 10
-          },
-          default: {
-            minChunks: 2,
-            priority: -20,
-            reuseExistingChunk: true
-          }
-        }
-      };
     }
+
+    // Split chunks for both client and server
+    config.optimization.splitChunks = {
+      chunks: 'all',
+      minSize: 10000,
+      maxSize: 20000000, // 20MB to be safe (below 25MB limit)
+      cacheGroups: {
+        framework: {
+          test: /[\\/]node_modules[\\/](react|react-dom|next|@next)[\\/]/,
+          name: 'framework',
+          priority: 40,
+        },
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name(module) {
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            return `vendor.${packageName.replace('@', '')}`;
+          },
+          priority: 20
+        },
+        default: {
+          minChunks: 2,
+          priority: 10,
+          reuseExistingChunk: true
+        }
+      }
+    };
+    
     return config;
   },
 
-
-  // Experimental features (carefully selected)
+  // Experimental features (minimal)
   experimental: {
-    optimizeCss: true,
-    scrollRestoration: true,
-    esmExternals: true
-  },
-
-  // Environment configuration
-  env: {
-    NEXT_PUBLIC_APP_ENV: process.env.NODE_ENV || 'development',
-  },
-
-  // Empty redirects by default
-  async redirects() {
-    return [];
+    optimizeCss: true
   }
 };
 

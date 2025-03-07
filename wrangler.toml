@@ -1,41 +1,5 @@
 name = "ecommerce-frontend"
-main = ".next/server/index.js"
 compatibility_date = "2025-03-06"
-
-[build]
-command = "npm run build:cloudflare"
-
-[build.upload]
-format = "service-worker"
 
 [site]
 bucket = ".next"
-
-[site.build]
-upload.format = "service-worker"
-pages_build_output_dir = ".next"
-
-[env.production]
-workers_dev = true
-
-# Configure browser caching
-[site.headers]
-"/*" = [
-  { key = "Cache-Control", value = "public, max-age=3600" }
-]
-
-"/*.js" = [
-  { key = "Cache-Control", value = "public, max-age=31536000, immutable" }
-]
-
-"/*.css" = [
-  { key = "Cache-Control", value = "public, max-age=31536000, immutable" }
-]
-
-"/images/*" = [
-  { key = "Cache-Control", value = "public, max-age=31536000, immutable" }
-]
-
-# KV Namespace binding if needed
-# [kv_namespaces]
-# my_namespace = { binding = "MY_NAMESPACE", id = "YOUR_KV_NAMESPACE_ID" }
