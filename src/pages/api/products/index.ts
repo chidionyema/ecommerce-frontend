@@ -1,4 +1,7 @@
 // src/pages/api/products/index.ts
+export const config = {
+  runtime: 'edge'
+};
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const API_BASE_URL = process.env.API_BASE_URL || 'https://api.haworks.com';

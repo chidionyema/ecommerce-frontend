@@ -1,4 +1,7 @@
 // src/pages/api/[[...path]].ts
+export const config = {
+  runtime: 'edge'
+};
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextRequest, NextResponse } from 'next/server';
 
