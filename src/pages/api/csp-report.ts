@@ -1,6 +1,6 @@
 // src/pages/api/csp-report.ts
 export const config = {
-    runtime: 'edge'
+    runtime: 'experimental-edge'
   };
 
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Use default Node.js runtime for now to troubleshoot
 // export const config = {
-//   runtime: 'edge',
+//   runtime: 'experimental-edge',
 // };
 
 export default async function handler(
