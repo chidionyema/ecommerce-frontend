@@ -1,7 +1,7 @@
 // File: pages/store/products/[id].tsx
 export const config = {
   runtime: 'edge'
-};s
+};
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
