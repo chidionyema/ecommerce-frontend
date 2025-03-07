@@ -1,40 +1,40 @@
 /** @type {import('next').NextConfig} */
 const path = require('path');
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 const nextConfig = {
-  // Set output for Cloudflare compatibility
-  output: 'export',
-  
-  // Disable browser source maps to reduce bundle size
+  output: 'standalone',
   productionBrowserSourceMaps: false,
-  
-  // Enable compression for Cloudflare
   compress: true,
-
-  // Images configuration for Cloudflare
+  
+  // Enable Next.js image optimization
   images: {
-    unoptimized: true,
-    formats: ['image/webp'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'your-cdn.com'
-      }
-    ],
-    imageSizes: [16, 32, 48, 64]
+    formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    minimumCacheTTL: 60,
   },
   
-  // Security headers configuration with environment awareness
+  // Font optimization
+  optimizeFonts: true,
+  
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
-      (isProduction
-        ? 'https://api.ritualworks.com'
-        : 'https://api.local.ritualworks.com');
+      (isProduction ? 'https://api.ritualworks.com' : 'https://api.local.ritualworks.com');
+    
+    // Generate a nonce for inline scripts in production
+    const generateNonce = () => {
+      return isProduction ? `'nonce-${Buffer.from(crypto.randomBytes(16)).toString('base64')}'` : '';
+    };
+    
+    const scriptNonce = generateNonce();
     
     const cspDirectives = [
       `default-src 'self'`,
-      `script-src 'self' ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''} https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
+      `script-src 'self' ${scriptNonce} ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''} https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
       `style-src 'self' ${!isProduction ? "'unsafe-inline'" : ''} https://fonts.googleapis.com`,
       `img-src 'self' data: https://*.stripe.com https://www.google.com/recaptcha/`,
       `connect-src 'self' ${apiUrl} ${!isProduction ? 'http://localhost:3000 ws://localhost:3000' : ''} https://checkout.stripe.com https://api.ritualworks.com`,
@@ -55,40 +55,49 @@ const nextConfig = {
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          {
-            key: 'Content-Security-Policy',
-            value: cspDirectives.join('; ').trim(),
-          }
+          { key: 'Content-Security-Policy', value: cspDirectives.join('; ').trim() },
+          // Add Font preload headers
+          { key: 'Link', value: '<https://fonts.googleapis.com>; rel=preconnect' },
+          { key: 'Link', value: '<https://fonts.gstatic.com>; rel=preconnect; crossorigin' }
         ]
       }
     ];
   },
 
-  // Webpack configuration optimized for Cloudflare
-  webpack: (config, { isServer }) => {
-    // Split chunks more aggressively to reduce bundle size
-    if (!isServer) {
+  webpack: (config, { isServer, dev }) => {
+    // Server-specific optimizations
+    if (isServer) {
+      // Disable chunk generation for server
+      config.optimization.splitChunks = {
+        cacheGroups: { default: false }
+      };
+    } else {
+      // Client-side chunk optimization
       config.optimization.splitChunks = {
         chunks: 'all',
         maxInitialRequests: 25,
         minSize: 20000,
-        maxSize: 1000000, // 1MB max chunk size for Cloudflare
+        maxSize: 1000000,
         cacheGroups: {
           react: {
             test: /[\\/]node_modules[\\/](react|react-dom|scheduler)/,
             name: 'react-core',
             priority: 50
           },
+          mui: {
+            test: /[\\/]node_modules[\\/](@mui|@emotion)/,
+            name: 'mui-core',
+            priority: 45
+          },
           next: {
             test: /[\\/]node_modules[\\/](next|@next)/,
             name: 'next-core',
             priority: 40
           },
-          framework: {
-            test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
-            name: 'framework',
-            priority: 30,
-            chunks: 'all',
+          ui: {
+            test: /[\\/]node_modules[\\/](@headlessui|@heroicons|@radix-ui)/,
+            name: 'ui-libs',
+            priority: 35
           },
           vendors: {
             test: /[\\/]node_modules[\\/]/,
@@ -102,6 +111,31 @@ const nextConfig = {
           }
         }
       };
+      
+      // Enhanced tree-shaking for production
+      if (!dev) {
+        config.optimization.usedExports = true;
+        config.optimization.sideEffects = true;
+        
+        // Terser optimization options
+        if (config.optimization.minimizer) {
+          const terserIndex = config.optimization.minimizer.findIndex(
+            minimizer => minimizer.constructor.name === 'TerserPlugin'
+          );
+          
+          if (terserIndex >= 0) {
+            config.optimization.minimizer[terserIndex].options.terserOptions = {
+              ...config.optimization.minimizer[terserIndex].options.terserOptions,
+              compress: {
+                ...config.optimization.minimizer[terserIndex].options.terserOptions?.compress,
+                drop_console: true,
+                pure_funcs: ['console.debug', 'console.info', 'console.log'],
+              },
+              mangle: true
+            };
+          }
+        }
+      }
     }
 
     // Critical size limits
@@ -122,17 +156,20 @@ const nextConfig = {
       };
     }
 
-    // Add proper null-loader
+    // Add null-loader for problematic/large modules
     config.module.rules.push({
       test: /next[\\/]dist[\\/]esm[\\/]server[\\/]use-cache/,
       use: require.resolve('null-loader')
     });
 
-    // Also handle other problematic modules
+    // Use dynamic imports instead of null-loader for large modules
+    // Commented out null-loader approach
+    /*
     config.module.rules.push({
-      test: /node_modules[\\\/](stripe|micro|iconv-lite|safer-buffer)[\\\/]/,
+      test: /node_modules[\\\/](stripe|micro|@stripe|react-confetti|framer-motion)/,
       use: 'null-loader',
     });
+    */
 
     // Fix crypto polyfill
     config.resolve.alias = {
@@ -149,23 +186,28 @@ const nextConfig = {
     'bufferutil',
     'utf-8-validate',
     'sharp',
-    'aws-sdk'
+    '@prisma/client',
+    'next/dist/compiled/etag',
+    'next/dist/server/lib/squoosh',
+    'next/dist/server/image-optimizer'
   ],
   
-  // Cloudflare-specific optimizations
   experimental: {
     optimizeCss: true,
-    disableOptimizedLoading: process.env.NODE_ENV === 'development'
+    disableOptimizedLoading: process.env.NODE_ENV === 'development',
+    // Enable Incremental Static Regeneration features
+    isrMemoryCacheSize: 50,
+    isrFlushToDisk: true
   },
   
-  // Handle trailing slash for Cloudflare Pages
   trailingSlash: true,
-  
-  // Set React runtime to fix Edge compatibility
   reactStrictMode: true,
+  staticPageGenerationTimeout: 180,
   
-  // Increase static page generation timeout
-  staticPageGenerationTimeout: 180
+  // Add Incremental Static Regeneration default config
+  // This can be overridden at the page level
+  unstable_runtimeJS: true,
+  unstable_JsPreload: true
 };
 
-module.exports = nextConfig;
+module.exports = withBundleAnalyzer(nextConfig);

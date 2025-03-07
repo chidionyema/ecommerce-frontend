@@ -1,12 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-/**
- * Auth Service API Route
- * Acts as a proxy to the backend .NET API authentication endpoints
- * 
- * @param {NextApiRequest} req - The Next.js API request
- * @param {NextApiResponse} res - The Next.js API response
- */
 export default async function authService(req: NextApiRequest, res: NextApiResponse) {
   // Only allow specific methods
   const allowedMethods = ['GET', 'POST', 'OPTIONS'];
@@ -25,7 +18,7 @@ export default async function authService(req: NextApiRequest, res: NextApiRespo
     // Get the backend API URL from environment variables
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://api.yourbackend.com';
     
-    // THIS IS THE KEY FIX: Safely handle undefined req.url
+    // Safely handle undefined req.url
     if (!req.url) {
       console.error('Request URL is undefined in auth-service');
       return res.status(400).json({ error: 'Invalid request URL' });
@@ -35,9 +28,9 @@ export default async function authService(req: NextApiRequest, res: NextApiRespo
     const authEndpoint = `${backendUrl}/auth${urlPath}`;
 
     // Prepare headers for the backend request
-    const headers: Record<string, string> = {
+    const headers = {
       'Content-Type': 'application/json',
-    };
+    } as { [key: string]: string };
 
     // Forward authorization header if present
     if (req.headers.authorization) {
@@ -56,7 +49,6 @@ export default async function authService(req: NextApiRequest, res: NextApiRespo
 
     // Forward the response from the backend
     return res.status(response.status).json(data);
-
   } catch (error: any) {
     console.error('Auth service error:', error);
     return res.status(500).json({ 
