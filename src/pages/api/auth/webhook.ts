@@ -1,6 +1,6 @@
 // File: pages/api/webhook.ts
 export const config = {
-    runtime: 'edge'
+     runtime: 'experimental-edge' 
   };
 
 import { NextApiRequest, NextApiResponse } from 'next';

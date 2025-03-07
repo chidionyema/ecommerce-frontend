@@ -1,7 +1,7 @@
 
 
 export const config = {
-  runtime: '  edge'
+   runtime: 'experimental-edge' 
 };
 
 import { useParams, useRouter } from 'next/navigation';
