@@ -1,5 +1,7 @@
 // File: pages/api/webhook.ts
-export const runtime = 'edge';
+// REMOVE EDGE RUNTIME FOR THIS API ROUTE
+// export const runtime = 'edge'; 
+
 import { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 import { buffer } from 'micro';
