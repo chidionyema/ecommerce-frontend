@@ -1,11 +1,14 @@
 // File: pages/store/products/[id].tsx
-export const runtime = 'edge';
+// REMOVED: export const runtime = 'experimental-edge';
 
+export const config = {
+    runtime: 'edge'
+  };
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { GetStaticProps, GetStaticPaths } from 'next';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import { GetStaticProps, GetStaticPaths } from 'next'; // Changed from GetServerSideProps
+import { AlertCircle, CheckCircle, ShoppingBag } from 'lucide-react';
 import MainLayout from '../../../components/layouts/MainLayout';
 import ProductDetail from '../../../components/catalog/ProductDetail';
 import { productService } from '../../../services/product.service';
@@ -13,48 +16,19 @@ import { useCheckout } from '../../../contexts/CheckoutContext';
 import { ProductDto } from '../../../types/haworks.types';
 import ErrorBoundary from '../../../components/Common/ErrorBoundary';
 import ProductSkeleton from '../../../components/catalog/ProductSkeleton';
-import { unstable_cache } from 'next/cache';
 
 interface ProductDetailPageProps {
   product: ProductDto;
   relatedProducts: ProductDto[];
 }
 
+// Helper to sanitize input
 const sanitizeInput = (input: string): string => {
   return String(input).replace(/[^\w-]/g, '');
 };
 
+// Maximum quantity allowed per product
 const MAX_QUANTITY = 99;
-
-const getCachedProduct = unstable_cache(
-  async (id: string) => {
-    try {
-      return await productService.getProductById(id);
-    } catch (error) {
-      console.error('Error fetching product:', error);
-      return null;
-    }
-  },
-  ['product-details'],
-  { revalidate: 3600 }
-);
-
-const getCachedRelated = unstable_cache(
-  async (categoryId: string, productId: string) => {
-    try {
-      return await productService.getRelatedProducts({
-        categoryId,
-        excludeId: productId,
-        limit: 4
-      });
-    } catch (error) {
-      console.error('Error fetching related products:', error);
-      return [];
-    }
-  },
-  ['related-products'],
-  { revalidate: 1800 }
-);
 
 export default function ProductDetailPage({ product, relatedProducts }: ProductDetailPageProps) {
   const router = useRouter();
@@ -64,20 +38,36 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
   const [feedback, setFeedback] = useState<{message: string, type: 'success' | 'error'} | null>(null);
   const [quantity, setQuantity] = useState(1);
 
+  // Show a loading state while the page is being generated statically
+  if (router.isFallback) {
+    return (
+      <MainLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <ProductSkeleton />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  // Validate product data is available
   useEffect(() => {
-    if (!product && !router.isFallback) {
+    if (!product) {
       setError('Product information could not be loaded');
     }
-  }, [product, router.isFallback]);
+  }, [product]);
 
+  // Clear feedback after a timeout
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     if (feedback) {
       timeoutId = setTimeout(() => setFeedback(null), 5000);
     }
-    return () => timeoutId && clearTimeout(timeoutId);
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [feedback]);
 
+  // Validate quantity before updating
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity > 0 && newQuantity <= MAX_QUANTITY) {
       setQuantity(newQuantity);
@@ -87,16 +77,19 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
   const handleAddToCart = () => {
     setError(null);
     
+    // Validate product is available
     if (!product) {
       setError('Product information is not available');
       return;
     }
     
+    // Validate quantity
     if (quantity <= 0 || quantity > MAX_QUANTITY) {
       setError(`Quantity must be between 1 and ${MAX_QUANTITY}`);
       return;
     }
     
+    // Validate price
     if (!product.unitPrice || product.unitPrice <= 0) {
       setError('Product price information is invalid');
       return;
@@ -130,8 +123,10 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
     }
   };
 
+  // Handle adding to wishlist
   const handleAddToWishlist = (productId: string) => {
     try {
+      // This would integrate with your wishlist service
       console.log(`Added product ${productId} to wishlist`);
       setFeedback({
         message: 'Added to wishlist',
@@ -146,16 +141,6 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
     }
   };
 
-  if (router.isFallback) {
-    return (
-      <MainLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <ProductSkeleton />
-        </div>
-      </MainLayout>
-    );
-  }
-
   return (
     <MainLayout>
       <Head>
@@ -165,17 +150,19 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
         <meta property="og:description" content={product.shortDescription || product.description?.substring(0, 160)} />
         <meta property="og:type" content="product" />
         <meta property="og:url" content={`https://yourstore.com/store/products/${product.id}`} />
-        {product.contents?.[0]?.url && (
+        {product.contents && product.contents.length > 0 && (
           <meta property="og:image" content={product.contents[0].url} />
         )}
         
+        {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={product.name} />
         <meta name="twitter:description" content={product.shortDescription || product.description?.substring(0, 160)} />
-        {product.contents?.[0]?.url && (
+        {product.contents && product.contents.length > 0 && (
           <meta name="twitter:image" content={product.contents[0].url} />
         )}
         
+        {/* Product Schema Markup */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -228,6 +215,7 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
             error={error}
           />
           
+          {/* Feedback Toast Notification */}
           {feedback && (
             <div className={`fixed top-4 right-4 z-50 rounded-md shadow-md p-4 transition-opacity duration-500 ${
               feedback.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
@@ -250,66 +238,52 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
+// Replace getServerSideProps with getStaticProps for better performance with ISR
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const { id } = params || {};
+  const sanitizedId = sanitizeInput(id as string);
+  
   try {
-    const products = await unstable_cache(
-      async () => {
-        try {
-          return await productService.getProducts();
-        } catch (error) {
-          console.error('Error fetching product IDs:', error);
-          return [];
-        }
-      },
-      ['all-product-ids'],
-      { revalidate: 86400 }
-    )();
-
-    const paths = products.map(({ id }) => ({
-      params: { id: sanitizeInput(id) }
-    }));
-
+    // Fetch product details
+    const product = await productService.getProductById(sanitizedId);
+    
+    if (!product) {
+      return {
+        notFound: true
+      };
+    }
+    
+    // Fetch related products based on category
+    const relatedProducts = await productService.getRelatedProducts({
+      categoryId: product.categoryId,
+      excludeId: product.id,
+      limit: 4
+    });
+    
     return {
-      paths,
-      fallback: 'blocking'
+      props: {
+        product,
+        relatedProducts
+      },
+      // Enable Incremental Static Regeneration
+      revalidate: 60 // Regenerate page at most once every 60 seconds
     };
   } catch (error) {
-    console.error('Error generating paths:', error);
+    console.error('Error fetching product details:', error);
+    
+    // Return 404 for non-existent or inaccessible products
     return {
-      paths: [],
-      fallback: 'blocking'
+      notFound: true
     };
   }
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const { id } = params || {};
-  const sanitizedId = sanitizeInput(id as string);
-
-  try {
-    const product = await getCachedProduct(sanitizedId);
-    
-    if (!product) {
-      return { notFound: true };
-    }
-
-    const relatedProducts = await getCachedRelated(
-      product.categoryId, 
-      sanitizedId
-    );
-
-    return {
-      props: {
-        product: JSON.parse(JSON.stringify(product)),
-        relatedProducts: JSON.parse(JSON.stringify(relatedProducts))
-      },
-      revalidate: 3600
-    };
-  } catch (error) {
-    console.error('Error in getStaticProps:', error);
-    return {
-      notFound: true,
-      revalidate: 60
-    };
-  }
+// Add getStaticPaths
+export const getStaticPaths: GetStaticPaths = async () => {
+  // You can pre-render popular products here if you want
+  // For this example, we'll generate all pages on-demand
+  return {
+    paths: [],
+    fallback: 'blocking' // Use blocking fallback for better SEO
+  };
 };

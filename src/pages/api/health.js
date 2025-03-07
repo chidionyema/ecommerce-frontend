@@ -1,6 +1,6 @@
 // src/pages/api/health.js
 export const config = {
-    runtime: '  edge',
+    runtime: 'edge',
   };
   
   export default function handler(req) {

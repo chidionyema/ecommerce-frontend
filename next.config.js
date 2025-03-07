@@ -177,9 +177,6 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
     disableOptimizedLoading: process.env.NODE_ENV === 'development',
-    incrementalCacheHandlerPath: require.resolve('./cache-handler.js'),
-    esmExternals: 'loose',
-    isrMemoryCacheSize: 512,
   },
 
   trailingSlash: true,
