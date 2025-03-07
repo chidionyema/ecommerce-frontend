@@ -9,7 +9,7 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   compress: true,
 
-  // Enable Next.js image optimization (keeping only webp)
+  // Enable Next.js image optimization while keeping webp format
   images: {
     formats: ['image/webp'],
   },
@@ -59,56 +59,49 @@ const nextConfig = {
   },
 
   webpack: (config, { isServer, dev }) => {
+    // Server-specific optimizations:
     if (isServer) {
       // Disable chunk generation for server bundles
       config.optimization.splitChunks = {
         cacheGroups: { default: false },
       };
     } else {
-      // Client-side chunk optimization with aggressive splitting.
-      // The maxSize is set to ~244KB (~238KB actual limit) to ensure chunks stay small.
+      // Client-side chunk optimization
       config.optimization.splitChunks = {
         chunks: 'all',
         maxInitialRequests: 25,
         minSize: 20000,
-        maxSize: 244000, // ~244,000 bytes (≈238KB)
-        automaticNameDelimiter: '.',
+        maxSize: 244000, // ~238KB (ensuring compliance with Cloudflare's 25MB limit)
         cacheGroups: {
           react: {
             test: /[\\/]node_modules[\\/](react|react-dom|scheduler)/,
             name: 'react-core',
             priority: 50,
-            enforce: true,
           },
           mui: {
             test: /[\\/]node_modules[\\/](@mui|@emotion)/,
             name: 'mui-core',
             priority: 45,
-            enforce: true,
           },
           next: {
             test: /[\\/]node_modules[\\/](next|@next)/,
             name: 'next-core',
             priority: 40,
-            enforce: true,
           },
           ui: {
             test: /[\\/]node_modules[\\/](@headlessui|@heroicons|@radix-ui)/,
             name: 'ui-libs',
             priority: 35,
-            enforce: true,
           },
           stripe: {
             test: /[\\/]node_modules[\\/](@stripe)/,
             name: 'stripe',
             priority: 30,
-            enforce: true,
           },
           heavy: {
             test: /[\\/]node_modules[\\/](react-google-recaptcha|framer-motion)/,
             name: 'heavy-libs',
             priority: 25,
-            enforce: true,
           },
           vendors: {
             test: /[\\/]node_modules[\\/]/,
@@ -119,24 +112,24 @@ const nextConfig = {
               return `vendor.${packageName?.replace('@', '') || 'misc'}`;
             },
             priority: 20,
-            enforce: true,
           },
         },
       };
 
+      // Enhanced tree-shaking for production
       if (!dev) {
         config.optimization.usedExports = true;
         config.optimization.sideEffects = true;
       }
     }
 
-    // Set performance limits (not directly limiting chunk size, but a warning threshold)
+    // Critical size limits
     config.performance = {
       maxEntrypointSize: 2500000,
       maxAssetSize: 2500000,
     };
 
-    // Polyfill Node.js modules for client builds
+    // Node.js polyfills for client
     if (!isServer) {
       config.resolve.fallback = {
         fs: false,
@@ -148,19 +141,19 @@ const nextConfig = {
       };
     }
 
-    // Use null-loader for problematic modules
+    // Add null-loader for problematic/large modules:
     config.module.rules.push({
       test: /next[\\/]dist[\\/]esm[\\/]server[\\/]use-cache/,
       use: require.resolve('null-loader'),
     });
 
-    // Null-load specific modules not needed on the client
+    // Only null-load specific modules that aren't needed:
     config.module.rules.push({
       test: /node_modules[\\\/](react-confetti)/,
       use: 'null-loader',
     });
 
-    // Merge additional alias values with the existing ones (do not override Next.js defaults)
+    // Fix crypto polyfill: Merge with existing aliases
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       'next/cache': false,
@@ -170,7 +163,7 @@ const nextConfig = {
     return config;
   },
 
-  // Externalize heavy dependencies so they aren’t bundled into the client bundle
+  // Externalize heavy dependencies:
   serverExternalPackages: [
     'bufferutil',
     'utf-8-validate',
@@ -192,3 +185,4 @@ const nextConfig = {
 };
 
 module.exports = withBundleAnalyzer(nextConfig);
+s
