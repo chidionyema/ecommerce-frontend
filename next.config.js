@@ -3,9 +3,10 @@ const nextConfig = {
   distDir: '.next',
   productionBrowserSourceMaps: false,
   staticPageGenerationTimeout: 180,
-
+  
+  // Reduce image optimization options
   images: {
-    formats: ['image/avif', 'image/webp'],
+    formats: ['image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,7 +16,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: '*.stripe.com'
       }
-    ]
+    ],
+    // Limit maximum image size
+    deviceSizes: [640, 960, 1280],
+    imageSizes: [16, 32, 48, 64]
   },
 
   async headers() {
@@ -27,13 +31,10 @@ const nextConfig = {
 
     const cspDirectives = [
       `default-src 'self'`,
-      `script-src 'self' ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''}`
-        + ` https://apis.google.com https://js.stripe.com`
-        + ` https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
+      `script-src 'self' ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''} https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
       `style-src 'self' ${!isProduction ? "'unsafe-inline'" : ''} https://fonts.googleapis.com`,
       `img-src 'self' data: https://*.stripe.com https://www.google.com/recaptcha/`,
-      `connect-src 'self' ${apiUrl} ${!isProduction ? 'http://localhost:3000 ws://localhost:3000' : ''}`
-        + ` https://checkout.stripe.com https://api.ritualworks.com`,
+      `connect-src 'self' ${apiUrl} ${!isProduction ? 'http://localhost:3000 ws://localhost:3000' : ''} https://checkout.stripe.com https://api.ritualworks.com`,
       `frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://stripe.com`,
       `font-src 'self' https://fonts.gstatic.com`,
       `form-action 'self'`,
@@ -53,7 +54,7 @@ const nextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {
             key: 'Content-Security-Policy',
-            value: cspDirectives.join('; ').replace(/\s+/g, ' ').trim(),
+            value: cspDirectives.join('; ').trim(),
           }
         ]
       }
@@ -61,10 +62,7 @@ const nextConfig = {
   },
 
   webpack: (config, { dev, isServer }) => {
-    if (isServer) {
-      config.output.globalObject = 'this';
-    }
-
+    // Node.js polyfills for client
     if (!isServer) {
       config.resolve.fallback = {
         fs: false,
@@ -76,30 +74,64 @@ const nextConfig = {
       };
     }
 
+    // Null loader for problematic modules
     config.module.rules.push({
       test: /node_modules[\\\/](stripe|micro|iconv-lite|safer-buffer)[\\\/]/,
       use: 'null-loader',
     });
 
-    // Basic splitChunks configuration for Edge Runtime compatibility
-    config.optimization.splitChunks = {
-      chunks: 'all',
+    // Optimize chunks for Cloudflare Pages
+    config.optimization = {
+      minimize: true,
+      minimizer: [
+        // Keep existing minimizers
+        ...config.optimization.minimizer || []
+      ],
+      splitChunks: {
+        chunks: 'all',
+        maxInitialRequests: 25,
+        minSize: 20000,
+        maxSize: 20000000, // 20MB max chunk size
+        cacheGroups: {
+          default: false,
+          vendors: false,
+          framework: {
+            name: 'framework',
+            test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
+            priority: 40,
+            chunks: 'all',
+          },
+          lib: {
+            test: /[\\/]node_modules[\\/]/,
+            priority: 30,
+            minChunks: 2,
+            chunks: 'all',
+          },
+          commons: {
+            name: 'commons',
+            minChunks: 2,
+            priority: 20,
+          },
+          shared: {
+            name: false,
+            priority: 10,
+            minChunks: 2,
+            reuseExistingChunk: true,
+          }
+        }
+      }
     };
-
-    // Disable cache in production client-side builds
-    if (!dev && !isServer) {
-      config.cache = false;
-    }
 
     return config;
   },
 
-  // Add Edge Runtime configuration
+  // Remove experimental features to reduce build size
   experimental: {
-    optimizeCss: true,
-    // Force all pages to use the Edge Runtime
-    runtime: 'edge'
-  }
+    optimizeCss: false
+  },
+  
+  // Add output configuration for smaller files
+  output: 'standalone'
 };
 
 module.exports = nextConfig;
