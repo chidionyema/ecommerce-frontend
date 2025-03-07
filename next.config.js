@@ -9,32 +9,19 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   compress: true,
   
-  // Enable Next.js image optimization
+  // Enable Next.js image optimization while keeping webp format
   images: {
-    formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256],
-    minimumCacheTTL: 60,
+    formats: ['image/webp'],
   },
-  
-  // Font optimization
-  optimizeFonts: true,
   
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
       (isProduction ? 'https://api.ritualworks.com' : 'https://api.local.ritualworks.com');
     
-    // Generate a nonce for inline scripts in production
-    const generateNonce = () => {
-      return isProduction ? `'nonce-${Buffer.from(crypto.randomBytes(16)).toString('base64')}'` : '';
-    };
-    
-    const scriptNonce = generateNonce();
-    
     const cspDirectives = [
       `default-src 'self'`,
-      `script-src 'self' ${scriptNonce} ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''} https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
+      `script-src 'self' ${!isProduction ? "'unsafe-inline' 'unsafe-eval'" : ''} https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
       `style-src 'self' ${!isProduction ? "'unsafe-inline'" : ''} https://fonts.googleapis.com`,
       `img-src 'self' data: https://*.stripe.com https://www.google.com/recaptcha/`,
       `connect-src 'self' ${apiUrl} ${!isProduction ? 'http://localhost:3000 ws://localhost:3000' : ''} https://checkout.stripe.com https://api.ritualworks.com`,
@@ -55,10 +42,10 @@ const nextConfig = {
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Content-Security-Policy', value: cspDirectives.join('; ').trim() },
-          // Add Font preload headers
-          { key: 'Link', value: '<https://fonts.googleapis.com>; rel=preconnect' },
-          { key: 'Link', value: '<https://fonts.gstatic.com>; rel=preconnect; crossorigin' }
+          {
+            key: 'Content-Security-Policy',
+            value: cspDirectives.join('; ').trim(),
+          }
         ]
       }
     ];
@@ -116,25 +103,6 @@ const nextConfig = {
       if (!dev) {
         config.optimization.usedExports = true;
         config.optimization.sideEffects = true;
-        
-        // Terser optimization options
-        if (config.optimization.minimizer) {
-          const terserIndex = config.optimization.minimizer.findIndex(
-            minimizer => minimizer.constructor.name === 'TerserPlugin'
-          );
-          
-          if (terserIndex >= 0) {
-            config.optimization.minimizer[terserIndex].options.terserOptions = {
-              ...config.optimization.minimizer[terserIndex].options.terserOptions,
-              compress: {
-                ...config.optimization.minimizer[terserIndex].options.terserOptions?.compress,
-                drop_console: true,
-                pure_funcs: ['console.debug', 'console.info', 'console.log'],
-              },
-              mangle: true
-            };
-          }
-        }
       }
     }
 
@@ -162,14 +130,11 @@ const nextConfig = {
       use: require.resolve('null-loader')
     });
 
-    // Use dynamic imports instead of null-loader for large modules
-    // Commented out null-loader approach
-    /*
+    // Using null-loader for large modules
     config.module.rules.push({
       test: /node_modules[\\\/](stripe|micro|@stripe|react-confetti|framer-motion)/,
       use: 'null-loader',
     });
-    */
 
     // Fix crypto polyfill
     config.resolve.alias = {
@@ -194,20 +159,12 @@ const nextConfig = {
   
   experimental: {
     optimizeCss: true,
-    disableOptimizedLoading: process.env.NODE_ENV === 'development',
-    // Enable Incremental Static Regeneration features
-    isrMemoryCacheSize: 50,
-    isrFlushToDisk: true
+    disableOptimizedLoading: process.env.NODE_ENV === 'development'
   },
   
   trailingSlash: true,
   reactStrictMode: true,
-  staticPageGenerationTimeout: 180,
-  
-  // Add Incremental Static Regeneration default config
-  // This can be overridden at the page level
-  unstable_runtimeJS: true,
-  unstable_JsPreload: true
+  staticPageGenerationTimeout: 180
 };
 
 module.exports = withBundleAnalyzer(nextConfig);
