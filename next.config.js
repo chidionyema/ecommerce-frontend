@@ -1,17 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use standalone output
-  output: 'standalone',
+  // Use export output for Cloudflare Pages instead of standalone
+  output: 'export',
   
   // Core settings
   distDir: '.next',
   staticPageGenerationTimeout: 180,
   productionBrowserSourceMaps: false,
 
-  // Server external packages
-  serverExternalPackages: ['stripe', 'micro'],
-
-  // Image configuration
+  // Image configuration (using unoptimized for Cloudflare)
   images: {
     unoptimized: true,
     formats: ['image/avif', 'image/webp'],
@@ -86,7 +83,19 @@ const nextConfig = {
         crypto: false
       };
     }
-
+    
+    // Prevent server-side errors by properly marking node modules for client-only use
+    config.module = config.module || {};
+    config.module.rules = config.module.rules || [];
+    
+    // Add a rule to handle certain packages as client-only
+    config.module.rules.push({
+      test: /node_modules[\\\/](stripe|micro|iconv-lite|safer-buffer)[\\\/]/,
+      use: 'null-loader',
+      include: [/node_modules/],
+      exclude: [/[\\/]node_modules[\\/]next[\\/]/],
+    });
+    
     // Split chunks for both client and server
     config.optimization.splitChunks = {
       chunks: 'all',
