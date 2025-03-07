@@ -7,12 +7,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 import { buffer } from 'micro';
 
-// Disable bodyParser to get the raw body for Stripe webhook
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-02-24.acacia', // Updated to the required API version
