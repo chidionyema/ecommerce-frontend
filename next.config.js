@@ -17,6 +17,7 @@ const nextConfig = {
 
   // Enable Next.js image optimization with WebP
   images: {
+    unoptimized: true,
     formats: ['image/webp'],
   },
 
