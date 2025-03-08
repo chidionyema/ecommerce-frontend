@@ -42,15 +42,15 @@ import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import { SPACING, getSharedStyles } from '../utils/sharedStyles';
 import { pricingPageContent, plans } from '../data/pricingPageData';
 
-const MotionComponents = dynamic(
-  () => import('framer-motion').then((mod) => ({
-    motion: mod.motion,
-    AnimatePresence: mod.AnimatePresence
-  })),
-  { ssr: true }
+const MotionDiv = dynamic(
+  () => import('framer-motion').then((mod) => mod.motion.div),
+  { ssr: false }
 );
 
-
+const AnimatePresence = dynamic(
+  () => import('framer-motion').then((mod) => mod.AnimatePresence),
+  { ssr: false }
+);
 const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon: Icon, text }) => {
   const theme = useTheme();
   return (
@@ -108,7 +108,7 @@ const renderPlanCard = (
     height: '100%',
     width: '100%'
   }}>
-    <motion.div
+    <MotionDiv
       style={{ 
         display: 'flex', 
         flexDirection: 'column',
@@ -255,7 +255,7 @@ const renderPlanCard = (
           </Button>
         </Box>
       </Paper>
-    </motion.div>
+      </MotionDiv>
   </Box>
 );
 

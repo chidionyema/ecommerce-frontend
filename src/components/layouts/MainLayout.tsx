@@ -20,7 +20,7 @@ import {
   Divider, 
   alpha 
 } from '@mui/material';
-import Menu from '@mui/icons-material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
 import ShoppingCart from '@mui/icons-material/ShoppingCart';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Favorite from '@mui/icons-material/Favorite';
@@ -263,7 +263,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                   href="/store/cart"
                 >
                   <Badge badgeContent={3} color="error">
-                    <ShoppingCartIcon />
+                    <ShoppingCart />
                   </Badge>
                 </IconButton>
                 <IconButton 
@@ -285,7 +285,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           open={drawerOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile
+            keepMounted: true,
           }}
           sx={{
             display: { xs: 'block', md: 'none' },
