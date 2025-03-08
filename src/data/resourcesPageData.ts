@@ -1,25 +1,24 @@
 // data/resourcesPageData.ts
 import React from 'react';
-import {
-  Cloud as CloudIcon,
-  VpnKey,
-  Code as CodeIcon,
-  Security as SecurityIcon,
-  Storage as StorageIcon,
-  Speed as SpeedIcon,
-  Build as BuildIcon,
-  School as SchoolIcon,
-  MenuBook as MenuBookIcon,
-  Assessment as AssessmentIcon,
-  Extension as ExtensionIcon,
-  ViewQuilt as ViewQuiltIcon,
-  AccountTree as AccountTreeIcon,
-  Architecture as ArchitectureIcon,
-  DataObject as DataObjectIcon,
-  IntegrationInstructions as IntegrationInstructionsIcon,
-  CheckCircle as CheckmarkIcon
-} from '@mui/icons-material';
 
+// Optimized imports from Material UI icons
+import CloudIcon from '@mui/icons-material/Cloud';
+import VpnKey from '@mui/icons-material/VpnKey';
+import CodeIcon from '@mui/icons-material/Code';
+import SecurityIcon from '@mui/icons-material/Security';
+import StorageIcon from '@mui/icons-material/Storage';
+import SpeedIcon from '@mui/icons-material/Speed';
+import BuildIcon from '@mui/icons-material/Build';
+import SchoolIcon from '@mui/icons-material/School';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import ExtensionIcon from '@mui/icons-material/Extension';
+import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import ArchitectureIcon from '@mui/icons-material/Architecture';
+import DataObjectIcon from '@mui/icons-material/DataObject';
+import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
+import CheckmarkIcon from '@mui/icons-material/CheckCircle';
 // Hero Section Data
 export const heroSection = {
   title: "Production-Grade Resources",
