@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-     "export": "next build",
+    "export": "next build",
     "analyze": "cross-env ANALYZE=true next build"
   },
   "engines": {
@@ -74,6 +74,7 @@
     "@babel/plugin-transform-runtime": "7.25.9",
     "@cloudflare/next-on-pages": "^1.13.8",
     "@next/bundle-analyzer": "^15.2.1",
+    "@swc/helpers": "^0.5.15",
     "@types/cookie": "0.5.2",
     "@types/lodash-es": "4.17.12",
     "@types/nprogress": "^0.2.3",

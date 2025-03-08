@@ -172,6 +172,15 @@ const nextConfig = {
     'next/dist/compiled/etag',
     'next/dist/server/lib/squoosh',
     'next/dist/server/image-optimizer',
+    'elliptic',
+    'asn1.js',
+    'jose',
+    'openid-client',
+    'diffie-hellman',
+    'public-encrypt',
+    'create-ecdh',
+    'miller-rabin',
+    'bn.js',
   ],
 
   experimental: {
