@@ -30,7 +30,11 @@ class MyDocument extends Document {
     return (
       <Html lang="en" className="h-full">
         <Head>
-         
+          {/* Set CSP via meta tag for static export */}
+          <meta
+            httpEquiv="Content-Security-Policy"
+            content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*; frame-src 'self' https://js.stripe.com https://www.google.com;"
+          />
 
           {/* Self Polyfill */}
           {nonce && (
