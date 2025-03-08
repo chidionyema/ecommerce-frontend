@@ -17,12 +17,27 @@ interface ProductDetailPageProps {
   relatedProducts: ProductDto[];
 }
 
+interface ProductState {
+  loading: boolean;
+  error: string | null;
+  feedback: {
+    message: string;
+    type: 'success' | 'error';
+  } | null;
+  quantity: number;
+}
+
+interface FeedbackToastProps {
+  message: string;
+  type: 'success' | 'error';
+}
+
 const MAX_QUANTITY = 99;
 
 export default function ProductDetailPage({ product, relatedProducts }: ProductDetailPageProps) {
   const router = useRouter();
   const { addToCart } = useCheckout();
-  const [state, setState] = useState({
+  const [state, setState] = useState<ProductState>({
     loading: false,
     error: null,
     feedback: null,
@@ -120,7 +135,6 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
   );
 }
 
-// Helper components
 const ProductMetaTags = ({ product }: { product: ProductDto }) => (
   <>
     <meta property="og:title" content={`${product.name} | Your Store`} />
@@ -164,7 +178,7 @@ const ErrorFallback = () => (
   </div>
 );
 
-const FeedbackToast = ({ message, type }) => (
+const FeedbackToast = ({ message, type }: FeedbackToastProps) => (
   <div className={`fixed top-4 right-4 z-50 p-4 rounded-md shadow-md ${
     type === 'success' ? 'bg-green-100 border-green-200' : 'bg-red-100 border-red-200'
   }`}>
@@ -175,7 +189,6 @@ const FeedbackToast = ({ message, type }) => (
   </div>
 );
 
-// Data fetching
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   try {
     const id = sanitizeId(params?.id);
@@ -197,7 +210,6 @@ export const getStaticPaths: GetStaticPaths = async () => ({
   fallback: 'blocking'
 });
 
-// Pure helper functions
 const sanitizeId = (id: unknown) => String(id).replace(/[^\w-]/g, '');
 
 const validateProduct = (product: ProductDto, quantity: number) => {
