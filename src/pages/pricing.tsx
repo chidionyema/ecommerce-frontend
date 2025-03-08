@@ -13,17 +13,17 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionSummary from '@mui/material/AccordionDetails';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 import useTheme from '@mui/material/styles/useTheme';
 import { alpha } from '@mui/material/styles';
 
-// MUI Icons with original names
+// MUI Icons
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccessTime from '@mui/icons-material/AccessTime';
-import { 
+import {
   EmojiEvents as EmojiEventsIcon,
   CalendarToday as CalendarTodayIcon,
   Work as WorkIcon,
@@ -36,21 +36,37 @@ import {
   ArrowForward as ArrowForwardIcon
 } from '@mui/icons-material';
 
-// Dynamically imported animation library
-
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import { SPACING, getSharedStyles } from '../utils/sharedStyles';
 import { pricingPageContent, plans } from '../data/pricingPageData';
 
-const MotionDiv = dynamic(
-  () => import('framer-motion').then((mod) => mod.motion.div),
+/** 
+ * 1) Create a type matching framer-motion's "motion.div" props 
+ *    (children, animate, initial, transition, etc.).
+ */
+type MotionDivProps = React.ComponentPropsWithoutRef<
+  typeof import('framer-motion')['motion']['div']
+>;
+
+/**
+ * 2) Dynamic import for motion.div, with our typed props. 
+ *    This ensures Next.js knows `children` etc. exist on this component.
+ */
+const MotionDiv = dynamic<MotionDivProps>(
+  () =>
+    import('framer-motion').then(mod => mod.motion.div),
   { ssr: false }
 );
 
+/** 
+ * Similarly, for AnimatePresence if needed 
+ */
 const AnimatePresence = dynamic(
   () => import('framer-motion').then((mod) => mod.AnimatePresence),
   { ssr: false }
 );
+
+// Basic feature item
 const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon: Icon, text }) => {
   const theme = useTheme();
   return (
@@ -64,7 +80,7 @@ const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon
           borderRadius: '16px',
           width: 40,
           height: 40,
-          minWidth: 40, // Add minWidth to prevent icon from shrinking
+          minWidth: 40,
           border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
         }}
       >
@@ -77,16 +93,17 @@ const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon
   );
 };
 
+// Extra feature item with check mark
 const ExtraFeatureItem: React.FC<{ text: string }> = ({ text }) => {
   const theme = useTheme();
   return (
     <Box display="flex" alignItems="flex-start" gap={1.5} my={1.5}>
-      <CheckCircleIcon 
-        fontSize="small" 
-        sx={{ 
+      <CheckCircleIcon
+        fontSize="small"
+        sx={{
           color: theme.palette.success.main,
-          mt: 0.5, // Align icon with text when text wraps
-        }} 
+          mt: 0.5,
+        }}
       />
       <Typography variant="body2" color="text.secondary">
         {text}
@@ -95,31 +112,38 @@ const ExtraFeatureItem: React.FC<{ text: string }> = ({ text }) => {
   );
 };
 
-// Updated renderPlanCard function with FORCIBLY EQUAL HEIGHT
+/**
+ * Renders a single plan card with motion.
+ */
 const renderPlanCard = (
   plan: typeof plans[0],
   handlePlanClick: (type: string) => void,
   theme: any,
   isAnnual: boolean
 ) => (
-  <Box sx={{ 
-    display: 'flex', 
-    flexDirection: 'column', 
-    height: '100%',
-    width: '100%'
-  }}>
+  <Box
+    sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+      width: '100%',
+    }}
+  >
     <MotionDiv
-      style={{ 
-        display: 'flex', 
+      style={{
+        display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        width: '100%'
+        width: '100%',
       }}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{
         duration: 0.5,
-        delay: plan.type === 'consultation' ? 0 : plan.type === 'project' ? 0.1 : 0.2,
+        delay:
+          plan.type === 'consultation' ? 0
+          : plan.type === 'project' ? 0.1
+          : 0.2,
       }}
       viewport={{ once: true }}
       whileHover={{ y: -10, transition: { duration: 0.3 } }}
@@ -136,7 +160,10 @@ const renderPlanCard = (
           borderRadius: 4,
           position: 'relative',
           background: plan.recommended
-            ? `linear-gradient(145deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, ${
+            ? `linear-gradient(145deg, ${alpha(
+                theme.palette.primary.light,
+                0.1
+              )} 0%, ${
                 theme.palette.mode === 'light' ? 'white' : '#28282a'
               } 100%)`
             : theme.palette.mode === 'light'
@@ -151,42 +178,45 @@ const renderPlanCard = (
         }}
       >
         {plan.recommended && (
-          <Chip
-            label="Most Popular"
-            size="small"
-            sx={{
-              position: 'absolute',
-              top: 16,
-              right: 16,
-              zIndex: 1,
-              fontSize: '0.8rem',
-              px: 1,
-              fontWeight: 600,
-              bgcolor: alpha(theme.palette.primary.main, 0.1),
-              color: theme.palette.primary.main,
-              boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.25)}`,
-            }}
-          />
+          <>
+            <Chip
+              label="Most Popular"
+              size="small"
+              sx={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                zIndex: 1,
+                fontSize: '0.8rem',
+                px: 1,
+                fontWeight: 600,
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                color: theme.palette.primary.main,
+                boxShadow: `0 2px 8px ${alpha(
+                  theme.palette.primary.main,
+                  0.25
+                )}`,
+              }}
+            />
+            <Box
+              sx={{
+                position: 'absolute',
+                top: -50,
+                right: -50,
+                width: 100,
+                height: 100,
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                borderRadius: '50%',
+                zIndex: 0,
+              }}
+            />
+          </>
         )}
-        {plan.recommended && (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: -50,
-              right: -50,
-              width: 100,
-              height: 100,
-              bgcolor: alpha(theme.palette.primary.main, 0.1),
-              borderRadius: '50%',
-              zIndex: 0,
-            }}
-          />
-        )}
-        <Box 
-          position="relative" 
-          zIndex={1} 
-          sx={{ 
-            display: 'flex', 
+        <Box
+          position="relative"
+          zIndex={1}
+          sx={{
+            display: 'flex',
             flexDirection: 'column',
             height: '100%',
           }}
@@ -203,35 +233,51 @@ const renderPlanCard = (
                 {isAnnual && plan.annualPrice ? plan.annualPrice : plan.price}
               </Typography>
               {isAnnual && plan.annualPrice && (
-                <Typography variant="caption" color="success.main" sx={{ fontWeight: 'medium', mt: 0.5, display: 'block' }}>
+                <Typography
+                  variant="caption"
+                  color="success.main"
+                  sx={{
+                    fontWeight: 'medium',
+                    mt: 0.5,
+                    display: 'block',
+                  }}
+                >
                   Save 10% with annual billing
                 </Typography>
               )}
             </Box>
           </Box>
-          
-          <Box sx={{ 
-            mb: 3,
-            flex: '1 0 auto',
-            height: { xs: 'auto', md: '250px' }, // FIXED HEIGHT - crucial for consistency
-            overflow: 'auto' // Allow scrolling if content is too much
-          }}>
+
+          {/* Feature list */}
+          <Box
+            sx={{
+              mb: 3,
+              flex: '1 0 auto',
+              height: { xs: 'auto', md: '250px' },
+              overflow: 'auto',
+            }}
+          >
             {plan.features.map((feature, i) => (
               <FeatureItem key={i} icon={feature.icon} text={feature.text} />
             ))}
-            
+
             {plan.extraFeatures && (
               <Box sx={{ mt: 3 }}>
-                <Typography variant="subtitle2" fontWeight="bold" mb={1.5} color="text.primary">
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="bold"
+                  mb={1.5}
+                  color="text.primary"
+                >
                   Also includes:
                 </Typography>
-                {plan.extraFeatures.map((feature, i) => (
-                  <ExtraFeatureItem key={i} text={feature} />
+                {plan.extraFeatures.map((extra, i) => (
+                  <ExtraFeatureItem key={i} text={extra} />
                 ))}
               </Box>
             )}
           </Box>
-          
+
           <Button
             variant={plan.recommended ? 'contained' : 'outlined'}
             color="primary"
@@ -255,16 +301,23 @@ const renderPlanCard = (
           </Button>
         </Box>
       </Paper>
-      </MotionDiv>
+    </MotionDiv>
   </Box>
 );
 
-const CustomSection: React.FC<{
+type CustomSectionProps = {
   children: React.ReactNode;
   id?: string;
   sx?: any;
   [key: string]: any;
-}> = ({ children, id, sx = [], ...props }) => {
+};
+
+const CustomSection: React.FC<CustomSectionProps> = ({
+  children,
+  id,
+  sx = [],
+  ...props
+}) => {
   const theme = useTheme();
   return (
     <Box
@@ -291,6 +344,7 @@ const PricingPage: React.FC = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
   const router = useRouter();
+
   const [isAnnual, setIsAnnual] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
@@ -298,12 +352,16 @@ const PricingPage: React.FC = () => {
     router.push(`/contact?plan=${type}`);
   };
 
-  const handleFaqChange = (panel: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-    setActiveFaq(isExpanded ? panel : null);
-  };
+  const handleFaqChange =
+    (panel: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+      setActiveFaq(isExpanded ? panel : null);
+    };
 
   return (
-    <ConsistentPageLayout title={pricingPageContent.hero.title} subtitle={pricingPageContent.hero.subtitle}>
+    <ConsistentPageLayout
+      title={pricingPageContent.hero.title}
+      subtitle={pricingPageContent.hero.subtitle}
+    >
       {/* HERO SECTION */}
       <CustomSection>
         <Box
@@ -328,7 +386,10 @@ const PricingPage: React.FC = () => {
             width: 180,
             height: 180,
             borderRadius: '50%',
-            background: `radial-gradient(circle, ${alpha(theme.palette.primary.light, 0.4)} 0%, transparent 70%)`,
+            background: `radial-gradient(circle, ${alpha(
+              theme.palette.primary.light,
+              0.4
+            )} 0%, transparent 70%)`,
             zIndex: 0,
             opacity: 0.6,
           }}
@@ -341,13 +402,20 @@ const PricingPage: React.FC = () => {
             width: 250,
             height: 250,
             borderRadius: '50%',
-            background: `radial-gradient(circle, ${alpha(theme.palette.primary.light, 0.3)} 0%, transparent 70%)`,
+            background: `radial-gradient(circle, ${alpha(
+              theme.palette.primary.light,
+              0.3
+            )} 0%, transparent 70%)`,
             zIndex: 0,
             opacity: 0.6,
           }}
         />
         <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+          <MotionDiv
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+          >
             <Typography
               variant="h2"
               textAlign="center"
@@ -360,10 +428,17 @@ const PricingPage: React.FC = () => {
                 textShadow: '0 2px 10px rgba(0,0,0,0.2)',
               }}
             >
-              Pricing That Fuels <Box component="span" sx={{ color: alpha('#fff', 0.85) }}>Your Growth</Box>
+              Pricing That Fuels{' '}
+              <Box component="span" sx={{ color: alpha('#fff', 0.85) }}>
+                Your Growth
+              </Box>
             </Typography>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
+          </MotionDiv>
+          <MotionDiv
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+          >
             <Typography
               variant="body1"
               textAlign="center"
@@ -378,8 +453,12 @@ const PricingPage: React.FC = () => {
             >
               {pricingPageContent.hero.subtitle}
             </Typography>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}>
+          </MotionDiv>
+          <MotionDiv
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.4 }}
+          >
             <Box textAlign="center">
               <Button
                 variant="contained"
@@ -393,27 +472,40 @@ const PricingPage: React.FC = () => {
                   px: 6,
                   py: 2,
                   fontSize: '1.1rem',
-                  color: theme.palette.getContrastText(theme.palette.secondary.main),
+                  color: theme.palette.getContrastText(
+                    theme.palette.secondary.main
+                  ),
                   background: theme.palette.secondary.main,
-                  boxShadow: `0 8px 20px ${alpha(theme.palette.secondary.main, 0.4)}`,
+                  boxShadow: `0 8px 20px ${alpha(
+                    theme.palette.secondary.main,
+                    0.4
+                  )}`,
                   transition: 'all 0.3s ease',
                   '&:hover': {
                     transform: 'translateY(-4px)',
-                    boxShadow: `0 10px 25px ${alpha(theme.palette.secondary.main, 0.6)}`,
+                    boxShadow: `0 10px 25px ${alpha(
+                      theme.palette.secondary.main,
+                      0.6
+                    )}`,
                   },
                 }}
               >
                 {pricingPageContent.hero.cta}
               </Button>
             </Box>
-          </motion.div>
+          </MotionDiv>
         </Container>
       </CustomSection>
 
       {/* PRICING PLANS SECTION */}
       <CustomSection id="pricing-plans" sx={{ py: { xs: 10, md: 12 } }}>
         <Container>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+          <MotionDiv
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
             <Typography
               variant="h3"
               textAlign="center"
@@ -440,24 +532,23 @@ const PricingPage: React.FC = () => {
             >
               {pricingPageContent.pricingSection.description}
             </Typography>
-          </motion.div>
-          
-          {/* FIXED: Grid container with consistent height handling */}
-          <Grid 
-            container 
-            spacing={4} 
-            sx={{ 
+          </MotionDiv>
+
+          <Grid
+            container
+            spacing={4}
+            sx={{
               display: 'flex',
               alignItems: 'stretch',
             }}
           >
             {plans.map((plan) => (
-              <Grid 
-                item 
-                xs={12} 
-                md={4} 
-                key={plan.type} 
-                sx={{ 
+              <Grid
+                item
+                xs={12}
+                md={4}
+                key={plan.type}
+                sx={{
                   display: 'flex',
                   height: '100%',
                 }}
@@ -466,7 +557,7 @@ const PricingPage: React.FC = () => {
               </Grid>
             ))}
           </Grid>
-          
+
           <Box textAlign="center" mt={4}>
             <Button
               variant="outlined"
@@ -485,10 +576,17 @@ const PricingPage: React.FC = () => {
         </Container>
       </CustomSection>
 
-      {/* GUIDE SECTION - COMPLETELY FIXED WITH ABSOLUTE HEIGHTS */}
-      <CustomSection sx={{ py: { xs: 10, md: 12 }, bgcolor: alpha(theme.palette.background.default, 0.6) }}>
+      {/* GUIDE SECTION */}
+      <CustomSection
+        sx={{ py: { xs: 10, md: 12 }, bgcolor: alpha(theme.palette.background.default, 0.6) }}
+      >
         <Container>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+          <MotionDiv
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
             <Typography
               variant="h3"
               textAlign="center"
@@ -515,38 +613,40 @@ const PricingPage: React.FC = () => {
             >
               {pricingPageContent.guideSection.description}
             </Typography>
-          </motion.div>
-          
-          {/* FIXED WITH ABSOLUTE POSITIONING */}
-          <Grid 
-            container 
-            spacing={4} 
-            sx={{ 
+          </MotionDiv>
+
+          <Grid
+            container
+            spacing={4}
+            sx={{
               display: 'flex',
               alignItems: 'stretch',
             }}
           >
             {pricingPageContent.guideSection.items.map((item, index) => (
-              <Grid 
-                item 
-                xs={12} 
-                md={4} 
-                key={index} 
-                sx={{ 
+              <Grid
+                item
+                xs={12}
+                md={4}
+                key={index}
+                sx={{
                   display: 'flex',
-                  height: { md: '420px' }, // FIXED ABSOLUTE HEIGHT
+                  height: { md: '420px' }, // fixed height
                 }}
               >
-                <motion.div
-                  style={{ 
+                <MotionDiv
+                  style={{
                     width: '100%',
-                    height: '100%'
+                    height: '100%',
                   }}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-100px' }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
-                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                  whileHover={{
+                    y: -5,
+                    transition: { duration: 0.2 },
+                  }}
                 >
                   <Paper
                     elevation={3}
@@ -557,13 +657,13 @@ const PricingPage: React.FC = () => {
                       height: '100%',
                       display: 'flex',
                       flexDirection: 'column',
-                      background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.9)} 0%, ${alpha(
+                      background: `linear-gradient(145deg, ${alpha(
                         theme.palette.background.paper,
-                        0.7
-                      )} 100%)`,
+                        0.9
+                      )} 0%, ${alpha(theme.palette.background.paper, 0.7)} 100%)`,
                       backdropFilter: 'blur(10px)',
                       border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                      position: 'relative', // Important for absolute positioning
+                      position: 'relative',
                     }}
                   >
                     <Box
@@ -576,27 +676,37 @@ const PricingPage: React.FC = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         mb: 3,
-                        boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.3)}`,
+                        boxShadow: `0 8px 20px ${alpha(
+                          theme.palette.primary.main,
+                          0.3
+                        )}`,
                       }}
                     >
-                      {item.icon && React.createElement(item.icon, { sx: { fontSize: 30, color: 'white' } })}
+                      {item.icon &&
+                        React.createElement(item.icon, {
+                          sx: { fontSize: 30, color: 'white' },
+                        })}
                     </Box>
                     <Typography variant="h5" fontWeight="bold" mb={2}>
                       {item.title}
                     </Typography>
-                    <Box 
+                    <Box
                       sx={{
                         overflow: 'auto',
                         flex: 1,
-                        maxHeight: 'calc(100% - 150px)', // Fixed content area
+                        maxHeight: 'calc(100% - 150px)',
                       }}
                     >
-                      <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                      <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ lineHeight: 1.7 }}
+                      >
                         {item.description}
                       </Typography>
                     </Box>
                   </Paper>
-                </motion.div>
+                </MotionDiv>
               </Grid>
             ))}
           </Grid>
@@ -606,7 +716,12 @@ const PricingPage: React.FC = () => {
       {/* FAQ SECTION */}
       <CustomSection sx={{ py: { xs: 10, md: 12 } }}>
         <Container>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+          <MotionDiv
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
             <Typography
               variant="h3"
               textAlign="center"
@@ -633,8 +748,13 @@ const PricingPage: React.FC = () => {
             >
               Have questions? We've got answers to help you choose the right plan.
             </Typography>
-          </motion.div>
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }}>
+          </MotionDiv>
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <Box sx={{ maxWidth: 800, mx: 'auto' }}>
               {pricingPageContent.faqSection.items.map((faq, index) => (
                 <Accordion
@@ -645,7 +765,8 @@ const PricingPage: React.FC = () => {
                     mb: 2,
                     borderRadius: '12px !important',
                     overflow: 'hidden',
-                    boxShadow: activeFaq === index ? theme.shadows[3] : theme.shadows[1],
+                    boxShadow:
+                      activeFaq === index ? theme.shadows[3] : theme.shadows[1],
                     transition: 'all 0.3s ease',
                     '&:before': { display: 'none' },
                     border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
@@ -666,7 +787,10 @@ const PricingPage: React.FC = () => {
                       minHeight: 64,
                       px: 3,
                       py: 1,
-                      bgcolor: activeFaq === index ? alpha(theme.palette.primary.light, 0.08) : theme.palette.background.paper,
+                      bgcolor:
+                        activeFaq === index
+                          ? alpha(theme.palette.primary.light, 0.08)
+                          : theme.palette.background.paper,
                     }}
                   >
                     <Typography
@@ -675,32 +799,44 @@ const PricingPage: React.FC = () => {
                       sx={{
                         fontWeight: 600,
                         fontSize: '1.1rem',
-                        color: activeFaq === index ? theme.palette.primary.main : theme.palette.text.primary,
+                        color:
+                          activeFaq === index
+                            ? theme.palette.primary.main
+                            : theme.palette.text.primary,
                       }}
                     >
                       {faq.question}
                     </Typography>
                   </AccordionSummary>
-                  <AccordionDetails sx={{ px: 3, py: 2, bgcolor: alpha(theme.palette.background.paper, 0.5) }}>
+                  <AccordionDetails
+                    sx={{
+                      px: 3,
+                      py: 2,
+                      bgcolor: alpha(theme.palette.background.paper, 0.5),
+                    }}
+                  >
                     <AnimatePresence>
                       {activeFaq === index && (
-                        <motion.div
+                        <MotionDiv
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.2 }}
                         >
-                          <Typography variant="body1" sx={{ color: theme.palette.text.secondary, lineHeight: 1.7 }}>
+                          <Typography
+                            variant="body1"
+                            sx={{ color: theme.palette.text.secondary, lineHeight: 1.7 }}
+                          >
                             {faq.answer}
                           </Typography>
-                        </motion.div>
+                        </MotionDiv>
                       )}
                     </AnimatePresence>
                   </AccordionDetails>
                 </Accordion>
               ))}
             </Box>
-          </motion.div>
+          </MotionDiv>
         </Container>
       </CustomSection>
 
@@ -708,10 +844,10 @@ const PricingPage: React.FC = () => {
       <CustomSection
         sx={{
           py: { xs: 10, md: 14 },
-          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.9)} 0%, ${alpha(
-            theme.palette.primary.main,
-            0.85
-          )} 100%)`,
+          background: `linear-gradient(135deg, ${alpha(
+            theme.palette.primary.dark,
+            0.9
+          )} 0%, ${alpha(theme.palette.primary.main, 0.85)} 100%)`,
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -738,7 +874,10 @@ const PricingPage: React.FC = () => {
             width: 300,
             height: 300,
             borderRadius: '50%',
-            background: `radial-gradient(circle, ${alpha(theme.palette.primary.light, 0.2)} 0%, transparent 70%)`,
+            background: `radial-gradient(circle, ${alpha(
+              theme.palette.primary.light,
+              0.2
+            )} 0%, transparent 70%)`,
             zIndex: 0,
           }}
         />
@@ -750,12 +889,20 @@ const PricingPage: React.FC = () => {
             width: 350,
             height: 350,
             borderRadius: '50%',
-            background: `radial-gradient(circle, ${alpha(theme.palette.primary.light, 0.2)} 0%, transparent 70%)`,
+            background: `radial-gradient(circle, ${alpha(
+              theme.palette.primary.light,
+              0.2
+            )} 0%, transparent 70%)`,
             zIndex: 0,
           }}
         />
         <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
+          <MotionDiv
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
             <Typography
               variant="h2"
               textAlign="center"
@@ -769,8 +916,13 @@ const PricingPage: React.FC = () => {
             >
               {pricingPageContent.finalCta.heading}
             </Typography>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.2 }}>
+          </MotionDiv>
+          <MotionDiv
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+          >
             <Typography
               variant="h6"
               textAlign="center"
@@ -785,8 +937,13 @@ const PricingPage: React.FC = () => {
             >
               {pricingPageContent.finalCta.description}
             </Typography>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.4 }}>
+          </MotionDiv>
+          <MotionDiv
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <Box textAlign="center">
               <Button
                 variant="contained"
@@ -800,13 +957,21 @@ const PricingPage: React.FC = () => {
                   px: 6,
                   py: 2,
                   fontSize: '1.1rem',
-                  color: theme.palette.getContrastText(theme.palette.secondary.main),
+                  color: theme.palette.getContrastText(
+                    theme.palette.secondary.main
+                  ),
                   background: theme.palette.secondary.main,
-                  boxShadow: `0 8px 20px ${alpha(theme.palette.secondary.main, 0.5)}`,
+                  boxShadow: `0 8px 20px ${alpha(
+                    theme.palette.secondary.main,
+                    0.5
+                  )}`,
                   transition: 'all 0.3s ease',
                   '&:hover': {
                     transform: 'translateY(-5px) scale(1.03)',
-                    boxShadow: `0 12px 30px ${alpha(theme.palette.secondary.main, 0.7)}`,
+                    boxShadow: `0 12px 30px ${alpha(
+                      theme.palette.secondary.main,
+                      0.7
+                    )}`,
                   },
                 }}
                 endIcon={<ArrowForwardIcon />}
@@ -814,7 +979,7 @@ const PricingPage: React.FC = () => {
                 {pricingPageContent.finalCta.cta}
               </Button>
             </Box>
-          </motion.div>
+          </MotionDiv>
         </Container>
       </CustomSection>
     </ConsistentPageLayout>
