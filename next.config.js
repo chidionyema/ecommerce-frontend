@@ -7,7 +7,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 const nextConfig = {
   // Tells Next.js to produce a standalone build.
-//  output: 'standalone',
+  output: 'standalone',
 
   // Don't generate browser source maps in production.
   productionBrowserSourceMaps: false,
@@ -20,7 +20,6 @@ const nextConfig = {
     formats: ['image/webp'],
   },
 
-  // Post-build size checking
 
 
   // Build CSP and security headers
