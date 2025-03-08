@@ -21,10 +21,9 @@ import GoldCard from '../../GoldCard';
 import { GradientButton } from '../../../components/GradientButton';
 
 // Dynamic import for framer-motion
-const MotionBox = lazy(() => import('./MotionComponents.tsx').then(module => ({ 
-  default: module.MotionBox 
+const MotionBox = lazy(() => import('./MotionComponents').then(module => ({
+  default: module.MotionBox
 })));
-
 // Code icon loaded from lucide-react
 import { Code } from 'lucide-react';
 
@@ -632,27 +631,28 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     </Box>
   );
 
-  return visible ? (
-    <Suspense fallback={renderCardContent()}>
-      {typeof window !== 'undefined' && window.innerWidth > 768 ? (
-        <MotionBox 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ 
-            duration: 0.5,
-            ease: "easeOut",
-            delay: delay * 0.1
-          }}
-        >
-          {renderCardContent()}
-        </MotionBox>
-      ) : (
-        renderCardContent()
-      )}
-    </Suspense>
-  ) : (
-    renderCardContent()
-  );
+  // Update the return statement
+return visible ? (
+  <Suspense fallback={<LoadingFallback />}>
+    {typeof window !== 'undefined' && window.innerWidth > 768 ? (
+      <MotionBox 
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ 
+          duration: 0.5,
+          ease: "easeOut",
+          delay: delay * 0.1
+        }}
+      >
+        {renderCardContent()}
+      </MotionBox>
+    ) : (
+      renderCardContent()
+    )}
+  </Suspense>
+) : (
+  renderCardContent()
+);
 };
 
 // ProjectGrid component with proper type definitions
