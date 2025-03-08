@@ -11,8 +11,6 @@ import { ProductDto } from '../../../types/haworks.types';
 import ErrorBoundary from '../../../components/Common/ErrorBoundary';
 import ProductSkeleton from '../../../components/catalog/ProductSkeleton';
 
-
-
 interface ProductDetailPageProps {
   product: ProductDto;
   relatedProducts: ProductDto[];
@@ -44,8 +42,8 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
     if (!product) setError('Product information could not be loaded');
   }, [product]);
 
-// Replace the existing feedback useEffect with this implementation
-useEffect(() => {
+  // Fixed useEffect cleanup function
+  useEffect(() => {
     let timeoutId: number | undefined;
     
     if (feedback) {
@@ -58,6 +56,7 @@ useEffect(() => {
       }
     };
   }, [feedback]);
+
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity > 0 && newQuantity <= MAX_QUANTITY) {
       setQuantity(newQuantity);
@@ -147,7 +146,8 @@ useEffect(() => {
 // Helper Components
 const ErrorFallback = () => (
   <div className="text-center py-12">
-    {/* Error UI */}
+    <h2 className="text-2xl font-semibold text-gray-800">Something went wrong</h2>
+    <p className="mt-2 text-gray-600">We couldn't load the product information. Please try again later.</p>
   </div>
 );
 
@@ -155,7 +155,18 @@ const FeedbackToast = ({ message, type }: { message: string, type: 'success' | '
   <div className={`fixed top-4 right-4 z-50 rounded-md shadow-md p-4 transition-opacity duration-500 ${
     type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
   }`}>
-    {/* Toast Content */}
+    <div className="flex items-center">
+      {type === 'success' ? (
+        <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+      ) : (
+        <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+      )}
+      <p className={`text-sm font-medium ${
+        type === 'success' ? 'text-green-800' : 'text-red-800'
+      }`}>
+        {message}
+      </p>
+    </div>
   </div>
 );
 

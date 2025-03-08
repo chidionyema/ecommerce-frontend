@@ -3,15 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev:safe": "node custom-server.js",
-    "dev:debug": "NODE_OPTIONS='--inspect' node -r ./path-guard.js ./node_modules/.bin/next dev",
-    "dev:clean": "rm -rf .next && next dev",
-    "build": "ANALYZE=true next build",
-   
-    "dev": "NODE_OPTIONS='--inspect' next dev",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "analyze": "cross-env ANALYZE=true next build"
   },
+  
   "engines": {
     "node": ">=18.0.0"
   },
