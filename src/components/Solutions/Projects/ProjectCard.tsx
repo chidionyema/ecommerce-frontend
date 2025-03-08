@@ -1,6 +1,4 @@
-// Update to ProjectCard.tsx to import and use the TechnologyChip component
-
-import React, { useState, useEffect, useRef, lazy, Suspense, ElementType } from 'react';
+import React, { useState, useEffect, useRef, Suspense, ElementType } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
@@ -34,7 +32,7 @@ const MetricCounter = dynamic(() => import('./MetricCounter'), {
 });
 
 // Default fallback icon
-import { Code as DefaultIcon } from 'lucide-react';
+import { Code as DefaultIcon, Play, CloudLightning } from 'lucide-react';
 
 // Project type definition
 export interface Metric {
@@ -97,6 +95,23 @@ const float = keyframes`
   50% { transform: translateY(-10px); }
 `;
 
+const spotlight = keyframes`
+  0%, 100% { 
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  50% { 
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+`;
+
+const gradientShift = keyframes`
+  0% { background-position: 0% 50% }
+  50% { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+`;
+
 // Fallback component for suspense
 const FallbackButton: React.FC<{ brandColor: string }> = ({ brandColor }) => (
   <Box
@@ -115,6 +130,51 @@ const FallbackButton: React.FC<{ brandColor: string }> = ({ brandColor }) => (
   </Box>
 );
 
+// Particle effect component for featured projects
+const ParticleEffect: React.FC<{ color: string }> = ({ color }) => {
+  const particles = Array.from({ length: 20 }, (_, i) => i);
+  
+  return (
+    <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+      {particles.map((_, index) => {
+        const size = Math.floor(Math.random() * 3) + 2;
+        const duration = Math.floor(Math.random() * 15) + 10;
+        const delay = Math.random() * 5;
+        
+        return (
+          <Box
+            key={index}
+            component={motion.div}
+            sx={{
+              position: 'absolute',
+              width: `${size}px`,
+              height: `${size}px`,
+              borderRadius: '50%',
+              backgroundColor: color,
+              filter: `blur(${size > 3 ? 1 : 0}px)`,
+              opacity: Math.random() * 0.5 + 0.2,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+            }}
+            initial={{ y: 0, x: 0 }}
+            animate={{
+              y: [0, -(Math.random() * 50 + 20), 0],
+              x: [0, (Math.random() * 40 - 20), 0],
+            }}
+            transition={{
+              duration,
+              repeat: Infinity,
+              delay,
+              ease: "easeInOut",
+              times: [0, 0.5, 1]
+            }}
+          />
+        );
+      })}
+    </Box>
+  );
+};
+
 // Component's main function
 const ProjectCard: React.FC<ProjectCardProps> = ({
   project,
@@ -128,6 +188,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   const [expanded, setExpanded] = useState<boolean>(false);
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
   const [isHovering, setIsHovering] = useState<boolean>(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [showSpotlight, setShowSpotlight] = useState(false);
   
   // Using Intersection Observer through react-intersection-observer
   const [ref, inView] = useInView({
@@ -166,6 +228,26 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       cardRef.current.style.setProperty('--primary-rgb', rgbColor);
     }
   }, [priority, inView, imageUrl, project.background, brandColor]);
+
+  // Handle mouse move for spotlight effect
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    setMousePosition({ x, y });
+    
+    if (!showSpotlight) {
+      setShowSpotlight(true);
+    }
+  };
+  
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    setShowSpotlight(false);
+  };
 
   // Toggle expanded state
   const toggleExpand = (e: React.MouseEvent): void => {
@@ -209,6 +291,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     return match ? parseFloat(match[0]) : 0;
   };
 
+  // 3D rotation values
+  const rotateX = isHovering ? ((mousePosition.y / (cardRef.current?.clientHeight || 1)) - 0.5) * 5 : 0;
+  const rotateY = isHovering ? ((mousePosition.x / (cardRef.current?.clientWidth || 1)) - 0.5) * -5 : 0;
+
   // Card content
   return (
     <Box
@@ -232,13 +318,18 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               damping: 20,
               delay: delay * 0.1
             }}
-            style={{ transformStyle: 'preserve-3d' }}
+            style={{ 
+              transformStyle: 'preserve-3d',
+              transform: `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+              transition: 'transform 0.1s ease'
+            }}
           >
             <Box
               ref={cardRef}
               onClick={handleCardClick}
               onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
+              onMouseLeave={handleMouseLeave}
+              onMouseMove={handleMouseMove}
               sx={{
                 width: { xs: '320px', sm: '360px', md: '380px' },
                 height: expanded ? 'auto' : { xs: '450px', sm: '480px', md: '500px' },
@@ -247,10 +338,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 overflow: 'hidden',
                 cursor: 'pointer',
                 boxShadow: isHovering 
-                  ? `0 25px 50px -12px ${alpha(brandColor, 0.35)}`
+                  ? `0 25px 50px -12px ${alpha(brandColor, 0.35)}, 0 0 30px ${alpha(brandColor, 0.1)}`
                   : `0 15px 30px -5px ${alpha(theme.palette.common.black, 0.2)}`,
                 transition: 'all 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67)',
-                transform: isHovering ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)',
+                transform: isHovering ? 'translateY(-10px) scale(1.02)' : 'translateY(0) scale(1)',
                 '&::before': project.featured ? {
                   content: '""',
                   position: 'absolute',
@@ -259,6 +350,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   borderRadius: 'inherit',
                   padding: '2px',
                   background: `linear-gradient(45deg, ${brandColor}, ${alpha(theme.palette.secondary.main, 0.7)})`,
+                  backgroundSize: '400% 400%',
+                  animation: `${gradientShift} 15s ease infinite`,
                   WebkitMask: 
                     'linear-gradient(#fff 0 0) content-box, ' +
                     'linear-gradient(#fff 0 0)',
@@ -268,9 +361,37 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 ...sx
               }}
             >
+              {/* Spotlight effect */}
+              {showSpotlight && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: mousePosition.y,
+                    left: mousePosition.x,
+                    width: '350px',
+                    height: '350px',
+                    borderRadius: '50%',
+                    background: `radial-gradient(circle, ${alpha(brandColor, 0.15)} 0%, transparent 70%)`,
+                    transform: 'translate(-50%, -50%)',
+                    pointerEvents: 'none',
+                    zIndex: 1,
+                    opacity: 0.8,
+                  }}
+                />
+              )}
+
+              {/* Particle effect for featured projects */}
+              {project.featured && (
+                <ParticleEffect color={brandColor} />
+              )}
+
               {/* Featured Badge */}
               {project.featured && (
                 <Box
+                  component={motion.div}
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3, type: 'spring', stiffness: 100 }}
                   sx={{
                     position: 'absolute',
                     top: 16,
@@ -290,9 +411,33 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                     fontSize: '0.8rem',
                     transform: isHovering ? 'scale(1.05)' : 'scale(1)',
                     transition: 'transform 0.3s ease',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      inset: 0,
+                      borderRadius: 'inherit',
+                      padding: '1px',
+                      background: 'linear-gradient(45deg, rgba(255,255,255,0.2), transparent, rgba(255,255,255,0.2))',
+                      WebkitMask: 
+                        'linear-gradient(#fff 0 0) content-box, ' +
+                        'linear-gradient(#fff 0 0)',
+                      WebkitMaskComposite: 'xor',
+                      maskComposite: 'exclude',
+                      opacity: isHovering ? 1 : 0,
+                      transition: 'opacity 0.3s ease',
+                    }
                   }}
                 >
-                  <StarRounded sx={{ fontSize: '1rem' }} />
+                  <motion.div 
+                    animate={{ rotate: [0, 5, 0, -5, 0] }} 
+                    transition={{ 
+                      repeat: Infinity, 
+                      duration: 5, 
+                      ease: "easeInOut" 
+                    }}
+                  >
+                    <StarRounded sx={{ fontSize: '1rem', color: '#000' }} />
+                  </motion.div>
                   <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.85rem' }}>
                     Featured
                   </Typography>
@@ -402,6 +547,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   }}
                 >
                   <Box
+                    component={motion.div}
+                    whileHover={{ 
+                      scale: 1.15,
+                      rotateZ: [0, -5, 5, 0],
+                      transition: { duration: 0.5 }
+                    }}
                     sx={{
                       width: 44,
                       height: 44,
@@ -415,6 +566,17 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                       border: `1px solid ${alpha(brandColor, 0.6)}`,
                       transform: isHovering ? 'scale(1.1) translateY(-4px)' : 'scale(1) translateY(0)',
                       transition: 'all 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67)',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        width: '150%',
+                        height: '150%',
+                        borderRadius: 'inherit',
+                        background: `radial-gradient(circle, ${alpha(brandColor, 0.5)}, transparent 70%)`,
+                        opacity: isHovering ? 0.4 : 0,
+                        transition: 'opacity 0.4s ease',
+                        zIndex: -1,
+                      }
                     }}
                   >
                     {renderIcon()}
@@ -454,6 +616,16 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               >
                 {/* Floating decoration elements */}
                 <Box
+                  component={motion.div}
+                  animate={{ 
+                    scale: [1, 1.1, 1],
+                    opacity: [0.5, 0.7, 0.5]
+                  }}
+                  transition={{ 
+                    duration: 6,
+                    repeat: Infinity,
+                    repeatType: "reverse"
+                  }}
                   sx={{
                     position: 'absolute',
                     width: 60,
@@ -462,7 +634,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                     right: -20,
                     background: `radial-gradient(circle, ${alpha(brandColor, 0.2)}, transparent 70%)`,
                     borderRadius: '50%',
-                    animation: `${float} 6s ease-in-out infinite`,
                     zIndex: 0,
                     opacity: isHovering ? 0.9 : 0.5,
                     transition: 'opacity 0.5s ease',
@@ -470,6 +641,17 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 />
 
                 <Box
+                  component={motion.div}
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 0.8, 0.5]
+                  }}
+                  transition={{ 
+                    duration: 5,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    delay: 1
+                  }}
                   sx={{
                     position: 'absolute',
                     width: 30,
@@ -478,7 +660,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                     left: 10,
                     background: `radial-gradient(circle, ${alpha(brandColor, 0.3)}, transparent 70%)`,
                     borderRadius: '50%',
-                    animation: `${float} 5s ease-in-out infinite 1s`,
                     zIndex: 0,
                     opacity: isHovering ? 0.9 : 0.5,
                     transition: 'opacity 0.5s ease',
@@ -488,6 +669,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 {/* Project Title */}
                 <Typography
                   variant="h5"
+                  component={motion.h2}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 + delay * 0.1, duration: 0.5 }}
                   sx={{
                     fontSize: { xs: '1.25rem', sm: '1.4rem' },
                     fontWeight: 800,
@@ -514,6 +699,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 {/* Key Metrics */}
                 {project.metrics && project.metrics.length > 0 && (
                   <Box
+                    component={motion.div}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 + delay * 0.1, duration: 0.5 }}
                     sx={{
                       display: 'flex',
                       gap: 2,
@@ -539,7 +728,19 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                         height: '1.5px',
                         background: `linear-gradient(90deg, ${alpha(brandColor, 0.05)}, ${brandColor}, ${alpha(brandColor, 0.05)})`,
                         zIndex: 1,
-                      }
+                      },
+                      '&::after': isHovering ? {
+                        content: '""',
+                        position: 'absolute',
+                        top: '25%',
+                        left: -150,
+                        width: '100px',
+                        height: '200%',
+                        background: `linear-gradient(90deg, transparent, ${alpha(brandColor, 0.05)}, transparent)`,
+                        transform: 'rotate(35deg)',
+                        animation: `${shimmer} 3s infinite`,
+                        zIndex: 2,
+                      } : {}
                     }}
                   >
                     {project.metrics.slice(0, 3).map((metric, index) => (
@@ -556,6 +757,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                             alignItems: 'center',
                             flex: 1,
                             position: 'relative',
+                            zIndex: 3,
                             '&::after': index < project.metrics.length - 1 ? {
                               content: '""',
                               position: 'absolute',
@@ -613,7 +815,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 )}
 
                 {/* Project Description */}
-                <Box>
+                <Box component={motion.div}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + delay * 0.1, duration: 0.5 }}>
                   <AnimatePresence initial={false}>
                     {expanded ? (
                       <motion.div
@@ -674,6 +879,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
                 {/* Technology Stack */}
                 <Box
+                  component={motion.div}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + delay * 0.1, duration: 0.5 }}
                   sx={{
                     borderRadius: 3,
                     p: 2,
@@ -685,6 +894,19 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                     boxShadow: isHovering 
                       ? `0 8px 20px -5px ${alpha(brandColor, 0.25)}`
                       : 'none',
+                    overflow: 'hidden',
+                    '&::after': isHovering ? {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: -100,
+                      width: '40px',
+                      height: '300%',
+                      background: `linear-gradient(90deg, transparent, ${alpha('#fff', 0.1)}, transparent)`,
+                      transform: 'rotate(35deg)',
+                      animation: `${shimmer} 3s infinite ease-in-out`,
+                      zIndex: 1,
+                    } : {}
                   }}
                 >
                   <Typography
@@ -696,6 +918,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                       display: 'flex',
                       alignItems: 'center',
                       mb: 1.5,
+                      zIndex: 2,
+                      position: 'relative',
                       '&::before': {
                         content: '""',
                         display: 'inline-block',
@@ -719,6 +943,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                       maxHeight: expanded ? '200px' : '80px',
                       overflowY: expanded ? 'auto' : 'hidden',
                       position: 'relative',
+                      zIndex: 2,
                       '&::after': !expanded ? {
                         content: '""',
                         position: 'absolute',
@@ -758,6 +983,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   {project.technologies.length > 6 && (
                     <Box
                       onClick={toggleExpand}
+                      component={motion.div}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.98 }}
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
@@ -774,7 +1002,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                         background: alpha(brandColor, 0.05),
                         '&:hover': {
                           background: alpha(brandColor, 0.15),
-                        }
+                        },
+                        zIndex: 2,
+                        position: 'relative',
                       }}
                     >
                       {expanded ? (
@@ -794,58 +1024,112 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
                 {/* CTA Button */}
                 <Suspense fallback={<FallbackButton brandColor={brandColor} />}>
-                  <StylizedButton
-                    href={`/projects/${project.id}`}
-                    label="View Case Study"
-                    endIcon={
-                      <ArrowRightAltRounded
-                        sx={{
-                          transition: 'transform 0.3s ease',
-                          transform: isHovering ? 'translateX(4px)' : 'translateX(0)',
-                        }}
-                      />
-                    }
-                    isHovering={isHovering}
-                    brandColor={brandColor}
-                    sx={{
-                      mt: 'auto',
-                      py: 1.5,
-                      borderRadius: 3,
-                      fontWeight: 700,
-                    }}
-                  />
+                  <Box component={motion.div}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + delay * 0.1, duration: 0.5 }}>
+                    <StylizedButton
+                      href={`/projects/${project.id}`}
+                      label="View Case Study"
+                      endIcon={
+                        <ArrowRightAltRounded
+                          sx={{
+                            transition: 'transform 0.3s ease',
+                            transform: isHovering ? 'translateX(4px)' : 'translateX(0)',
+                          }}
+                        />
+                      }
+                      isHovering={isHovering}
+                      brandColor={brandColor}
+                      sx={{
+                        mt: 'auto',
+                        py: 1.5,
+                        borderRadius: 3,
+                        fontWeight: 700,
+                      }}
+                    />
+                  </Box>
                 </Suspense>
               </Box>
 
-              {/* Quick view button */}
+              {/* Live demo button */}
               {isHovering && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.2 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Box
+                    component={motion.div}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    sx={{
+                      position: 'absolute',
+                      top: 16,
+                      left: 16,
+                      zIndex: 10,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: '20px',
+                      background: alpha(theme.palette.background.paper, 0.85),
+                      backdropFilter: 'blur(8px)',
+                      border: `1px solid ${alpha(brandColor, 0.3)}`,
+                      color: brandColor,
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.2)}`,
+                      cursor: 'pointer',
+                      '&:hover': {
+                        background: alpha(theme.palette.background.paper, 0.95),
+                      },
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(`/projects/${project.id}/demo`, '_blank');
+                    }}
+                  >
+                    <Play size={14} />
+                    Live Demo
+                  </Box>
+                </motion.div>
+              )}
+
+              {/* Quick view button */}
+              {isHovering && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2, delay: 0.1 }}
                 >
                   <IconButton
                     aria-label="Quick view"
+                    component={motion.button}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
                       handleCardClick();
                     }}
                     sx={{
                       position: 'absolute',
-                      top: 16,
-                      left: 16,
+                      bottom: isHovering ? 16 : -50,
+                      right: 16,
                       zIndex: 10,
-                      width: 40,
-                      height: 40,
-                      background: alpha(theme.palette.background.paper, 0.85),
+                      width: 44,
+                      height: 44,
+                      background: alpha(brandColor, 0.85),
                       backdropFilter: 'blur(8px)',
-                      border: `1px solid ${alpha(brandColor, 0.3)}`,
-                      color: brandColor,
-                      boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.2)}`,
+                      border: `1px solid ${alpha('#fff', 0.3)}`,
+                      color: '#fff',
+                      boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.3)}`,
+                      transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                       '&:hover': {
-                        background: alpha(theme.palette.background.paper, 0.95),
-                        transform: 'scale(1.1)',
+                        background: alpha(brandColor, 0.95),
                       },
                     }}
                   >

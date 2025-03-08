@@ -19,11 +19,16 @@ const pulse = keyframes`
 type ButtonSize = 'small' | 'medium' | 'large';
 type ButtonVariant = 'subtle' | 'solid' | 'gradient' | 'outline' | 'ghost';
 
+// Define a type for the icon elements that includes fontSize
+interface IconElementProps {
+  fontSize?: string | number;
+}
+
 interface StylizedButtonProps {
   href?: string;
   label: string;
-  startIcon?: ReactNode;
-  endIcon?: ReactNode;
+  startIcon?: React.ReactElement<IconElementProps>;
+  endIcon?: React.ReactElement<IconElementProps>;
   isHovering?: boolean;
   brandColor?: string;
   sx?: SxProps<Theme>;
@@ -218,9 +223,11 @@ const StylizedButton: React.FC<StylizedButtonProps> = ({
   // Button content
   const ButtonContent = (
     <>
-      {startIcon && React.isValidElement(startIcon) && React.cloneElement(startIcon, { fontSize: 'inherit' })}
+      {startIcon && React.isValidElement<IconElementProps>(startIcon) && 
+        React.cloneElement(startIcon, { fontSize: 'inherit' as any })}
       {label}
-      {endIcon && React.isValidElement(endIcon) && React.cloneElement(endIcon, { fontSize: 'inherit' })}
+      {endIcon && React.isValidElement<IconElementProps>(endIcon) && 
+        React.cloneElement(endIcon, { fontSize: 'inherit' as any })}
     </>
   );
 
