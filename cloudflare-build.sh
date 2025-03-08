@@ -31,16 +31,24 @@ ls -la out || echo "out directory doesn't exist or is empty"
 # Step 2: Create the directory structure Cloudflare Pages expects
 echo "Creating Cloudflare Pages directory structure..."
 mkdir -p .vercel/output/static
-mkdir -p .vercel/output/functions/_middleware
+mkdir -p .vercel/output/functions
 
 # Step 3: Copy all content from the Next.js output directory to the .vercel/output/static directory
 echo "Copying files to .vercel/output/static..."
-# Use find to copy files individually rather than with a wildcard
 if [ -d "out" ] && [ "$(ls -A out)" ]; then
-  find out -type f -exec cp {} .vercel/output/static/ \;
+  # Use cp -r to preserve directory structure
+  cp -r out/* .vercel/output/static/
 else
   # Create a placeholder file to prevent empty directory errors
   echo "<html><body><h1>Site is being set up</h1></body></html>" > .vercel/output/static/index.html
+fi
+
+# Ensure index.html exists and is properly placed
+if [ ! -f ".vercel/output/static/index.html" ]; then
+  echo "No index.html found at root level, copying from elsewhere or creating new one..."
+  # Try to find an index.html somewhere in the output
+  find .vercel/output/static -name "index.html" -exec cp {} .vercel/output/static/ \; || \
+  echo "<html><body><h1>Welcome to the site</h1><p>The site is being set up.</p></body></html>" > .vercel/output/static/index.html
 fi
 
 # Step 4: Create a config.json file for Cloudflare Pages
@@ -50,15 +58,17 @@ cat > .vercel/output/config.json << 'EOF'
   "version": 1,
   "routes": [
     { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/(.*)", "status": 200, "dest": "/index.html" }
   ]
 }
 EOF
 
-# Step 5: Create a simple middleware function
-echo "Creating middleware function..."
-cat > .vercel/output/functions/_middleware.js << 'EOF'
-export async function onRequest(context) {
+# Step 5: Create a simple function file (not middleware)
+echo "Creating functions..."
+mkdir -p .vercel/output/functions
+cat > .vercel/output/functions/[[path]].js << 'EOF'
+export function onRequest(context) {
+  // This is a catch-all function that will handle any requests not handled by static files
   return context.next();
 }
 EOF
