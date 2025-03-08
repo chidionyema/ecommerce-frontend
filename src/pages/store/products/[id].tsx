@@ -195,6 +195,16 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  // During build time in production environments
+  if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_DEV_BUILD) {
+    console.log('Build environment detected, returning empty paths array');
+    return {
+      paths: [],
+      fallback: 'blocking'
+    };
+  }
+  
+  // Only try to fetch paths during development or when explicitly enabled
   try {
     const popularProducts = await productService.getPopularProducts(100);
     return {
