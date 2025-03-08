@@ -22,11 +22,9 @@ import { GradientButton } from '../../../components/GradientButton';
 
 // Dynamic import for framer-motion
 
-const MotionBox = lazy(() =>
-  import('./MotionComponents').then((mod) => ({
-    default: mod.MotionBox
-  }))
-);
+const MotionBox = lazy(() => import('./MotionComponents').then(module => ({ 
+  default: module.MotionBox 
+})));
 
 // Code icon loaded from lucide-react
 import { Code } from 'lucide-react';
