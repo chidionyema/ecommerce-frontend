@@ -8,6 +8,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig = {
   // Tells Next.js to produce a standalone build.
   output: 'export',
+  distDir: 'out',  
 
   // Don't generate browser source maps in production.
   productionBrowserSourceMaps: false,
