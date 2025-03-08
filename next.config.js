@@ -7,7 +7,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig = {
   // Tells Next.js to produce a standalone build (which is good for Cloudflare Pages + next-on-pages).
   output: 'standalone',
-a
+
   // Don't generate browser source maps in production (reduces final build size).
   productionBrowserSourceMaps: false,
 
