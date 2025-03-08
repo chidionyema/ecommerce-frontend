@@ -1,9 +1,19 @@
 name = "ecommerce-frontend"
 compatibility_date = "2024-03-08"
 
-# This is the critical missing part
 [build]
-command = "npm run build"
+command = "npm run build && bash ./deploy-setup.sh"
+
 [build.upload]
 format = "directory"
+
+# This is the critical property that was missing in your configuration
 pages_build_output_dir = ".vercel/output/static"
+
+[site]
+bucket = "out"
+
+[env.production]
+routes = [
+  { pattern = "/*", script = "index.js" }
+]

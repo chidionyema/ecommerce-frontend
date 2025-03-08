@@ -4,16 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "rm -rf .next/cache .tmp .webpack-cache",
-    "build": "next build && npx next-on-pages build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "next build",
-    "analyze": "cross-env ANALYZE=true next build",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "pages:deploy": "npx wrangler pages deploy .vercel/output/static",
-    "pages:watch": "npx @cloudflare/next-on-pages --watch",
-    "pages:dev": "npx wrangler pages dev .vercel/output/static --compatibility-flag=nodejs_compat"
+    "deploy": "chmod +x ./deploy-setup.sh && npm run build && ./deploy-setup.sh"
   },
   "engines": {
     "node": ">=18.0.0"
