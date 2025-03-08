@@ -1,8 +1,9 @@
 name = "ecommerce-frontend"
 compatibility_date = "2024-03-08"
 
+# This is the critical missing part
 [build]
 command = "npm run build"
-
-[site]
-bucket = ".next/standalone"
+[build.upload]
+format = "directory"
+pages_build_output_dir = ".vercel/output/static"
