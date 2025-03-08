@@ -2,7 +2,7 @@
  'use client';  // Add this at the top
 import { useState, useEffect, useCallback } from 'react';
 import { Box, Dialog, IconButton, CircularProgress } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import Close from '@mui/icons-material/Close';
 import Script from 'next/script';
 
 interface CalendlyProps {

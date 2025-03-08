@@ -1,17 +1,18 @@
 // src/data/contactPageData.ts
-import {
-    Person,
-    Email,
-    Phone,
-    ChatBubbleOutline,
-    Headset,
-    LocationOn,
-    AccessTime,
-    Star,
-  } from '@mui/icons-material';
-  import { SvgIconTypeMap } from '@mui/material';
-  import { OverridableComponent } from '@mui/material/OverridableComponent';
-  
+
+// Import icons individually for better tree-shaking
+import Person from '@mui/icons-material/Person';
+import Email from '@mui/icons-material/Email';
+import Phone from '@mui/icons-material/Phone';
+import ChatBubbleOutline from '@mui/icons-material/ChatBubbleOutline';
+import Headset from '@mui/icons-material/Headset';
+import LocationOn from '@mui/icons-material/LocationOn';
+import AccessTime from '@mui/icons-material/AccessTime';
+import Star from '@mui/icons-material/Star';
+
+// Import types
+import { SvgIconTypeMap } from '@mui/material';
+import { OverridableComponent } from '@mui/material/OverridableComponent';
   interface FaqItem {
     question: string;
     answer: string;

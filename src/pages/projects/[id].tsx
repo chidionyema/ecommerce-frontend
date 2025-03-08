@@ -1,49 +1,60 @@
 
 
 
+'use client';
 
 import { useParams, useRouter } from 'next/navigation';
+
+// React imports
 import { useMemo, useRef, useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Container,
-  CircularProgress,
-  Grid,
-  useTheme,
-  Fade,
-  Divider,
-  Chip,
-  Avatar,
-  Tooltip,
-  Backdrop,
-  Button,
-  IconButton,
-  Tabs,
-  Tab,
-  useMediaQuery,
-} from '@mui/material';
+
+// MUI Core Components
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import CircularProgress from '@mui/material/CircularProgress';
+import Grid from '@mui/material/Grid';
+import Fade from '@mui/material/Fade';
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
+import Avatar from '@mui/material/Avatar';
+import Tooltip from '@mui/material/Tooltip';
+import Backdrop from '@mui/material/Backdrop';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+
+// MUI Utilities
+import useTheme from '@mui/material/styles/useTheme';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { alpha, darken } from '@mui/material/styles';
+
+// MUI Icons
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import CalendarMonth from '@mui/icons-material/CalendarMonth';
+import People from '@mui/icons-material/People';
+import Code from '@mui/icons-material/Code';
+import BusinessCenter from '@mui/icons-material/BusinessCenter';
+import ChevronRight from '@mui/icons-material/ChevronRight';
+import ChevronLeft from '@mui/icons-material/ChevronLeft';
+import Share from '@mui/icons-material/Share';
+import BookmarkAdd from '@mui/icons-material/BookmarkAdd';
+import Download from '@mui/icons-material/Download';
+import MoreVert from '@mui/icons-material/MoreVert';
+import LightbulbOutlined from '@mui/icons-material/LightbulbOutlined';
+import Timeline from '@mui/icons-material/Timeline';
+import EmojiEvents from '@mui/icons-material/EmojiEvents';
+import School from '@mui/icons-material/School';
+
+// Animation library
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowBack, 
-  CalendarMonth, 
-  People, 
-  Code, 
-  BusinessCenter, 
-  ChevronRight, 
-  ChevronLeft, 
-  Share, 
-  BookmarkAdd, 
-  Download, 
-  MoreVert,
-  LightbulbOutlined,
-  Timeline,
-  EmojiEvents,
-  School
-} from '@mui/icons-material';
+
+// Data and types
 import { cvProjects } from '../../data/cvProjects';
 import { Project } from '../../types/project';
+
+// Components
 import ConsistentPageLayout from '../../components/Shared/ConsistentPageLayout';
 import QuickFacts from '../../components/Project/QuickFacts';
 import { LessonsLearned } from '../../components/Project/LessonsLearned';

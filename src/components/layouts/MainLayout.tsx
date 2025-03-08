@@ -20,14 +20,13 @@ import {
   Divider, 
   alpha 
 } from '@mui/material';
-import { 
-  Menu as MenuIcon, 
-  ShoppingCart as ShoppingCartIcon, 
-  AccountCircle, 
-  Favorite, 
-  Search, 
-  ArrowUpward 
-} from '@mui/icons-material';
+import Menu from '@mui/icons-material/Menu';
+import ShoppingCart from '@mui/icons-material/ShoppingCart';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import Favorite from '@mui/icons-material/Favorite';
+import Search from '@mui/icons-material/Search';
+import ArrowUpward from '@mui/icons-material/ArrowUpward';
+
 import Footer from '../Footer';
 
 interface MainLayoutProps {

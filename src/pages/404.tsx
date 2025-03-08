@@ -1,14 +1,26 @@
 'use client';
 
 import React from 'react';
-import { useTheme, Typography, Box, Button, Container } from '@mui/material';
+
+import useTheme from '@mui/material/styles/useTheme';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+
 import NextLink from 'next/link';
+
 import GoldCard from '../components/GoldCard';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import CardGrid from '../components/CardGrid';
 import PageSection from '../components/PageSection';
-import { Cloud as CloudIcon, VpnKey, Code as CodeIcon } from '@mui/icons-material';
+
+import CloudIcon from '@mui/icons-material/Cloud';
+import VpnKey from '@mui/icons-material/VpnKey';
+import CodeIcon from '@mui/icons-material/Code';
+
 import { CARD_STYLES, getSharedStyles, SPACING } from '../utils/sharedStyles';
+
 
 const resources = [
   {

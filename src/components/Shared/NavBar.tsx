@@ -3,30 +3,39 @@
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Container,
-  alpha,
-  Stack,
-  useMediaQuery,
-  Box,
-  Button,
-  Divider,
-  Drawer,
-  Fade,
-  Tooltip,
-  AppBarProps,
-  LinearProgress,
-  CircularProgress,
-  Skeleton,
-} from '@mui/material';
+
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import Container from '@mui/material/Container';
+import { alpha } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
+import Drawer from '@mui/material/Drawer';
+import Fade from '@mui/material/Fade';
+import Tooltip from '@mui/material/Tooltip';
+import { AppBarProps } from '@mui/material/AppBar';
+import LinearProgress from '@mui/material/LinearProgress';
+import CircularProgress from '@mui/material/CircularProgress';
+import Skeleton from '@mui/material/Skeleton';
+
 import { styled, useTheme } from '@mui/material/styles';
-import { Menu, Close, Home, Book, Paid, Email, KeyboardArrowDown } from '@mui/icons-material';
+
+import Menu from '@mui/icons-material/Menu';
+import Close from '@mui/icons-material/Close';
+import Home from '@mui/icons-material/Home';
+import Book from '@mui/icons-material/Book';
+import Paid from '@mui/icons-material/Paid';
+import Email from '@mui/icons-material/Email';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
+
 import { Cpu } from 'lucide-react';
 import { SvgIconComponent } from '@mui/icons-material';
+
 
 // Define proper types for navigation items
 interface NavItemType {

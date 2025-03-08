@@ -1,18 +1,31 @@
 // src/data/pricingPageData.ts
-import {
-    AccessTime,
-    EmojiEvents as EmojiEventsIcon,
-    CalendarToday as CalendarTodayIcon,
-    Work as WorkIcon,
-    Group as GroupIcon,
-    Info as InfoIcon,
-    CheckCircle as CheckCircleIcon,
-    Support as SupportIcon,
-    Analytics as AnalyticsIcon,
-    Speed as SpeedIcon,
-  } from '@mui/icons-material';
-  import { OverridableComponent } from '@mui/material/OverridableComponent';
-  import { SvgIconTypeMap } from '@mui/material';
+
+// Import icons individually for better tree-shaking
+import AccessTime from '@mui/icons-material/AccessTime';
+import EmojiEvents from '@mui/icons-material/EmojiEvents';
+import CalendarToday from '@mui/icons-material/CalendarToday';
+import Work from '@mui/icons-material/Work';
+import Group from '@mui/icons-material/Group';
+import Info from '@mui/icons-material/Info';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import Support from '@mui/icons-material/Support';
+import Analytics from '@mui/icons-material/Analytics';
+import Speed from '@mui/icons-material/Speed';
+
+// Rename imports to match your convention
+const EmojiEventsIcon = EmojiEvents;
+const CalendarTodayIcon = CalendarToday;
+const WorkIcon = Work;
+const GroupIcon = Group;
+const InfoIcon = Info;
+const CheckCircleIcon = CheckCircle;
+const SupportIcon = Support;
+const AnalyticsIcon = Analytics;
+const SpeedIcon = Speed;
+
+// Import types
+import { OverridableComponent } from '@mui/material/OverridableComponent';
+import { SvgIconTypeMap } from '@mui/material';
   
   export type MuiIcon = OverridableComponent<SvgIconTypeMap<{}, "svg">> & {
     muiName: string;

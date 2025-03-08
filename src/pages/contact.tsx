@@ -1,39 +1,50 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import {
-  useTheme,
-  TextField,
-  Button,
-  Box,
-  CircularProgress,
-  Typography,
-  InputAdornment,
-  Container,
-  Divider,
-  Fab,
-  Stack,
-  Grid,
-  alpha,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Paper,
-  Avatar,
-  useMediaQuery,
-  Slide,
-  Fade,
-  Zoom
-} from '@mui/material';
-import { 
-  Person, 
-  Email, 
-  Phone, 
-  KeyboardArrowUp,
-  Star,
-  CheckCircle
-} from '@mui/icons-material';
+
+// Base MUI components
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+import Paper from '@mui/material/Paper';
+import Avatar from '@mui/material/Avatar';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+
+// Form components
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import InputAdornment from '@mui/material/InputAdornment';
+import CircularProgress from '@mui/material/CircularProgress';
+import Fab from '@mui/material/Fab';
+
+// Animations
+import Slide from '@mui/material/Slide';
+import Fade from '@mui/material/Fade';
+import Zoom from '@mui/material/Zoom';
+
+// Utilities
+import useTheme from '@mui/material/styles/useTheme';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { alpha } from '@mui/material/styles';
+
+// MUI Icons - imported individually
+import Person from '@mui/icons-material/Person';
+import Email from '@mui/icons-material/Email';
+import Phone from '@mui/icons-material/Phone';
+import KeyboardArrowUp from '@mui/icons-material/KeyboardArrowUp';
+import Star from '@mui/icons-material/Star';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+
+// Lucide Icons
+import { CheckCircle as CheckCircleIcon } from 'lucide-react';
+
+// Project components and utilities
 import { SPACING } from '../utils/sharedStyles';
 import { GradientButton } from '../components/GradientButton';
 import { useRouter } from 'next/navigation';
@@ -42,8 +53,11 @@ import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import GoldCard from '../components/GoldCard';
 import { getSharedStyles } from '../utils/sharedStyles';
 import * as yup from 'yup';
-// Update the import path to use the common folder
+
+// Common components
 import FAQ from '../components/Common/FAQ';
+
+// Data imports
 import { 
   faqItems, 
   testimonials, 
@@ -52,8 +66,6 @@ import {
   testimonialSection,
   successPageData
 } from '../data/contactPageData';
-import { CheckCircleIcon } from 'lucide-react';
-
 // Form validation schema
 const validationSchema = yup.object().shape({
   name: yup.string()

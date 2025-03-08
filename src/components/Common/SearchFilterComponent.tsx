@@ -20,13 +20,11 @@ import {
   Tooltip,
   SelectChangeEvent,
 } from '@mui/material';
-import {
-  Search as SearchIcon,
-  FilterList as FilterListIcon,
-  Clear as ClearIcon,
-  ArrowDropDown as ArrowDropDownIcon,
-  Check as CheckIcon,
-} from '@mui/icons-material';
+import Search from '@mui/icons-material/Search';
+import FilterList from '@mui/icons-material/FilterList';
+import Clear from '@mui/icons-material/Clear';
+import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
+import Check from '@mui/icons-material/Check';
 
 // Types for the component - Fixed icon type to be ReactElement instead of ReactNode
 export interface FilterOption {

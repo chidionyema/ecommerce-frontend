@@ -1,6 +1,11 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
-import { Box, IconButton, useMediaQuery } from '@mui/material';
-import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
+import ChevronLeft from '@mui/icons-material/ChevronLeft';
+import ChevronRight from '@mui/icons-material/ChevronRight';
+
 import throttle from 'lodash/throttle';
 
 interface HorizontalScrollPanelProps {

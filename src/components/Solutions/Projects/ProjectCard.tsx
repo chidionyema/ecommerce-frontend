@@ -1,10 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Box, Typography, CardContent, Chip, Tooltip, useTheme, alpha, Collapse } from '@mui/material';
-import { ArrowRightAlt, ExpandMore, ExpandLess, Star } from '@mui/icons-material';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
+
+// MUI Core imports grouped together
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
+import Collapse from '@mui/material/Collapse';
+import useTheme from '@mui/material/styles/useTheme';
+import { alpha } from '@mui/material';
+
+// MUI Icons imported separately
+import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import Star from '@mui/icons-material/Star';
+
+// Local components
 import GoldCard from '../../GoldCard';
-import { Code } from 'lucide-react';
 import { GradientButton } from '../../../components/GradientButton';
-import { motion } from 'framer-motion';
+
+// Dynamic import for framer-motion
+const MotionBox = lazy(() => import('./MotionComponents.tsx').then(module => ({ 
+  default: module.MotionBox 
+})));
+
+// Code icon loaded from lucide-react
+import { Code } from 'lucide-react';
 
 // Project type definition
 export interface Project {
@@ -42,6 +64,20 @@ const CARD_SIZES = {
   width: { xs: '320px', sm: '340px', md: '360px' },
   height: { xs: '460px', sm: '470px', md: '480px' },
 };
+
+// Fallback loading component
+const LoadingFallback = () => (
+  <Box sx={{ 
+    width: '100%', 
+    height: '100%', 
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    p: 2
+  }}>
+    <Typography variant="body2">Loading...</Typography>
+  </Box>
+);
 
 // Main component with improved readability and performance
 const ProjectCard: React.FC<ProjectCardProps> = ({ 
@@ -92,6 +128,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
   // Progressive loading with IntersectionObserver
   useEffect(() => {
+    // Only observe if IntersectionObserver is available
+    if (!('IntersectionObserver' in window)) {
+      setVisible(true);
+      return;
+    }
+    
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -164,17 +206,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       : '75, 123, 236';
   };
 
-  return (
+  // Card content without motion effects
+  const renderCardContent = () => (
     <Box
       ref={cardRef}
-      component={motion.div}
-      initial={{ opacity: 0, y: 30 }}
-      animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ 
-        duration: 0.5,
-        ease: "easeOut",
-        delay: delay * 0.1
-      }}
       sx={{
         display: 'flex',
         justifyContent: 'center',
@@ -212,10 +247,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         {/* Featured badge */}
         {project.featured && (
           <Box
-            component={motion.div}
-            initial={{ x: 30, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
             sx={{
               position: 'absolute',
               top: 16,
@@ -362,10 +393,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           {/* Project title */}
           <Typography
             variant="h6"
-            component={motion.h2}
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
             sx={{
               fontSize: '1.2rem',
               fontWeight: 700,
@@ -604,6 +631,28 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       </GoldCard>
     </Box>
   );
+
+  return visible ? (
+    <Suspense fallback={renderCardContent()}>
+      {typeof window !== 'undefined' && window.innerWidth > 768 ? (
+        <MotionBox 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ 
+            duration: 0.5,
+            ease: "easeOut",
+            delay: delay * 0.1
+          }}
+        >
+          {renderCardContent()}
+        </MotionBox>
+      ) : (
+        renderCardContent()
+      )}
+    </Suspense>
+  ) : (
+    renderCardContent()
+  );
 };
 
 // ProjectGrid component with proper type definitions
@@ -638,5 +687,8 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({
     </Box>
   );
 };
+
+// Create a separate file for MotionComponents.tsx
+// export const MotionBox = motion(Box);
 
 export default ProjectCard;

@@ -1,6 +1,14 @@
 import React from 'react';
-import { Box, Typography, Stack, Chip } from '@mui/material';
-import { Timeline, People, Code, Work } from '@mui/icons-material';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import Chip from '@mui/material/Chip';
+
+import Timeline from '@mui/icons-material/Timeline';
+import People from '@mui/icons-material/People';
+import Code from '@mui/icons-material/Code';
+import Work from '@mui/icons-material/Work';
+
 
 interface QuickFactsProps {
   teamSize: number;

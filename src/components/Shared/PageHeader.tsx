@@ -1,23 +1,21 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  useTheme,
-  SxProps,
-  Theme,
-  alpha,
-  styled,
-  Grid,
-  Container,
-  useMediaQuery,
-} from '@mui/material';
+
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import useTheme from '@mui/material/styles/useTheme';
+import { alpha } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import Container from '@mui/material/Container';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { SxProps, Theme } from '@mui/material';
+
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
-import { ArrowForward } from '@mui/icons-material';
-import { GradientButton } from '../../components/GradientButton';
+
+import ArrowForward from '@mui/icons-material/ArrowForward';
 
 interface PageHeaderProps {
   title: string;

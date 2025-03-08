@@ -1,51 +1,59 @@
 // pages/resources.tsx
 'use client';
+
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  useTheme,
-  Container,
-  Chip,
-  Grid,
-  Divider,
-  Paper,
-  Avatar,
-  Rating,
-  TextField,
-  InputAdornment,
-  useMediaQuery,
-  alpha
-} from '@mui/material';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
+
+// MUI Core Components - imported directly for better tree-shaking
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
+import Divider from '@mui/material/Divider';
+import Paper from '@mui/material/Paper';
+import Avatar from '@mui/material/Avatar';
+import Rating from '@mui/material/Rating';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+
+// MUI Utilities
+import useTheme from '@mui/material/styles/useTheme';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { alpha } from '@mui/material/styles';
+
+// MUI Icons - imported individually for better tree-shaking
+import Cloud from '@mui/icons-material/Cloud';
+import VpnKey from '@mui/icons-material/VpnKey';
+import Code from '@mui/icons-material/Code';
+import Security from '@mui/icons-material/Security';
+import Search from '@mui/icons-material/Search';
+import Star from '@mui/icons-material/Star';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import Download from '@mui/icons-material/Download';
+import AccessTime from '@mui/icons-material/AccessTime';
+import FilterList from '@mui/icons-material/FilterList';
+import LocalOffer from '@mui/icons-material/LocalOffer';
+import Bookmark from '@mui/icons-material/Bookmark';
+import FormatQuote from '@mui/icons-material/FormatQuote';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import PersonOutline from '@mui/icons-material/PersonOutline';
+
+// Animation library - consider dynamic import for this
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Cloud as CloudIcon,
-  VpnKey,
-  Code as CodeIcon,
-  Security as SecurityIcon,
-  Search as SearchIcon,
-  Star as StarIcon,
-  ArrowForward as ArrowForwardIcon,
-  Download as DownloadIcon,
-  AccessTime as AccessTimeIcon,
-  FilterList as FilterListIcon,
-  LocalOffer as LocalOfferIcon,
-  Bookmark as BookmarkIcon,
-  FormatQuote as FormatQuoteIcon,
-  CheckCircle as CheckCircleIcon,
-  PersonOutline as PersonOutlineIcon
-} from '@mui/icons-material';
+
+// Custom components
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import PageSection from '../components/PageSection';
 import CardGrid from '../components/CardGrid';
+
+// Utilities and context
 import { CARD_STYLES, getSharedStyles, SPACING } from '../utils/sharedStyles';
 import { useAuth } from '../contexts/AuthContext';
 
-// Add dynamic import at the top with other imports
-import dynamic from 'next/dynamic'
-// Import data from external file
+// Data imports
 import {
   freeResources,
   premiumResources,
@@ -61,6 +69,21 @@ import {
   ctaSection
 } from '../data/resourcesPageData';
 
+// Rename icons for component usage
+const CloudIcon = Cloud;
+const CodeIcon = Code;
+const SecurityIcon = Security;
+const SearchIcon = Search;
+const StarIcon = Star;
+const ArrowForwardIcon = ArrowForward;
+const DownloadIcon = Download;
+const AccessTimeIcon = AccessTime;
+const FilterListIcon = FilterList;
+const LocalOfferIcon = LocalOffer;
+const BookmarkIcon = Bookmark;
+const FormatQuoteIcon = FormatQuote;
+const CheckCircleIcon = CheckCircle;
+const PersonOutlineIcon = PersonOutline;
 interface SectionHeaderProps {
   overline?: string;
   title: string;

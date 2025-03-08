@@ -1,26 +1,29 @@
 'use client';
 
-import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  useTheme,
-  Container,
-  Grid,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Chip,
-  alpha,
-  Paper,
-} from '@mui/material';
+// React and Next.js imports
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import NextLink from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
+
+// MUI direct imports for better tree-shaking
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Chip from '@mui/material/Chip';
+import Paper from '@mui/material/Paper';
+import useTheme from '@mui/material/styles/useTheme';
+import { alpha } from '@mui/material/styles';
+
+// MUI Icons with original names
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {
-  AccessTime,
+import AccessTime from '@mui/icons-material/AccessTime';
+import { 
   EmojiEvents as EmojiEventsIcon,
   CalendarToday as CalendarTodayIcon,
   Work as WorkIcon,
@@ -30,14 +33,23 @@ import {
   Support as SupportIcon,
   Analytics as AnalyticsIcon,
   Speed as SpeedIcon,
-  ArrowForward as ArrowForwardIcon,
+  ArrowForward as ArrowForwardIcon
 } from '@mui/icons-material';
+
+// Dynamically imported animation library
+
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
-
 import { SPACING, getSharedStyles } from '../utils/sharedStyles';
-
-// Import the data objects from the data file
 import { pricingPageContent, plans } from '../data/pricingPageData';
+
+const MotionComponents = dynamic(
+  () => import('framer-motion').then((mod) => ({
+    motion: mod.motion,
+    AnimatePresence: mod.AnimatePresence
+  })),
+  { ssr: true }
+);
+
 
 const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon: Icon, text }) => {
   const theme = useTheme();

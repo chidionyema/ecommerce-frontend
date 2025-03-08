@@ -6,7 +6,16 @@ import { useRef } from 'react';
 import { SPACING } from '../../utils/sharedStyles';
 import { alpha } from '@mui/material/styles';
 import dynamic from 'next/dynamic';
-import { SiAmazonaws, SiMicrosoftazure, SiDocker, SiKubernetes, SiTerraform, SiReact, SiNextdotjs, SiDotnet } from 'react-icons/si';
+
+// Instead of a named import from 'react-icons/si', dynamically import each icon:
+const AmazonawsIcon = dynamic(() => import('react-icons/si').then((mod) => mod.SiAmazonaws), { ssr: false });
+const MicrosoftazureIcon = dynamic(() => import('react-icons/si').then((mod) => mod.SiMicrosoftazure), { ssr: false });
+const DockerIcon = dynamic(() => import('react-icons/si').then((mod) => mod.SiDocker), { ssr: false });
+const KubernetesIcon = dynamic(() => import('react-icons/si').then((mod) => mod.SiKubernetes), { ssr: false });
+const TerraformIcon = dynamic(() => import('react-icons/si').then((mod) => mod.SiTerraform), { ssr: false });
+const ReactIcon = dynamic(() => import('react-icons/si').then((mod) => mod.SiReact), { ssr: false });
+const NextjsIcon = dynamic(() => import('react-icons/si').then((mod) => mod.SiNextdotjs), { ssr: false });
+const DotnetIcon = dynamic(() => import('react-icons/si').then((mod) => mod.SiDotnet), { ssr: false });
 
 // Dynamic import of TechCard to avoid SSR issues
 const TechCard = dynamic(() => import('../Common/TechCard'), { ssr: false });
@@ -14,49 +23,49 @@ const TechCard = dynamic(() => import('../Common/TechCard'), { ssr: false });
 // Enhanced tech icons with enterprise-focused descriptions
 const enhancedTechIcons = [
   {
-    icon: <SiAmazonaws size={40} />,
+    icon: <AmazonawsIcon size={40} />,
     title: 'AWS Cloud',
     description: 'Scalable infrastructure with EC2, Lambda, S3, and more',
     color: '#FF9900'
   },
   {
-    icon: <SiMicrosoftazure size={40} />,
+    icon: <MicrosoftazureIcon size={40} />,
     title: 'Azure Services',
     description: 'Enterprise solutions with Azure DevOps, Functions, and AKS',
     color: '#0078D4'
   },
   {
-    icon: <SiDocker size={40} />,
+    icon: <DockerIcon size={40} />,
     title: 'Containerization',
     description: 'Isolated, portable environments with Docker and Docker Compose',
     color: '#2496ED'
   },
   {
-    icon: <SiKubernetes size={40} />,
+    icon: <KubernetesIcon size={40} />,
     title: 'Kubernetes',
     description: 'Industry-standard container orchestration for scaling',
     color: '#326CE5'
   },
   {
-    icon: <SiTerraform size={40} />,
+    icon: <TerraformIcon size={40} />,
     title: 'Infrastructure as Code',
     description: 'Terraform and CloudFormation for automated provisioning',
     color: '#7B42BC'
   },
   {
-    icon: <SiReact size={40} />,
+    icon: <ReactIcon size={40} />,
     title: 'React & Modern JS',
     description: 'Responsive frontends with React, Vue, and Angular',
     color: '#61DAFB'
   },
   {
-    icon: <SiNextdotjs size={40} />,
+    icon: <NextjsIcon size={40} />,
     title: 'Next.js',
     description: 'Production-grade React apps with SSR and static optimization',
     color: '#000000'
   },
   {
-    icon: <SiDotnet size={40} />,
+    icon: <DotnetIcon size={40} />,
     title: '.NET Core',
     description: 'Enterprise-ready backend systems with C# and ASP.NET',
     color: '#512BD4'
@@ -109,7 +118,7 @@ const TechnologyShowcase = () => {
           right: 0,
           bottom: 0,
           opacity: 0.05,
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
         }}
       />
       
