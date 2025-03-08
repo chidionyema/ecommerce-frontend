@@ -210,6 +210,13 @@ const nextConfig = {
     optimizeCss: true,
     disableOptimizedLoading: process.env.NODE_ENV === 'development',
   },
+  outputFileTracingExcludes: {
+    '*': [
+      'node_modules/**/@swc/core',
+      'node_modules/**/esbuild',
+      'node_modules/**/webpack',
+      'cache/**/*' // 👈 Explicitly exclude cache directory
+    ]},
 
   trailingSlash: true,
   reactStrictMode: true,
