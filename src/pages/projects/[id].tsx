@@ -899,5 +899,29 @@ const TabPanel = ({ children, value, index }: {
     </ConsistentPageLayout>
   );
 };
+// Add this for static generation with Next.js
+export async function getStaticProps({ params }: { params: { id: string } }) {
+  const projectId = params.id;
+  const project = cvProjects.find(p => p.id === projectId) || null;
+  
+  return {
+    props: {
+      project // Will be passed to the page component as props
+    }
+  };
+}
+
+export async function getStaticPaths() {
+  // Generate paths for all projects
+  const paths = cvProjects.map(project => ({
+    params: { id: project.id }
+  }));
+  
+  return {
+    paths,
+    fallback: true // Show a loading state for projects not generated at build time
+  };
+}
+
 
 export default ProjectDetails;

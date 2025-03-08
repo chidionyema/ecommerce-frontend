@@ -1,3 +1,4 @@
+// pages/_document.tsx
 import Document, {
   Html,
   Head,
@@ -26,6 +27,7 @@ class MyDocument extends Document {
   render(): JSX.Element {
     const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
     const nonce = MyDocument.nonce;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.haworks.com';
 
     return (
       <Html lang="en" className="h-full">
@@ -33,7 +35,7 @@ class MyDocument extends Document {
           {/* Set CSP via meta tag for static export */}
           <meta
             httpEquiv="Content-Security-Policy"
-            content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*; frame-src 'self' https://js.stripe.com https://www.google.com;"
+            content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*; frame-src 'self' https://js.stripe.com https://www.google.com;"
           />
 
           {/* Self Polyfill */}
@@ -48,7 +50,7 @@ class MyDocument extends Document {
                         subtle: {},
                         getRandomValues: (arr) => crypto.getRandomValues(arr)
                       },
-                      location: new URL('https://${process.env.NEXT_PUBLIC_DOMAIN}')
+                      location: new URL('https://${process.env.NEXT_PUBLIC_DOMAIN || 'example.com'}')
                     };
                   }
                 `
@@ -85,6 +87,16 @@ class MyDocument extends Document {
             </>
           )}
 
+          {/* Environment Variables for Client */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.ENV = {
+                  NEXT_PUBLIC_API_URL: "${apiUrl}"
+                };
+              `
+            }}
+          />
         </Head>
         <body className="h-full bg-white antialiased">
           <Main />
@@ -98,16 +110,11 @@ class MyDocument extends Document {
                 __html: `
                   window.addEventListener('error', (event) => {
                     console.error('Uncaught error:', event.error);
-                    fetch('/api/error-log', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        message: event.error.message,
-                        stack: event.error.stack,
-                        href: window.location.href
-                      })
+                    // For static export, just log the error instead of using API
+                    console.error({
+                      message: event.error?.message || 'Unknown error',
+                      stack: event.error?.stack || '',
+                      href: window.location.href
                     });
                   });
                 `

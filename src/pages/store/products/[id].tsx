@@ -1,3 +1,4 @@
+// pages/store/products/[id].tsx
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -11,24 +12,76 @@ import { ProductDto } from '../../../types/haworks.types';
 import ErrorBoundary from '../../../components/Common/ErrorBoundary';
 import ProductSkeleton from '../../../components/catalog/ProductSkeleton';
 
+// Client-side API fetching for fallback
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.haworks.com';
+
+const fetchProduct = async (id: string): Promise<ProductDto> => {
+  const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
+  if (!response.ok) throw new Error('Failed to fetch product');
+  return response.json();
+};
+
+const fetchRelatedProducts = async (params: { categoryId: string; excludeId: string; limit: number }): Promise<ProductDto[]> => {
+  const queryString = new URLSearchParams({
+    categoryId: params.categoryId,
+    excludeId: params.excludeId,
+    limit: params.limit.toString()
+  }).toString();
+  
+  const response = await fetch(`${API_BASE_URL}/api/products/related?${queryString}`);
+  if (!response.ok) throw new Error('Failed to fetch related products');
+  return response.json();
+};
+
 interface ProductDetailPageProps {
-  product: ProductDto;
+  product: ProductDto | null;
   relatedProducts: ProductDto[];
 }
 
 const sanitizeInput = (input: string) => input.replace(/[^\w-]/g, '');
 const MAX_QUANTITY = 99;
 
-export default function ProductDetailPage({ product, relatedProducts }: ProductDetailPageProps) {
+export default function ProductDetailPage({ product: initialProduct, relatedProducts: initialRelatedProducts }: ProductDetailPageProps) {
   const router = useRouter();
+  const { id } = router.query;
   const { addToCart } = useCheckout();
-  const [loading, setLoading] = useState(false);
+  
+  const [product, setProduct] = useState<ProductDto | null>(initialProduct);
+  const [relatedProducts, setRelatedProducts] = useState<ProductDto[]>(initialRelatedProducts || []);
+  const [loading, setLoading] = useState<boolean>(router.isFallback);
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{message: string, type: 'success' | 'error'} | null>(null);
   const [quantity, setQuantity] = useState(1);
 
+  // Client-side data fetching for fallback mode
+  useEffect(() => {
+    if ((router.isFallback || !initialProduct) && id) {
+      setLoading(true);
+      setError(null);
+      
+      fetchProduct(id as string)
+        .then(productData => {
+          setProduct(productData);
+          return fetchRelatedProducts({
+            categoryId: productData.categoryId,
+            excludeId: id as string,
+            limit: 4
+          });
+        })
+        .then(relatedData => {
+          setRelatedProducts(relatedData);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error loading product:', error);
+          setError('Product information could not be loaded');
+          setLoading(false);
+        });
+    }
+  }, [router.isFallback, id, initialProduct]);
+
   // Loading state for fallback
-  if (router.isFallback) {
+  if (loading || router.isFallback) {
     return (
       <MainLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -118,23 +171,39 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
   return (
     <MainLayout>
       <Head>
-        <title>{product.name} | Your Store</title>
-        <meta name="description" content={product.shortDescription?.substring(0, 160) || ''} />
+        <title>{product?.name || 'Product Not Found'} | Your Store</title>
+        <meta name="description" content={product?.shortDescription?.substring(0, 160) || ''} />
         {/* SEO and Social Meta Tags */}
       </Head>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ErrorBoundary fallback={<ErrorFallback />}>
-          <ProductDetail
-            product={product}
-            relatedProducts={relatedProducts}
-            onAddToCart={handleAddToCart}
-            onAddToWishlist={handleAddToWishlist}
-            loading={loading}
-            quantity={quantity}
-            onQuantityChange={handleQuantityChange}
-            error={error}
-          />
+          {product ? (
+            <ProductDetail
+              product={product}
+              relatedProducts={relatedProducts}
+              onAddToCart={handleAddToCart}
+              onAddToWishlist={handleAddToWishlist}
+              loading={loading}
+              quantity={quantity}
+              onQuantityChange={handleQuantityChange}
+              error={error}
+            />
+          ) : (
+            <div className="text-center py-12">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 mb-4">
+                <AlertCircle className="h-8 w-8 text-yellow-600" />
+              </div>
+              <h2 className="text-xl font-medium text-gray-900">Product Not Found</h2>
+              <p className="mt-2 text-gray-600">The product you're looking for doesn't exist or has been removed.</p>
+              <button
+                onClick={() => router.push('/store/products')}
+                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              >
+                Browse Products
+              </button>
+            </div>
+          )}
           
           {feedback && <FeedbackToast {...feedback} />}
         </ErrorBoundary>
@@ -175,44 +244,48 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const sanitizedId = sanitizeInput(id as string);
 
   try {
-    const [product, relatedProducts] = await Promise.all([
-      productService.getProductById(sanitizedId),
-      productService.getRelatedProducts({
-        categoryId: (await productService.getProductById(sanitizedId)).categoryId,
-        excludeId: sanitizedId,
-        limit: 4
-      })
-    ]);
+    const product = await productService.getProductById(sanitizedId);
+    const relatedProducts = await productService.getRelatedProducts({
+      categoryId: product.categoryId,
+      excludeId: sanitizedId,
+      limit: 4
+    });
 
     return {
-      props: { product, relatedProducts },
-      revalidate: 60
+      props: { product, relatedProducts }
+      // No revalidate for static export
     };
   } catch (error) {
     console.error('Product page generation error:', error);
-    return { notFound: true };
+    // Return empty props instead of notFound for static export
+    return { 
+      props: { 
+        product: null, 
+        relatedProducts: [] 
+      } 
+    };
   }
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // During build time in production environments
-  if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_DEV_BUILD) {
-    console.log('Build environment detected, returning empty paths array');
-    return {
-      paths: [],
-      fallback: 'blocking'
-    };
-  }
-  
-  // Only try to fetch paths during development or when explicitly enabled
   try {
-    const popularProducts = await productService.getPopularProducts(100);
+    // For static export, we need to pre-render some popular products
+    const popularProducts = await productService.getPopularProducts(15);
+    
+    // Generate paths for the most popular products
+    const paths = popularProducts.map(p => ({ 
+      params: { id: p.id.toString() } 
+    }));
+    
     return {
-      paths: popularProducts.map(p => ({ params: { id: p.id } })),
-      fallback: 'blocking'
+      paths,
+      fallback: true // Use true instead of 'blocking' for static export
     };
   } catch (error) {
     console.error('Error generating static paths:', error);
-    return { paths: [], fallback: 'blocking' };
+    return { 
+      paths: [], 
+      fallback: true 
+    };
   }
 };

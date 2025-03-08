@@ -11,8 +11,29 @@ import { ProductDto } from '../../../../types/haworks.types';
 import ErrorBoundary from '../../../../components/Common/ErrorBoundary';
 import ProductSkeleton from '../../../../components/catalog/ProductSkeleton';
 
+// Client-side API fetching for fallback
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.haworks.com';
+
+const fetchProduct = async (id: string): Promise<ProductDto> => {
+  const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
+  if (!response.ok) throw new Error('Failed to fetch product');
+  return response.json();
+};
+
+const fetchRelatedProducts = async (params: { categoryId: string; excludeId: string; limit: number }): Promise<ProductDto[]> => {
+  const queryString = new URLSearchParams({
+    categoryId: params.categoryId,
+    excludeId: params.excludeId,
+    limit: params.limit.toString()
+  }).toString();
+  
+  const response = await fetch(`${API_BASE_URL}/api/products/related?${queryString}`);
+  if (!response.ok) throw new Error('Failed to fetch related products');
+  return response.json();
+};
+
 interface ProductDetailPageProps {
-  product: ProductDto;
+  product: ProductDto | null;
   relatedProducts: ProductDto[];
 }
 
@@ -28,20 +49,47 @@ interface ProductState {
 
 const MAX_QUANTITY = 99;
 
-export default function AdminProductDetailPage({ product, relatedProducts }: ProductDetailPageProps) {
+export default function AdminProductDetailPage({ product: initialProduct, relatedProducts: initialRelatedProducts }: ProductDetailPageProps) {
   const router = useRouter();
+  const { id } = router.query;
+  
+  const [product, setProduct] = useState<ProductDto | null>(initialProduct);
+  const [relatedProducts, setRelatedProducts] = useState<ProductDto[]>(initialRelatedProducts || []);
   const [state, setState] = useState<ProductState>({
-    loading: false,
+    loading: router.isFallback,
     error: null,
     feedback: null,
     quantity: 1
   });
 
+  // Client-side data fetching for fallback mode
   useEffect(() => {
-    if (!product && !router.isFallback) {
-      setState(prev => ({ ...prev, error: 'Product information could not be loaded' }));
+    if ((router.isFallback || !initialProduct) && id) {
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      fetchProduct(id as string)
+        .then(productData => {
+          setProduct(productData);
+          return fetchRelatedProducts({
+            categoryId: productData.categoryId,
+            excludeId: id as string,
+            limit: 4
+          });
+        })
+        .then(relatedData => {
+          setRelatedProducts(relatedData);
+          setState(prev => ({ ...prev, loading: false }));
+        })
+        .catch(error => {
+          console.error('Error loading product:', error);
+          setState(prev => ({ 
+            ...prev, 
+            loading: false, 
+            error: 'Product information could not be loaded' 
+          }));
+        });
     }
-  }, [product, router.isFallback]);
+  }, [router.isFallback, id, initialProduct]);
 
   useEffect(() => {
     if (state.feedback) {
@@ -100,7 +148,7 @@ export default function AdminProductDetailPage({ product, relatedProducts }: Pro
     }));
   };
 
-  if (router.isFallback) {
+  if (state.loading || router.isFallback) {
     return (
       <AdminLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -119,16 +167,32 @@ export default function AdminProductDetailPage({ product, relatedProducts }: Pro
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ErrorBoundary fallback={<ErrorFallback />}>
-          <ProductDetail
-            product={product}
-            relatedProducts={relatedProducts}
-            onAddToCart={handleAddToCart}
-            onAddToWishlist={handleAddToWishlist}
-            loading={state.loading}
-            quantity={state.quantity}
-            onQuantityChange={handleQuantityChange}
-            error={state.error}
-          />
+          {product ? (
+            <ProductDetail
+              product={product}
+              relatedProducts={relatedProducts}
+              onAddToCart={handleAddToCart}
+              onAddToWishlist={handleAddToWishlist}
+              loading={state.loading}
+              quantity={state.quantity}
+              onQuantityChange={handleQuantityChange}
+              error={state.error}
+            />
+          ) : (
+            <div className="text-center py-12">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 mb-4">
+                <AlertCircle className="h-8 w-8 text-yellow-600" />
+              </div>
+              <h2 className="text-xl font-medium text-gray-900">Product Not Found</h2>
+              <p className="mt-2 text-gray-600">The product you're looking for doesn't exist or has been removed.</p>
+              <button
+                onClick={() => router.push('/admin/catalog/products')}
+                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              >
+                Return to Products
+              </button>
+            </div>
+          )}
           {state.feedback && <FeedbackToast {...state.feedback} />}
         </ErrorBoundary>
       </div>
@@ -182,17 +246,39 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     });
 
     return { 
-      props: { product, relatedProducts }, 
-      revalidate: 3600 
+      props: { product, relatedProducts }
+      // No revalidate for static export
     };
   } catch (error) {
-    return { notFound: true };
+    console.error('Error in getStaticProps:', error);
+    // Return empty props instead of notFound for static export
+    return { 
+      props: { 
+        product: null, 
+        relatedProducts: [] 
+      } 
+    };
   }
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: 'blocking'
-  };
+  try {
+    // For static export, we need to pre-render some popular products
+    const popularProductIds = await productService.getPopularProductIds(15);
+    
+    const paths = popularProductIds.map(id => ({
+      params: { id: id.toString() }
+    }));
+    
+    return {
+      paths,
+      fallback: true // Use true instead of 'blocking' for static export
+    };
+  } catch (error) {
+    console.error("Error fetching product paths:", error);
+    return { 
+      paths: [], 
+      fallback: true 
+    };
+  }
 };
