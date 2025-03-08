@@ -7,7 +7,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig = {
   // Tells Next.js to produce a standalone build (which is good for Cloudflare Pages + next-on-pages).
   output: 'standalone',
-
+a
   // Don't generate browser source maps in production (reduces final build size).
   productionBrowserSourceMaps: false,
 
@@ -18,12 +18,6 @@ const nextConfig = {
   images: {
     formats: ['image/webp'],
   },
-
-  // Enable React Strict Mode for additional checks and warnings.
-  reactStrictMode: true,
-  
-  // Enable SWC-based minification.
-  swcMinify: true,
 
   // Example custom security headers
   async headers() {
@@ -72,24 +66,6 @@ const nextConfig = {
   },
 
   webpack: (config, { isServer, dev }) => {
-    // Add a rule to handle .ts and .tsx files using ts-loader.
-    config.module.rules.push({
-      test: /\.tsx?$/,
-      use: [
-        {
-          loader: 'ts-loader',
-          options: {
-            // Only transpile the files; type-checking is skipped for faster builds.
-            transpileOnly: true,
-            // Override compiler options to output ESNext modules.
-            compilerOptions: {
-              module: 'esnext'
-            }
-          }
-        }
-      ]
-    });
-
     //
     // 1) Remove forcing server into a single chunk
     //    This prevents a massive "0.pack" from merging everything.
@@ -226,6 +202,7 @@ const nextConfig = {
   },
 
   trailingSlash: true,
+  reactStrictMode: true,
   staticPageGenerationTimeout: 180,
 };
 
