@@ -7,7 +7,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 const nextConfig = {
   // Tells Next.js to produce a standalone build.
-  output: 'standalone',
+//  output: 'standalone',
 
   // Don't generate browser source maps in production.
   productionBrowserSourceMaps: false,
@@ -21,16 +21,7 @@ const nextConfig = {
   },
 
   // Post-build size checking
-  async afterBuild({ dir }) {
-    try {
-      console.log('Checking build directory size:');
-      execSync('du -sh .next/standalone', { stdio: 'inherit' });
-      console.log('\nChecking large files:');
-      execSync('find .next -type f -size +20M', { stdio: 'inherit' });
-    } catch (error) {
-      console.error('Build verification failed:', error);
-    }
-  },
+
 
   // Build CSP and security headers
   async headers() {
