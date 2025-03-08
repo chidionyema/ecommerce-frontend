@@ -290,7 +290,7 @@ const SearchFilterComponent: React.FC<SearchFilterProps> = ({
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon color="action" />
+                      <Search color="action" />
                     </InputAdornment>
                   ),
                   endAdornment: searchTerm && (
@@ -301,7 +301,7 @@ const SearchFilterComponent: React.FC<SearchFilterProps> = ({
                         edge="end"
                         aria-label="clear search"
                       >
-                        <ClearIcon fontSize="small" />
+                        <Clear fontSize="small" />
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -350,8 +350,8 @@ const SearchFilterComponent: React.FC<SearchFilterProps> = ({
                 variant={showFilters ? "contained" : "outlined"}
                 color={contentColor === 'default' ? 'primary' : contentColor}
                 onClick={() => setShowFilters(!showFilters)}
-                startIcon={<FilterListIcon />}
-                endIcon={<ArrowDropDownIcon
+                startIcon={<FilterList />}
+                endIcon={<ArrowDropDown
                   sx={{
                     transform: showFilters ? 'rotate(180deg)' : 'rotate(0deg)',
                     transition: 'transform 0.3s',
@@ -377,7 +377,7 @@ const SearchFilterComponent: React.FC<SearchFilterProps> = ({
                   variant="outlined"
                   color="error"
                   onClick={handleClearFilters}
-                  startIcon={<ClearIcon />}
+                  startIcon={<Clear />}
                   size={isMinimal ? "small" : "medium"}
                   sx={{
                     borderRadius: isMinimal ? 3 : 2,
@@ -398,7 +398,7 @@ const SearchFilterComponent: React.FC<SearchFilterProps> = ({
               
               {hasActiveFilters && (
                 <Chip
-                  icon={<ClearIcon fontSize="small" />}
+                  icon={<Clear fontSize="small" />}
                   label="Clear All"
                   onClick={handleClearFilters}
                   color="default"
@@ -462,7 +462,7 @@ const SearchFilterComponent: React.FC<SearchFilterProps> = ({
                         const isSelected = (selectedFilters[category.id] || []).includes(option.id);
                         
                         // Create a CheckIcon element to use as avatar for selected chips
-                        const checkIconElement = isSelected ? <CheckIcon /> : undefined;
+                        const checkIconElement = isSelected ? <Check /> : undefined;
                         
                         return (
                           <Chip
@@ -500,7 +500,7 @@ const SearchFilterComponent: React.FC<SearchFilterProps> = ({
                     variant="outlined"
                     color="error"
                     onClick={handleClearFilters}
-                    startIcon={<ClearIcon />}
+                    startIcon={<Clear />}
                     sx={{
                       textTransform: 'none',
                       fontWeight: 500,
