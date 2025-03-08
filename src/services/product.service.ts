@@ -60,6 +60,17 @@ class ProductService {
       throw error;
     }
   }
+  async getPopularProducts(limit: number): Promise<ProductDto[]> {
+    // New implementation
+    try {
+      const response = await fetch(`/api/products/popular?limit=${limit}`);
+      if (!response.ok) throw new Error('Failed to fetch popular products');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching popular products:', error);
+      return []; // Return empty array as fallback
+    }
+  }
   
   // Admin-facing methods
   public async createProduct(productData: ProductCreateDto): Promise<ProductDto> {

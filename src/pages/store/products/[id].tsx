@@ -44,11 +44,20 @@ export default function ProductDetailPage({ product, relatedProducts }: ProductD
     if (!product) setError('Product information could not be loaded');
   }, [product]);
 
-  useEffect(() => {
-    const timeoutId = feedback && setTimeout(() => setFeedback(null), 5000);
-    return () => timeoutId && clearTimeout(timeoutId);
+// Replace the existing feedback useEffect with this implementation
+useEffect(() => {
+    let timeoutId: number | undefined;
+    
+    if (feedback) {
+      timeoutId = window.setTimeout(() => setFeedback(null), 5000);
+    }
+    
+    return () => {
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
+    };
   }, [feedback]);
-
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity > 0 && newQuantity <= MAX_QUANTITY) {
       setQuantity(newQuantity);
