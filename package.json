@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "rm -rf .next/cache .tmp .webpack-cache",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

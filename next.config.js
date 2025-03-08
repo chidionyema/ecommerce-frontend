@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const path = require('path');
+const { execSync } = require('child_process');
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
@@ -17,6 +18,18 @@ const nextConfig = {
   // Enable Next.js image optimization with WebP
   images: {
     formats: ['image/webp'],
+  },
+
+  // Post-build size checking
+  async afterBuild({ dir }) {
+    try {
+      console.log('Checking build directory size:');
+      execSync('du -sh .next/standalone', { stdio: 'inherit' });
+      console.log('\nChecking large files:');
+      execSync('find .next -type f -size +20M', { stdio: 'inherit' });
+    } catch (error) {
+      console.error('Build verification failed:', error);
+    }
   },
 
   // Build CSP and security headers
@@ -95,6 +108,15 @@ const nextConfig = {
 
   // Your existing Webpack config, chunk splitting, etc.
   webpack: (config, { isServer, dev }) => {
+    // Add filesystem cache configuration
+    config.cache = {
+      type: 'filesystem',
+      cacheDirectory: path.resolve(__dirname, '.tmp/webpack-cache'),
+      buildDependencies: {
+        config: [__filename]
+      }
+    };
+    
     //
     // Example advanced Webpack configuration
     //
@@ -209,14 +231,23 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
     disableOptimizedLoading: process.env.NODE_ENV === 'development',
+    // Add this experimental flag
+    externalDir: true
   },
+  
   outputFileTracingExcludes: {
     '*': [
+      // Enhanced exclusions
+      '**/*.map',
+      '**/webpack/cache/**',
+      '**/cache/**',
+      '**/.next/cache/**',
+      'node_modules/**/@swc',
       'node_modules/**/@swc/core',
       'node_modules/**/esbuild',
-      'node_modules/**/webpack',
-      'cache/**/*' // 👈 Explicitly exclude cache directory
-    ]},
+      'node_modules/**/webpack'
+    ]
+  },
 
   trailingSlash: true,
   reactStrictMode: true,
