@@ -19,6 +19,12 @@ const nextConfig = {
     formats: ['image/webp'],
   },
 
+  // Enable React Strict Mode for additional checks and warnings.
+  reactStrictMode: true,
+  
+  // Enable SWC-based minification.
+  swcMinify: true,
+
   // Example custom security headers
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
@@ -66,6 +72,24 @@ const nextConfig = {
   },
 
   webpack: (config, { isServer, dev }) => {
+    // Add a rule to handle .ts and .tsx files using ts-loader.
+    config.module.rules.push({
+      test: /\.tsx?$/,
+      use: [
+        {
+          loader: 'ts-loader',
+          options: {
+            // Only transpile the files; type-checking is skipped for faster builds.
+            transpileOnly: true,
+            // Override compiler options to output ESNext modules.
+            compilerOptions: {
+              module: 'esnext'
+            }
+          }
+        }
+      ]
+    });
+
     //
     // 1) Remove forcing server into a single chunk
     //    This prevents a massive "0.pack" from merging everything.
@@ -202,7 +226,6 @@ const nextConfig = {
   },
 
   trailingSlash: true,
-  reactStrictMode: true,
   staticPageGenerationTimeout: 180,
 };
 
