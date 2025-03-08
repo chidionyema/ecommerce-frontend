@@ -9,8 +9,8 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { styled } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-const GLASS_OPACITY = 0.07;
-const GLASS_BLUR = '12px';
+const GLASS_OPACITY = 0.08;
+const GLASS_BLUR = '16px';
 
 export interface TechCardProps {
   icon?: ReactElement | null;
@@ -37,16 +37,16 @@ const NumberedCircle = ({ number, theme, accentColor }: {
     <motion.div
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      whileHover={{ scale: 1.12, rotate: 5 }}
+      whileHover={{ scale: 1.15, rotate: 5 }}
       whileTap={{ scale: 0.95 }}
     >
       <Box
         sx={{
-          width: 64,
-          height: 64,
+          width: 68,
+          height: 68,
           borderRadius: '50%',
           background: `linear-gradient(135deg, ${accentColor || theme.palette.primary.main} 0%, ${alpha(accentColor || theme.palette.primary.dark, 0.8)} 100%)`,
-          boxShadow: `0 ${isHovered ? '8' : '4'}px ${isHovered ? '32' : '12'}px ${alpha(accentColor || theme.palette.primary.main, isHovered ? 0.5 : 0.3)}`,
+          boxShadow: `0 ${isHovered ? '8' : '4'}px ${isHovered ? '32' : '16'}px ${alpha(accentColor || theme.palette.primary.main, isHovered ? 0.6 : 0.35)}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -82,10 +82,10 @@ const NumberedCircle = ({ number, theme, accentColor }: {
           fontWeight="bold" 
           color="white" 
           sx={{ 
-            fontSize: '1.25rem',
-            fontFamily: '"Space Grotesk", "Roboto", "Helvetica", "Arial", sans-serif',
+            fontSize: '1.35rem',
+            fontFamily: '"Space Grotesk", "Poppins", "Roboto", sans-serif',
             letterSpacing: '0.5px',
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+            textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
           }}
         >
           {number}
@@ -123,7 +123,7 @@ const ShineEffect = styled(motion.div)({
   left: 0,
   width: '150%',
   height: '100%',
-  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)',
   transform: 'translateX(-100%)',
   pointerEvents: 'none',
   zIndex: 1,
@@ -135,16 +135,17 @@ const CategoryLabel = ({ category, theme }: { category: string; theme: Theme }) 
       position: 'absolute',
       top: 16,
       right: 16,
-      background: alpha(theme.palette.primary.main, 0.15),
+      background: alpha(theme.palette.primary.main, 0.18),
       color: theme.palette.primary.main,
       fontSize: '0.7rem',
-      fontWeight: 600,
-      padding: '4px 8px',
-      borderRadius: '4px',
+      fontWeight: 700,
+      padding: '4px 10px',
+      borderRadius: '6px',
       letterSpacing: '0.5px',
       textTransform: 'uppercase',
-      backdropFilter: 'blur(4px)',
-      border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+      backdropFilter: 'blur(6px)',
+      border: `1px solid ${alpha(theme.palette.primary.main, 0.25)}`,
+      boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.15)}`,
     }}
   >
     {category}
@@ -164,18 +165,21 @@ const StyledTechCard = styled(motion.div, {
       case 'primary':
         return {
           borderWidth: 2,
-          boxShadow: `0px 20px 40px ${alpha(accentColor || theme.palette.primary.main, 0.2)}`,
+          boxShadow: `0px 20px 60px ${alpha(accentColor || theme.palette.primary.main, 0.25)}`,
+          transform: 'scale(1.05)',
         };
       case 'secondary':
         return {
-          borderWidth: 1,
-          boxShadow: `0px 12px 28px ${alpha(theme.palette.grey[800], 0.15)}`,
+          borderWidth: 1.5,
+          boxShadow: `0px 15px 35px ${alpha(theme.palette.grey[800], 0.18)}`,
+          transform: 'scale(1)',
         };
       case 'tertiary':
       default:
         return {
           borderWidth: 1,
-          boxShadow: `0px 8px 16px ${alpha(theme.palette.grey[800], 0.1)}`,
+          boxShadow: `0px 10px 20px ${alpha(theme.palette.grey[800], 0.12)}`,
+          transform: 'scale(1)',
         };
     }
   };
@@ -190,8 +194,8 @@ const StyledTechCard = styled(motion.div, {
     background: 'transparent',
     border: `${importanceStyles.borderWidth}px solid ${
       theme.palette.mode === 'light'
-        ? alpha(accentColor || theme.palette.primary.light, 0.2)
-        : alpha(accentColor || theme.palette.primary.dark, 0.3)
+        ? alpha(accentColor || theme.palette.primary.light, 0.25)
+        : alpha(accentColor || theme.palette.primary.dark, 0.35)
     }`,
     transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
     display: 'flex',
@@ -201,12 +205,12 @@ const StyledTechCard = styled(motion.div, {
     width: '100%',
     overflow: 'hidden',
     boxShadow: importanceStyles.boxShadow,
-    transform: importance === 'primary' ? 'scale(1.05)' : 'scale(1)',
+    transform: importanceStyles.transform,
     '&:hover': {
       transform: `translateY(-12px) ${importance === 'primary' ? 'scale(1.07)' : 'scale(1.02)'}`,
       boxShadow: theme.palette.mode === 'light' 
-        ? `0px 24px 48px ${alpha(accentColor || theme.palette.primary.main, 0.25)}`
-        : `0px 24px 48px ${alpha(theme.palette.common.black, 0.5)}`,
+        ? `0px 30px 70px ${alpha(accentColor || theme.palette.primary.main, 0.3)}`
+        : `0px 30px 60px ${alpha(theme.palette.common.black, 0.5)}`,
       '& .card-content': {
         transform: 'translateY(-8px)',
       },
@@ -217,15 +221,15 @@ const StyledTechCard = styled(motion.div, {
       top: 0,
       left: 0,
       width: '100%',
-      height: '10px',
-      background: `linear-gradient(90deg, ${accentColor || theme.palette.primary.main}, ${accentColor ? alpha(accentColor, 0.6) : theme.palette.primary.light})`,
-      opacity: 0.8,
+      height: importance === 'primary' ? '15px' : '10px',
+      background: `linear-gradient(90deg, ${accentColor || theme.palette.primary.main}, ${accentColor ? alpha(accentColor, 0.7) : theme.palette.primary.light})`,
+      opacity: 0.9,
       transition: 'height 0.3s ease',
     },
     '&:hover::after': {
-      height: '15px',
+      height: importance === 'primary' ? '18px' : '12px',
     },
-    '@media (maxWidth:599.95px)': { // Fixed media query syntax
+    '@media (max-width: 599.95px)': {
       padding: theme.spacing(3),
     }
   };
@@ -251,7 +255,7 @@ const TechCard: React.FC<TechCardProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const cardVariants = {
-    hidden: { opacity: 0, y: 80, scale: 0.8 },
+    hidden: { opacity: 0, y: 80, scale: 0.9 },
     visible: { 
       opacity: 1, 
       y: 0, 
@@ -304,12 +308,12 @@ const TechCard: React.FC<TechCardProps> = ({
       whileTap="tap"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      sx={sx} // Corrected prop usage
+      sx={sx}
       {...rest}
     >
       <GlassBackdrop 
-        blurAmount={isHovered ? '16px' : blurAmount || GLASS_BLUR}
-        opacityLevel={isHovered ? (opacityLevel || GLASS_OPACITY) + 0.03 : opacityLevel || GLASS_OPACITY} 
+        blurAmount={isHovered ? '24px' : blurAmount || GLASS_BLUR}
+        opacityLevel={isHovered ? (opacityLevel || GLASS_OPACITY) + 0.04 : opacityLevel || GLASS_OPACITY} 
       />
       
       {theme.palette.mode === 'light' && (
@@ -341,13 +345,13 @@ const TechCard: React.FC<TechCardProps> = ({
             <Box sx={{ mb: 3, display: 'inline-block' }}>
               {React.cloneElement(icon, {
                 sx: {
-                  width: 56,
-                  height: 56,
+                  width: 60,
+                  height: 60,
                   color: accentColor || 
                     (theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.primary.light),
-                  filter: `drop-shadow(0 4px 6px ${alpha(
+                  filter: `drop-shadow(0 4px 8px ${alpha(
                     accentColor || theme.palette.primary.main, 
-                    0.4
+                    0.5
                   )})`,
                   transition: 'all 0.4s ease',
                 }
@@ -366,8 +370,8 @@ const TechCard: React.FC<TechCardProps> = ({
             component="div"
             sx={{
               fontWeight: 800,
-              fontSize: '1.35rem',
-              fontFamily: '"Space Grotesk", "Roboto", "Helvetica", "Arial", sans-serif',
+              fontSize: '1.45rem',
+              fontFamily: '"Space Grotesk", "Poppins", sans-serif',
               color: theme.palette.text.primary,
               textShadow: theme.palette.mode === 'dark' ? '0 2px 4px rgba(0, 0, 0, 0.7)' : 'none',
               mb: 2,

@@ -1,146 +1,153 @@
-// ProjectCardStyles.ts - All the styles separated into one file
-import { keyframes, alpha, Theme } from '@mui/material';
+// ProjectCardStyles.ts
+import { keyframes, Theme, alpha } from '@mui/material/styles';
 
-// Animations
+// Animation keyframes
 export const animations = {
-  shine: keyframes`
-    0% { left: -100%; }
-    20% { left: 100%; }
-    100% { left: 100%; }
+  shimmer: keyframes`
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  `,
+  pulse: keyframes`
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
   `,
   float: keyframes`
-    0% { transform: translateY(0px); }
+    0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
   `,
   glow: keyframes`
-    0% { box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.5), 0 0 20px rgba(var(--primary-rgb), 0.3); }
-    50% { box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.8), 0 0 40px rgba(var(--primary-rgb), 0.5); }
-    100% { box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.5), 0 0 20px rgba(var(--primary-rgb), 0.3); }
+    0% { 
+      box-shadow: 0 0 5px rgba(var(--primary-rgb), 0.3),
+                 0 0 10px rgba(var(--primary-rgb), 0.2); 
+    }
+    50% { 
+      box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.5),
+                 0 0 25px rgba(var(--primary-rgb), 0.3); 
+    }
+    100% { 
+      box-shadow: 0 0 5px rgba(var(--primary-rgb), 0.3),
+                 0 0 10px rgba(var(--primary-rgb), 0.2); 
+    }
   `,
+  reveal: keyframes`
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  `,
+  rotateIn: keyframes`
+    0% { transform: perspective(1200px) rotateX(10deg); opacity: 0; }
+    100% { transform: perspective(1200px) rotateX(0); opacity: 1; }
+  `
 };
 
-// Constants
-export const CARD_SIZES = {
-  xlarge: {
-    width: { xs: '320px', sm: '340px', md: '360px' },
-    height: { xs: '460px', sm: '470px', md: '480px' },
+// Design constants
+export const SIZES = {
+  card: {
+    width: { xs: '320px', sm: '360px', md: '380px' },
+    height: { xs: '450px', sm: '480px', md: '500px' },
+  },
+  icon: {
+    small: 36,
+    medium: 44,
+    large: 56,
+  },
+  borderRadius: {
+    small: 2,
+    medium: 3,
+    large: 4,
   }
 };
 
-export const SPACING = {
-  xsmall: 0.75,
-  small: 1.5,
-  medium: 2.5,
-  large: 3.5,
-  xlarge: 5,
+// Z-index management
+export const Z_INDICES = {
+  base: 1,
+  imageOverlay: 2,
+  content: 3,
+  badge: 9,
+  button: 10,
 };
 
-// Style creator functions
-export const createStyles = (theme: Theme) => {
+// Create common styles with theme integration
+export const createCardStyles = (theme: Theme, brandColor: string, isHovering: boolean = false) => {
+  const isDarkMode = theme.palette.mode === 'dark';
+  const brandColorLight = alpha(brandColor, 0.15);
+  const brandColorMedium = alpha(brandColor, 0.3);
   
   return {
-    // Card container styles
-    cardContainer: (hovering: boolean, brandColor: string) => ({
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100%',
-      width: '100%',
-      transform: hovering ? 'scale(1.03)' : 'scale(1)',
-      transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-      animation: hovering ? `${animations.float} 4s ease-in-out infinite` : 'none',
-      cursor: 'pointer',
-      position: 'relative',
-      filter: 'drop-shadow(0 4px 20px rgba(0,0,0,0.1))',
-    }),
-
-    // Badge and badge content
-    badge: (hovering: boolean) => ({
-      '& .MuiBadge-badge': {
-        top: 25,
-        right: 25,
-        opacity: hovering ? 1 : 0,
-        transition: 'opacity 0.3s ease',
-        zIndex: 20,
-      },
-    }),
-
-    badgeContent: (brandColor: string) => ({
-      display: 'flex',
-      alignItems: 'center',
-      bgcolor: alpha(brandColor, 0.95),
-      color: '#fff',
-      px: 1.8,
-      py: 0.8,
-      borderRadius: '30px',
-      fontSize: '0.85rem',
-      fontWeight: 'bold',
-      boxShadow: `0 2px 15px ${alpha(theme.palette.common.black, 0.35)}`,
-      backdropFilter: 'blur(8px)',
-    }),
-
-    // Card styles
-    card: (hovering: boolean, expanded: boolean, height: any, featured: boolean | undefined, brandColor: string) => ({
-      width: CARD_SIZES.xlarge.width,
-      height: expanded ? 'auto' : height,
-      p: 2,
+    // Main card container
+    card: {
+      width: SIZES.card.width,
+      height: SIZES.card.height,
+      borderRadius: SIZES.borderRadius.large,
       position: 'relative',
       overflow: 'hidden',
-      cursor: 'pointer !important',
-      '& *': { pointerEvents: 'none !important' },
-      '& a, & button': { pointerEvents: 'all !important' },
-      transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
-      boxShadow: hovering 
-        ? `0 25px 50px -10px ${alpha(theme.palette.common.black, 0.3)}, 0 10px 20px -5px ${alpha(theme.palette.common.black, 0.2)}`
-        : `0 8px 20px -5px ${alpha(theme.palette.common.black, 0.15)}`,
-      borderRadius: '24px',
-      animation: featured ? `${animations.glow} 3s infinite ease-in-out` : 'none',
-      '&:hover': {
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: '-100%',
-          width: '70%',
-          height: '100%',
-          background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.common.white, 0.35)}, transparent)`,
-          transform: 'skewX(-25deg)',
-          animation: `${animations.shine} 1.5s ease-in-out`,
-          zIndex: 1,
-        },
-      },
-      border: featured ? `1px solid ${alpha(brandColor, 0.3)}` : 'none',
-      maxWidth: '100%',
-      mx: 'auto',
-    }),
-
-    // Other component styles
+      cursor: 'pointer',
+      boxShadow: isHovering 
+        ? `0 25px 50px -12px ${alpha(brandColor, 0.35)}`
+        : `0 15px 30px -5px ${alpha(theme.palette.common.black, 0.2)}`,
+      transition: 'all 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67)',
+      transform: isHovering ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)',
+    },
+    
+    // Featured card styles
+    featuredCard: {
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        zIndex: 0,
+        borderRadius: 'inherit',
+        padding: '2px',
+        background: `linear-gradient(45deg, ${brandColor}, ${alpha(theme.palette.secondary.main, 0.7)})`,
+        WebkitMask: 
+          'linear-gradient(#fff 0 0) content-box, ' +
+          'linear-gradient(#fff 0 0)',
+        WebkitMaskComposite: 'xor',
+        maskComposite: 'exclude',
+        animation: `${animations.glow} 3s infinite ease-in-out`,
+      }
+    },
+    
+    // Featured badge
     featuredBadge: {
       position: 'absolute',
-      top: 20,
-      right: 20,
-      zIndex: 10,
-      background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 180, 0, 0.95))',
-      color: '#000',
-      borderRadius: '30px',
-      px: 2.2,
+      top: 16,
+      right: 16,
+      zIndex: Z_INDICES.badge,
+      px: 2,
       py: 0.8,
+      borderRadius: '30px',
+      background: `linear-gradient(135deg, ${alpha('#FFD700', 0.95)}, ${alpha('#FFA500', 0.95)})`,
+      backdropFilter: 'blur(4px)',
+      boxShadow: `0 4px 12px ${alpha('#000', 0.15)}`,
       display: 'flex',
       alignItems: 'center',
       gap: 0.8,
-      boxShadow: `0 4px 15px ${alpha(theme.palette.common.black, 0.3)}`,
-      backdropFilter: 'blur(5px)',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
+      color: '#000',
+      fontWeight: 700,
+      fontSize: '0.8rem',
+      transform: isHovering ? 'scale(1.05)' : 'scale(1)',
+      transition: 'transform 0.3s ease',
     },
-
-    imageContainer: (hovering: boolean) => ({
-      height: '40%',
+    
+    // Image container
+    imageContainer: {
+      height: '200px',
       width: '100%',
-      overflow: 'hidden',
       position: 'relative',
+      overflow: 'hidden',
+    },
+    
+    // Loading skeleton
+    skeleton: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      bgcolor: alpha(theme.palette.background.default, 0.1),
       display: 'flex',
-      alignItems: 'flex-end',
+      alignItems: 'center',
+      justifyContent: 'center',
       '&::after': {
         content: '""',
         position: 'absolute',
@@ -148,151 +155,238 @@ export const createStyles = (theme: Theme) => {
         left: 0,
         width: '100%',
         height: '100%',
-        background: hovering 
-          ? 'linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.65))' 
-          : 'linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.75))',
-        transition: 'all 0.5s ease',
-        zIndex: 1,
+        backgroundImage: `linear-gradient(90deg, 
+          ${alpha(theme.palette.background.default, 0)} 0%, 
+          ${alpha(theme.palette.background.default, 0.15)} 50%, 
+          ${alpha(theme.palette.background.default, 0)} 100%)`,
+        animation: `${animations.shimmer} 2s infinite`,
       }
-    }),
-
-    clientInfoBox: {
+    },
+    
+    // Image background
+    backgroundImage: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      transform: isHovering ? 'scale(1.08)' : 'scale(1)',
+      transition: 'transform 0.7s cubic-bezier(0.17, 0.67, 0.83, 0.67)',
+    },
+    
+    // Gradient overlay for images
+    imageOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      background: isHovering
+        ? `linear-gradient(to bottom, 
+            ${alpha(theme.palette.common.black, 0.2)}, 
+            ${alpha(theme.palette.common.black, 0.7)})`
+        : `linear-gradient(to bottom, 
+            ${alpha(theme.palette.common.black, 0.3)}, 
+            ${alpha(theme.palette.common.black, 0.8)})`,
+      transition: 'all 0.5s ease',
+      zIndex: Z_INDICES.imageOverlay,
+    },
+    
+    // Client info section
+    clientInfo: {
       position: 'absolute',
       bottom: 0,
       left: 0,
-      right: 0,
-      p: 2.8,
-      background: 'transparent',
+      p: 2.5,
       display: 'flex',
       alignItems: 'center',
-      gap: 2,
-      zIndex: 2,
+      gap: 1.5,
+      zIndex: Z_INDICES.content,
+      width: '100%',
     },
-
-    iconBox: (hovering: boolean, brandColor: string) => ({
+    
+    // Icon container
+    iconContainer: {
+      width: SIZES.icon.medium,
+      height: SIZES.icon.medium,
+      borderRadius: '12px',
+      bgcolor: alpha('#fff', 0.92),
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: alpha(theme.palette.background.paper, 0.85),
-      p: 1.3,
-      borderRadius: '50%',
-      width: 48,
-      height: 48,
-      backdropFilter: 'blur(10px)',
-      border: `2px solid ${alpha(brandColor, 0.6)}`,
-      boxShadow: `0 5px 15px ${alpha(theme.palette.common.black, 0.25)}`,
+      boxShadow: `0 4px 15px ${alpha(theme.palette.common.black, 0.25)}`,
+      backdropFilter: 'blur(8px)',
+      border: `1px solid ${alpha(brandColor, 0.6)}`,
+      transform: isHovering ? 'scale(1.1) translateY(-4px)' : 'scale(1) translateY(0)',
+      transition: 'all 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67)',
+    },
+    
+    // Client name
+    clientName: {
+      color: '#fff',
+      fontWeight: 700,
+      textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+      fontSize: '1.1rem',
+      transform: isHovering ? 'translateY(-2px)' : 'translateY(0)',
       transition: 'all 0.4s ease',
-      transform: hovering ? 'scale(1.15)' : 'scale(1)',
-      background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.85)}, ${alpha(theme.palette.background.paper, 0.95)})`,
-    }),
-
-    cardContent: {
-      px: 3.8,
-      py: 3.5,
-      height: '60%',
+    },
+    
+    // Content container
+    contentContainer: {
+      p: 2.5,
+      pt: 3,
       display: 'flex',
       flexDirection: 'column',
-      '&:last-child': { pb: 3.5 },
+      gap: 2.5,
       position: 'relative',
-      zIndex: 2,
-      bgcolor: alpha(theme.palette.background.paper, 0.98),
+      background: isDarkMode 
+        ? `linear-gradient(to bottom, ${alpha(theme.palette.background.paper, 0.85)}, ${alpha(theme.palette.background.paper, 0.97)})`
+        : theme.palette.background.paper,
+      backdropFilter: 'blur(10px)',
+      height: 'calc(100% - 200px)',
     },
-
-    projectTitle: (hovering: boolean, brandColor: string) => ({
-      fontSize: '1.7rem', 
-      mb: SPACING.medium,
-      lineHeight: 1.2,
-      position: 'relative',
-      display: 'inline-block',
-      color: theme.palette.text.primary,
+    
+    // Floating decoration
+    floatingElement: (size: number, position: { top?: number | string; bottom?: number | string; left?: number | string; right?: number | string }, delay: number = 0) => ({
+      position: 'absolute',
+      width: size,
+      height: size,
+      ...position,
+      background: `radial-gradient(circle, ${alpha(brandColor, 0.2)}, transparent 70%)`,
+      borderRadius: '50%',
+      animation: `${animations.float} ${5 + delay}s ease-in-out infinite ${delay}s`,
+      zIndex: 0,
+      opacity: isHovering ? 0.9 : 0.5,
+      transition: 'opacity 0.5s ease',
+    }),
+    
+    // Project title
+    projectTitle: {
+      fontSize: { xs: '1.25rem', sm: '1.4rem' },
       fontWeight: 800,
+      lineHeight: 1.3,
+      position: 'relative',
+      pb: 1.5,
       '&::after': {
         content: '""',
         position: 'absolute',
         left: 0,
-        bottom: -12,
-        width: hovering ? '90px' : '60px',
-        height: '5px',
-        background: `linear-gradient(90deg, ${brandColor}, ${theme.palette.secondary.main})`,
-        borderRadius: '3px',
+        bottom: 0,
+        width: isHovering ? '80px' : '60px',
+        height: '4px',
+        background: `linear-gradient(90deg, ${brandColor}, ${alpha(brandColor, 0.5)})`,
+        borderRadius: '4px',
         transition: 'width 0.4s ease',
+        boxShadow: `0 2px 6px ${alpha(brandColor, 0.4)}`,
       }
-    }),
-
-    metricsBox: (hovering: boolean, brandColor: string) => ({
-      display: 'flex', 
-      flexWrap: 'wrap', 
-      gap: 2.8,
-      mb: SPACING.medium,
-      background: alpha(theme.palette.background.default, 0.7),
-      p: 2.2,
-      borderRadius: 3.5,
-      border: `1px solid ${alpha(brandColor, 0.15)}`,
-      backdropFilter: 'blur(8px)',
-      boxShadow: `inset 0 0 15px ${alpha(brandColor, 0.08)}`,
-      transition: 'all 0.4s ease',
-      transform: hovering ? 'translateY(-3px)' : 'translateY(0)',
-    }),
-
-    metricItem: (hovering: boolean, index: number) => ({
-      display: 'flex', 
-      flexDirection: 'column',
-      alignItems: 'center',
-      flex: 1,
-      p: 1,
-      transition: 'all 0.4s ease',
-      transform: hovering ? 'scale(1.05)' : 'scale(1)',
-      position: 'relative',
-      '&::after': index < 2 ? {
-        content: '""',
-        position: 'absolute',
-        right: -10,
-        top: '25%',
-        height: '50%',
-        width: '1px',
-        background: alpha(theme.palette.divider, 0.5),
-      } : {},
-    }),
-
-    metricValue: (brandColor: string) => ({
-      fontSize: '1.45rem',
-      lineHeight: 1.2,
-      fontWeight: 800,
-      background: `linear-gradient(90deg, ${brandColor}, ${theme.palette.secondary.main})`,
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-    }),
-
-    techBox: (hovering: boolean, brandColorLight: string, brandColor: string) => ({
-      mb: SPACING.medium, 
-      p: 2.2,
+    },
+    
+    // Metrics container
+    metricsContainer: {
+      display: 'flex',
+      gap: 2,
+      justifyContent: 'space-between',
+      px: 2,
+      py: 2,
       borderRadius: 3,
-      background: hovering 
-        ? alpha(brandColorLight, 0.7)
-        : alpha(brandColorLight, 0.4),
-      border: `1px solid ${alpha(brandColor, 0.25)}`,
-      transition: 'all 0.3s ease',
+      background: isDarkMode 
+        ? alpha(theme.palette.background.default, 0.6)
+        : alpha(theme.palette.background.default, 0.8),
+      border: `1px solid ${alpha(brandColor, 0.2)}`,
+      boxShadow: `inset 0 0 15px ${alpha(brandColor, 0.05)}`,
+      transform: isHovering ? 'translateY(-4px)' : 'translateY(0)',
+      transition: 'all 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67)',
       position: 'relative',
       overflow: 'hidden',
       '&::before': {
         content: '""',
         position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '2px',
-        background: `linear-gradient(90deg, ${brandColor}, transparent)`,
+        top: -2,
+        left: -2,
+        right: -2,
+        height: '1.5px',
+        background: `linear-gradient(90deg, ${alpha(brandColor, 0.05)}, ${brandColor}, ${alpha(brandColor, 0.05)})`,
         zIndex: 1,
-      },
+      }
+    },
+    
+    // Metric item
+    metricItem: (index: number, total: number) => ({
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      flex: 1,
+      position: 'relative',
+      '&::after': index < total - 1 ? {
+        content: '""',
+        position: 'absolute',
+        right: -8,
+        top: '20%',
+        height: '60%',
+        width: '1px',
+        background: alpha(theme.palette.divider, 0.6),
+      } : {},
     }),
-
-    techContainer: (expanded: boolean, brandColorLight: string) => ({
-      display: 'flex', 
-      gap: 1.2, 
+    
+    // Metric value
+    metricValue: {
+      fontWeight: 800,
+      fontSize: '1.3rem',
+      background: `linear-gradient(90deg, ${brandColor}, ${theme.palette.secondary.main})`,
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+    },
+    
+    // Metric label
+    metricLabel: {
+      fontSize: '0.75rem',
+      textTransform: 'uppercase',
+      fontWeight: 600,
+      letterSpacing: 0.5,
+      opacity: 0.8,
+      mt: 0.5,
+    },
+    
+    // Technology container
+    technologiesContainer: {
+      borderRadius: 3,
+      p: 2,
+      background: alpha(brandColorLight, isDarkMode ? 0.2 : 0.5),
+      border: `1px solid ${alpha(brandColor, 0.2)}`,
+      position: 'relative',
+      transition: 'all 0.3s ease',
+      transform: isHovering ? 'translateY(-4px)' : 'translateY(0)',
+      boxShadow: isHovering 
+        ? `0 8px 20px -5px ${alpha(brandColor, 0.25)}`
+        : 'none',
+    },
+    
+    // Tech label
+    techLabel: {
+      fontSize: '0.75rem',
+      color: isDarkMode ? theme.palette.text.secondary : alpha(theme.palette.text.primary, 0.7),
+      display: 'flex',
+      alignItems: 'center',
+      mb: 1.5,
+      '&::before': {
+        content: '""',
+        display: 'inline-block',
+        width: 8,
+        height: 8,
+        borderRadius: '50%',
+        background: brandColor,
+        mr: 1,
+        boxShadow: `0 0 8px ${alpha(brandColor, 0.8)}`,
+      }
+    },
+    
+    // Tech chips wrapper
+    techChipsWrapper: (expanded: boolean) => ({
+      display: 'flex',
       flexWrap: 'wrap',
-      maxHeight: expanded ? '300px' : '70px',
-      overflow: expanded ? 'visible' : 'hidden',
-      transition: 'max-height 0.5s ease',
+      gap: 0.8,
+      maxHeight: expanded ? '200px' : '80px',
+      overflowY: expanded ? 'auto' : 'hidden',
       position: 'relative',
       '&::after': !expanded ? {
         content: '""',
@@ -300,152 +394,203 @@ export const createStyles = (theme: Theme) => {
         bottom: 0,
         left: 0,
         right: 0,
-        height: '25px',
-        background: `linear-gradient(to top, ${alpha(brandColorLight, 0.9)}, transparent)`,
+        height: '35px',
+        background: `linear-gradient(to top, ${alpha(brandColorLight, 0.95)}, transparent)`,
         pointerEvents: 'none',
+        zIndex: 1,
       } : {},
-    }),
-
-    techChip: (brandColor: string) => ({
-      height: '32px',
-      borderRadius: '8px',
-      transition: 'all 0.3s ease',
-      mb: 1,
-      background: `linear-gradient(120deg, ${alpha(brandColor, 0.15)}, ${alpha(brandColor, 0.25)})`,
-      border: `1px solid ${alpha(brandColor, 0.35)}`,
-      '&:hover': {
-        transform: 'translateY(-3px) scale(1.05)',
-        boxShadow: `0 5px 15px ${alpha(brandColor, 0.3)}`,
-        background: `linear-gradient(120deg, ${alpha(brandColor, 0.25)}, ${alpha(brandColor, 0.4)})`,
+      // Custom scrollbar
+      '&::-webkit-scrollbar': {
+        width: '5px',
       },
-      '& .MuiChip-label': { 
-        px: 1.8,
-        fontSize: '0.88rem',
-        fontWeight: 600,
-        color: theme.palette.mode === 'dark' ? '#fff' : theme.palette.text.primary,
-      } 
+      '&::-webkit-scrollbar-track': {
+        background: alpha(theme.palette.background.default, 0.1),
+        borderRadius: '10px',
+      },
+      '&::-webkit-scrollbar-thumb': {
+        background: alpha(brandColor, 0.3),
+        borderRadius: '10px',
+      },
     }),
-
-    expandButton: (brandColor: string) => ({
+    
+    // Tech chip
+    techChip: (index: number) => ({
+      height: '28px',
+      fontSize: '0.8rem',
+      fontWeight: 600,
+      borderRadius: '8px',
+      mb: 0.8,
+      background: `linear-gradient(120deg, ${alpha(brandColor, 0.1)}, ${alpha(brandColor, 0.25)})`,
+      color: theme.palette.text.primary,
+      border: `1px solid ${alpha(brandColor, 0.3)}`,
+      transition: 'all 0.3s ease',
+      animation: isHovering ? `${animations.pulse} ${3 + index % 2}s ease-in-out infinite` : 'none',
+      '&:hover': {
+        transform: 'translateY(-3px)',
+        boxShadow: `0 4px 8px ${alpha(brandColor, 0.3)}`,
+        background: `linear-gradient(120deg, ${alpha(brandColor, 0.2)}, ${alpha(brandColor, 0.35)})`,
+      },
+      '& .MuiChip-label': { px: 1.2 },
+    }),
+    
+    // Show more/less button
+    showMoreButton: {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
+      gap: 0.5,
       mt: 1.5,
-      gap: 0.8,
+      py: 0.8,
+      borderRadius: 2,
       cursor: 'pointer',
       color: brandColor,
-      fontWeight: 600,
       fontSize: '0.85rem',
-      borderRadius: 2,
-      py: 0.8,
-      transition: 'all 0.3s ease',
+      fontWeight: 600,
+      transition: 'all 0.2s ease',
+      background: alpha(brandColor, 0.05),
       '&:hover': {
-        background: alpha(brandColor, 0.1),
+        background: alpha(brandColor, 0.15),
       }
-    }),
-
-    description: {
-      fontSize: '0.98rem',
-      mb: SPACING.medium,
-      lineHeight: 1.75,
-      pr: 0.5,
     },
-
+    
+    // Description text
+    description: {
+      fontSize: '0.95rem',
+      lineHeight: 1.7,
+      pb: 1,
+      position: 'relative',
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        width: '100%',
+        height: '1px',
+        background: alpha(theme.palette.divider, 0.5),
+      }
+    },
+    
+    // Truncated description
     truncatedDescription: {
-      fontSize: '0.98rem',
+      fontSize: '0.95rem',
       display: '-webkit-box',
       WebkitLineClamp: 2,
       WebkitBoxOrient: 'vertical',
       overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      mb: SPACING.medium,
-      lineHeight: 1.75,
-      pr: 0.5,
+      lineHeight: 1.7,
+      mb: 1,
     },
-
-    // Add the missing floating element styles
-    floatingElement1: (brandColor: string) => ({
-      position: 'absolute',
-      width: 40,
-      height: 40,
-      borderRadius: '50%',
-      background: `radial-gradient(circle, ${alpha(brandColor, 0.7)}, ${alpha(brandColor, 0.2)})`,
-      filter: 'blur(8px)',
-      top: -15,
-      left: 10,
-      opacity: 0.5,
-      animation: `${animations.float} 5s ease-in-out infinite`,
-    }),
-
-    floatingElement2: (secondaryColor: string) => ({
-      position: 'absolute',
-      width: 25,
-      height: 25,
-      borderRadius: '50%',
-      background: `radial-gradient(circle, ${alpha(secondaryColor, 0.7)}, ${alpha(secondaryColor, 0.2)})`,
-      filter: 'blur(6px)',
-      bottom: -10,
-      right: 15,
-      opacity: 0.4,
-      animation: `${animations.float} 4s ease-in-out infinite 1s`,
-    }),
-
-    ctaButton: (hovering: boolean, brandColor: string) => ({
-      py: 1.8,
-      px: 3.8,
-      width: '100%',
-      maxWidth: '250px',
-      fontWeight: 800,
-      borderRadius: 10,
-      fontSize: '1.05rem',
-      letterSpacing: '0.6px',
+    
+    // CTA Button
+    ctaButton: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 1,
+      py: 1.2,
+      px: 2,
+      borderRadius: 2,
+      background: `linear-gradient(90deg, ${brandColor}, ${theme.palette.secondary.main || alpha(brandColor, 0.7)})`,
+      color: '#fff',
+      textDecoration: 'none',
+      fontWeight: 600,
+      fontSize: '0.95rem',
       transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      transform: isHovering ? 'translateY(-4px)' : 'translateY(0)',
+      boxShadow: isHovering 
+        ? `0 10px 25px -5px ${alpha(brandColor, 0.6)}, 0 8px 10px -6px ${alpha(theme.palette.common.black, 0.2)}`
+        : `0 6px 15px -3px ${alpha(brandColor, 0.4)}, 0 3px 6px -4px ${alpha(theme.palette.common.black, 0.1)}`,
       position: 'relative',
       overflow: 'hidden',
-      background: `linear-gradient(90deg, ${brandColor}, ${alpha(theme.palette.secondary.main, 0.9)})`,
-      boxShadow: hovering 
-        ? `0 10px 30px -8px ${alpha(brandColor, 0.7)}, 0 6px 15px -5px ${alpha(theme.palette.common.black, 0.2)}` 
-        : `0 8px 20px -5px ${alpha(brandColor, 0.5)}, 0 3px 10px -5px ${alpha(theme.palette.common.black, 0.1)}`,
-      transform: hovering ? 'translateY(-5px)' : 'translateY(0)',
       '&::before': {
         content: '""',
         position: 'absolute',
         top: 0,
         left: 0,
-        width: '100%',
-        height: '100%',
-        background: 'linear-gradient(rgba(255,255,255,0.25), rgba(255,255,255,0))',
-        opacity: hovering ? 1 : 0.5,
-        transition: 'opacity 0.4s ease',
-        zIndex: 0,
+        right: 0,
+        height: '50%',
+        background: 'linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0))',
+        zIndex: 1,
       },
       '&::after': {
         content: '""',
         position: 'absolute',
         top: 0,
         left: '-100%',
-        width: '70%',
+        width: '100%',
         height: '100%',
-        background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.common.white, 0.4)}, transparent)`,
-        transform: 'skewX(-25deg)',
-        transition: 'all 0.7s ease',
-        animation: hovering ? `${animations.shine} 1.5s infinite ease-in-out` : 'none',
-        zIndex: 1,
-      },
-      '& .MuiButton-startIcon, & .MuiButton-endIcon': {
+        background: `linear-gradient(90deg, transparent, ${alpha('#fff', 0.2)}, transparent)`,
         zIndex: 2,
+        animation: isHovering ? `${animations.shimmer} 2s infinite` : 'none',
       },
-      '& .MuiTouchRipple-root': {
-        zIndex: 1,
+      '& > *': {
+        zIndex: 3,
       },
-    }),
+    },
+    
+    // Quick view button
+    quickViewButton: {
+      position: 'absolute',
+      top: 16,
+      left: 16,
+      zIndex: Z_INDICES.button,
+      width: 40,
+      height: 40,
+      background: alpha(theme.palette.background.paper, 0.85),
+      backdropFilter: 'blur(8px)',
+      border: `1px solid ${alpha(brandColor, 0.3)}`,
+      color: brandColor,
+      boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.2)}`,
+      '&:hover': {
+        background: alpha(theme.palette.background.paper, 0.95),
+        transform: 'scale(1.1)',
+      },
+    }
   };
 };
 
-// Utility function
+// Utility functions
 export const hexToRgb = (hex: string): string => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
     : '75, 123, 236';
 };
+
+export const extractNumericValue = (value: string): number => {
+  const match = value.match(/[-+]?[0-9]*\.?[0-9]+/);
+  return match ? parseFloat(match[0]) : 0;
+};
+
+// Media query helper functions
+export const generateResponsiveStyles = (
+  property: string, 
+  values: { xs?: any; sm?: any; md?: any; lg?: any; xl?: any }
+) => {
+  return Object.entries(values).reduce((acc, [breakpoint, value]) => {
+    if (value !== undefined) {
+      if (breakpoint === 'xs') {
+        acc[property] = value;
+      } else {
+        acc[`@media (min-width: ${getBreakpointValue(breakpoint)}px)`] = {
+          [property]: value
+        };
+      }
+    }
+    return acc;
+  }, {} as Record<string, any>);
+};
+
+// Get breakpoint values
+const getBreakpointValue = (breakpoint: string): number => {
+  const breakpoints: Record<string, number> = {
+    'xs': 0,
+    'sm': 600,
+    'md': 960, 
+    'lg': 1280,
+    'xl': 1920
+  };
+  return breakpoints[breakpoint] || 0;
+};
+
+export default createCardStyles;

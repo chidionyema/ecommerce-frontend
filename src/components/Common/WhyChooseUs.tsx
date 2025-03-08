@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Box,
   Container,
@@ -13,50 +13,89 @@ import {
 import { Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-react';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import TechCard from '../Common/TechCard';
+import { motion, useInView } from 'framer-motion';
+
+// Animation variants for consistent brand motion
+const ANIMATION_VARIANTS = {
+  container: {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      }
+    }
+  },
+  item: {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: "easeOut" }
+    }
+  }
+};
+
+// Define the type for reason items
+interface ReasonItem {
+  id: number;
+  text: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+}
+
+// Enhanced benefit-oriented reasons with more detailed enterprise messaging
+const reasons: ReasonItem[] = [
+  {
+    id: 1,
+    text: 'Deep Enterprise Expertise',
+    description:
+      "Benefit from the insights of seasoned consultants with extensive experience at ASOS, Tesco, and Philip Morris International. Our team brings practical knowledge from scaling systems that serve millions of users.",
+    icon: Lightbulb,
+    color: '#FF9900',
+  },
+  {
+    id: 2,
+    text: 'Tailored, Battle-Tested Solutions',
+    description:
+      "Receive custom-crafted strategies and proven solutions designed specifically for your unique challenges and growth goals. We don't reinvent the wheel—we apply patterns that work in enterprise environments.",
+    icon: Rocket,
+    color: '#2196F3',
+  },
+  {
+    id: 3,
+    text: 'Reliable & Agile Execution',
+    description:
+      "Count on our proven methodologies and adaptable approach to ensure projects are delivered on time and to the highest standards. Our transparent project management gives you visibility at every stage.",
+    icon: ShieldCheck,
+    color: '#4CAF50',
+  },
+  {
+    id: 4,
+    text: 'Scalable Architecture for Growth',
+    description:
+      "Implement future-proof solutions architected for scalability, supporting your business as it expands. We design systems that can grow from thousands to millions of users without requiring complete rewrites.",
+    icon: TrendingUp,
+    color: '#E91E63',
+  },
+];
 
 const WhyChooseUs = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
-
-  // Benefit-oriented reasons
-  const reasons = [
-    {
-      id: 1,
-      text: 'Deep Industry Expertise',
-      description:
-        'Benefit from the insights of seasoned consultants with extensive experience across diverse technology sectors.',
-      icon: Lightbulb,
-    },
-    {
-      id: 2,
-      text: 'Tailored, Innovative Solutions',
-      description:
-        'Receive custom-crafted strategies and cutting-edge solutions designed specifically for your unique challenges and goals.',
-      icon: Rocket,
-    },
-    {
-      id: 3,
-      text: 'Reliable & Agile Execution',
-      description:
-        'Count on our proven methodologies and adaptable approach to ensure projects are delivered on time and to the highest standards.',
-      icon: ShieldCheck,
-    },
-    {
-      id: 4,
-      text: 'Scalable Solutions for Growth',
-      description:
-        'Implement future-proof solutions architected for scalability, supporting your business as it expands and evolves.',
-      icon: TrendingUp,
-    },
-  ];
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
     <Box
       component="section"
+      ref={ref}
       sx={{
         width: '100%',
         py: SPACING.large * 1.5,
-        background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${alpha(theme.palette.primary.main, 0.8)} 100%)`,
+        background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${alpha(theme.palette.primary.main, 0.85)} 100%)`,
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -75,109 +114,132 @@ const WhyChooseUs = () => {
       />
 
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
-        <Typography
-          variant="h2"
-          component="h2"
-          align="center"
-          sx={{
-            ...styles.pageTitle,
-            color: 'white',
-            mb: SPACING.medium,
-            fontWeight: 700,
-            textShadow: '0 4px 8px rgba(0, 0, 0, 0.7)',
-            [theme.breakpoints.down('sm')]: {
-              fontSize: '2rem', // Smaller font size on mobile
-            },
-          }}
+        <motion.div
+          variants={ANIMATION_VARIANTS.container}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
         >
-          Why Partner with Us?
-        </Typography>
-
-        <Grid
-          container
-          spacing={SPACING.medium}
-          justifyContent="center"
-        >
-          {reasons.map((reason) => (
-            <Grid 
-              item 
-              key={reason.id} 
-              xs={12} 
-              md={6}
+          <motion.div variants={ANIMATION_VARIANTS.item}>
+            <Typography
+              variant="h2"
+              component="h2"
+              align="center"
               sx={{
-                display: 'flex',
-                alignItems: 'stretch'
+                ...styles.pageTitle,
+                color: 'white',
+                mb: 2,
+                fontWeight: 800,
+                fontSize: { xs: '2.2rem', sm: '2.7rem', md: '3.2rem' },
+                letterSpacing: '-0.01em',
+                textShadow: '0 4px 12px rgba(0, 0, 0, 0.6)',
               }}
             >
-              <TechCard
-                title={reason.text}
-                index={reason.id - 1}
-                icon={<reason.icon />}
+              Why Partner with GLUStack?
+            </Typography>
+          </motion.div>
+
+          <motion.div variants={ANIMATION_VARIANTS.item}>
+            <Typography 
+              variant="subtitle1"
+              align="center"
+              sx={{
+                color: alpha(theme.palette.common.white, 0.9),
+                mb: 6,
+                maxWidth: '800px',
+                mx: 'auto',
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.4)',
+                fontSize: '1.2rem',
+                lineHeight: 1.6,
+                fontWeight: 500,
+              }}
+            >
+              We bring enterprise-grade expertise and solutions to growing businesses
+            </Typography>
+          </motion.div>
+
+          <Grid
+            container
+            spacing={4}
+            justifyContent="center"
+          >
+            {reasons.map((reason) => {
+              const IconComponent = reason.icon;
+              
+              return (
+                <Grid 
+                  item 
+                  key={reason.id} 
+                  xs={12} 
+                  md={6}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'stretch'
+                  }}
+                >
+                  <motion.div 
+                    variants={ANIMATION_VARIANTS.item}
+                    style={{ width: '100%', height: '100%' }}
+                  >
+                    <TechCard
+                      title={reason.text}
+                      icon={<IconComponent color={reason.color} />}
+                      accentColor={reason.color}
+                      importance={reason.id <= 2 ? 'primary' : 'secondary'}
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      <Typography 
+                        variant="body1" 
+                        sx={{
+                          mt: 1,
+                          fontWeight: 500,
+                          color: alpha(theme.palette.text.primary, 0.95),
+                          textAlign: 'center',
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {reason.description}
+                      </Typography>
+                    </TechCard>
+                  </motion.div>
+                </Grid>
+              );
+            })}
+          </Grid>
+
+          <motion.div variants={ANIMATION_VARIANTS.item}>
+            <Box sx={{ 
+              textAlign: 'center', 
+              mt: 8,
+            }}>
+              <Button
+                variant="contained"
+                color="secondary"
+                size="large"
+                href="/contact"
                 sx={{
-                  height: '100%', // Make card full height of its grid item
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  width: '100%'
+                  px: 5,
+                  py: 1.6,
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  boxShadow: `0 6px 20px ${alpha(theme.palette.secondary.main, 0.6)}, 0 2px 6px rgba(0, 0, 0, 0.3)`,
+                  '&:hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: `0 10px 25px ${alpha(theme.palette.secondary.main, 0.7)}, 0 4px 10px rgba(0, 0, 0, 0.4)`,
+                  },
+                  transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                 }}
               >
-                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                  <Typography 
-                    variant="body1" 
-                    sx={{
-                      flexGrow: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mt: 1,
-                      fontWeight: 500,
-                      color: alpha(theme.palette.text.primary, 0.9),
-                      textAlign: 'center'
-                    }}
-                  >
-                    {reason.description}
-                  </Typography>
-                </Box>
-              </TechCard>
-            </Grid>
-          ))}
-        </Grid>
-
-        <Box sx={{ 
-          textAlign: 'center', 
-          mt: SPACING.large,
-          [theme.breakpoints.down('sm')]: {
-            mt: 4, // Reduced margin on mobile
-          }
-        }}>
-          <Button
-            variant="contained"
-            color="secondary"
-            size="large"
-            href="/solutions"
-            sx={{
-              px: 4,
-              py: 1.5,
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              borderRadius: 2,
-              textTransform: 'none',
-              boxShadow: `0 4px 14px ${alpha(theme.palette.secondary.main, 0.5)}`,
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: `0 6px 20px ${alpha(theme.palette.secondary.main, 0.6)}`,
-              },
-              transition: 'all 0.3s ease',
-              [theme.breakpoints.down('sm')]: {
-                fontSize: '1rem', // Smaller font on mobile
-                px: 3,
-                py: 1.25,
-              }
-            }}
-          >
-            Explore Our Services
-          </Button>
-        </Box>
+                Schedule a Consultation
+              </Button>
+            </Box>
+          </motion.div>
+        </motion.div>
       </Container>
     </Box>
   );

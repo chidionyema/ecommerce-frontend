@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -11,14 +11,21 @@ import {
   Grid,
   Chip,
   Stack,
-  Theme,
+  Avatar,
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { SiAmazonaws, SiMicrosoftazure, SiDocker, SiKubernetes, SiTerraform } from 'react-icons/si';
-import { BracketsIcon, ShieldCheck, Bolt, Cog } from 'lucide-react';
-import { SPACING } from '../../utils/sharedStyles';
+import {
+  SiAmazonaws,
+  SiMicrosoftazure,
+  SiDocker,
+  SiKubernetes,
+  SiTerraform,
+} from 'react-icons/si';
+import { BracketsIcon, ShieldCheck, Bolt, Cog, Clock, TrendingUp, DollarSign, Users, ArrowRight } from 'lucide-react';
+// Import ArrowForwardIos from MUI icons
+import { ArrowForwardIos } from '@mui/icons-material';
 
-// Define interfaces for data structures
+// Define interfaces
 interface TechStackItem {
   icon: React.ComponentType<{ color: string; size: number; style?: React.CSSProperties }>;
   name: string;
@@ -28,10 +35,15 @@ interface TechStackItem {
 interface BenefitItem {
   icon: React.ReactNode;
   text: string;
+  subtext: string;
 }
 
-// Constants moved to their own dedicated file (import in real implementation)
-// This improves maintainability and separation of concerns
+interface ClientLogoItem {
+  name: string;
+  logoUrl: string;
+}
+
+// Tech stack
 const TECH_STACK: TechStackItem[] = [
   { icon: SiAmazonaws, name: 'AWS', color: '#FF9900' },
   { icon: SiMicrosoftazure, name: 'Azure', color: '#0078D4' },
@@ -40,313 +52,383 @@ const TECH_STACK: TechStackItem[] = [
   { icon: SiTerraform, name: 'Terraform', color: '#7B42BC' },
 ];
 
+// Benefits with expanded details
 const BENEFITS: BenefitItem[] = [
-  { icon: <BracketsIcon size={22} />, text: 'Production-Grade Code & Documentation' },
-  { icon: <ShieldCheck size={22} />, text: 'Security Best Practices & Compliance' },
-  { icon: <Bolt size={22} />, text: 'Optimized Performance' },
-  { icon: <Cog size={22} />, text: 'CI/CD & DevOps Integration' },
+  { 
+    icon: <TrendingUp size={22} />, 
+    text: '70% Faster Deployment', 
+    subtext: 'Go to market in weeks, not months'
+  },
+  { 
+    icon: <ShieldCheck size={22} />, 
+    text: 'Enterprise-Grade Security', 
+    subtext: 'GDPR & ISO 27001 compliant'
+  },
+  { 
+    icon: <DollarSign size={22} />, 
+    text: '40% Cost Reduction', 
+    subtext: 'Optimized cloud infrastructure'
+  },
+  { 
+    icon: <Users size={22} />, 
+    text: '99.99% Reliability', 
+    subtext: 'Built for scale & resilience'
+  },
 ];
 
-// Animation variants extracted for better organization
+// Client logos
+const CLIENT_LOGOS: ClientLogoItem[] = [
+  { name: 'ASOS', logoUrl: '/images/asos-logo.svg' },
+  { name: 'Tesco', logoUrl: '/images/tesco-logo.svg' },
+  { name: 'Philip Morris', logoUrl: '/images/philip-morris-logo.svg' },
+];
+
+// Framer-motion variants
 const ANIMATION_VARIANTS = {
   container: {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
+      transition: { staggerChildren: 0.15, delayChildren: 0.2 },
     },
   },
   item: {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 15 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, ease: 'easeOut' },
+      transition: { duration: 0.6, ease: 'easeOut' },
     },
-  }
+  },
 };
 
-// Define interfaces for component props
-interface BenefitItemProps {
-  icon: React.ReactNode;
-  text: string;
-}
-
-// Separate component for better organization
-const BenefitItem = ({ icon, text }: BenefitItemProps) => {
+// Single Benefit item with improved design
+const BenefitItem = ({ icon, text, subtext }: BenefitItem) => {
   const theme = useTheme();
-  
+  const [hovered, setHovered] = useState(false);
+
   return (
     <Box
+      component={motion.div}
+      whileHover={{ scale: 1.03, y: -4 }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
       sx={{
         display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        backgroundColor: alpha(theme.palette.background.paper, 0.6), // Increased opacity for better visibility
-        p: 2,
+        flexDirection: 'column',
+        p: 2.5,
         borderRadius: 2,
-        border: `1px solid ${alpha(theme.palette.common.white, 0.3)}`,
+        backgroundColor: alpha(theme.palette.background.paper, 0.6),
+        border: `1px solid ${alpha('#fff', 0.25)}`,
+        backdropFilter: 'blur(10px)',
+        boxShadow: hovered
+          ? `0 6px 18px rgba(0,0,0,0.4), 0 2px 8px ${alpha(theme.palette.primary.main, 0.4)}`
+          : `0 3px 12px rgba(0,0,0,0.25)`,
+        transition: 'all 0.4s ease',
+        cursor: 'default',
         height: '100%',
-        backdropFilter: 'blur(8px)', // Increased blur for better text contrast
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Added shadow for depth and visibility
       }}
     >
       <Box
         sx={{
-          backgroundColor: alpha(theme.palette.secondary.main, 0.4), // Increased opacity
+          backgroundColor: alpha(theme.palette.primary.main, hovered ? 0.7 : 0.5),
           borderRadius: '50%',
-          p: 1,
-          display: 'flex',
-          color: theme.palette.secondary.light, // Lighter color for better visibility
+          p: 1.2,
+          color: theme.palette.common.white,
+          boxShadow: hovered ? `0 0 16px ${alpha(theme.palette.primary.main, 0.5)}` : 'none',
+          transition: 'all 0.3s ease',
+          width: 'fit-content',
+          mb: 1.5,
         }}
       >
         {icon}
       </Box>
-      <Typography 
-        variant="body1" 
-        fontWeight={700} // Increased from 600 to 700 for better visibility
+      <Typography
+        variant="h6"
+        fontWeight={700}
         color="white"
-        sx={{ textShadow: '0 2px 4px rgba(0,0,0,0.7)' }} // Enhanced text shadow
+        sx={{
+          textShadow: '0 2px 4px rgba(0,0,0,0.7)',
+          mb: 0.5,
+        }}
       >
         {text}
+      </Typography>
+      <Typography
+        variant="body2"
+        color={alpha('#fff', 0.85)}
+        sx={{
+          textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+        }}
+      >
+        {subtext}
       </Typography>
     </Box>
   );
 };
 
-interface TechLogoProps {
+// Tech logo (AWS, Azure, etc.)
+const TechLogo = ({
+  Icon,
+  name,
+  color,
+}: {
   Icon: React.ComponentType<{ color: string; size: number; style?: React.CSSProperties }>;
   name: string;
   color: string;
-}
+}) => {
+  const [hovered, setHovered] = useState(false);
 
-// Separate component for better organization
-const TechLogo = ({ Icon, name, color }: TechLogoProps) => (
-  <Box
-    sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 1,
-    }}
-  >
-    <Icon
-      color={color}
-      size={30}
-      style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.7))' }} // Enhanced shadow
-    />
-    <Typography 
-      variant="caption" 
-      color="white" 
-      fontWeight={700} // Increased from 600 to 700
-      sx={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }} // Enhanced text shadow
+  return (
+    <Box
+      component={motion.div}
+      whileHover={{ y: -5 }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 1,
+        transition: 'all 0.3s ease',
+        cursor: 'default',
+        userSelect: 'none',
+      }}
     >
-      {name}
-    </Typography>
-  </Box>
-);
+      <Icon
+        color={color}
+        size={34}
+        style={{
+          filter: hovered
+            ? `drop-shadow(0 0 14px ${color}80) drop-shadow(0 4px 8px rgba(0,0,0,0.6))`
+            : 'drop-shadow(0 4px 6px rgba(0,0,0,0.7))',
+          transition: 'filter 0.3s ease',
+        }}
+      />
+      <Typography
+        variant="caption"
+        color="#fff"
+        fontWeight={700}
+        sx={{
+          textShadow: '0 2px 3px rgba(0,0,0,0.6)',
+          fontSize: '0.85rem',
+        }}
+      >
+        {name}
+      </Typography>
+    </Box>
+  );
+};
 
-// Styles extracted to their own objects for better organization and reuse
-const getStyles = (theme: Theme) => ({
-  heroContainer: {
-    position: 'relative',
-    minHeight: { xs: '600px', md: '700px' },
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    paddingBottom: SPACING.large * 2,
-  },
-  backgroundImage: (imageLoaded: boolean, imageUrl: string) => ({
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundImage: imageLoaded ? `url(${imageUrl})` : 'none',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    zIndex: 0,
-    opacity: imageLoaded ? 1 : 0, // Full visibility
-    transition: 'opacity 0.5s ease',
-    willChange: 'opacity',
-    filter: 'blur(1px)', // Kept the subtle blur
-  }),
-  gradientOverlay: (imageLoaded: boolean, theme: Theme) => ({
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    background: imageLoaded
-      ? `linear-gradient(
-          to bottom,
-          ${alpha(theme.palette.primary.dark, 0.4)} 0%, 
-          ${alpha(theme.palette.primary.dark, 0.3)} 50%,
-          ${alpha(theme.palette.primary.dark, 0.5)} 100%
-        )` // Adjusted opacity values for better readability
-      : 'transparent',
-    zIndex: 1,
-    transition: 'opacity 0.3s ease',
-  }),
-  contentContainer: {
-    position: 'relative',
-    zIndex: 2,
-    py: { xs: 6, md: 8 },
-    px: { xs: 2, sm: 4 },
-    textAlign: 'center',
-  },
-  eyebrowChip: {
-    backgroundColor: alpha(theme.palette.secondary.main, 0.5), // Increased opacity
-    color: 'white',
-    fontWeight: 'bold',
-    mb: 3,
-    border: `1px solid ${alpha(theme.palette.secondary.main, 0.8)}`, // Increased border opacity
-    px: 2,
-    py: 1,
-    '& .MuiChip-label': {
-      px: 1,
-      fontSize: '0.9rem',
-    },
-    textShadow: '0 2px 3px rgba(0,0,0,0.7)', // Enhanced text shadow
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)', // Added shadow for visibility
-  },
-  headline: {
-    fontSize: { xs: '2.5rem', sm: '3.2rem', md: '4rem' },
-    lineHeight: 1.2,
-    fontWeight: 800,
-    mb: 3,
-    textShadow: '0 3px 15px rgba(0, 0, 0, 0.9), 0 5px 12px rgba(0, 0, 0, 0.5)', // Enhanced text shadow
-    maxWidth: '900px',
-    mx: 'auto',
-    letterSpacing: '-0.01em',
-  },
-  subheadline: {
-    fontSize: { xs: '1.2rem', sm: '1.4rem', md: '1.6rem' },
-    fontWeight: 600, // Increased from 500 to 600
-    lineHeight: 1.5,
-    mb: 5,
-    opacity: 1,
-    maxWidth: '800px',
-    mx: 'auto',
-    textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)', // Enhanced text shadow
-  },
-  primaryButton: {
-    px: 4,
-    py: 1.5,
-    fontSize: '1.1rem',
-    fontWeight: 700, // Increased from 600 to 700
-    borderRadius: 2,
-    textTransform: 'none',
-    boxShadow: `0 4px 14px ${alpha(theme.palette.secondary.main, 0.8)}, 0 2px 6px rgba(0, 0, 0, 0.3)`, // Enhanced shadow
-    '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: `0 6px 20px ${alpha(theme.palette.secondary.main, 0.9)}, 0 3px 8px rgba(0, 0, 0, 0.4)`,
-    },
-    transition: 'all 0.3s ease',
-  },
-  secondaryButton: {
-    px: 4,
-    py: 1.5,
-    fontSize: '1.1rem',
-    fontWeight: 700, // Increased from 600 to 700
-    borderRadius: 2,
-    textTransform: 'none',
-    borderWidth: 2,
-    borderColor: alpha(theme.palette.common.white, 0.7), // Increased from 0.5 to 0.7
-    color: theme.palette.common.white,
-    backgroundColor: alpha(theme.palette.common.black, 0.2), // Added slight background tint
-    '&:hover': {
-      borderColor: theme.palette.common.white,
-      backgroundColor: alpha(theme.palette.common.white, 0.3), // Increased from 0.2 to 0.3
-    },
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    boxShadow: '0 3px 8px rgba(0, 0, 0, 0.3)', // Enhanced shadow
-  },
-  techSection: {
-    p: { xs: 2, sm: 3 },
-    borderRadius: 2,
-    backgroundColor: alpha(theme.palette.background.paper, 0.5), // Increased from 0.25 to 0.5
-    border: `1px solid ${alpha(theme.palette.common.white, 0.3)}`, // Increased from 0.2 to 0.3
-    backdropFilter: 'blur(8px)', // Increased blur
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)', // Added shadow for visibility
-  }
-});
+// Client Logo Component
+const ClientLogo = ({ name, logoUrl }: ClientLogoItem) => {
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        px: 2,
+      }}
+    >
+      <Avatar
+        src={logoUrl}
+        alt={`${name} logo`}
+        variant="square"
+        sx={{
+          width: 'auto',
+          height: 24,
+          filter: 'brightness(0) invert(1)',
+          opacity: 0.9,
+        }}
+      />
+    </Box>
+  );
+};
 
 export const HeroSection = () => {
   const theme = useTheme();
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const imageUrl = '/images/istockphoto-realhero.jpg';
-  const styles = getStyles(theme);
-
-  useEffect(() => {
-    const img = new Image();
-    img.src = imageUrl;
-    img.onload = () => setImageLoaded(true);
-    img.onerror = () => setImageLoaded(false);
-  }, [imageUrl]);
+  const [learnMoreHovered, setLearnMoreHovered] = useState(false);
 
   return (
-    <Box component="section" sx={styles.heroContainer}>
-      {/* Background image with loading transition */}
-      <Box sx={styles.backgroundImage(imageLoaded, imageUrl)} />
+    <Box
+      component="section"
+      sx={{
+        position: 'relative',
+        minHeight: { xs: '650px', md: '92vh' },
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        pt: { xs: 12, md: 14 },
+        pb: { xs: 8, md: 10 },
+      }}
+    >
+      {/* Background image */}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `url('/images/istockphoto-realhero.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          zIndex: 0,
+        }}
+      />
 
-      {/* Gradient overlay */}
-      <Box sx={styles.gradientOverlay(imageLoaded, theme)} />
+      {/* Dark gradient overlay */}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          background: `linear-gradient(
+            to bottom,
+            ${alpha(theme.palette.primary.dark, 0.9)} 0%,
+            ${alpha(theme.palette.primary.dark, 0.7)} 50%,
+            ${alpha(theme.palette.primary.dark, 0.9)} 100%
+          )`,
+          zIndex: 1,
+        }}
+      />
 
-      <Container maxWidth="lg" sx={styles.contentContainer}>
+      <Container
+        maxWidth="lg"
+        sx={{
+          position: 'relative',
+          zIndex: 2,
+          textAlign: 'center',
+        }}
+      >
         <motion.div
           variants={ANIMATION_VARIANTS.container}
           initial="hidden"
           animate="visible"
         >
-          {/* Eyebrow text */}
+          {/* Eyebrow/Chip with countdown */}
           <motion.div variants={ANIMATION_VARIANTS.item}>
-            <Chip label="For Startups & Tech Teams" sx={styles.eyebrowChip} />
+            <Stack direction="row" spacing={1} justifyContent="center" sx={{ mb: 3 }}>
+              <Chip
+                icon={<Clock size={16} />}
+                label="Limited Time: 2 Free Strategy Sessions"
+                sx={{
+                  backgroundColor: alpha(theme.palette.error.main, 0.3),
+                  color: '#fff',
+                  fontWeight: 'bold',
+                  border: `1px solid ${alpha(theme.palette.error.main, 0.6)}`,
+                  px: 1.5,
+                  py: 2.5,
+                  textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
+                  '& .MuiChip-icon': {
+                    color: theme.palette.error.light
+                  }
+                }}
+              />
+            </Stack>
+          </motion.div>
+
+          {/* Client logos */}
+          <motion.div variants={ANIMATION_VARIANTS.item}>
+            <Box sx={{ mb: 4, opacity: 0.9 }}>
+              <Typography
+                variant="subtitle2"
+                color={alpha('#fff', 0.8)}
+                textTransform="uppercase"
+                letterSpacing={1}
+                fontSize="0.75rem"
+                mb={1.5}
+              >
+                Trusted by industry leaders
+              </Typography>
+              <Stack
+                direction="row"
+                spacing={4}
+                justifyContent="center"
+                alignItems="center"
+                sx={{
+                  py: 1.5,
+                  px: 2,
+                  borderRadius: 2,
+                  backgroundColor: alpha('#000', 0.2),
+                  backdropFilter: 'blur(5px)',
+                  display: 'inline-flex',
+                }}
+              >
+                {CLIENT_LOGOS.map((client, index) => (
+                  <ClientLogo key={index} name={client.name} logoUrl={client.logoUrl} />
+                ))}
+              </Stack>
+            </Box>
           </motion.div>
 
           {/* Main headline */}
           <motion.div variants={ANIMATION_VARIANTS.item}>
-            <Typography variant="h1" component="h1" color="white" sx={styles.headline}>
-              Skip Trial &amp; Error with{' '}
-              <Box component="span" sx={{ 
-                color: theme.palette.secondary.light,
-                textShadow: '0 3px 10px rgba(0, 0, 0, 0.8)', // Enhanced shadow for highlight text
-                position: 'relative',
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  bottom: '-2px',
-                  left: 0,
-                  width: '100%',
-                  height: '4px',
-                  backgroundColor: alpha(theme.palette.secondary.main, 0.7), // Added underline highlight
-                  borderRadius: '2px',
-                }
-              }}>
-                Production-Ready
+            <Typography
+              variant="h1"
+              component="h1"
+              color="white"
+              sx={{
+                fontSize: { xs: '2.6rem', sm: '3.5rem', md: '4.5rem' },
+                lineHeight: 1.15,
+                fontWeight: 800,
+                mb: 3,
+                maxWidth: '950px',
+                mx: 'auto',
+                textShadow: '0 4px 15px rgba(0, 0, 0, 0.85), 0 8px 20px rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              Launch Your Enterprise Solution{' '}
+              <Box
+                component="span"
+                sx={{
+                  color: theme.palette.secondary.light,
+                  position: 'relative',
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    bottom: '-4px',
+                    left: 0,
+                    width: '100%',
+                    height: '6px',
+                    backgroundColor: alpha(theme.palette.secondary.main, 0.7),
+                    borderRadius: '3px',
+                  },
+                }}
+              >
+                10x Faster
               </Box>{' '}
-              Technology
+              With Zero Risk
             </Typography>
           </motion.div>
 
           {/* Subheadline */}
           <motion.div variants={ANIMATION_VARIANTS.item}>
-            <Typography variant="h2" component="h2" color="white" sx={styles.subheadline}>
-              Access expert-built technology solutions and consultancy from engineers
-              with proven enterprise experience at ASOS, Tesco, and Philip Morris.
+            <Typography
+              variant="h2"
+              component="h2"
+              color="#f0f0f0"
+              sx={{
+                fontSize: { xs: '1.25rem', sm: '1.4rem', md: '1.6rem' },
+                fontWeight: 500,
+                lineHeight: 1.5,
+                mb: 5,
+                maxWidth: '780px',
+                mx: 'auto',
+                textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)',
+              }}
+            >
+              Skip the painful learning curve with production-ready architectures built by
+              the same senior engineers who've delivered mission-critical systems for ASOS,
+              Tesco, and Philip Morris.
             </Typography>
           </motion.div>
 
           {/* Benefits */}
           <motion.div variants={ANIMATION_VARIANTS.item}>
-            <Grid container spacing={2} sx={{ mb: 5 }}>
+            <Grid container spacing={3} sx={{ mb: 5 }}>
               {BENEFITS.map((item, index) => (
-                <Grid item xs={12} sm={6} key={index}>
-                  <BenefitItem icon={item.icon} text={item.text} />
+                <Grid item xs={12} sm={6} md={3} key={index}>
+                  <BenefitItem icon={item.icon} text={item.text} subtext={item.subtext} />
                 </Grid>
               ))}
             </Grid>
@@ -354,9 +436,9 @@ export const HeroSection = () => {
 
           {/* CTA Buttons */}
           <motion.div variants={ANIMATION_VARIANTS.item}>
-            <Stack 
-              direction={{ xs: 'column', sm: 'row' }} 
-              spacing={2} 
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={{ xs: 2, sm: 3 }}
               justifyContent="center"
               sx={{ mb: 6 }}
             >
@@ -364,37 +446,105 @@ export const HeroSection = () => {
                 variant="contained"
                 color="secondary"
                 size="large"
-                sx={styles.primaryButton}
+                sx={{
+                  px: 4,
+                  py: 1.6,
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  boxShadow: `0 6px 20px ${alpha(
+                    theme.palette.secondary.main,
+                    0.8
+                  )}, 0 2px 8px rgba(0, 0, 0, 0.4)`,
+                  '&:hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: `0 10px 25px ${alpha(
+                      theme.palette.secondary.main,
+                      0.9
+                    )}, 0 4px 10px rgba(0, 0, 0, 0.5)`,
+                  },
+                  transition:
+                    'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                }}
               >
-                Start Free Consultation
+                Book Your Free Strategy Session
               </Button>
               <Button
                 variant="outlined"
                 size="large"
-                sx={styles.secondaryButton}
+                onMouseEnter={() => setLearnMoreHovered(true)}
+                onMouseLeave={() => setLearnMoreHovered(false)}
+                sx={{
+                  px: 4,
+                  py: 1.6,
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  borderWidth: 2,
+                  borderColor: alpha(theme.palette.common.white, 0.8),
+                  color: theme.palette.common.white,
+                  backgroundColor: alpha(theme.palette.common.black, 0.2),
+                  '&:hover': {
+                    borderColor: theme.palette.common.white,
+                    backgroundColor: alpha(theme.palette.common.white, 0.1),
+                    transform: 'translateY(-3px)',
+                  },
+                  transition:
+                    'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                }}
               >
-                Explore Solutions
+                View Case Studies
+                <Box
+                  component={motion.div}
+                  animate={{ x: learnMoreHovered ? 5 : 0 }}
+                  transition={{ duration: 0.3 }}
+                  sx={{ 
+                    display: 'inline-flex',
+                    ml: 1 
+                  }}
+                >
+                  {/* Use ArrowRight from Lucide instead of ArrowForwardIos */}
+                  <ArrowRight size={16} />
+                </Box>
               </Button>
             </Stack>
           </motion.div>
 
-          {/* Tech Logos */}
+          {/* Tech Stack logos */}
           <motion.div variants={ANIMATION_VARIANTS.item}>
-            <Box sx={styles.techSection}>
+            <Box
+              sx={{
+                p: { xs: 2.5, sm: 3 },
+                borderRadius: 2,
+                backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                border: `1px solid ${alpha('#fff', 0.25)}`,
+                backdropFilter: 'blur(12px)',
+                boxShadow: '0 6px 16px rgba(0, 0, 0, 0.25)',
+              }}
+            >
               <Typography
-                variant="subtitle2"
-                color="white"
+                variant="subtitle1"
+                color="#fff"
                 textAlign="center"
-                mb={2}
-                sx={{ 
-                  opacity: 1, // Increased from 0.9 to 1
-                  fontWeight: 600, // Increased from 500 to 600
-                  textShadow: '0 2px 4px rgba(0,0,0,0.6)' // Enhanced text shadow
+                mb={2.5}
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.6)',
+                  letterSpacing: '0.5px',
                 }}
               >
-                Expertise with leading technologies:
+                Pre-built architectures for leading enterprise technologies:
               </Typography>
-              <Grid container spacing={3} justifyContent="center" alignItems="center">
+              <Grid
+                container
+                spacing={3}
+                justifyContent="center"
+                alignItems="center"
+              >
                 {TECH_STACK.map((tech, index) => (
                   <Grid item key={index} xs={4} sm={2.4}>
                     <TechLogo Icon={tech.icon} name={tech.name} color={tech.color} />

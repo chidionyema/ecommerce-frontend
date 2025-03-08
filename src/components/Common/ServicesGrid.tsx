@@ -4,25 +4,22 @@ import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import TechCard from '../Common/TechCard';
 import { motion, useInView } from 'framer-motion';
 import {
-  Lightbulb, 
-  Wrench,
+  Layers, 
+  Cloud,
   Code,
   ShieldCheck,
   TrendingUp,
-  Users,
-  Layers,
-  Database,
-  LineChart,
-  BookOpen,
   Cpu,
-  Cloud,
+  Database,
+  BookOpen,
+  Wrench,
 } from 'lucide-react';
 
-// Enhanced services with more specific descriptions that highlight enterprise experience
+// Enhanced services with more specific descriptions highlighting enterprise experience
 const services = [
   {
     title: 'Enterprise Architecture',
-    content: 'Strategic design of scalable, maintainable systems based on experience at ASOS and Tesco.',
+    content: 'Strategic design of scalable, maintainable systems based on our experience at ASOS and Tesco.',
     icon: Layers,
     color: '#FF5722',
     ctaLink: '/services/enterprise-architecture'
@@ -78,31 +75,34 @@ const services = [
   },
 ];
 
-const ServicesGrid = () => {
-  const theme = useTheme();
-  const styles = getSharedStyles(theme);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
-
-  const containerVariants = {
+// Animation variants for consistent brand motion
+const ANIMATION_VARIANTS = {
+  container: {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.3,
+        delayChildren: 0.2,
       }
     }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+  },
+  item: {
+    hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5 }
+      transition: { duration: 0.5, ease: "easeOut" }
     }
-  };
+  }
+};
+
+const ServicesGrid = () => {
+  const theme = useTheme();
+  const styles = getSharedStyles(theme);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const [hoveredIndex, setHoveredIndex] = useState(-1);
 
   return (
     <Box
@@ -111,7 +111,7 @@ const ServicesGrid = () => {
       sx={{
         width: '100%',
         py: SPACING.large * 1.5,
-        background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${alpha(theme.palette.primary.main, 0.8)} 100%)`,
+        background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${alpha(theme.palette.primary.main, 0.85)} 100%)`,
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -131,11 +131,11 @@ const ServicesGrid = () => {
       
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
         <motion.div
-          variants={containerVariants}
+          variants={ANIMATION_VARIANTS.container}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
-          <motion.div variants={itemVariants}>
+          <motion.div variants={ANIMATION_VARIANTS.item}>
             <Typography
               variant="h2"
               component="h2"
@@ -144,33 +144,29 @@ const ServicesGrid = () => {
                 ...styles.pageTitle,
                 color: 'white',
                 mb: 2,
-                fontWeight: 700,
-                textShadow: '0 4px 8px rgba(0, 0, 0, 0.8)',
-                [theme.breakpoints.down('sm')]: {
-                  fontSize: '2rem', // Smaller font size on mobile
-                },
+                fontWeight: 800,
+                fontSize: { xs: '2.2rem', sm: '2.7rem', md: '3.2rem' },
+                letterSpacing: '-0.01em',
+                textShadow: '0 4px 12px rgba(0, 0, 0, 0.6)',
               }}
             >
               Enterprise Solutions for Growing Businesses
             </Typography>
           </motion.div>
 
-          <motion.div variants={itemVariants}>
+          <motion.div variants={ANIMATION_VARIANTS.item}>
             <Typography 
               variant="subtitle1"
               align="center"
               sx={{
                 color: alpha(theme.palette.common.white, 0.9),
-                mb: 5,
+                mb: 6,
                 maxWidth: '800px',
                 mx: 'auto',
                 textShadow: '0 2px 4px rgba(0, 0, 0, 0.4)',
-                fontSize: '1.1rem',
+                fontSize: '1.2rem',
                 lineHeight: 1.6,
-                [theme.breakpoints.down('sm')]: {
-                  fontSize: '0.95rem', // Slightly smaller on mobile
-                  px: 2, // Add some padding on smaller screens
-                },
+                fontWeight: 500,
               }}
             >
               Leverage our experience from ASOS, Tesco, and Philip Morris to build 
@@ -180,13 +176,8 @@ const ServicesGrid = () => {
 
           <Grid 
             container 
-            spacing={3} 
+            spacing={4} 
             justifyContent="center"
-            sx={{
-              [theme.breakpoints.down('sm')]: {
-                spacing: 2, // Reduce spacing on very small screens
-              }
-            }}
           >
             {services.map((service, index) => (
               <Grid 
@@ -198,28 +189,23 @@ const ServicesGrid = () => {
                 key={index}
                 sx={{
                   display: 'flex',
-                  justifyContent: 'center',
-                  [theme.breakpoints.down('sm')]: {
-                    maxWidth: '100%', // Full width on very small screens
-                    flexBasis: '100%',
-                  }
                 }}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(-1)}
               >
                 <motion.div 
-                  variants={itemVariants}
-                  style={{ width: '100%', maxWidth: '320px' }} // Consistent max-width
+                  variants={ANIMATION_VARIANTS.item}
+                  style={{ width: '100%', height: '100%' }}
                 >
                   <TechCard
-                    icon={<service.icon color={service.color} size={32} />}
+                    icon={<service.icon color={service.color} strokeWidth={hoveredIndex === index ? 2.5 : 2} />}
                     title={service.title}
-                    index={index}
+                    accentColor={service.color}
+                    importance={index < 4 ? 'primary' : 'secondary'}
                     sx={{
-                      height: '100%', // Full height
+                      height: '100%',
                       display: 'flex',
                       flexDirection: 'column',
-                      [theme.breakpoints.down('sm')]: {
-                        maxWidth: '100%', // Full width on mobile
-                      }
                     }}
                   >
                     <Typography
@@ -227,34 +213,37 @@ const ServicesGrid = () => {
                       sx={{ 
                         textAlign: 'center', 
                         mt: 1,
+                        mb: 2,
                         fontWeight: 500,
-                        color: alpha(theme.palette.text.primary, 0.9),
-                        flexGrow: 1, // Allow content to expand
-                        [theme.breakpoints.down('sm')]: {
-                          fontSize: '0.875rem', // Slightly smaller text on mobile
-                        }
+                        color: alpha(theme.palette.text.primary, 0.95),
+                        flexGrow: 1,
+                        lineHeight: 1.6,
                       }}
                     >
                       {service.content}
                     </Typography>
                     
-                    <Divider sx={{ my: 1.5, borderColor: alpha(theme.palette.divider, 0.5) }} />
+                    <Divider sx={{ 
+                      my: 1.5, 
+                      borderColor: alpha(theme.palette.divider, 0.6),
+                      width: '80%',
+                      mx: 'auto',
+                    }} />
                     
                     <Button
                       variant="text"
                       color="primary"
                       href={service.ctaLink}
-                      size="small"
                       sx={{
                         textTransform: 'none',
                         fontWeight: 600,
+                        fontSize: '0.95rem',
                         mt: 0.5,
                         '&:hover': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.1)
+                          backgroundColor: alpha(service.color || theme.palette.primary.main, 0.1),
+                          transform: 'translateY(-2px)',
                         },
-                        [theme.breakpoints.down('sm')]: {
-                          fontSize: '0.8rem', // Smaller button text on mobile
-                        }
+                        transition: 'all 0.2s ease',
                       }}
                     >
                       Learn More
@@ -265,13 +254,10 @@ const ServicesGrid = () => {
             ))}
           </Grid>
           
-          <motion.div variants={itemVariants}>
+          <motion.div variants={ANIMATION_VARIANTS.item}>
             <Box sx={{ 
               textAlign: 'center', 
-              mt: 6,
-              [theme.breakpoints.down('sm')]: {
-                mt: 4, // Reduced margin on mobile
-              }
+              mt: 8,
             }}>
               <Button
                 variant="contained"
@@ -279,26 +265,21 @@ const ServicesGrid = () => {
                 size="large"
                 href="/services"
                 sx={{
-                  px: 4,
-                  py: 1.5,
+                  px: 5,
+                  py: 1.6,
                   fontSize: '1.1rem',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   borderRadius: 2,
                   textTransform: 'none',
-                  boxShadow: `0 4px 14px ${alpha(theme.palette.secondary.main, 0.5)}`,
+                  boxShadow: `0 6px 20px ${alpha(theme.palette.secondary.main, 0.6)}, 0 2px 6px rgba(0, 0, 0, 0.3)`,
                   '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: `0 6px 20px ${alpha(theme.palette.secondary.main, 0.6)}`,
+                    transform: 'translateY(-3px)',
+                    boxShadow: `0 10px 25px ${alpha(theme.palette.secondary.main, 0.7)}, 0 4px 10px rgba(0, 0, 0, 0.4)`,
                   },
-                  transition: 'all 0.3s ease',
-                  [theme.breakpoints.down('sm')]: {
-                    fontSize: '1rem', // Smaller font on mobile
-                    px: 3,
-                    py: 1.25,
-                  }
+                  transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                 }}
               >
-                View All Services
+                View All Enterprise Services
               </Button>
             </Box>
           </motion.div>

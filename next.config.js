@@ -5,21 +5,21 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 const nextConfig = {
-  // Tells Next.js to produce a standalone build (which is good for Cloudflare Pages + next-on-pages).
+  // Tells Next.js to produce a standalone build.
   output: 'standalone',
 
-  // Don't generate browser source maps in production (reduces final build size).
+  // Don't generate browser source maps in production.
   productionBrowserSourceMaps: false,
 
   // Compress output assets
   compress: true,
 
-  // Enable Next.js image optimization with webp
+  // Enable Next.js image optimization with WebP
   images: {
     formats: ['image/webp'],
   },
 
-  // Example custom security headers
+  // Build CSP and security headers
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
     const apiUrl =
@@ -28,23 +28,50 @@ const nextConfig = {
         ? 'https://api.ritualworks.com'
         : 'https://api.local.ritualworks.com');
 
+    // Use arrays for each directive to ensure proper spacing when joined.
+    const scriptSources = [
+      "'self'",
+      ...(isProduction ? [] : ["'unsafe-inline'", "'unsafe-eval'"]), // Ensure 'unsafe-eval' in dev
+      'https://apis.google.com',
+      'https://js.stripe.com',
+      'https://www.google.com/recaptcha/',
+      'https://www.gstatic.com/recaptcha/',
+    ];
+
+    const styleSources = [
+      "'self'",
+      // Include unsafe-inline in development to accommodate HMR, etc.
+      ...(!isProduction ? ["'unsafe-inline'"] : []),
+      'https://fonts.googleapis.com',
+    ];
+
+    const connectSources = [
+      "'self'",
+      apiUrl,
+      // Add localhost and ws in development for HMR
+      ...(!isProduction
+        ? ['http://localhost:3000', 'ws://localhost:3000', 'http://localhost:3001', 'ws://localhost:3001']
+        : []),
+      'https://checkout.stripe.com',
+      // If production, include your production API URL explicitly as well
+      ...(isProduction ? ['https://api.ritualworks.com'] : []),
+    ];
+
+    // Put them all together into one CSP string.
     const cspDirectives = [
       `default-src 'self'`,
-      `script-src 'self' ${
-        !isProduction ? "'unsafe-inline' 'unsafe-eval'" : ""
-      } https://apis.google.com https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
-      `style-src 'self' ${!isProduction ? "'unsafe-inline'" : ""} https://fonts.googleapis.com`,
+      `script-src ${scriptSources.join(' ')}`,
+      `style-src ${styleSources.join(' ')}`,
       `img-src 'self' data: https://*.stripe.com https://www.google.com/recaptcha/`,
-      `connect-src 'self' ${apiUrl} ${
-        !isProduction ? 'http://localhost:3000 ws://localhost:3000' : ""
-      } https://checkout.stripe.com https://api.ritualworks.com`,
+      `connect-src ${connectSources.join(' ')}`,
       `frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://stripe.com`,
       `font-src 'self' https://fonts.gstatic.com`,
       `form-action 'self'`,
+      // Deny framing from all external origins
       `frame-ancestors 'none'`,
     ];
 
-    // For non-production, add a CSP report URI
+    // For development, optionally add a CSP reporting endpoint
     if (!isProduction) {
       cspDirectives.push('report-uri /api/csp-report');
     }
@@ -53,34 +80,30 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
+          // X-Frame-Options
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {
             key: 'Content-Security-Policy',
-            value: cspDirectives.join('; ').trim(),
+            value: cspDirectives.join('; '),
           },
         ],
       },
     ];
   },
 
+  // Your existing Webpack config, chunk splitting, etc.
   webpack: (config, { isServer, dev }) => {
     //
-    // 1) Remove forcing server into a single chunk
-    //    This prevents a massive "0.pack" from merging everything.
+    // Example advanced Webpack configuration
     //
-    //    If you need a truly minimal server bundle, you can do advanced tweaks,
-    //    but on Cloudflare Pages, it's safer to let Next's defaults handle chunking.
-    //
-
-    // 2) Fine-tune client chunking rules:
     if (!isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
         maxInitialRequests: 25,
         minSize: 20000,
-        maxSize: 244000, // ~238 KB per chunk (helps stay within 25MB total limit on CF)
+        maxSize: 244000,
         cacheGroups: {
           react: {
             test: /[\\/]node_modules[\\/](react|react-dom|scheduler)/,
@@ -125,13 +148,11 @@ const nextConfig = {
         },
       };
 
-      // Enhanced tree-shaking for production
       if (!dev) {
         config.optimization.usedExports = true;
         config.optimization.sideEffects = true;
       }
 
-      // Node.js polyfills for client
       config.resolve.fallback = {
         fs: false,
         path: false,
@@ -142,15 +163,11 @@ const nextConfig = {
       };
     }
 
-    // 3) Keep performance limits
     config.performance = {
-      maxEntrypointSize: 2500000, // ~2.5 MB per entry
-      maxAssetSize: 2500000,      // ~2.5 MB per asset
+      maxEntrypointSize: 2500000,
+      maxAssetSize: 2500000,
     };
 
-    //
-    // 4) Null-loader for big or server-only modules that are not needed in the browser
-    //
     config.module.rules.push({
       test: /next[\\/]dist[\\/]esm[\\/]server[\\/]use-cache/,
       use: require.resolve('null-loader'),
@@ -161,9 +178,6 @@ const nextConfig = {
       use: 'null-loader',
     });
 
-    //
-    // 5) Fix crypto polyfill references
-    //
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       'next/cache': false,
@@ -173,10 +187,6 @@ const nextConfig = {
     return config;
   },
 
-  //
-  // 6) Externalize heavy dependencies from the server bundle
-  //    (only works if they're NOT imported in client code)
-  //
   serverExternalPackages: [
     'bufferutil',
     'utf-8-validate',

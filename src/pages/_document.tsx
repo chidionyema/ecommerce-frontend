@@ -30,18 +30,7 @@ class MyDocument extends Document {
     return (
       <Html lang="en" className="h-full">
         <Head>
-          {/* Security Headers */}
-          <meta httpEquiv="Content-Security-Policy" content={`
-            default-src 'self';
-            script-src 'self' ${nonce ? `'nonce-${nonce}'` : ''} ${gaMeasurementId ? `https://www.googletagmanager.com` : ''};
-            style-src 'self' 'unsafe-inline';
-            img-src 'self' data: blob:;
-            connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL};
-            font-src 'self';
-            frame-src 'none';
-            base-uri 'none';
-            form-action 'self';
-          `.replace(/\s+/g, ' ').trim()} />
+         
 
           {/* Self Polyfill */}
           {nonce && (
@@ -92,10 +81,6 @@ class MyDocument extends Document {
             </>
           )}
 
-          {/* Security Meta Tags */}
-          <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-          <meta httpEquiv="X-Frame-Options" content="DENY" />
-          <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
         </Head>
         <body className="h-full bg-white antialiased">
           <Main />

@@ -13,8 +13,9 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
+
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 import useTheme from '@mui/material/styles/useTheme';
