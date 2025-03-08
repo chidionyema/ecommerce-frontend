@@ -5,15 +5,21 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 const nextConfig = {
+  // Tells Next.js to produce a standalone build (which is good for Cloudflare Pages + next-on-pages).
   output: 'standalone',
+
+  // Don't generate browser source maps in production (reduces final build size).
   productionBrowserSourceMaps: false,
+
+  // Compress output assets
   compress: true,
 
-  // Enable Next.js image optimization while keeping webp format
+  // Enable Next.js image optimization with webp
   images: {
     formats: ['image/webp'],
   },
 
+  // Example custom security headers
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
     const apiUrl =
@@ -38,6 +44,7 @@ const nextConfig = {
       `frame-ancestors 'none'`,
     ];
 
+    // For non-production, add a CSP report URI
     if (!isProduction) {
       cspDirectives.push('report-uri /api/csp-report');
     }
@@ -59,19 +66,21 @@ const nextConfig = {
   },
 
   webpack: (config, { isServer, dev }) => {
-    // Server-specific optimizations:
-    if (isServer) {
-      // Disable chunk generation for server bundles
-      config.optimization.splitChunks = {
-        cacheGroups: { default: false },
-      };
-    } else {
-      // Client-side chunk optimization
+    //
+    // 1) Remove forcing server into a single chunk
+    //    This prevents a massive "0.pack" from merging everything.
+    //
+    //    If you need a truly minimal server bundle, you can do advanced tweaks,
+    //    but on Cloudflare Pages, it's safer to let Next's defaults handle chunking.
+    //
+
+    // 2) Fine-tune client chunking rules:
+    if (!isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
         maxInitialRequests: 25,
         minSize: 20000,
-        maxSize: 244000, // ~238KB (ensuring compliance with Cloudflare's 25MB limit)
+        maxSize: 244000, // ~238 KB per chunk (helps stay within 25MB total limit on CF)
         cacheGroups: {
           react: {
             test: /[\\/]node_modules[\\/](react|react-dom|scheduler)/,
@@ -121,16 +130,8 @@ const nextConfig = {
         config.optimization.usedExports = true;
         config.optimization.sideEffects = true;
       }
-    }
 
-    // Critical size limits
-    config.performance = {
-      maxEntrypointSize: 2500000,
-      maxAssetSize: 2500000,
-    };
-
-    // Node.js polyfills for client
-    if (!isServer) {
+      // Node.js polyfills for client
       config.resolve.fallback = {
         fs: false,
         path: false,
@@ -141,19 +142,28 @@ const nextConfig = {
       };
     }
 
-    // Add null-loader for problematic/large modules:
+    // 3) Keep performance limits
+    config.performance = {
+      maxEntrypointSize: 2500000, // ~2.5 MB per entry
+      maxAssetSize: 2500000,      // ~2.5 MB per asset
+    };
+
+    //
+    // 4) Null-loader for big or server-only modules that are not needed in the browser
+    //
     config.module.rules.push({
       test: /next[\\/]dist[\\/]esm[\\/]server[\\/]use-cache/,
       use: require.resolve('null-loader'),
     });
 
-    // Only null-load specific modules that aren't needed:
     config.module.rules.push({
-      test: /node_modules[\\\/](react-confetti)/,
+      test: /node_modules[\\/](react-confetti)/,
       use: 'null-loader',
     });
 
-    // Fix crypto polyfill: Merge with existing aliases
+    //
+    // 5) Fix crypto polyfill references
+    //
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       'next/cache': false,
@@ -163,7 +173,10 @@ const nextConfig = {
     return config;
   },
 
-  // Externalize heavy dependencies:
+  //
+  // 6) Externalize heavy dependencies from the server bundle
+  //    (only works if they're NOT imported in client code)
+  //
   serverExternalPackages: [
     'bufferutil',
     'utf-8-validate',
