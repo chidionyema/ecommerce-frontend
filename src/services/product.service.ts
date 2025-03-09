@@ -1,4 +1,3 @@
-// File: services/product.service.ts
 import { apiService } from './api.service';
 import { 
   ProductDto, 
@@ -60,12 +59,12 @@ class ProductService {
       throw error;
     }
   }
-  async getPopularProducts(limit: number): Promise<ProductDto[]> {
-    // New implementation
+  
+  // FIXED: Use apiService.get instead of direct fetch for consistency
+  public async getPopularProducts(limit: number = 15): Promise<ProductDto[]> {
     try {
-      const response = await fetch(`/api/products/popular?limit=${limit}`);
-      if (!response.ok) throw new Error('Failed to fetch popular products');
-      return await response.json();
+      const response = await apiService.get<ProductDto[]>(`${this.baseUrl}/popular`, { limit });
+      return response;
     } catch (error) {
       console.error('Error fetching popular products:', error);
       return []; // Return empty array as fallback
@@ -91,7 +90,7 @@ class ProductService {
     }
   }
   
-  // New method: Bulk update products
+  // Bulk update products
   public async bulkUpdateProducts(ids: string[], updateData: Partial<ProductCreateDto>): Promise<{ message: string; updatedCount: number }> {
     try {
       return await apiService.put<{ message: string; updatedCount: number }>(`${this.baseUrl}/bulk-update`, { ids, ...updateData });
