@@ -320,13 +320,90 @@ export const createBuildProtectedService = () => {
     }
   };
   
+  // Add bulk delete method
+  const bulkDeleteProductsProtected = async (productIds: string[]): Promise<void> => {
+    if (isBuildTime()) {
+      console.log('Build-time detected, skipping bulk delete operation');
+      return;
+    }
+    
+    try {
+      await apiService.post('/api/products/bulk-delete', { productIds });
+    } catch (error) {
+      console.error('Error deleting products:', error);
+      throw error;
+    }
+  };
+  
+  // Add CRUD operations that might be needed
+  const createProductProtected = async (product: any): Promise<any> => {
+    if (isBuildTime()) {
+      console.log('Build-time detected, skipping product creation');
+      return getFallbackProducts()[0];
+    }
+    
+    try {
+      return await apiService.post<any>('/api/products', product);
+    } catch (error) {
+      console.error('Error creating product:', error);
+      throw error;
+    }
+  };
+  
+  const updateProductProtected = async (id: string, product: any): Promise<any> => {
+    if (isBuildTime()) {
+      console.log(`Build-time detected, skipping product update for ID: ${id}`);
+      return getFallbackProducts()[0];
+    }
+    
+    try {
+      return await apiService.put<any>(`/api/products/${id}`, product);
+    } catch (error) {
+      console.error(`Error updating product ${id}:`, error);
+      throw error;
+    }
+  };
+  
+  const deleteProductProtected = async (id: string): Promise<void> => {
+    if (isBuildTime()) {
+      console.log(`Build-time detected, skipping product deletion for ID: ${id}`);
+      return;
+    }
+    
+    try {
+      await apiService.delete(`/api/products/${id}`);
+    } catch (error) {
+      console.error(`Error deleting product ${id}:`, error);
+      throw error;
+    }
+  };
+  
+  const bulkUpdateProductsProtected = async (products: any[]): Promise<void> => {
+    if (isBuildTime()) {
+      console.log('Build-time detected, skipping bulk update operation');
+      return;
+    }
+    
+    try {
+      await apiService.post('/api/products/bulk-update', { products });
+    } catch (error) {
+      console.error('Error updating products:', error);
+      throw error;
+    }
+  };
+  
   // Return the protected methods
   return {
     getPopularProducts: getPopularProductsProtected,
     getFeaturedProducts: getFeaturedProductsProtected,
     getProducts: getProductsProtected,
     getProductById: getProductByIdProtected,
-    getRelatedProducts: getRelatedProductsProtected
+    getRelatedProducts: getRelatedProductsProtected,
+    bulkDeleteProducts: bulkDeleteProductsProtected,
+    createProduct: createProductProtected,
+    updateProduct: updateProductProtected,
+    deleteProduct: deleteProductProtected,
+    bulkUpdateProducts: bulkUpdateProductsProtected
   };
 };
 
