@@ -1,0 +1,92 @@
+/* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* styles.css */
+:root {
+  --deep-space: #050813; /* Updated from #080D19 */
+  --crystal-white: #F5F7FA;
+  --primary-blue: #0077B6; /* Example primary blue */
+  --accent-orange: #FF9900; /* Example accent orange */ 
+}
+
+@supports (backdrop-filter: blur(24px)) {
+  .cyber-glass {
+    backdrop-filter: blur(24px);
+  }
+}
+
+@keyframes hologram-pulse {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+  100% { opacity: 0.3; }
+}
+
+body {
+  background-color: var(--deep-space);
+  /* Add subtle gradient texture */
+  background-image: 
+    radial-gradient(circle at 50% 50%, 
+      transparent 20%),
+    linear-gradient(
+      15deg,
+      transparent 60%,
+    );
+  font-family: 'Orbitron', sans-serif; /* Apply Orbitron font globally */
+}
+
+/* Scoped button styles - only affect buttons outside the NavBar */
+button:not(.MuiButton-root) {
+  background-color: var(--accent-orange); /* Use accent color */
+  color: var(--deep-space); /* Text color for contrast */
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+
+/* Focus styles (consider moving these to theme.ts) */
+.js-focus-visible :focus:not(.focus-visible) {
+  outline: none;
+}
+
+.focus-visible {
+  outline: 2px solid #7d93e2;
+  outline-offset: 2px;
+}
+
+// Add this to your global CSS
+.react-switch-transition {
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+/* styles.css or similar global CSS file */
+.gold-card {
+  position: relative; /* Needed for pseudo-element positioning */
+  overflow: hidden; /* Clip ripple within card bounds */
+}
+
+.gold-card::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent; /* Start transparent */
+  border-radius: inherit; /* Match card's border-radius */
+  pointer-events: none; /* Ensure ripple doesn't interfere with clicks */
+  opacity: 0;
+  transition: opacity 0.3s, background-color 0.3s; /* Smooth transitions */
+}
+
+.gold-card:active::after { /* :active for click/touch feedback */
+  opacity: 0.1; /* Fade in ripple */
+  background-color: rgba(25, 118, 210, 0.4); /* Example ripple color - primary light with alpha, adjust to your theme */
+  transform: scale(1.2); /* Slightly expand ripple */
+  transition: opacity 0.2s, background-color 0.2s, transform 0.3s;
+}

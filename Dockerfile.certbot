@@ -1,0 +1,4 @@
+FROM certbot/certbot:latest
+
+# Install the certbot-dns-cloudflare plugin
+RUN pip install certbot-dns-cloudflare

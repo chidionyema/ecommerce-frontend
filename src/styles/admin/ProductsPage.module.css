@@ -1,0 +1,114 @@
+/* src/styles/admin/ProductsPage.module.css */
+
+.container {
+    padding: 20px;
+  }
+  
+  .heading {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 600;
+  }
+  
+  .tableContainer {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .tableHeader {
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .tableHeaderCell {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    color: #374151;
+    white-space: nowrap;
+  }
+  
+  .tableRow {
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .tableRow:last-child {
+    border-bottom: none;
+  }
+  
+  .tableCell {
+    padding: 12px 16px;
+    color: #1f2937;
+  }
+  
+  .actionButton {
+    padding: 6px 12px;
+    margin-right: 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .editButton {
+    background-color: #eff6ff;
+    color: #3b82f6;
+    border: 1px solid #93c5fd;
+  }
+  
+  .deleteButton {
+    background-color: #fee2e2;
+    color: #ef4444;
+    border: 1px solid #fecaca;
+  }
+  
+  .addButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  
+  .addButton:hover {
+    background-color: #2563eb;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .paginationButton {
+    padding: 6px 12px;
+    margin: 0 4px;
+    border-radius: 4px;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+  }
+  
+  .paginationButton:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .activeButton {
+    background-color: #3b82f6;
+    color: white;
+    border: 1px solid #3b82f6;
+  }

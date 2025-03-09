@@ -1,0 +1,54 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    border: 2px dashed #ccc;
+    border-radius: 0.5rem;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .container:hover {
+    border-color: #0070f3;
+    background-color: #f0f7ff;
+  }
+  
+  .icon {
+    font-size: 2rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+  
+  .text {
+    font-size: 0.875rem;
+    color: #666;
+    text-align: center;
+  }
+  
+  .fileInput {
+    display: none;
+  }
+  
+  .fileList {
+    width: 100%;
+    margin-top: 1rem;
+  }
+  
+  .fileItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border: 1px solid #eee;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .removeButton {
+    background: none;
+    border: none;
+    color: #ff4d4f;
+    cursor: pointer;
+  }
