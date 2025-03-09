@@ -2,70 +2,34 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 
-// Base MUI components
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-import Paper from '@mui/material/Paper';
-import Avatar from '@mui/material/Avatar';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+// MUI components - use object imports to reduce LOC
+import {
+  Box, Container, Typography, Divider, Grid, Stack, Paper, Avatar, 
+  List, ListItem, ListItemIcon, ListItemText, TextField, Button, 
+  InputAdornment, CircularProgress, Fab, Slide, Fade, Zoom,
+  useTheme, useMediaQuery, alpha
+} from '@mui/material';
 
-// Form components
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import InputAdornment from '@mui/material/InputAdornment';
-import CircularProgress from '@mui/material/CircularProgress';
-import Fab from '@mui/material/Fab';
-
-// Animations
-import Slide from '@mui/material/Slide';
-import Fade from '@mui/material/Fade';
-import Zoom from '@mui/material/Zoom';
-
-// Utilities
-import useTheme from '@mui/material/styles/useTheme';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { alpha } from '@mui/material/styles';
-
-// MUI Icons - imported individually
-import Person from '@mui/icons-material/Person';
-import Email from '@mui/icons-material/Email';
-import Phone from '@mui/icons-material/Phone';
-import KeyboardArrowUp from '@mui/icons-material/KeyboardArrowUp';
-import Star from '@mui/icons-material/Star';
-import CheckCircle from '@mui/icons-material/CheckCircle';
+// MUI Icons - use object imports to reduce LOC
+import { Person, Email, Phone, KeyboardArrowUp, Star, CheckCircle } from '@mui/icons-material';
 
 // Lucide Icons
 import { CheckCircle as CheckCircleIcon } from 'lucide-react';
 
-// Project components and utilities
-import { SPACING } from '../utils/sharedStyles';
+// Project imports - organized and consolidated
+import { SPACING, getSharedStyles } from '../utils/sharedStyles';
 import { GradientButton } from '../components/GradientButton';
 import { useRouter } from 'next/navigation';
 import SEO from '../components/SEO';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
 import GoldCard from '../components/GoldCard';
-import { getSharedStyles } from '../utils/sharedStyles';
 import * as yup from 'yup';
-
-// Common components
 import FAQ from '../components/Common/FAQ';
-
-// Data imports
 import { 
-  faqItems, 
-  testimonials, 
-  contactInfoItems, 
-  heroSection, 
-  testimonialSection,
-  successPageData
+  faqItems, testimonials, contactInfoItems, heroSection, 
+  testimonialSection, successPageData 
 } from '../data/contactPageData';
+
 // Form validation schema
 const validationSchema = yup.object().shape({
   name: yup.string()
@@ -95,12 +59,138 @@ interface FormData {
   message?: string;
 }
 
+interface SuccessViewProps {
+  successData: {
+    seoTitle: string;
+    seoDescription: string;
+    title: string;
+    subtitle: string;
+    message: string;
+    buttonText: string;
+  };
+}
+
+// Back to Top Button Component - moved to its own function for cleaner code
+const BackToTopButton = () => {
+  const theme = useTheme();
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsVisible(document.documentElement.scrollTop > 300);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <Zoom in={isVisible}>
+      <Fab
+        color="primary"
+        aria-label="Back to Top"
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        sx={{
+          position: 'fixed',
+          bottom: theme.spacing(4),
+          right: theme.spacing(4),
+          transition: 'transform 0.3s ease',
+          '&:hover': { transform: 'scale(1.1)' },
+          zIndex: 1100,
+          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+        }}
+      >
+        <KeyboardArrowUp />
+      </Fab>
+    </Zoom>
+  );
+};
+
+
+// Success component - extracted for cleaner code organization
+const SuccessView = ({ successData }: SuccessViewProps) => {
+  const theme = useTheme();
+  
+  return (
+    <ConsistentPageLayout
+      seoTitle={successData.seoTitle}
+      seoDescription={successData.seoDescription}
+      title={successData.title}
+      subtitle={successData.subtitle}
+    >
+      <Zoom in={true} timeout={800}>
+        <Box sx={{ 
+          mt: 4, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          maxWidth: 600,
+          mx: 'auto'
+        }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 120,
+              height: 120,
+              borderRadius: '50%',
+              backgroundColor: alpha(theme.palette.success.main, 0.15),
+              mb: 4
+            }}
+          >
+            <CheckCircleIcon 
+              style={{ 
+                fontSize: 80, 
+                color: theme.palette.success.main,
+                width: '1.5em',
+                height: '1.5em'
+              }} 
+            />
+          </Box>
+          <Typography
+            variant="h3"
+            component="h2"
+            sx={{
+              fontWeight: 700,
+              mb: 2,
+              textAlign: 'center'
+            }}
+          >
+            {successData.title}
+          </Typography>
+          <Typography
+            variant="body1"
+            role="alert"
+            aria-live="assertive"
+            sx={{
+              mb: 4,
+              fontSize: '1.25rem',
+              color: theme.palette.text.secondary,
+              textAlign: 'center',
+              lineHeight: 1.6
+            }}
+          >
+            {successData.message}
+          </Typography>
+          <GradientButton
+            href="/"
+            label={successData.buttonText}
+            sizeVariant="large"
+            sx={{ my: 2, px: 6 }}
+          />
+        </Box>
+      </Zoom>
+      <BackToTopButton />
+    </ConsistentPageLayout>
+  );
+};
+
 const Contact = () => {
   const router = useRouter();
   const theme = useTheme();
   const styles = getSharedStyles(theme);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -153,10 +243,7 @@ const Contact = () => {
   // Input change handler
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value,
-    }));
+    setFormData(prevState => ({ ...prevState, [name]: value }));
     
     // Clear error when user starts typing
     if (errors[name as keyof FormData]) {
@@ -166,86 +253,14 @@ const Contact = () => {
         return updated;
       });
     }
-  }, [setFormData, errors]);
+  }, [errors]);
 
   // Success page
   if (success) {
-    return (
-      <ConsistentPageLayout
-        seoTitle={successPageData.seoTitle}
-        seoDescription={successPageData.seoDescription}
-        title={successPageData.title}
-        subtitle={successPageData.subtitle}
-      >
-        <Zoom in={true} timeout={800}>
-          <Box sx={{ 
-            mt: 4, 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center',
-            maxWidth: 600,
-            mx: 'auto'
-          }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 120,
-                height: 120,
-                borderRadius: '50%',
-                backgroundColor: alpha(theme.palette.success.main, 0.15),
-                mb: 4
-              }}
-            >
-             <CheckCircleIcon 
-    style={{ 
-      fontSize: 80, 
-      color: theme.palette.success.main,
-      width: '1.5em',  // Add explicit sizing
-      height: '1.5em'
-    }} 
-  />
-            </Box>
-            <Typography
-              variant="h3"
-              component="h2"
-              sx={{
-                fontWeight: 700,
-                mb: 2,
-                textAlign: 'center'
-              }}
-            >
-              {successPageData.title}
-            </Typography>
-            <Typography
-              variant="body1"
-              role="alert"
-              aria-live="assertive"
-              sx={{
-                mb: 4,
-                fontSize: '1.25rem',
-                color: theme.palette.text.secondary,
-                textAlign: 'center',
-                lineHeight: 1.6
-              }}
-            >
-              {successPageData.message}
-            </Typography>
-            <GradientButton
-              href="/"
-              label={successPageData.buttonText}
-              sizeVariant="large"
-              sx={{ my: 2, px: 6 }}
-            />
-          </Box>
-        </Zoom>
-        <BackToTopButton />
-      </ConsistentPageLayout>
-    );
+    return <SuccessView successData={successPageData} />;
   }
 
-  // TextField styling
+  // TextField styling - moved to a single object
   const textFieldStyles = {
     '& .MuiInputBase-root': {
       borderRadius: 2,
@@ -287,15 +302,16 @@ const Contact = () => {
     },
   };
 
-  // Create stars based on rating
-  const renderStars = (rating: number) => {
-    return Array(5).fill(0).map((_, index) => (
-      <Star key={index} sx={{ 
-        color: index < rating ? theme.palette.secondary.main : alpha(theme.palette.divider, 0.5),
-        fontSize: '1.2rem' 
-      }} />
-    ));
-  };
+  // Helper function for stars rendering
+// Helper function for stars rendering
+const renderStars = (rating: number) => (
+  Array(5).fill(0).map((_, index) => (
+    <Star key={index} sx={{ 
+      color: index < rating ? theme.palette.secondary.main : alpha(theme.palette.divider, 0.5),
+      fontSize: '1.2rem' 
+    }} />
+  ))
+);
 
   return (
     <>
@@ -305,13 +321,7 @@ const Contact = () => {
         keywords="contact, support, inquiry, partnership, technology consulting"
       />
       <ConsistentPageLayout>
-        <Container 
-          maxWidth="lg" 
-          sx={{ 
-            px: { xs: 2, sm: 4, md: 6 },
-            py: { xs: 6, md: 10 }
-          }}
-        >
+        <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 4, md: 6 }, py: { xs: 6, md: 10 } }}>
           {/* Hero Header */}
           <Fade in={animateIn} timeout={1000}>
             <Box sx={{ textAlign: 'center', mb: 8 }}>
@@ -346,17 +356,17 @@ const Contact = () => {
           </Fade>
 
           <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: '1fr 1.5fr' },
-            gap: { xs: 6, md: 8 },
-            width: '100%',
-            maxWidth: 1400,
-            mx: 'auto',
-            mb: { xs: 8, md: 12 },
-            alignItems: 'stretch', // Add this to make children equal height
-          }}
-        >
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr 1.5fr' },
+              gap: { xs: 6, md: 8 },
+              width: '100%',
+              maxWidth: 1400,
+              mx: 'auto',
+              mb: { xs: 8, md: 12 },
+              alignItems: 'stretch',
+            }}
+          >
             {/* Contact Information Section */}
             <Slide direction="right" in={animateIn} timeout={800}>
               <Box
@@ -482,7 +492,7 @@ const Contact = () => {
 
             {/* Contact Form Section */}
             <Slide direction="left" in={animateIn} timeout={800}>
-            <Box sx={{ height: '100%' }}>
+              <Box sx={{ height: '100%' }}>
                 <GoldCard
                   component="form"
                   onSubmit={handleSubmit}
@@ -549,6 +559,7 @@ const Contact = () => {
                   </Box>
 
                   <Stack spacing={4} sx={{ width: '100%' }}>
+                    {/* Name Field */}
                     <TextField
                       fullWidth
                       label="Full Name"
@@ -568,6 +579,7 @@ const Contact = () => {
                       required
                     />
 
+                    {/* Email Field */}
                     <TextField
                       fullWidth
                       label="Email Address"
@@ -587,6 +599,7 @@ const Contact = () => {
                       required
                     />
 
+                    {/* Phone Field */}
                     <TextField
                       fullWidth
                       label="Phone Number"
@@ -605,6 +618,7 @@ const Contact = () => {
                       }}
                     />
 
+                    {/* Message Field */}
                     <TextField
                       fullWidth
                       label="Tell us about your project"
@@ -631,14 +645,11 @@ const Contact = () => {
                         }
                       }}
                       InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                         
-                          </InputAdornment>
-                        ),
+                        startAdornment: <InputAdornment position="start" />
                       }}
                     />
 
+                    {/* Submit Button */}
                     <Button
                       type="submit"
                       fullWidth
@@ -664,11 +675,7 @@ const Contact = () => {
                         },
                       }}
                     >
-                      {loading ? (
-                        <CircularProgress size={28} color="inherit" />
-                      ) : (
-                        'Request Your Tech Roadmap'
-                      )}
+                      {loading ? <CircularProgress size={28} color="inherit" /> : 'Request Your Tech Roadmap'}
                     </Button>
                   </Stack>
                 </GoldCard>
@@ -764,7 +771,7 @@ const Contact = () => {
             </Grid>
           </Box>
 
-          {/* FAQ Section - Using the reusable component */}
+          {/* FAQ Section */}
           <FAQ 
             items={faqItems} 
             title="Frequently Asked Questions"
@@ -776,58 +783,6 @@ const Contact = () => {
         </Container>
       </ConsistentPageLayout>
     </>
-  );
-};
-
-// Back to Top Button Component
-const BackToTopButton = () => {
-  const theme = useTheme();
-  const [isVisible, setIsVisible] = useState(false);
-
-  const handleScroll = () => {
-    const scrolled = document.documentElement.scrollTop;
-    if (scrolled > 300) {
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-    }
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  };
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  return (
-    <Zoom in={isVisible}>
-      <Fab
-        color="primary"
-        aria-label="Back to Top"
-        onClick={scrollToTop}
-        sx={{
-          position: 'fixed',
-          bottom: theme.spacing(4),
-          right: theme.spacing(4),
-          transition: 'transform 0.3s ease',
-          '&:hover': {
-            transform: 'scale(1.1)',
-          },
-          zIndex: 1100,
-          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-        }}
-      >
-        <KeyboardArrowUp />
-      </Fab>
-    </Zoom>
   );
 };
 
