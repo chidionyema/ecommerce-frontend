@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, memo, useMemo, useCallback } from 'react';
 import { Box, Container, Typography, Grid, useTheme, Button, Paper } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import dynamic from 'next/dynamic';
-import NextLink from 'next/link';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
-
+import { motion, useInView } from 'framer-motion';
 
 // Import missing icon
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -14,24 +12,24 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 // Dynamic import of TechCard to avoid SSR issues
 const TechCard = dynamic(() => import('../Common/TechCard'), { ssr: false });
 
-// Animation variants for consistent brand motion
+// Animation variants for consistent brand motion - simplified
 const ANIMATION_VARIANTS = {
   container: {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
+        staggerChildren: 0.08, // Slightly faster staggering
+        delayChildren: 0.1, // Reduced delay
       },
     },
   },
   item: {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20 }, // Reduced y offset
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: 'easeOut' },
+      transition: { duration: 0.4, ease: 'easeOut' }, // Slightly faster transition
     },
   },
 };
@@ -45,7 +43,19 @@ interface TechItem {
   category: string;
 }
 
-// Enhanced tech icons array
+// Import additional icons from react-icons
+import {
+  SiAmazonaws,
+  SiMicrosoftazure,
+  SiDocker,
+  SiKubernetes,
+  SiTerraform,
+  SiReact,
+  SiNextdotjs,
+  SiDotnet,
+} from 'react-icons/si';
+
+// Enhanced tech icons array - moved after imports to avoid reference errors
 const enhancedTechIcons: TechItem[] = [
   {
     icon: <SiAmazonaws size={48} />,
@@ -113,20 +123,8 @@ const enhancedTechIcons: TechItem[] = [
   },
 ];
 
-// Import additional icons from react-icons (if needed)
-import {
-  SiAmazonaws,
-  SiMicrosoftazure,
-  SiDocker,
-  SiKubernetes,
-  SiTerraform,
-  SiReact,
-  SiNextdotjs,
-  SiDotnet,
-} from 'react-icons/si';
-
-// Feature item component
-const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon: Icon, text }) => {
+// Memoized Feature Item component
+const FeatureItem = memo(({ icon: Icon, text }: { icon: React.ElementType; text: string }) => {
   const theme = useTheme();
   return (
     <Box display="flex" alignItems="flex-start" gap={2} my={2}>
@@ -150,10 +148,12 @@ const FeatureItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon
       </Typography>
     </Box>
   );
-};
+});
 
-// Extra feature item with check mark
-const ExtraFeatureItem: React.FC<{ text: string }> = ({ text }) => {
+FeatureItem.displayName = 'FeatureItem';
+
+// Memoized Extra Feature Item component
+const ExtraFeatureItem = memo(({ text }: { text: string }) => {
   const theme = useTheme();
   return (
     <Box display="flex" alignItems="flex-start" gap={1.5} my={1.5}>
@@ -169,22 +169,27 @@ const ExtraFeatureItem: React.FC<{ text: string }> = ({ text }) => {
       </Typography>
     </Box>
   );
-};
+});
 
-// Function to render a plan card (simplified for brevity)
-const renderPlanCard = (
-  plan: TechItem,
-  handlePlanClick: (type: string) => void,
-  theme: any,
-  isAnnual: boolean
-) => (
+ExtraFeatureItem.displayName = 'ExtraFeatureItem';
+
+// Memoized Plan Card component
+const PlanCard = memo(({ 
+  plan, 
+  handlePlanClick, 
+  theme 
+}: { 
+  plan: TechItem; 
+  handlePlanClick: (type: string) => void; 
+  theme: any;
+}) => (
   <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
     <motion.div
       style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      whileHover={{ y: -10, transition: { duration: 0.3 } }}
+      transition={{ duration: 0.4 }}
+      whileHover={{ y: -8, transition: { duration: 0.2 } }}
       key={plan.title}
     >
       <Paper
@@ -222,8 +227,108 @@ const renderPlanCard = (
       </Paper>
     </motion.div>
   </Box>
-);
+));
 
+PlanCard.displayName = 'PlanCard';
+
+// Memoized Technology Card component
+const TechCardItem = memo(({ 
+  tech, 
+  index, 
+  isHovered, 
+  onMouseEnter, 
+  onMouseLeave 
+}: { 
+  tech: TechItem; 
+  index: number; 
+  isHovered: boolean; 
+  onMouseEnter: () => void; 
+  onMouseLeave: () => void;
+}) => {
+  const theme = useTheme();
+  
+  return (
+    <Grid
+      item
+      xs={12}
+      sm={6}
+      md={4}
+      lg={3}
+      sx={{ display: 'flex' }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      <motion.div variants={ANIMATION_VARIANTS.item} style={{ width: '100%', height: '100%' }}>
+        <TechCard
+          icon={tech.icon}
+          title={tech.title}
+          accentColor={tech.color}
+          category={tech.category}
+          importance={isHovered ? 'primary' : 'secondary'}
+          sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+        >
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              textAlign: 'center', 
+              mt: 2, 
+              fontWeight: 500, 
+              color: alpha(theme.palette.text.primary, 0.95), 
+              flexGrow: 1, 
+              lineHeight: 1.6 
+            }}
+          >
+            {tech.description}
+          </Typography>
+        </TechCard>
+      </motion.div>
+    </Grid>
+  );
+});
+
+TechCardItem.displayName = 'TechCardItem';
+
+// Memoized Category Button component
+const CategoryButton = memo(({ 
+  category, 
+  isActive, 
+  onClick 
+}: { 
+  category: string; 
+  isActive: boolean; 
+  onClick: () => void;
+}) => {
+  const theme = useTheme();
+  
+  return (
+    <Button
+      variant={isActive ? 'contained' : 'outlined'}
+      onClick={onClick}
+      sx={{
+        borderColor: 'white',
+        color: 'white',
+        backgroundColor: isActive ? alpha(theme.palette.secondary.main, 0.8) : 'transparent',
+        '&:hover': {
+          backgroundColor: isActive ? alpha(theme.palette.secondary.main, 0.9) : alpha(theme.palette.common.white, 0.15),
+          transform: 'translateY(-2px)',
+        },
+        fontWeight: 600,
+        borderRadius: 10,
+        px: 3,
+        py: 1,
+        mx: 0.5,
+        transition: 'all 0.2s ease',
+        textTransform: 'none',
+      }}
+    >
+      {category}
+    </Button>
+  );
+});
+
+CategoryButton.displayName = 'CategoryButton';
+
+// Main component
 const TechnologyShowcase: React.FC = () => {
   const theme = useTheme();
   const ref = useRef<HTMLDivElement>(null);
@@ -231,20 +336,64 @@ const TechnologyShowcase: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState(-1);
   const [filter, setFilter] = useState('All');
 
-  const filteredTech = filter === 'All'
-    ? enhancedTechIcons
-    : enhancedTechIcons.filter(tech => tech.category === filter);
+  // Memoized derived data
+  const filteredTech = useMemo(() => 
+    filter === 'All'
+      ? enhancedTechIcons
+      : enhancedTechIcons.filter(tech => tech.category === filter),
+    [filter]
+  );
 
-  const categories = ['All', ...new Set(enhancedTechIcons.map(tech => tech.category))];
+  const categories = useMemo(() => 
+    ['All', ...Array.from(new Set(enhancedTechIcons.map(tech => tech.category)))],
+    []
+  );
 
-  const handlePlanClick = (type: string) => {
-    // Navigate or perform any action based on the plan clicked.
+  // Memoized event handlers
+  const handlePlanClick = useCallback((type: string) => {
     console.log(`Plan clicked: ${type}`);
-  };
+  }, []);
 
-  const handleFaqChange = (panel: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-    // For FAQ expansion if needed
-  };
+  const handleSetFilter = useCallback((category: string) => {
+    setFilter(category);
+  }, []);
+
+  const handleMouseEnter = useCallback((index: number) => {
+    setHoveredIndex(index);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setHoveredIndex(-1);
+  }, []);
+
+  // Memoized UI sections
+  const categoryButtons = useMemo(() => (
+    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap', mb: 4 }}>
+      {categories.map((category) => (
+        <CategoryButton
+          key={category}
+          category={category}
+          isActive={filter === category}
+          onClick={() => handleSetFilter(category)}
+        />
+      ))}
+    </Box>
+  ), [categories, filter, handleSetFilter]);
+
+  const techCards = useMemo(() => (
+    <Grid container spacing={4} justifyContent="center">
+      {filteredTech.map((tech, index) => (
+        <TechCardItem
+          key={tech.title}
+          tech={tech}
+          index={index}
+          isHovered={hoveredIndex === index}
+          onMouseEnter={() => handleMouseEnter(index)}
+          onMouseLeave={handleMouseLeave}
+        />
+      ))}
+    </Grid>
+  ), [filteredTech, hoveredIndex, handleMouseEnter, handleMouseLeave]);
 
   return (
     <Box
@@ -267,6 +416,7 @@ const TechnologyShowcase: React.FC = () => {
           bottom: 0,
           opacity: 0.05,
           backgroundImage: 'url("/images/grid-pattern.svg")',
+          willChange: 'transform', // GPU acceleration hint
         }}
       />
       <Container sx={{ position: 'relative', zIndex: 2 }}>
@@ -282,65 +432,10 @@ const TechnologyShowcase: React.FC = () => {
           </motion.div>
 
           <motion.div variants={ANIMATION_VARIANTS.item}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap', mb: 4 }}>
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={filter === category ? 'contained' : 'outlined'}
-                  onClick={() => setFilter(category)}
-                  sx={{
-                    borderColor: 'white',
-                    color: 'white',
-                    backgroundColor: filter === category ? alpha(theme.palette.secondary.main, 0.8) : 'transparent',
-                    '&:hover': {
-                      backgroundColor: filter === category ? alpha(theme.palette.secondary.main, 0.9) : alpha(theme.palette.common.white, 0.15),
-                      transform: 'translateY(-2px)',
-                    },
-                    fontWeight: 600,
-                    borderRadius: 10,
-                    px: 3,
-                    py: 1,
-                    mx: 0.5,
-                    transition: 'all 0.2s ease',
-                    textTransform: 'none',
-                  }}
-                >
-                  {category}
-                </Button>
-              ))}
-            </Box>
+            {categoryButtons}
           </motion.div>
 
-          <Grid container spacing={4} justifyContent="center">
-            {filteredTech.map((tech, index) => (
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-                key={index}
-                sx={{ display: 'flex' }}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(-1)}
-              >
-                <motion.div variants={ANIMATION_VARIANTS.item} style={{ width: '100%', height: '100%' }}>
-                  <TechCard
-                    icon={tech.icon}
-                    title={tech.title}
-                    accentColor={tech.color}
-                    category={tech.category}
-                    importance={hoveredIndex === index ? 'primary' : 'secondary'}
-                    sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                  >
-                    <Typography variant="body2" sx={{ textAlign: 'center', mt: 2, fontWeight: 500, color: alpha(theme.palette.text.primary, 0.95), flexGrow: 1, lineHeight: 1.6 }}>
-                      {tech.description}
-                    </Typography>
-                  </TechCard>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
+          {techCards}
 
           <motion.div variants={ANIMATION_VARIANTS.item}>
             <Box sx={{ textAlign: 'center', mt: 8 }}>
@@ -374,4 +469,4 @@ const TechnologyShowcase: React.FC = () => {
   );
 };
 
-export default TechnologyShowcase;
+export default memo(TechnologyShowcase);

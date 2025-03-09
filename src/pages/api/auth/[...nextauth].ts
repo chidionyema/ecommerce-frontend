@@ -1,331 +1,239 @@
-// Edge-compatible Auth API implementation
+import NextAuth, { NextAuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
+import FacebookProvider from 'next-auth/providers/facebook';
+import MicrosoftProvider from 'next-auth/providers/azure-ad';
+import { JWT } from 'next-auth/jwt';
 
-import { NextRequest } from 'next/server';
+// Get the API URL from environment variables
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.haworks.com';
 
-const API_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://api.local.ritualworks.com';
-
-// Edge-compatible Base64 encoding/decoding
-function encodeBase64(data: string) {
-  return btoa(encodeURIComponent(data));
-}
-
-function decodeBase64(base64: string) {
-  return decodeURIComponent(atob(base64));
-}
-
-export default async function handler(req: NextRequest) {
-  const url = new URL(req.url);
-  const action = url.pathname.split('/').pop();
-
-  // Parse request body if it exists
-  let body = {};
+// Helper function to refresh the token
+async function refreshAccessToken(token: JWT) {
   try {
-    const text = await req.text();
-    if (text) {
-      body = JSON.parse(text);
-    }
-  } catch (error) {
-    console.error('Error parsing request body:', error);
-  }
-
-  switch (action) {
-    case 'signin':
-      return await handleSignIn(req, body);
-    case 'callback':
-      return await handleCallback(req, body);
-    case 'session':
-      return await handleSession(req);
-    case 'signout':
-      return await handleSignOut(req);
-    default:
-      return new Response(JSON.stringify({ error: 'Not found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' }
-      });
-  }
-}
-
-async function handleSignIn(req: NextRequest, body: any) {
-  try {
-    // Extract credentials from request body
-    const { username, password } = body;
-
-    if (!username || !password) {
-      return new Response(JSON.stringify({ error: 'Username and password are required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Call the backend API for authentication
-    const response = await fetch(`${API_URL}/api/Authentication/login`, {
+    const response = await fetch(`${API_URL}/api/Authentication/refresh-token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        Username: username,
-        Password: password,
+        AccessToken: token.accessToken,
+        RefreshToken: token.refreshToken,
       }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      return new Response(JSON.stringify({ error: data.message || 'Authentication failed' }), {
-        status: response.status,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      throw new Error('Failed to refresh token');
     }
 
-    // Create a simple session object
-    const session = {
-      user: {
-        id: data.user.id,
-        name: data.user.userName,
-        email: data.user.email,
-        isSubscribed: data.user.isSubscribed || false,
-      },
-      accessToken: data.token,
+    return {
+      ...token,
+      accessToken: data.accessToken,
       refreshToken: data.refreshToken,
       expires: data.expires,
+      // Update the expiry time for the token
+      accessTokenExpires: new Date(data.expires).getTime(),
     };
-
-    // Create a base64 token using edge-compatible methods
-    const token = encodeBase64(JSON.stringify(session));
-
-    // Set the session cookie
-    const cookieHeader = `session-token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
-
-    // Return the user data
-    return new Response(JSON.stringify({
-      user: session.user,
-      redirectUrl: '/dashboard'
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': cookieHeader
-      }
-    });
   } catch (error) {
-    console.error('Sign-in error:', error);
-    return new Response(JSON.stringify({ error: 'Authentication failed' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    console.error('Token refresh error:', error);
+    // Return the token with an error flag
+    return {
+      ...token,
+      error: 'RefreshTokenError',
+    };
   }
 }
 
-async function handleCallback(req: NextRequest, body: any) {
-  try {
-    const { provider, accessToken } = body;
-
-    if (!provider || !accessToken) {
-      return new Response(JSON.stringify({ error: 'Provider and access token are required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Call the backend API to exchange the OAuth token
-    const response = await fetch(`${API_URL}/api/external-authentication/callback`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        provider,
-        accessToken,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return new Response(JSON.stringify({ error: data.message || 'Authentication failed' }), {
-        status: response.status,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Create a simple session
-    const session = {
-      user: {
-        id: data.user.id,
-        name: data.user.name,
-        email: data.user.email,
-        isSubscribed: data.user.isSubscribed || false,
+export const authOptions: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      id: 'credentials',
+      name: 'Credentials',
+      credentials: {
+        username: { label: 'Username', type: 'text' },
+        password: { label: 'Password', type: 'password' },
       },
-      accessToken: data.token,
-      refreshToken: data.refreshToken,
-      expires: data.expires,
-    };
+      async authorize(credentials) {
+        if (!credentials?.username || !credentials?.password) {
+          throw new Error('Username and password are required');
+        }
 
-    // Create a base64 token using edge-compatible methods
-    const token = encodeBase64(JSON.stringify(session));
+        try {
+          const response = await fetch(`${API_URL}/api/Authentication/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              Username: credentials.username,
+              Password: credentials.password,
+            }),
+          });
 
-    // Set the session cookie
-    const cookieHeader = `session-token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
+          const data = await response.json();
 
-    // Return the user data
-    return new Response(JSON.stringify({
-      user: session.user,
-      redirectUrl: '/dashboard'
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': cookieHeader
-      }
-    });
-  } catch (error) {
-    console.error('Callback error:', error);
-    return new Response(JSON.stringify({ error: 'Authentication failed' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-}
+          if (!response.ok) {
+            throw new Error(data.message || 'Invalid username or password');
+          }
 
-async function handleSession(req: NextRequest) {
-  try {
-    // Get the session token from cookies
-    const cookies = req.headers.get('cookie') || '';
-    const tokenCookie = cookies.split(';').find(c => c.trim().startsWith('session-token='));
-    
-    if (!tokenCookie) {
-      return new Response(JSON.stringify({ user: null }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    const token = tokenCookie.split('=')[1];
-
-    // Decode the token using edge-compatible methods
-    try {
-      const sessionData = JSON.parse(decodeBase64(token));
-      
-      // Check if token needs refresh
-      const expires = new Date(sessionData.expires);
-      const now = new Date();
-      
-      // If token expires in less than 5 minutes, refresh it
-      if (expires.getTime() - now.getTime() < 300000) {
-        // Call refresh token endpoint
-        if (sessionData.refreshToken) {
+          // Return the user data and token
+          return {
+            id: data.user.id,
+            name: data.user.userName,
+            email: data.user.email,
+            accessToken: data.token,
+            refreshToken: data.refreshToken,
+            expires: data.expires,
+            accessTokenExpires: new Date(data.expires).getTime(),
+            isSubscribed: data.user.isSubscribed || false,
+          };
+        } catch (error) {
+          console.error('Login error:', error);
+          throw new Error('Authentication failed');
+        }
+      },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID || '',
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET || '',
+    }),
+    MicrosoftProvider({
+      clientId: process.env.MICROSOFT_CLIENT_ID || '',
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || '',
+      tenantId: process.env.MICROSOFT_TENANT_ID,
+    }),
+  ],
+  pages: {
+    signIn: '/login',
+    signOut: '/logout',
+    error: '/login', // Error code passed in query string as ?error=
+    newUser: '/register', // New users will be directed here on first sign in
+  },
+  callbacks: {
+    async jwt({ token, user, account }) {
+      // Initial sign in
+      if (account && user) {
+        if (account.provider === 'credentials') {
+          return {
+            ...token,
+            accessToken: user.accessToken,
+            refreshToken: user.refreshToken,
+            expires: user.expires,
+            accessTokenExpires: user.accessTokenExpires,
+            isSubscribed: user.isSubscribed || false,
+          };
+        } else {
+          // For social logins, we need to get the JWT from our backend
           try {
-            const response = await fetch(`${API_URL}/api/Authentication/refresh-token`, {
+            // Exchange the OAuth access token for a JWT from our backend
+            const response = await fetch(`${API_URL}/api/external-authentication/callback`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                AccessToken: sessionData.accessToken,
-                RefreshToken: sessionData.refreshToken,
+                provider: account.provider,
+                accessToken: account.access_token,
               }),
             });
 
             const data = await response.json();
 
-            if (response.ok) {
-              // Create a new session with the refreshed tokens
-              const newSession = {
-                ...sessionData,
-                accessToken: data.accessToken,
-                refreshToken: data.refreshToken,
-                expires: data.expires,
-              };
-
-              // Create new token
-              const newToken = encodeBase64(JSON.stringify(newSession));
-
-              // Set the new session cookie
-              const cookieHeader = `session-token=${newToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
-
-              return new Response(JSON.stringify({
-                user: sessionData.user
-              }), {
-                status: 200,
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Set-Cookie': cookieHeader
-                }
-              });
+            if (!response.ok) {
+              throw new Error(data.message || 'Failed to authenticate with social provider');
             }
+
+            return {
+              ...token,
+              accessToken: data.token,
+              refreshToken: data.refreshToken,
+              expires: data.expires,
+              accessTokenExpires: new Date(data.expires).getTime(),
+              isSubscribed: data.user?.isSubscribed || false,
+            };
           } catch (error) {
-            console.error('Token refresh error:', error);
+            console.error('Social auth token exchange error:', error);
+            return token;
           }
         }
       }
 
-      // Return the session data
-      return new Response(JSON.stringify({
-        user: sessionData.user
-      }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    } catch (error) {
-      console.error('Token verification error:', error);
-      // Clear the invalid session cookie
-      const cookieHeader = `session-token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
-      
-      return new Response(JSON.stringify({ user: null }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Set-Cookie': cookieHeader
+      // On subsequent uses, check if token is expired or about to expire
+      if (token.accessTokenExpires) {
+        // If token is still valid for more than 1 minute
+        if (Date.now() < (token.accessTokenExpires as number) - 60 * 1000) {
+          return token;
         }
-      });
-    }
-  } catch (error) {
-    console.error('Session error:', error);
-    return new Response(JSON.stringify({ user: null }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-}
-
-async function handleSignOut(req: NextRequest) {
-  try {
-    // Get the session token from cookies
-    const cookies = req.headers.get('cookie') || '';
-    const tokenCookie = cookies.split(';').find(c => c.trim().startsWith('session-token='));
-    
-    if (tokenCookie) {
-      const token = tokenCookie.split('=')[1];
-      
-      try {
-        // Decode the token to get the access token
-        const sessionData = JSON.parse(decodeBase64(token));
         
-        // Call the backend logout endpoint
-        if (sessionData.accessToken) {
-          await fetch(`${API_URL}/api/Authentication/logout`, {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${sessionData.accessToken}`
-            },
-          });
-        }
-      } catch (error) {
-        console.error('Token decoding error during logout:', error);
+        // Token is expired or will expire soon, try to refresh it
+        return refreshAccessToken(token);
       }
-    }
 
-    // Clear the session cookie
-    const cookieHeader = `session-token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
-    
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': cookieHeader
+      // Fall back to checking using the expires string if accessTokenExpires is not available
+      if (token.expires && new Date(token.expires as string) > new Date(Date.now() + 60 * 1000)) {
+        return token;
       }
-    });
-  } catch (error) {
-    console.error('Sign-out error:', error);
-    return new Response(JSON.stringify({ error: 'Logout failed' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-}
+
+      // Token has expired or will expire soon, try to refresh it
+      return refreshAccessToken(token);
+    },
+    async session({ session, token }) {
+      // If there's an error with the token, clear the session
+      if (token.error) {
+        return { ...session, error: token.error };
+      }
+
+      // Add the token to the session
+      session.accessToken = token.accessToken as string;
+      session.refreshToken = token.refreshToken as string;
+      session.expires = token.expires as string;
+      session.isSubscribed = token.isSubscribed as boolean;
+      
+      // Add user ID to the session
+      if (token.sub) {
+        session.user = {
+          ...session.user,
+          id: token.sub,
+          isSubscribed: token.isSubscribed as boolean,
+        };
+      }
+
+      return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) {
+        return url;
+      }
+      return baseUrl;
+    },
+  },
+  session: {
+    strategy: 'jwt',
+    maxAge: 24 * 60 * 60, // 24 hours
+  },
+  // Enhanced event handlers
+  events: {
+    async signOut({ token }) {
+      // Call backend logout endpoint when user signs out
+      try {
+        await fetch(`${API_URL}/api/Authentication/logout`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.accessToken}`
+          },
+        });
+      } catch (error) {
+        console.error('Error during logout:', error);
+      }
+    },
+  },
+  debug: process.env.NODE_ENV === 'development',
+};
+
+export default NextAuth(authOptions);

@@ -1,60 +1,19 @@
-
-
-
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-
-// React imports
-import { useMemo, useRef, useState, useEffect } from 'react';
-
-// MUI Core Components
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import CircularProgress from '@mui/material/CircularProgress';
-import Grid from '@mui/material/Grid';
-import Fade from '@mui/material/Fade';
-import Divider from '@mui/material/Divider';
-import Chip from '@mui/material/Chip';
-import Avatar from '@mui/material/Avatar';
-import Tooltip from '@mui/material/Tooltip';
-import Backdrop from '@mui/material/Backdrop';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-
-// MUI Utilities
-import useTheme from '@mui/material/styles/useTheme';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { alpha, darken } from '@mui/material/styles';
-
-// MUI Icons
-import ArrowBack from '@mui/icons-material/ArrowBack';
-import CalendarMonth from '@mui/icons-material/CalendarMonth';
-import People from '@mui/icons-material/People';
-import Code from '@mui/icons-material/Code';
-import BusinessCenter from '@mui/icons-material/BusinessCenter';
-import ChevronRight from '@mui/icons-material/ChevronRight';
-import ChevronLeft from '@mui/icons-material/ChevronLeft';
-import Share from '@mui/icons-material/Share';
-import BookmarkAdd from '@mui/icons-material/BookmarkAdd';
-import Download from '@mui/icons-material/Download';
-import MoreVert from '@mui/icons-material/MoreVert';
-import LightbulbOutlined from '@mui/icons-material/LightbulbOutlined';
-import Timeline from '@mui/icons-material/Timeline';
-import EmojiEvents from '@mui/icons-material/EmojiEvents';
-import School from '@mui/icons-material/School';
-
-// Animation library
+import { useMemo, useRef, useState, useEffect, ReactNode } from 'react';
+import {
+  Box, Typography, Container, CircularProgress, Grid, Fade, Divider, 
+  Chip, Avatar, Tooltip, Backdrop, Button, IconButton, Tabs, Tab,
+  useTheme, useMediaQuery, alpha, SvgIconProps
+} from '@mui/material';
+import {
+  ArrowBack, CalendarMonth, People, Code, BusinessCenter, ChevronRight,
+  ChevronLeft, Share, BookmarkAdd, Download, MoreVert, LightbulbOutlined,
+  Timeline, EmojiEvents, School
+} from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Data and types
 import { cvProjects } from '../../data/cvProjects';
-import { Project } from '../../types/project';
-
-// Components
 import ConsistentPageLayout from '../../components/Shared/ConsistentPageLayout';
 import QuickFacts from '../../components/Project/QuickFacts';
 import { LessonsLearned } from '../../components/Project/LessonsLearned';
@@ -64,76 +23,53 @@ import { MetricTilesContainer } from '../../components/Project/MetricsSection';
 import { AchievementsList } from '../../components/Project/AchievementsList';
 import { GlassCard } from '../../components/Theme/GlassCard';
 
-/**
- * Enhanced ProjectDetails Component
- * 
- * An ultra-modern, polished presentation of a project case study
- * with advanced animations, streamlined UI, and improved user experience.
- */
-const ProjectDetails = () => {
+// Define interfaces for component props
+interface TabPanelProps {
+  children: ReactNode;
+  value: number;
+  index: number;
+}
+
+interface ProjectSectionProps {
+  title: string;
+  icon: ReactNode;
+  children: ReactNode;
+  delay?: number;
+}
+
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  clientName: string;
+  timeline: string;
+  teamSize: string;
+  role: string;
+  tags?: string[];
+  technologies?: string[];
+  technologyIcons?: Record<string, string>;
+  challenges: any;
+  metrics: any;
+  approach: any[];
+  achievements: any[];
+  lessonsLearned: any;
+}
+
+// TabPanel component 
+const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => (
+  <div
+    role="tabpanel"
+    hidden={value !== index}
+    id={`project-tabpanel-${index}`}
+    aria-labelledby={`project-tab-${index}`}
+  >
+    {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+  </div>
+);
+
+// Section content components grouped for reuse
+const ProjectSection: React.FC<ProjectSectionProps> = ({ title, icon, children, delay = 0 }) => {
   const theme = useTheme();
-  const params = useParams();
-  const router = useRouter();
-  const containerRef = useRef(null);
-  const timelineRef = useRef(null);
-  const projectId = params?.id as string;
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(0);
-  const [isImageOpen, setIsImageOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
-  
-  // Find the project based on the URL parameter
-  const project = useMemo(
-    () => cvProjects.find(p => p.id === projectId),
-    [projectId]
-  );
-
-  // Find next and previous projects for navigation
-  const [prevProject, nextProject] = useMemo(() => {
-    if (!project) return [null, null];
-    const projectIndex = cvProjects.findIndex((p) => p.id === projectId);
-    const prev = projectIndex > 0 ? cvProjects[projectIndex - 1] : null;
-    const next = projectIndex < cvProjects.length - 1 ? cvProjects[projectIndex + 1] : null;
-    return [prev, next];
-  }, [project, projectId]);
-
-  // Handle animation sequence and scroll tracking
-  useEffect(() => {
-    if (project) {
-      setIsLoading(false);
-    }
-
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      const scrollTop = window.scrollY;
-      const docHeight = 
-        document.documentElement.scrollHeight - 
-        document.documentElement.clientHeight;
-      const scrollPercent = scrollTop / docHeight;
-      setScrollProgress(scrollPercent);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [project]);
-
-  // Handle tab changes
-// Handle tab changes
-const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-  setActiveTab(newValue);
-};
-  // Navigation handlers
-// Navigation handlers
-const handleNavigateTo = (id: string | undefined) => {
-  if (!id) {
-    console.error('Attempted to navigate to undefined project ID');
-    return; // Exit early if id is undefined
-  }
-  router.push(`/projects/${id}`);
-};
-  // Section heading style for consistency
   const sectionHeadingStyle = {
     fontWeight: 'bold',
     color: theme.palette.primary.main,
@@ -144,54 +80,96 @@ const handleNavigateTo = (id: string | undefined) => {
     mt: 1,
   };
 
-  // Tab panel component for mobile view
-// Tab panel component for mobile view
-const TabPanel = ({ children, value, index }: { 
-  children: React.ReactNode; 
-  value: number; 
-  index: number 
-}) => (
-  <div
-    role="tabpanel"
-    hidden={value !== index}
-    id={`project-tabpanel-${index}`}
-    aria-labelledby={`project-tab-${index}`}
-  >
-    {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
-  </div>
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay }}
+    >
+      <GlassCard sx={{ p: 4, borderRadius: 3 }}>
+        <Typography variant="h5" component="h2" sx={sectionHeadingStyle}>
+          {icon}
+          {title}
+        </Typography>
+        {children}
+      </GlassCard>
+    </motion.div>
+  );
+};
+
+// Loading screen component
+const LoadingScreen: React.FC = () => (
+  <Container sx={{
+    display: 'flex',
+    height: '100vh',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    gap: 2,
+  }}>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <CircularProgress size={60} thickness={4} color="primary" />
+    </motion.div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      <Typography variant="h4" sx={{ mt: 2 }}>Loading Project...</Typography>
+    </motion.div>
+  </Container>
 );
-  // Loading state
-  if (isLoading || !project) {
-    return (
-      <Container
-        sx={{
-          display: 'flex',
-          height: '100vh',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 2,
-        }}
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <CircularProgress size={60} thickness={4} color="primary" />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Typography variant="h4" sx={{ mt: 2 }}>
-            Loading Project...
-          </Typography>
-        </motion.div>
-      </Container>
-    );
-  }
+
+const ProjectDetails: React.FC = () => {
+  const theme = useTheme();
+  const params = useParams();
+  const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const projectId = params?.id as string;
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [activeTab, setActiveTab] = useState<number>(0);
+  const [isImageOpen, setIsImageOpen] = useState<boolean>(false);
+  const [scrollProgress, setScrollProgress] = useState<number>(0);
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
+  // Find current, previous and next projects
+  const { project, prevProject, nextProject } = useMemo(() => {
+    const current = cvProjects.find(p => p.id === projectId);
+    if (!current) return { project: null, prevProject: null, nextProject: null };
+    
+    const projectIndex = cvProjects.findIndex(p => p.id === projectId);
+    const prev = projectIndex > 0 ? cvProjects[projectIndex - 1] : null;
+    const next = projectIndex < cvProjects.length - 1 ? cvProjects[projectIndex + 1] : null;
+    
+    return { project: current, prevProject: prev, nextProject: next };
+  }, [projectId]);
+
+  // Handle scroll tracking
+  useEffect(() => {
+    if (project) setIsLoading(false);
+
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      setScrollProgress(scrollTop / docHeight);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [project]);
+
+  // Handler functions
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => setActiveTab(newValue);
+  const handleNavigateTo = (id: string | null) => id && router.push(`/projects/${id}`);
+
+  // Render loading state if needed
+  if (isLoading || !project) return <LoadingScreen />;
 
   return (
     <ConsistentPageLayout
@@ -208,294 +186,152 @@ const TabPanel = ({ children, value, index }: {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Box 
-            component="div" 
-            ref={containerRef}
-            sx={{
-              position: 'relative',
-              overflow: 'hidden',
-              minHeight: '100vh',
-            }}
-          >
+          <Box component="div" ref={containerRef} sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
             {/* Progress indicator */}
-            <Box
-              sx={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '4px',
-                zIndex: 1100,
-                background: theme.palette.background.paper,
-              }}
-            >
-              <Box
-                sx={{
-                  height: '100%',
-                  width: `${scrollProgress * 100}%`,
-                  background: theme.palette.primary.main,
-                  transition: 'width 0.1s',
-                }}
-              />
+            <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, height: '4px', zIndex: 1100, background: theme.palette.background.paper }}>
+              <Box sx={{ height: '100%', width: `${scrollProgress * 100}%`, background: theme.palette.primary.main, transition: 'width 0.1s' }} />
             </Box>
 
             <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, my: 4 }}>
-              {/* Navigation */}
-              <Box 
-                sx={{ 
-                  position: 'relative', 
-                  mb: 5, 
-                  display: 'flex', 
-                  justifyContent: 'space-between',
-                  alignItems: 'center' 
-                }}
-              >
-                <motion.div
-                  whileHover={{ x: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+              {/* Back button and action buttons */}
+              <Box sx={{ position: 'relative', mb: 5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <motion.div whileHover={{ x: -5 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     variant="contained"
                     color="primary"
                     startIcon={<ArrowBack />}
                     onClick={() => router.back()}
-                    sx={{
-                      borderRadius: '24px',
-                      padding: '8px 24px',
-                    }}
+                    sx={{ borderRadius: '24px', padding: '8px 24px' }}
                   >
                     All Projects
                   </Button>
                 </motion.div>
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  <Tooltip title="Save Project">
-                    <IconButton color="primary" sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1) }}>
-                      <BookmarkAdd />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Share">
-                    <IconButton color="primary" sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1) }}>
-                      <Share />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Download PDF">
-                    <IconButton color="primary" sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1) }}>
-                      <Download />
-                    </IconButton>
-                  </Tooltip>
+                  {['Save Project', 'Share', 'Download PDF'].map((tooltip, idx) => (
+                    <Tooltip key={idx} title={tooltip}>
+                      <IconButton color="primary" sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1) }}>
+                        {[<BookmarkAdd key="bookmark" />, <Share key="share" />, <Download key="download" />][idx]}
+                      </IconButton>
+                    </Tooltip>
+                  ))}
                 </Box>
               </Box>
               
-              {/* Project Header Section - Enhanced */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.6 }}
-              >
+              {/* Project Header Card */}
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6 }}>
                 <GlassCard
                   sx={{
-                    mb: 6,
-                    position: 'relative',
-                    p: { xs: 3, md: 5 },
-                    borderRadius: 4,
-                    boxShadow: theme.shadows[4],
-                    background: alpha(theme.palette.background.paper, 0.8),
-                    backdropFilter: 'blur(10px)',
-                    overflow: 'hidden',
+                    mb: 6, position: 'relative', p: { xs: 3, md: 5 }, borderRadius: 4,
+                    boxShadow: theme.shadows[4], background: alpha(theme.palette.background.paper, 0.8),
+                    backdropFilter: 'blur(10px)', overflow: 'hidden',
                   }}
                 >
                   <Box sx={{ position: 'relative', zIndex: 2 }}>
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, mb: 4 }}>
-                      <Box 
-                        sx={{ 
-                          width: { xs: '100%', md: '30%' },
-                          height: { xs: '200px', md: '250px' },
-                          borderRadius: 3,
-                          overflow: 'hidden',
-                          position: 'relative',
-                          boxShadow: theme.shadows[3],
-                        }}
-                      >
-                     
-                      </Box>
+                      <Box sx={{ width: { xs: '100%', md: '30%' }, height: { xs: '200px', md: '250px' }, borderRadius: 3, overflow: 'hidden', position: 'relative', boxShadow: theme.shadows[3] }} />
                       
                       <Box sx={{ flex: 1 }}>
+                        {/* Tags */}
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
                           {project.tags?.map((tag, index) => (
                             <Chip 
                               key={index} 
                               label={tag} 
                               size="small" 
-                              sx={{ 
-                                bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                color: theme.palette.primary.main,
-                                fontWeight: 'medium',
-                              }} 
+                              sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: theme.palette.primary.main, fontWeight: 'medium' }} 
                             />
                           ))}
                         </Box>
                         
+                        {/* Project title and description */}
                         <Typography 
                           variant="h3" 
                           component="h1" 
                           sx={{ 
-                            fontSize: { xs: '2rem', md: '2.5rem' },
-                            fontWeight: 700,
-                            mb: 2,
+                            fontSize: { xs: '2rem', md: '2.5rem' }, fontWeight: 700, mb: 2,
                             background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
+                            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                           }}
                         >
                           {project.name}
                         </Typography>
                         
-                        <Typography 
-                          variant="subtitle1" 
-                          sx={{ mb: 3, color: theme.palette.text.secondary, lineHeight: 1.6 }}
-                        >
+                        <Typography variant="subtitle1" sx={{ mb: 3, color: theme.palette.text.secondary, lineHeight: 1.6 }}>
                           {project.description}
                         </Typography>
                         
+                        {/* Project meta info */}
                         <Grid container spacing={3}>
-                          <Grid item xs={12} sm={6}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              <Avatar 
-                                sx={{ 
-                                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                  color: theme.palette.primary.main,
-                                  width: 40,
-                                  height: 40,
-                                }}
-                              >
-                                <BusinessCenter fontSize="small" />
-                              </Avatar>
-                              <Box>
-                                <Typography variant="body2" color="text.secondary">Client</Typography>
-                                <Typography variant="body1" fontWeight="medium">{project.clientName}</Typography>
+                          {[
+                            { icon: <BusinessCenter fontSize="small" />, label: 'Client', value: project.clientName },
+                            { icon: <CalendarMonth fontSize="small" />, label: 'Timeline', value: project.timeline },
+                            { icon: <People fontSize="small" />, label: 'Team Size', value: project.teamSize },
+                            { icon: <Code fontSize="small" />, label: 'Role', value: project.role }
+                          ].map((item, idx) => (
+                            <Grid item xs={12} sm={6} key={idx}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                <Avatar sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: theme.palette.primary.main, width: 40, height: 40 }}>
+                                  {item.icon}
+                                </Avatar>
+                                <Box>
+                                  <Typography variant="body2" color="text.secondary">{item.label}</Typography>
+                                  <Typography variant="body1" fontWeight="medium">{item.value}</Typography>
+                                </Box>
                               </Box>
-                            </Box>
-                          </Grid>
-                          
-                          <Grid item xs={12} sm={6}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              <Avatar 
-                                sx={{ 
-                                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                  color: theme.palette.primary.main,
-                                  width: 40,
-                                  height: 40,
-                                }}
-                              >
-                                <CalendarMonth fontSize="small" />
-                              </Avatar>
-                              <Box>
-                                <Typography variant="body2" color="text.secondary">Timeline</Typography>
-                                <Typography variant="body1" fontWeight="medium">{project.timeline}</Typography>
-                              </Box>
-                            </Box>
-                          </Grid>
-                          
-                          <Grid item xs={12} sm={6}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              <Avatar 
-                                sx={{ 
-                                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                  color: theme.palette.primary.main,
-                                  width: 40,
-                                  height: 40,
-                                }}
-                              >
-                                <People fontSize="small" />
-                              </Avatar>
-                              <Box>
-                                <Typography variant="body2" color="text.secondary">Team Size</Typography>
-                                <Typography variant="body1" fontWeight="medium">{project.teamSize}</Typography>
-                              </Box>
-                            </Box>
-                          </Grid>
-                          
-                          <Grid item xs={12} sm={6}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              <Avatar 
-                                sx={{ 
-                                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                  color: theme.palette.primary.main,
-                                  width: 40,
-                                  height: 40,
-                                }}
-                              >
-                                <Code fontSize="small" />
-                              </Avatar>
-                              <Box>
-                                <Typography variant="body2" color="text.secondary">Role</Typography>
-                                <Typography variant="body1" fontWeight="medium">{project.role}</Typography>
-                              </Box>
-                            </Box>
-                          </Grid>
+                            </Grid>
+                          ))}
                         </Grid>
                       </Box>
                     </Box>
                     
                     <Divider sx={{ mt: 2, mb: 3 }} />
                     
+                    {/* Technologies */}
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
-                      <Typography variant="subtitle2" fontWeight="bold" sx={{ mr: 1 }}>
-                        Technologies:
-                      </Typography>
+                      <Typography variant="subtitle2" fontWeight="bold" sx={{ mr: 1 }}>Technologies:</Typography>
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-                      {project.technologies?.map((tech, index) => {
-  let techIcon = undefined;
-  
-  // Handle tech icons whether they're an array or an object
-  if (project.technologyIcons && !Array.isArray(project.technologyIcons)) {
-    techIcon = (project.technologyIcons as Record<string, string>)[tech];
-  }
-  
-  return (
-    <Tooltip key={index} title={tech}>
-      <Chip
-        icon={techIcon ? (
-          <Box component="img" src={techIcon} sx={{ width: 20, height: 20 }} />
-        ) : undefined}
-        label={tech}
-        variant="outlined"
-        size="small"
-        sx={{
-          borderRadius: '12px',
-          borderColor: theme.palette.divider,
-          '&:hover': {
-            borderColor: theme.palette.primary.main,
-            backgroundColor: alpha(theme.palette.primary.main, 0.05),
-          },
-        }}
-      />
-    </Tooltip>
-  );
-})}
+                        {project.technologies?.map((tech, index) => {
+                          let techIcon = undefined;
+                          if (project.technologyIcons && !Array.isArray(project.technologyIcons)) {
+                            techIcon = (project.technologyIcons)[tech];
+                          }
+                          
+                          return (
+                            <Tooltip key={index} title={tech}>
+                              <Chip
+                                icon={techIcon ? <Box component="img" src={techIcon} sx={{ width: 20, height: 20 }} /> : undefined}
+                                label={tech}
+                                variant="outlined"
+                                size="small"
+                                sx={{
+                                  borderRadius: '12px',
+                                  borderColor: theme.palette.divider,
+                                  '&:hover': {
+                                    borderColor: theme.palette.primary.main,
+                                    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                                  },
+                                }}
+                              />
+                            </Tooltip>
+                          );
+                        })}
                       </Box>
                     </Box>
                   </Box>
                   
-                  {/* Decorative background elements */}
+                  {/* Decorative background */}
                   <Box 
                     sx={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      width: '100%',
-                      height: '100%',
-                      zIndex: 0,
-                      opacity: 0.05,
-                      pointerEvents: 'none',
+                      position: 'absolute', top: 0, right: 0, width: '100%', height: '100%',
+                      zIndex: 0, opacity: 0.05, pointerEvents: 'none',
                       background: `radial-gradient(circle at 80% 20%, ${theme.palette.primary.main}, transparent 60%)`,
                     }}
                   />
                 </GlassCard>
               </motion.div>
               
-              {/* Content Navigation for mobile/tablet */}
+              {/* Mobile Tabs */}
               {isMobile && (
                 <Box sx={{ width: '100%', mb: 4 }}>
                   <Tabs 
@@ -504,61 +340,33 @@ const TabPanel = ({ children, value, index }: {
                     variant="scrollable"
                     scrollButtons="auto"
                     sx={{
-                      '& .MuiTabs-indicator': {
-                        height: 3,
-                        borderRadius: '3px 3px 0 0',
-                      },
-                      '& .MuiTab-root': {
-                        textTransform: 'none',
-                        minWidth: 'auto',
-                        px: 3,
-                        fontWeight: 'medium',
-                        fontSize: '0.9rem',
-                      },
+                      '& .MuiTabs-indicator': { height: 3, borderRadius: '3px 3px 0 0' },
+                      '& .MuiTab-root': { textTransform: 'none', minWidth: 'auto', px: 3, fontWeight: 'medium', fontSize: '0.9rem' },
                     }}
                   >
-                    <Tab 
-                      icon={<LightbulbOutlined sx={{ mb: 0.5 }} />} 
-                      label="Challenge" 
-                      iconPosition="start" 
-                    />
-                    <Tab 
-                      icon={<Timeline sx={{ mb: 0.5 }} />} 
-                      label="Approach" 
-                      iconPosition="start" 
-                    />
-                    <Tab 
-                      icon={<EmojiEvents sx={{ mb: 0.5 }} />} 
-                      label="Achievements" 
-                      iconPosition="start" 
-                    />
-                    <Tab 
-                      icon={<School sx={{ mb: 0.5 }} />} 
-                      label="Lessons" 
-                      iconPosition="start" 
-                    />
+                    {[
+                      { icon: <LightbulbOutlined sx={{ mb: 0.5 }} />, label: 'Challenge' },
+                      { icon: <Timeline sx={{ mb: 0.5 }} />, label: 'Approach' },
+                      { icon: <EmojiEvents sx={{ mb: 0.5 }} />, label: 'Achievements' },
+                      { icon: <School sx={{ mb: 0.5 }} />, label: 'Lessons' }
+                    ].map((tab, idx) => (
+                      <Tab key={idx} icon={tab.icon} label={tab.label} iconPosition="start" />
+                    ))}
                   </Tabs>
                 </Box>
               )}
               
               {/* Main Content Grid */}
-              <Grid 
-                container 
-                spacing={{ xs: 3, md: 5 }} 
-                sx={{ mb: 6 }}
-              >
+              <Grid container spacing={{ xs: 3, md: 5 }} sx={{ mb: 6 }}>
                 {/* Main Content Column */}
                 <Grid item xs={12} md={8}>
                   {isMobile ? (
+                    // Mobile view with tabs
                     <>
                       <TabPanel value={activeTab} index={0}>
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5 }}
-                        >
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                           <Box>
-                            <Typography variant="h5" component="h2" sx={sectionHeadingStyle}>
+                            <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold', color: theme.palette.primary.main, display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, mt: 1 }}>
                               <LightbulbOutlined fontSize="small" />
                               The Challenge
                             </Typography>
@@ -566,7 +374,7 @@ const TabPanel = ({ children, value, index }: {
                           </Box>
 
                           <Box sx={{ mt: 4 }}>
-                            <Typography variant="h5" component="h2" sx={sectionHeadingStyle}>
+                            <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold', color: theme.palette.primary.main, display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, mt: 1 }}>
                               <EmojiEvents fontSize="small" />
                               Key Performance Metrics
                             </Typography>
@@ -576,13 +384,9 @@ const TabPanel = ({ children, value, index }: {
                       </TabPanel>
                       
                       <TabPanel value={activeTab} index={1}>
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5 }}
-                        >
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                           <Box>
-                            <Typography variant="h5" component="h2" sx={sectionHeadingStyle}>
+                            <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold', color: theme.palette.primary.main, display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, mt: 1 }}>
                               <Timeline fontSize="small" />
                               Our Approach
                             </Typography>
@@ -594,13 +398,9 @@ const TabPanel = ({ children, value, index }: {
                       </TabPanel>
                       
                       <TabPanel value={activeTab} index={2}>
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5 }}
-                        >
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                           <Box>
-                            <Typography variant="h5" component="h2" sx={sectionHeadingStyle}>
+                            <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold', color: theme.palette.primary.main, display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, mt: 1 }}>
                               <EmojiEvents fontSize="small" />
                               Key Achievements
                             </Typography>
@@ -610,13 +410,9 @@ const TabPanel = ({ children, value, index }: {
                       </TabPanel>
                       
                       <TabPanel value={activeTab} index={3}>
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5 }}
-                        >
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                           <Box>
-                            <Typography variant="h5" component="h2" sx={sectionHeadingStyle}>
+                            <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold', color: theme.palette.primary.main, display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, mt: 1 }}>
                               <School fontSize="small" />
                               Lessons Learned
                             </Typography>
@@ -628,115 +424,46 @@ const TabPanel = ({ children, value, index }: {
                   ) : (
                     // Desktop view - all sections visible
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      {/* Challenge Section */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                      >
-                        <GlassCard sx={{ p: 4, borderRadius: 3 }}>
-                          <Typography variant="h5" component="h2" sx={sectionHeadingStyle}>
-                            <LightbulbOutlined />
-                            The Challenge
-                          </Typography>
-                          <ChallengeSection challenge={project.challenges} />
-                        </GlassCard>
-                      </motion.div>
+                      <ProjectSection title="The Challenge" icon={<LightbulbOutlined />} delay={0.1}>
+                        <ChallengeSection challenge={project.challenges} />
+                      </ProjectSection>
                       
-                      {/* Metrics Section */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                      >
-                        <GlassCard sx={{ p: 4, borderRadius: 3 }}>
-                          <Typography variant="h5" component="h2" sx={sectionHeadingStyle}>
-                            <EmojiEvents />
-                            Key Performance Metrics
-                          </Typography>
-                          <MetricTilesContainer metrics={project.metrics} />
-                        </GlassCard>
-                      </motion.div>
+                      <ProjectSection title="Key Performance Metrics" icon={<EmojiEvents />} delay={0.2}>
+                        <MetricTilesContainer metrics={project.metrics} />
+                      </ProjectSection>
                       
-                      {/* Approach Timeline */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                      >
-                        <GlassCard sx={{ p: 4, borderRadius: 3 }}>
-                          <Typography variant="h5" component="h2" sx={sectionHeadingStyle}>
-                            <Timeline />
-                            Our Approach
-                          </Typography>
-                          <Box 
-                            ref={timelineRef}
-                            sx={{
-                              width: '100%',
-                              overflowX: 'auto',
-                              pb: 2,
-                              '&::-webkit-scrollbar': {
-                                height: '8px',
-                              },
-                              '&::-webkit-scrollbar-track': {
-                                background: alpha(theme.palette.divider, 0.1),
-                                borderRadius: '4px',
-                              },
-                              '&::-webkit-scrollbar-thumb': {
-                                background: alpha(theme.palette.primary.main, 0.2),
-                                borderRadius: '4px',
-                                '&:hover': {
-                                  background: alpha(theme.palette.primary.main, 0.4),
-                                },
-                              },
-                            }}
-                          >
-                            <ApproachTimeline steps={project.approach} />
-                          </Box>
-                        </GlassCard>
-                      </motion.div>
+                      <ProjectSection title="Our Approach" icon={<Timeline />} delay={0.3}>
+                        <Box 
+                          ref={timelineRef}
+                          sx={{
+                            width: '100%', overflowX: 'auto', pb: 2,
+                            '&::-webkit-scrollbar': { height: '8px' },
+                            '&::-webkit-scrollbar-track': { background: alpha(theme.palette.divider, 0.1), borderRadius: '4px' },
+                            '&::-webkit-scrollbar-thumb': {
+                              background: alpha(theme.palette.primary.main, 0.2), borderRadius: '4px',
+                              '&:hover': { background: alpha(theme.palette.primary.main, 0.4) },
+                            },
+                          }}
+                        >
+                          <ApproachTimeline steps={project.approach} />
+                        </Box>
+                      </ProjectSection>
                       
-                      {/* Achievements Section */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
-                      >
-                        <GlassCard sx={{ p: 4, borderRadius: 3 }}>
-                          <Typography variant="h5" component="h2" sx={sectionHeadingStyle}>
-                            <EmojiEvents />
-                            Key Achievements
-                          </Typography>
-                          <AchievementsList achievements={project.achievements} />
-                        </GlassCard>
-                      </motion.div>
+                      <ProjectSection title="Key Achievements" icon={<EmojiEvents />} delay={0.4}>
+                        <AchievementsList achievements={project.achievements} />
+                      </ProjectSection>
                       
-                      {/* Lessons Learned Section */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.5 }}
-                      >
-                        <GlassCard sx={{ p: 4, borderRadius: 3 }}>
-                          <Typography variant="h5" component="h2" sx={sectionHeadingStyle}>
-                            <School />
-                            Lessons Learned
-                          </Typography>
-                          <LessonsLearned lesson={project.lessonsLearned} />
-                        </GlassCard>
-                      </motion.div>
+                      <ProjectSection title="Lessons Learned" icon={<School />} delay={0.5}>
+                        <LessonsLearned lesson={project.lessonsLearned} />
+                      </ProjectSection>
                     </Box>
                   )}
                 </Grid>
                 
-                {/* Sidebar Content Column */}
+                {/* Sidebar Column */}
                 <Grid item xs={12} md={4}>
                   <Box sx={{ position: 'sticky', top: 24 }}>
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.6, delay: 0.2 }}
-                    >
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
                       <QuickFacts
                         teamSize={project.teamSize}
                         timeline={project.timeline}
@@ -748,24 +475,15 @@ const TabPanel = ({ children, value, index }: {
                     </motion.div>
                     
                     {/* Project Navigation */}
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.6, delay: 0.3 }}
-                    >
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>
                       <Box sx={{ mt: 4 }}>
-                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                          Other Projects
-                        </Typography>
+                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Other Projects</Typography>
                         
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                           {prevProject && (
                             <GlassCard
                               sx={{
-                                p: 2,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
+                                p: 2, cursor: 'pointer', display: 'flex', alignItems: 'center',
                                 transition: 'all 0.3s ease',
                                 '&:hover': {
                                   transform: 'translateX(-8px)',
@@ -777,12 +495,8 @@ const TabPanel = ({ children, value, index }: {
                             >
                               <ChevronLeft sx={{ color: theme.palette.primary.main }} />
                               <Box sx={{ ml: 1 }}>
-                                <Typography variant="body2" color="text.secondary">
-                                  Previous Project
-                                </Typography>
-                                <Typography variant="subtitle2" fontWeight="medium">
-                                  {prevProject.name}
-                                </Typography>
+                                <Typography variant="body2" color="text.secondary">Previous Project</Typography>
+                                <Typography variant="subtitle2" fontWeight="medium">{prevProject.name}</Typography>
                               </Box>
                             </GlassCard>
                           )}
@@ -790,11 +504,7 @@ const TabPanel = ({ children, value, index }: {
                           {nextProject && (
                             <GlassCard
                               sx={{
-                                p: 2,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
+                                p: 2, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                                 transition: 'all 0.3s ease',
                                 '&:hover': {
                                   transform: 'translateX(8px)',
@@ -805,12 +515,8 @@ const TabPanel = ({ children, value, index }: {
                               onClick={() => handleNavigateTo(nextProject.id)}
                             >
                               <Box sx={{ mr: 1 }}>
-                                <Typography variant="body2" color="text.secondary">
-                                  Next Project
-                                </Typography>
-                                <Typography variant="subtitle2" fontWeight="medium">
-                                  {nextProject.name}
-                                </Typography>
+                                <Typography variant="body2" color="text.secondary">Next Project</Typography>
+                                <Typography variant="subtitle2" fontWeight="medium">{nextProject.name}</Typography>
                               </Box>
                               <ChevronRight sx={{ color: theme.palette.primary.main }} />
                             </GlassCard>
@@ -826,52 +532,29 @@ const TabPanel = ({ children, value, index }: {
             {/* Project image backdrop */}
             <Backdrop
               sx={{ 
-                color: '#fff',
-                zIndex: theme.zIndex.drawer + 1,
-                backdropFilter: 'blur(8px)',
-                backgroundColor: alpha('#000', 0.85),
+                color: '#fff', zIndex: theme.zIndex.drawer + 1,
+                backdropFilter: 'blur(8px)', backgroundColor: alpha('#000', 0.85),
               }}
               open={isImageOpen}
               onClick={() => setIsImageOpen(false)}
             >
-              <Box
-                sx={{
-                  position: 'relative',
-                  maxWidth: '90vw',
-                  maxHeight: '90vh',
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                  boxShadow: theme.shadows[10],
-                }}
-              >
+              <Box sx={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh', borderRadius: 2, overflow: 'hidden', boxShadow: theme.shadows[10] }}>
                 <IconButton
                   sx={{
-                    position: 'absolute',
-                    top: 16,
-                    right: 16,
-                    backgroundColor: alpha('#000', 0.6),
-                    color: '#fff',
-                    '&:hover': {
-                      backgroundColor: alpha('#000', 0.8),
-                    },
+                    position: 'absolute', top: 16, right: 16,
+                    backgroundColor: alpha('#000', 0.6), color: '#fff',
+                    '&:hover': { backgroundColor: alpha('#000', 0.8) },
                     zIndex: 2,
                   }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsImageOpen(false);
-                  }}
+                  onClick={(e) => { e.stopPropagation(); setIsImageOpen(false); }}
                 >
                   <MoreVert />
                 </IconButton>
                 <Box
                   component="img"
-                  src={ "/images/project-placeholder.jpg"}
+                  src="/images/project-placeholder.jpg"
                   alt={project.name}
-                  sx={{
-                    maxWidth: '90vw',
-                    maxHeight: '90vh',
-                    objectFit: 'contain',
-                  }}
+                  sx={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain' }}
                 />
               </Box>
             </Backdrop>
@@ -879,14 +562,8 @@ const TabPanel = ({ children, value, index }: {
             {/* Background decorative elements */}
             <Box 
               sx={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                zIndex: -1,
-                opacity: 0.05,
-                pointerEvents: 'none',
+                position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                zIndex: -1, opacity: 0.05, pointerEvents: 'none',
                 background: `
                   radial-gradient(circle at 10% 10%, ${theme.palette.primary.light}, transparent 40%),
                   radial-gradient(circle at 90% 90%, ${theme.palette.secondary.main}, transparent 40%)
@@ -899,7 +576,8 @@ const TabPanel = ({ children, value, index }: {
     </ConsistentPageLayout>
   );
 };
-// Add this for static generation with Next.js
+
+// Static generation with Next.js
 export async function getStaticProps({ params }: { params: { id: string } }) {
   const projectId = params.id;
   const project = cvProjects.find(p => p.id === projectId) || null;
@@ -908,25 +586,19 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
   let serializedProject = null;
   
   if (project) {
-    // Deep clone the project first
+    // Deep clone and sanitize for serialization
     const projectClone = JSON.parse(JSON.stringify(project));
     
-    // Replace the technologyIcons array with a serializable version
-    // (we'll map the actual components in the client-side component)
+    // Remove non-serializable properties
     if (projectClone.technologyIcons) {
-      // Either remove it completely 
       delete projectClone.technologyIcons;
-      // Or set it to an empty array if the component expects it
-      // projectClone.technologyIcons = [];
     }
     
     serializedProject = projectClone;
   }
   
   return {
-    props: {
-      project: serializedProject
-    }
+    props: { project: serializedProject }
   };
 }
 
@@ -938,9 +610,8 @@ export async function getStaticPaths() {
   
   return {
     paths,
-    fallback: true // Show a loading state for projects not generated at build time
+    fallback: true // Show loading state for dynamic projects
   };
 }
-
 
 export default ProjectDetails;

@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTheme, Typography, Box, Container, Chip, useMediaQuery, Button, Grid, alpha, TextField, InputAdornment, IconButton, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
-import ProjectCard, { ProjectGrid } from '../components/Solutions/Projects/ProjectCard';
+import ProjectCard from '../components/Solutions/Projects/ProjectCard';
+import ProjectGrid from '../components/Solutions/Projects/ProjectGrid';
 import { cvProjects } from '../data/cvProjects';
 import PageSection from '../components/PageSection';
 import { SPACING, getSharedStyles } from '../utils/sharedStyles';
