@@ -378,14 +378,14 @@ export const createBuildProtectedService = () => {
     }
   };
   
-  const bulkUpdateProductsProtected = async (products: any[]): Promise<void> => {
+  const bulkUpdateProductsProtected = async (productIds: string[], updates: any): Promise<void> => {
     if (isBuildTime()) {
       console.log('Build-time detected, skipping bulk update operation');
       return;
     }
     
     try {
-      await apiService.post('/api/products/bulk-update', { products });
+      await apiService.post('/api/products/bulk-update', { productIds, updates });
     } catch (error) {
       console.error('Error updating products:', error);
       throw error;
