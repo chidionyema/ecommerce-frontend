@@ -3,8 +3,7 @@ import {
   ProductDto, 
   ProductCreateDto,
   ProductListResponse, 
-  ProductFilter, 
-  ContentDto
+  ProductFilter
 } from '../types/haworks.types';
 
 class ProductService {
@@ -60,14 +59,15 @@ class ProductService {
     }
   }
   
-  // FIXED: Use apiService.get instead of direct fetch for consistency
+  // FIXED: Use consistent apiService.get with proper error handling
   public async getPopularProducts(limit: number = 15): Promise<ProductDto[]> {
     try {
-      const response = await apiService.get<ProductDto[]>(`${this.baseUrl}/popular`, { limit });
-      return response;
+      // Use the apiService with proper parameters format
+      return await apiService.get<ProductDto[]>(`${this.baseUrl}/popular`, { limit });
     } catch (error) {
       console.error('Error fetching popular products:', error);
-      return []; // Return empty array as fallback
+      // Return empty array as fallback
+      return []; 
     }
   }
   
