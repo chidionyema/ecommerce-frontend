@@ -264,10 +264,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
     // For static export, we need to pre-render some popular products
-    const popularProductIds = await productService.getPopularProductIds(15);
+    const popularProducts = await productService.getPopularProducts(15);
     
-    const paths = popularProductIds.map(id => ({
-      params: { id: id.toString() }
+    const paths = popularProducts.map(product => ({
+      params: { id: product.id.toString() }
     }));
     
     return {
