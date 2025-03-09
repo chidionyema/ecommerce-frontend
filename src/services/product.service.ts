@@ -1,8 +1,5 @@
-// product-service-builder.ts
+// product.service.ts
 import { apiService } from './api.service';
-
-// IMPORTANT: Remove the types import to avoid redeclaration issues
-// Avoid importing ProductDto, ProductCreateDto, etc.
 
 // Use a function to check build time instead of a variable
 function isBuildTime(): boolean {
@@ -332,3 +329,6 @@ export const createBuildProtectedService = () => {
     getRelatedProducts: getRelatedProductsProtected
   };
 };
+
+// Create and export an instance of the service to use throughout the application
+export const productService = createBuildProtectedService();
