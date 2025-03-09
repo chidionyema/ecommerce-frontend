@@ -218,6 +218,21 @@ function getFallbackProducts(): any[] {
  * Extends your existing product service with fallback data during builds
  */
 export const createBuildProtectedService = () => {
+  // Define bulk delete method first to ensure it's properly included
+  const bulkDeleteProductsProtected = async (productIds: string[]): Promise<void> => {
+    if (isBuildTime()) {
+      console.log('Build-time detected, skipping bulk delete operation');
+      return;
+    }
+    
+    try {
+      await apiService.post('/api/products/bulk-delete', { productIds });
+    } catch (error) {
+      console.error('Error deleting products:', error);
+      throw error;
+    }
+  };
+  
   // Functions that return fallback data for build time
   const getPopularProductsProtected = async (limit: number = 15): Promise<any[]> => {
     if (isBuildTime()) {
@@ -320,21 +335,6 @@ export const createBuildProtectedService = () => {
     }
   };
   
-  // Add bulk delete method
-  const bulkDeleteProductsProtected = async (productIds: string[]): Promise<void> => {
-    if (isBuildTime()) {
-      console.log('Build-time detected, skipping bulk delete operation');
-      return;
-    }
-    
-    try {
-      await apiService.post('/api/products/bulk-delete', { productIds });
-    } catch (error) {
-      console.error('Error deleting products:', error);
-      throw error;
-    }
-  };
-  
   // Add CRUD operations that might be needed
   const createProductProtected = async (product: any): Promise<any> => {
     if (isBuildTime()) {
@@ -392,14 +392,14 @@ export const createBuildProtectedService = () => {
     }
   };
   
-  // Return the protected methods
+  // Return the protected methods - put bulkDeleteProducts first
   return {
+    bulkDeleteProducts: bulkDeleteProductsProtected,
     getPopularProducts: getPopularProductsProtected,
     getFeaturedProducts: getFeaturedProductsProtected,
     getProducts: getProductsProtected,
     getProductById: getProductByIdProtected,
     getRelatedProducts: getRelatedProductsProtected,
-    bulkDeleteProducts: bulkDeleteProductsProtected,
     createProduct: createProductProtected,
     updateProduct: updateProductProtected,
     deleteProduct: deleteProductProtected,
