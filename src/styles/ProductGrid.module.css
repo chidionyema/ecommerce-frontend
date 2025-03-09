@@ -1,0 +1,236 @@
+/* styles/ProductGrid.module.css */
+
+.gridContainer {
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 24px;
+  }
+  
+  /* Responsive grid adjustments */
+  @media (min-width: 600px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 960px) {
+    .grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  .loadingContainer {
+    text-align: center;
+    padding: 40px 0;
+    width: 100%;
+  }
+  
+  .loadMoreButton {
+    margin: 40px auto;
+    padding: 12px 24px;
+    background-color: #fff;
+    border: 2px solid #3f51b5;
+    border-radius: 8px;
+    color: #3f51b5;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .loadMoreButton:hover {
+    background-color: #3f51b5;
+    color: white;
+  }
+  
+  .noResults {
+    text-align: center;
+    padding: 60px 0;
+    width: 100%;
+  }
+  
+  .noResultsIcon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #bdbdbd;
+  }
+  
+  .noResultsTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  .noResultsMessage {
+    font-size: 1rem;
+    color: #757575;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .filtersButton {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #3f51b5;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: none;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+  }
+  
+  .filtersButton:hover {
+    background-color: #303f9f;
+    transform: scale(1.05);
+  }
+  
+  .filtersDrawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100vh;
+    background-color: white;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    z-index: 1100;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+  }
+  
+  .filtersDrawerOpen {
+    transform: translateX(0);
+  }
+  
+  .filtersHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .filtersTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  .closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #757575;
+  }
+  
+  .filtersContent {
+    padding: 16px;
+  }
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .overlayVisible {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  /* Animation for card appearance */
+  .gridItem {
+    animation: fadeIn 0.5s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Staggered animation delay for grid items */
+  .gridItem:nth-child(1) { animation-delay: 0.1s; }
+  .gridItem:nth-child(2) { animation-delay: 0.2s; }
+  .gridItem:nth-child(3) { animation-delay: 0.3s; }
+  .gridItem:nth-child(4) { animation-delay: 0.4s; }
+  .gridItem:nth-child(5) { animation-delay: 0.5s; }
+  .gridItem:nth-child(6) { animation-delay: 0.6s; }
+  .gridItem:nth-child(7) { animation-delay: 0.7s; }
+  .gridItem:nth-child(8) { animation-delay: 0.8s; }
+  
+  /* Dark mode support */
+  :global(.dark-mode) .loadMoreButton {
+    background-color: #2d2d2d;
+    border-color: #7986cb;
+    color: #7986cb;
+  }
+  
+  :global(.dark-mode) .loadMoreButton:hover {
+    background-color: #7986cb;
+    color: #2d2d2d;
+  }
+  
+  :global(.dark-mode) .noResultsTitle {
+    color: #e0e0e0;
+  }
+  
+  :global(.dark-mode) .noResultsMessage {
+    color: #bdbdbd;
+  }
+  
+  :global(.dark-mode) .noResultsIcon {
+    color: #757575;
+  }
+  
+  :global(.dark-mode) .filtersDrawer {
+    background-color: #2d2d2d;
+  }
+  
+  :global(.dark-mode) .filtersHeader {
+    border-bottom-color: #444;
+  }
+  
+  :global(.dark-mode) .filtersTitle {
+    color: #e0e0e0;
+  }
+  
+  :global(.dark-mode) .closeButton {
+    color: #bdbdbd;
+  }

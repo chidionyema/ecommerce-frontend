@@ -1,0 +1,63 @@
+/* styles/store/CheckoutSuccess.module.css */
+.timeline {
+    margin-top: 1.5rem;
+  }
+  
+  .timelineStep {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    padding-bottom: 1.5rem;
+  }
+  
+  .timelineIcon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 2rem;
+    height: 2rem;
+    background-color: #f3f4f6;
+    border-radius: 50%;
+    color: #9ca3af;
+    margin-right: 1rem;
+    flex-shrink: 0;
+  }
+  
+  .timelineStep.completed .timelineIcon {
+    background-color: #d1fae5;
+    color: #10b981;
+  }
+  
+  .timelineContent {
+    flex: 1;
+  }
+  
+  .timelineTitle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.25rem;
+  }
+  
+  .timelineDate {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .timelineConnector {
+    position: absolute;
+    left: 1rem;
+    top: 2rem;
+    bottom: 0;
+    width: 2px;
+    background-color: #e5e7eb;
+    transform: translateX(-50%);
+  }
+  
+  .timelineStep:last-child {
+    padding-bottom: 0;
+  }
+  
+  .timelineStep:last-child .timelineConnector {
+    display: none;
+  }

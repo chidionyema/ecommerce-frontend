@@ -1,0 +1,12 @@
+# Improve dependency tree to reduce duplicates
+node-linker=hoisted
+public-hoist-pattern[]=*
+
+# Avoid saving to package.json
+save=false
+
+# Skip optional dependencies to reduce size
+omit=optional
+
+# Use clean installs
+prefer-clean=true

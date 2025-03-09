@@ -1,0 +1,112 @@
+// File: middleware.ts
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
+
+// Define which paths should be protected
+const PROTECTED_PATHS = [
+  '/dashboard',
+  '/account',
+  '/resources',
+  '/premium-content',
+  '/downloads',
+  '/advanced-features'
+];
+
+// Define which paths require an active subscription
+const SUBSCRIPTION_ONLY_PATHS = [
+  '/premium-content',
+  '/downloads',
+  '/advanced-features'
+];
+
+// Define public paths that don't need auth checks
+const PUBLIC_PATHS = [
+  '/login',
+  '/register',
+  '/',
+  '/about',
+  '/contact',
+  '/api/auth',
+  '/api/webhook',
+  '/terms',
+  '/privacy'
+];
+
+export async function middleware(req: NextRequest) {
+  // Get the pathname
+  const path = req.nextUrl.pathname;
+  
+  // Skip middleware for static files or API routes (except where we want to check auth)
+  if (
+    path.includes('.') || // Static files (images, CSS, etc.)
+    (path.startsWith('/api') && !path.startsWith('/api/protected')) // API routes that don't need auth
+  ) {
+    return NextResponse.next();
+  }
+  
+  // Skip middleware for public paths
+  if (PUBLIC_PATHS.some(pp => path.startsWith(pp))) {
+    return NextResponse.next();
+  }
+  
+  // For all other paths, check authentication
+  const isProtectedPath = PROTECTED_PATHS.some(pp => path.startsWith(pp));
+  const isSubscriptionOnlyPath = SUBSCRIPTION_ONLY_PATHS.some(pp => path.startsWith(pp));
+  
+  if (isProtectedPath || isSubscriptionOnlyPath) {
+    try {
+      // Check for session token
+      const token = await getToken({
+        req,
+        secret: process.env.NEXTAUTH_SECRET
+      });
+      
+      // Ensure we have a valid base URL for redirects
+      const baseUrl = req.nextUrl.origin;
+      
+      // Handle RefreshTokenError (user needs to sign in again)
+      if (token?.error === 'RefreshTokenError') {
+        // Clear cookies and redirect to login
+        const response = NextResponse.redirect(new URL('/api/auth/signout', baseUrl));
+        response.cookies.delete('next-auth.session-token');
+        response.cookies.delete('next-auth.callback-url');
+        response.cookies.delete('next-auth.csrf-token');
+        return response;
+      }
+      
+      // Redirect to login if not authenticated
+      if (!token) {
+        const url = new URL('/login', baseUrl);
+        url.searchParams.set('redirect', path);
+        return NextResponse.redirect(url);
+      }
+      
+      // Check for subscription for subscription-only paths
+      if (isSubscriptionOnlyPath && token.isSubscribed !== true) {
+        return NextResponse.redirect(new URL('/subscription', baseUrl));
+      }
+    } catch (error) {
+      console.error('Middleware error:', error);
+      // If something goes wrong, redirect to login as a fallback
+      return NextResponse.redirect(new URL('/login', req.nextUrl.origin));
+    }
+  }
+  
+  return NextResponse.next();
+}
+
+// Configure which paths this middleware runs on
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - images folder
+     * - public folder items
+     */
+    '/((?!_next/static|_next/image|favicon.ico|images|public).*)',
+  ],
+};

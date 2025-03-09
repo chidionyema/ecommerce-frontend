@@ -1,0 +1,36 @@
+cloudflare.ini
+# Dependency directories
+node_modules/
+.next
+.next/
+out/
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# Build files
+dist/
+build/
+
+# IDE/Editor files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db.next/cache/
+# Cloudflare build output
+.vercel/
+.cloudflare/
+
+# Dependencies
+node_modules/
+
+# Build output
+
+
+# Cache directories
+.npm
+.cache
