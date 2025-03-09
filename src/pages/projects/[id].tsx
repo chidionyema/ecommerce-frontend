@@ -904,9 +904,28 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
   const projectId = params.id;
   const project = cvProjects.find(p => p.id === projectId) || null;
   
+  // Create a serializable version of the project
+  let serializedProject = null;
+  
+  if (project) {
+    // Deep clone the project first
+    const projectClone = JSON.parse(JSON.stringify(project));
+    
+    // Replace the technologyIcons array with a serializable version
+    // (we'll map the actual components in the client-side component)
+    if (projectClone.technologyIcons) {
+      // Either remove it completely 
+      delete projectClone.technologyIcons;
+      // Or set it to an empty array if the component expects it
+      // projectClone.technologyIcons = [];
+    }
+    
+    serializedProject = projectClone;
+  }
+  
   return {
     props: {
-      project // Will be passed to the page component as props
+      project: serializedProject
     }
   };
 }
