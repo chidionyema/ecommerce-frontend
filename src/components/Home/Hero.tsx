@@ -393,43 +393,41 @@ export const HeroSection = () => {
             </Box>
           </motion.div>
 
-          {/* Main headline */}
+          {/* Main headline - more professional and slightly reduced */}
           <motion.div custom={1} variants={ANIMATIONS.item}>
             <Typography variant="h1" component="h1" color="white" sx={{
-              fontSize: { xs: '2.7rem', sm: '3.7rem', md: '4.7rem' },
-              lineHeight: 1.15, fontWeight: 800, mb: 3, mx: 'auto', maxWidth: '960px',
-              textShadow: '0 4px 15px rgba(0, 0, 0, 0.85), 0 8px 25px rgba(0, 0, 0, 0.5)',
+              fontSize: { xs: '2.5rem', sm: '3.3rem', md: '4.2rem' },
+              lineHeight: 1.2, fontWeight: 800, mb: 3, mx: 'auto', maxWidth: '900px',
+              textShadow: '0 3px 12px rgba(0, 0, 0, 0.7), 0 6px 20px rgba(0, 0, 0, 0.4)',
             }}>
-              Launch Your Enterprise Solution{' '}
+              Enterprise Solutions{' '}
               <Box component="span" sx={{
                 background: `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.main})`,
                 backgroundClip: 'text', WebkitBackgroundClip: 'text',
                 color: 'transparent', WebkitTextFillColor: 'transparent',
                 position: 'relative', display: 'inline-block', textShadow: 'none',
-                filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.7))',
+                filter: 'drop-shadow(0 3px 5px rgba(0,0,0,0.6))',
                 '&::after': {
-                  content: '""', position: 'absolute', bottom: '-4px', left: 0, width: '100%', height: '6px',
-                  background: `linear-gradient(to right, ${alpha(theme.palette.secondary.main, 0.3)}, ${alpha(theme.palette.secondary.main, 0.9)}, ${alpha(theme.palette.secondary.main, 0.3)})`,
+                  content: '""', position: 'absolute', bottom: '-4px', left: 0, width: '100%', height: '5px',
+                  background: `linear-gradient(to right, ${alpha(theme.palette.secondary.main, 0.3)}, ${alpha(theme.palette.secondary.main, 0.8)}, ${alpha(theme.palette.secondary.main, 0.3)})`,
                   borderRadius: '3px',
                 },
               }}>
-                10x Faster
-              </Box>{' '}
-              With Zero Risk
+                Delivered 10x Faster
+              </Box>
             </Typography>
           </motion.div>
 
-          {/* Subheadline */}
+          {/* Improved subheadline - more concise and professional */}
           <motion.div variants={ANIMATIONS.item}>
             <Typography variant="h2" component="h2" color="#f8f8f8" sx={{
-              fontSize: { xs: '1.25rem', sm: '1.4rem', md: '1.65rem' },
-              fontWeight: 500, lineHeight: 1.5, mb: 5.5, mx: 'auto', maxWidth: '810px',
-              textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)',
+              fontSize: { xs: '1.2rem', sm: '1.35rem', md: '1.5rem' },
+              fontWeight: 500, lineHeight: 1.5, mb: 5, mx: 'auto', maxWidth: '780px',
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.6)',
               '& strong': { fontWeight: 700, color: alpha(theme.palette.secondary.light, 0.9) }
             }}>
-              Skip the painful learning curve with <strong>production-ready architectures</strong> built by
-              the same senior engineers who've delivered mission-critical systems for
-              <strong> enterprise leaders</strong> across retail, finance, and healthcare.
+              Accelerate your time-to-market with <strong>enterprise-grade solutions</strong> architected by 
+              the same senior engineers behind mission-critical systems for <strong>industry leaders</strong>.
             </Typography>
           </motion.div>
 

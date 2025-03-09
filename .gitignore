@@ -34,3 +34,6 @@ node_modules/
 # Cache directories
 .npm
 .cache
+# Ignore webpack cache
+.tmp/
+.tmp/
