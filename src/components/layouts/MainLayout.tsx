@@ -1,7 +1,8 @@
+"use client";
+
 import React, { ReactNode } from 'react';
-import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import { 
   AppBar, 
   Box, 
@@ -47,6 +48,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   noIndex = false,
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -116,7 +118,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             key={item.label} 
             component={Link}
             href={item.path}
-            selected={router.pathname === item.path}
+            selected={pathname === item.path}
             sx={{
               '&.Mui-selected': {
                 backgroundColor: alpha(theme.palette.primary.main, 0.1),
@@ -129,7 +131,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           >
             <ListItemText 
               primary={item.label} 
-              primaryTypographyProps={{ fontWeight: router.pathname === item.path ? 'bold' : 'normal' }}
+              primaryTypographyProps={{ fontWeight: pathname === item.path ? 'bold' : 'normal' }}
             />
           </ListItem>
         ))}
@@ -147,187 +149,171 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   );
   
   return (
-    <>
-      <Head>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <meta name="keywords" content={keywords} />
-        {noIndex && <meta name="robots" content="noindex, nofollow" />}
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:image" content={ogImage} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={`https://yoursite.com${router.asPath}`} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        {/* AppBar */}
-        <AppBar 
-          position="sticky" 
-          elevation={scrolled ? 4 : 0}
-          sx={{
-            backgroundColor: scrolled 
-              ? theme.palette.mode === 'dark' 
-                ? alpha(theme.palette.background.paper, 0.9) 
-                : alpha(theme.palette.background.paper, 0.9)
-              : theme.palette.mode === 'dark'
-                ? theme.palette.background.paper
-                : theme.palette.background.paper,
-            color: theme.palette.text.primary,
-            backdropFilter: 'blur(8px)',
-            transition: 'all 0.3s',
-          }}
-        >
-          <Container maxWidth="xl">
-            <Toolbar disableGutters>
-              {/* Mobile menu icon */}
-              {isMobile && (
-                <IconButton
-                  color="inherit"
-                  aria-label="open drawer"
-                  edge="start"
-                  onClick={handleDrawerToggle}
-                  sx={{ mr: 2 }}
-                >
-                  <MenuIcon />
-                </IconButton>
-              )}
-              
-              {/* Logo */}
-              <Typography
-                variant="h6"
-                component={Link}
-                href="/"
-                sx={{
-                  mr: 2,
-                  display: { xs: 'flex' },
-                  fontWeight: 700,
-                  letterSpacing: '.1rem',
-                  color: 'inherit',
-                  textDecoration: 'none',
-                  flexGrow: { xs: 1, md: 0 }
-                }}
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {/* AppBar */}
+      <AppBar 
+        position="sticky" 
+        elevation={scrolled ? 4 : 0}
+        sx={{
+          backgroundColor: scrolled 
+            ? theme.palette.mode === 'dark' 
+              ? alpha(theme.palette.background.paper, 0.9) 
+              : alpha(theme.palette.background.paper, 0.9)
+            : theme.palette.mode === 'dark'
+              ? theme.palette.background.paper
+              : theme.palette.background.paper,
+          color: theme.palette.text.primary,
+          backdropFilter: 'blur(8px)',
+          transition: 'all 0.3s',
+        }}
+      >
+        <Container maxWidth="xl">
+          <Toolbar disableGutters>
+            {/* Mobile menu icon */}
+            {isMobile && (
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleDrawerToggle}
+                sx={{ mr: 2 }}
               >
-                GLUStack
-              </Typography>
-              
-              {/* Desktop navigation */}
-              {!isMobile && (
-                <Box sx={{ flexGrow: 1, display: 'flex', ml: 4 }}>
-                  {navItems.map((item) => (
-                    <Button
-                      key={item.label}
-                      component={Link}
-                      href={item.path}
-                      sx={{
-                        my: 2,
-                        mx: 1,
-                        color: 'inherit',
-                        display: 'block',
-                        fontWeight: router.pathname === item.path ? 'bold' : 'normal',
-                        position: 'relative',
-                        '&::after': router.pathname === item.path ? {
-                          content: '""',
-                          position: 'absolute',
-                          bottom: 10,
-                          left: '20%',
-                          width: '60%',
-                          height: '3px',
-                          backgroundColor: theme.palette.primary.main,
-                          borderRadius: '1.5px'
-                        } : {}
-                      }}
-                    >
-                      {item.label}
-                    </Button>
-                  ))}
-                </Box>
-              )}
-              
-              {/* Action icons */}
-              <Box sx={{ display: 'flex' }}>
-                <IconButton color="inherit" aria-label="search">
-                  <Search />
-                </IconButton>
-                <IconButton color="inherit" aria-label="favorites">
-                  <Badge badgeContent={4} color="error">
-                    <Favorite />
-                  </Badge>
-                </IconButton>
-                <IconButton 
-                  color="inherit" 
-                  aria-label="shopping cart"
-                  component={Link}
-                  href="/store/cart"
-                >
-                  <Badge badgeContent={3} color="error">
-                    <ShoppingCart />
-                  </Badge>
-                </IconButton>
-                <IconButton 
-                  color="inherit" 
-                  aria-label="account"
-                  component={Link}
-                  href="/account/profile"
-                >
-                  <AccountCircle />
-                </IconButton>
+                <MenuIcon />
+              </IconButton>
+            )}
+            
+            {/* Logo */}
+            <Typography
+              variant="h6"
+              component={Link}
+              href="/"
+              sx={{
+                mr: 2,
+                display: { xs: 'flex' },
+                fontWeight: 700,
+                letterSpacing: '.1rem',
+                color: 'inherit',
+                textDecoration: 'none',
+                flexGrow: { xs: 1, md: 0 }
+              }}
+            >
+              GLUStack
+            </Typography>
+            
+            {/* Desktop navigation */}
+            {!isMobile && (
+              <Box sx={{ flexGrow: 1, display: 'flex', ml: 4 }}>
+                {navItems.map((item) => (
+                  <Button
+                    key={item.label}
+                    component={Link}
+                    href={item.path}
+                    sx={{
+                      my: 2,
+                      mx: 1,
+                      color: 'inherit',
+                      display: 'block',
+                      fontWeight: pathname === item.path ? 'bold' : 'normal',
+                      position: 'relative',
+                      '&::after': pathname === item.path ? {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: 10,
+                        left: '20%',
+                        width: '60%',
+                        height: '3px',
+                        backgroundColor: theme.palette.primary.main,
+                        borderRadius: '1.5px'
+                      } : {}
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
               </Box>
-            </Toolbar>
-          </Container>
-        </AppBar>
-        
-        {/* Mobile navigation drawer */}
-        <Drawer
-          variant="temporary"
-          open={drawerOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true,
-          }}
+            )}
+            
+            {/* Action icons */}
+            <Box sx={{ display: 'flex' }}>
+              <IconButton color="inherit" aria-label="search">
+                <Search />
+              </IconButton>
+              <IconButton color="inherit" aria-label="favorites">
+                <Badge badgeContent={4} color="error">
+                  <Favorite />
+                </Badge>
+              </IconButton>
+              <IconButton 
+                color="inherit" 
+                aria-label="shopping cart"
+                component={Link}
+                href="/store/cart"
+              >
+                <Badge badgeContent={3} color="error">
+                  <ShoppingCart />
+                </Badge>
+              </IconButton>
+              <IconButton 
+                color="inherit" 
+                aria-label="account"
+                component={Link}
+                href="/account/profile"
+              >
+                <AccountCircle />
+              </IconButton>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+      
+      {/* Mobile navigation drawer */}
+      <Drawer
+        variant="temporary"
+        open={drawerOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': { 
+            boxSizing: 'border-box', 
+            width: 250 
+          },
+        }}
+      >
+        {drawer}
+      </Drawer>
+      
+      {/* Main content */}
+      <Box component="main" sx={{ flexGrow: 1 }}>
+        {children}
+      </Box>
+      
+      {/* Footer */}
+      <Footer />
+      
+      {/* Scroll to top button */}
+      {showScrollTop && (
+        <IconButton
+          onClick={scrollToTop}
           sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: 250 
+            position: 'fixed',
+            bottom: 20,
+            right: 20,
+            backgroundColor: theme.palette.primary.main,
+            color: 'white',
+            '&:hover': {
+              backgroundColor: theme.palette.primary.dark,
             },
+            zIndex: 999,
+            boxShadow: theme.shadows[4],
           }}
         >
-          {drawer}
-        </Drawer>
-        
-        {/* Main content */}
-        <Box component="main" sx={{ flexGrow: 1 }}>
-          {children}
-        </Box>
-        
-        {/* Footer */}
-        <Footer />
-        
-        {/* Scroll to top button */}
-        {showScrollTop && (
-          <IconButton
-            onClick={scrollToTop}
-            sx={{
-              position: 'fixed',
-              bottom: 20,
-              right: 20,
-              backgroundColor: theme.palette.primary.main,
-              color: 'white',
-              '&:hover': {
-                backgroundColor: theme.palette.primary.dark,
-              },
-              zIndex: 999,
-              boxShadow: theme.shadows[4],
-            }}
-          >
-            <ArrowUpward />
-          </IconButton>
-        )}
-      </Box>
-    </>
+          <ArrowUpward />
+        </IconButton>
+      )}
+    </Box>
   );
 };
 

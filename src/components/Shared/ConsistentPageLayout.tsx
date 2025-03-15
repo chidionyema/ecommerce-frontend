@@ -1,4 +1,3 @@
-'use client';
 import React from 'react';
 import { Container, styled, alpha, Button, Typography, Box } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -6,6 +5,8 @@ import PageHeader from './PageHeader';
 import SEO from '../SEO';
 import NextLink from 'next/link';
 import { Send } from 'react-feather';
+import { NavigationProgress } from './Nav/NavigationProgress';
+import UltimateScrollNavigation from './UltimateScrollNavigation';
 
 const GradientBackground = styled('div')(({ theme }) => ({
   background: `
@@ -24,7 +25,7 @@ const GradientBackground = styled('div')(({ theme }) => ({
 const PanelWrapper = styled('div')(({ theme }) => ({
   background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
   borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows,
+  boxShadow: theme.shadows[4],
   padding: theme.spacing(0.5), // Minimal padding
   marginBottom: theme.spacing(1), // Reduced margin
   textAlign: 'center',
@@ -61,6 +62,16 @@ export interface ConsistentPageLayoutProps {
   seoDescription?: string;
   seoKeywords?: string;
   children: React.ReactNode;
+  scrollOptions?: {
+    headings?: string[];
+    showSectionMenu?: boolean;
+    showProgressIndicator?: boolean;
+    primaryColor?: string;
+    secondaryColor?: string;
+    hideDelay?: number;
+    showLabels?: boolean;
+    enableSmartPositioning?: boolean;
+  };
 }
 
 const ConsistentPageLayout: React.FC<ConsistentPageLayoutProps> = ({
@@ -70,6 +81,7 @@ const ConsistentPageLayout: React.FC<ConsistentPageLayoutProps> = ({
   seoDescription = '',
   seoKeywords = '',
   children,
+  scrollOptions = {},
 }) => {
   return (
     <>
@@ -104,6 +116,18 @@ const ConsistentPageLayout: React.FC<ConsistentPageLayoutProps> = ({
           {children}
         </Container>
       </GradientBackground>
+      
+      {/* Add the UltimateScrollNavigation component */}
+      <UltimateScrollNavigation 
+        // Default settings optimized for your minimal design
+        showProgressIndicator={true}
+        showSectionMenu={true}
+        showLabels={true}
+        enableSmartPositioning={true}
+        hideDelay={2500}
+        // Allow individual pages to override any of these settings
+        {...scrollOptions}
+      />
     </>
   );
 };

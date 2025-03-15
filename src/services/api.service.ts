@@ -13,7 +13,7 @@ import axios, {
     private baseUrl: string;
   
     constructor() {
-      this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.haworks.com';
+      this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://ritualworks.com';
       
       this.client = axios.create({
         baseURL: this.baseUrl,

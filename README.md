@@ -71,7 +71,7 @@ NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-nextauth-secret
 
 # API URL
-NEXT_PUBLIC_BASE_URL=https://api.your-backend.com
+NEXT_PUBLIC_API_URL=https://api.your-backend.com
 
 # Stripe
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...

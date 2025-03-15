@@ -1,5 +1,7 @@
+"use client";
+
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -33,10 +35,11 @@ export default function CheckoutButton({
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleCheckout = async () => {
     if (!user) {
-      router.push(`/login?redirect=${encodeURIComponent(router.asPath)}`);
+      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
 

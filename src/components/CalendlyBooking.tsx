@@ -1,16 +1,19 @@
- // components/CalendlyBooking.tsx
- 'use client';  // Add this at the top
+;
+
 import { useState, useEffect, useCallback } from 'react';
 import { Box, Dialog, IconButton, CircularProgress } from '@mui/material';
 import Close from '@mui/icons-material/Close';
 import Script from 'next/script';
 
+// Update the interface to include the isOpen and onClose props
 interface CalendlyProps {
   eventTypeUrl: string;
   prefill?: {
     name?: string;
     email?: string;
   };
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 declare global {
@@ -23,14 +26,13 @@ declare global {
   }
 }
 
-export const CalendlyBooking = ({ eventTypeUrl, prefill }: CalendlyProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const CalendlyBooking = ({ eventTypeUrl, prefill, isOpen = false, onClose }: CalendlyProps) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const initCalendly = useCallback(() => {
     if (typeof window.Calendly !== 'undefined') {
       window.Calendly.initPopupWidget({
-        url: `${eventTypeUrl}?${new URLSearchParams(prefill).toString()}`
+        url: `${eventTypeUrl}?${new URLSearchParams(prefill || {}).toString()}`
       });
       setIsLoading(false);
     }
@@ -39,12 +41,18 @@ export const CalendlyBooking = ({ eventTypeUrl, prefill }: CalendlyProps) => {
   useEffect(() => {
     if (isOpen) {
       initCalendly();
+    } else if (typeof window.Calendly !== 'undefined') {
+      window.Calendly.closePopupWidget();
     }
   }, [isOpen, initCalendly]);
 
   const handleClose = () => {
-    window.Calendly?.closePopupWidget();
-    setIsOpen(false);
+    if (typeof window.Calendly !== 'undefined') {
+      window.Calendly.closePopupWidget();
+    }
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
@@ -52,40 +60,21 @@ export const CalendlyBooking = ({ eventTypeUrl, prefill }: CalendlyProps) => {
       <Script
         strategy="lazyOnload"
         src="https://assets.calendly.com/assets/external/widget.js"
-        onLoad={initCalendly}
+        onLoad={isOpen ? initCalendly : undefined}
       />
       
-      <Dialog
-        open={isOpen}
-        onClose={handleClose}
-        fullWidth
-        maxWidth="md"
-        PaperProps={{ sx: { height: '90vh' } }}
-      >
-        <Box position="relative" height="100%">
-          <IconButton
-            onClick={handleClose}
-            sx={{ position: 'absolute', right: 8, top: 8, zIndex: 1 }}
-          >
-            <Close />
-          </IconButton>
-          
-          {isLoading && (
-            <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-              <CircularProgress />
-            </Box>
-          )}
-          
-          <Box
-            id="calendly-inline-widget"
-            sx={{
-              height: '100%',
-              minHeight: '700px',
-              '.calendly-spinner': { display: 'none !important' }
-            }}
-          />
-        </Box>
-      </Dialog>
+      {isOpen && isLoading && (
+        <Dialog
+          open={true}
+          onClose={handleClose}
+          fullWidth
+          maxWidth="sm"
+        >
+          <Box display="flex" justifyContent="center" alignItems="center" p={4}>
+            <CircularProgress />
+          </Box>
+        </Dialog>
+      )}
     </>
   );
 };

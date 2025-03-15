@@ -1,4 +1,6 @@
-import { useRouter } from 'next/router';
+"use client";
+
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -12,6 +14,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireSubscription = false
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(true);
   
   // Use the auth context to access authentication state
@@ -31,7 +34,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         try {
           // If not authenticated, redirect to login
           if (!isAuthenticated || !token) {
-            router.push(`/login?redirect=${encodeURIComponent(router.asPath)}`);
+            router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
             return;
           }
 
@@ -51,7 +54,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
       checkAuth();
     }
-  }, [isAuthenticated, isSubscribed, authLoading, router, requireSubscription, token]);
+  }, [isAuthenticated, isSubscribed, authLoading, router, pathname, requireSubscription, token]);
 
   // Show loading state
   if (isLoading || authLoading) {

@@ -83,6 +83,149 @@ type TokenVerificationResult =
   | { valid: false; reason: 'invalid' | 'network' | 'server' | 'timeout'; error?: ApiError };
 
 // =====================================================================
+// Retry Logic and Circuit Breaker
+// =====================================================================
+
+// Constants for retry logic
+const MAX_RETRIES = 3;
+const BASE_DELAY = 1000; // 1 second base delay for exponential backoff
+const MAX_DELAY = 10000; // Maximum delay of 10 seconds
+
+// Circuit breaker state (shared across requests)
+let circuitState: 'closed' | 'half-open' | 'open' = 'closed';
+let lastCircuitChange = Date.now();
+const CIRCUIT_RESET_TIMEOUT = 30000; // 30 seconds before trying half-open
+
+// Function to check if circuit should transition from open to half-open
+const checkCircuitTransition = () => {
+  if (circuitState === 'open' && (Date.now() - lastCircuitChange) > CIRCUIT_RESET_TIMEOUT) {
+    console.log('[Auth Circuit] Transitioning from open to half-open');
+    circuitState = 'half-open';
+    lastCircuitChange = Date.now();
+  }
+};
+
+// Function to open the circuit
+const openCircuit = () => {
+  console.log('[Auth Circuit] Opening circuit breaker - auth service unreachable');
+  circuitState = 'open';
+  lastCircuitChange = Date.now();
+};
+
+// Function to close the circuit
+const closeCircuit = () => {
+  if (circuitState !== 'closed') {
+    console.log('[Auth Circuit] Closing circuit breaker - auth service restored');
+    circuitState = 'closed';
+    lastCircuitChange = Date.now();
+  }
+};
+
+// Function to execute requests with retry logic and circuit breaker
+async function executeWithRetry<T>(
+  requestFn: () => Promise<T>,
+  options: {
+    maxRetries?: number;
+    retryableErrors?: string[];
+    name?: string;
+    signal?: AbortSignal;
+  } = {}
+): Promise<T> {
+  // Check for circuit transition before attempting
+  checkCircuitTransition();
+  
+  // If circuit is open, fail fast
+  if (circuitState === 'open') {
+    throw {
+      message: 'Service unavailable - circuit breaker open',
+      code: 'SERVICE_UNAVAILABLE',
+      status: 503,
+      timestamp: new Date().toISOString(),
+    } as ApiError;
+  }
+  
+  const {
+    maxRetries = MAX_RETRIES,
+    retryableErrors = ['SERVICE_UNAVAILABLE', 'TIMEOUT', 'NETWORK_ERROR', 'REQUEST_TIMEOUT'],
+    name = 'API Request',
+    signal
+  } = options;
+  
+  let lastError: any;
+  let attempt = 0;
+  
+  while (attempt < maxRetries) {
+    try {
+      // Check for abort signal
+      if (signal?.aborted) {
+        throw { name: 'AbortError', message: 'Request aborted' };
+      }
+      
+      // Circuit is half-open, only allow one test request
+      if (circuitState === 'half-open' && attempt > 0) {
+        throw {
+          message: 'Service unavailable - circuit breaker in recovery',
+          code: 'SERVICE_UNAVAILABLE',
+          status: 503,
+          timestamp: new Date().toISOString(),
+        } as ApiError;
+      }
+      
+      const result = await requestFn();
+      
+      // Success - close circuit if in half-open state
+      if (circuitState === 'half-open') {
+        closeCircuit();
+      }
+      
+      return result;
+    } catch (error: any) {
+      lastError = error;
+      
+      // Check for abort - don't retry if aborted
+      if (error.name === 'AbortError' || signal?.aborted) {
+        throw { name: 'AbortError', message: 'Request aborted' };
+      }
+      
+      // Determine if we should retry based on error
+      const isRetryable = error.code && retryableErrors.includes(error.code);
+      
+      // If in half-open state and request failed, reopen circuit
+      if (circuitState === 'half-open') {
+        openCircuit();
+        break; // Don't retry if circuit reopened
+      }
+      
+      // If max failures reached and error is 503, open circuit
+      if (attempt === maxRetries - 1 && error.status === 503) {
+        openCircuit();
+      }
+      
+      // Only retry for retryable errors
+      if (!isRetryable) {
+        break;
+      }
+      
+      // Calculate exponential backoff with jitter
+      const delay = Math.min(
+        BASE_DELAY * Math.pow(2, attempt) + Math.random() * 1000,
+        MAX_DELAY
+      );
+      
+      console.warn(`[${name}] Attempt ${attempt + 1}/${maxRetries} failed: ${error.message}. Retrying in ${Math.round(delay)}ms...`);
+      
+      // Wait for backoff period before retrying
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    
+    attempt++;
+  }
+  
+  // All retries failed or non-retryable error
+  throw lastError;
+}
+
+// =====================================================================
 // Axios Instance Configuration
 // =====================================================================
 /**
@@ -231,10 +374,17 @@ export const login = async (
   credentials: { username: string; password: string }
 ): Promise<AuthResult> => {
   try {
-    const response = await api.post<ApiResponse<UserData>>(
-      '/auth/login',
-      credentials,
-      { timeout: 20000 } // Extended timeout for auth
+    // Use executeWithRetry for login to benefit from circuit breaker
+    const response = await executeWithRetry(
+      () => api.post<ApiResponse<UserData>>(
+        '/auth/login',
+        credentials,
+        { timeout: 20000 } // Extended timeout for auth
+      ),
+      {
+        name: 'Login',
+        maxRetries: 2 // Fewer retries for login to avoid multiple attempts
+      }
     );
 
     if (!response.data.data) {
@@ -263,9 +413,16 @@ export const register = async (
   }
 ): Promise<AuthResult> => {
   try {
-    const response = await api.post<ApiResponse<UserData>>(
-      '/auth/register',
-      userData
+    // Use executeWithRetry for registration
+    const response = await executeWithRetry(
+      () => api.post<ApiResponse<UserData>>(
+        '/auth/register',
+        userData
+      ),
+      {
+        name: 'Registration',
+        maxRetries: 2 // Fewer retries for registration
+      }
     );
 
     if (!response.data.data) {
@@ -284,12 +441,25 @@ export const register = async (
     };
   }
 };
-
-export const verifyToken = async (): Promise<TokenVerificationResult> => {
+export const verifyToken = async (signal?: AbortSignal): Promise<TokenVerificationResult> => {
+  console.log('[AUTH BYPASS] Returning mock successful authentication');
+  
+ 
   try {
-    const response = await api.get<ApiResponse<UserData>>(
-      '/auth/verify',
-      { timeout: 10000 }
+    // Use circuit breaker and retry logic for token verification
+    const response = await executeWithRetry(
+      () => api.get<ApiResponse<UserData>>(
+        '/auth/verify',
+        { 
+          timeout: 5000, // Reduce timeout
+          signal // Support AbortController
+        }
+      ),
+      {
+        name: 'Token Verification',
+        signal,
+        maxRetries: MAX_RETRIES
+      }
     );
 
     if (!response.data.data) {
@@ -309,7 +479,24 @@ export const verifyToken = async (): Promise<TokenVerificationResult> => {
       user: response.data.data,
       meta: response.data.meta,
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    // Type the error properly
+    const err = error as { name?: string; code?: string };
+    
+    // Handle AbortError specially
+    if (err.name === 'AbortError' || err.code === 'ECONNABORTED') {
+      return {
+        valid: false,
+        reason: 'timeout',
+        error: {
+          code: 'AUTH_VERIFICATION_TIMEOUT',
+          message: 'Authentication verification timed out',
+          status: 408
+        }
+      };
+    }
+    
+    // Safe casting after basic checks
     const apiError = error as ApiError;
     
     const result: TokenVerificationResult = {
@@ -336,6 +523,7 @@ export const verifyToken = async (): Promise<TokenVerificationResult> => {
 
 export const logout = async (): Promise<{ success: boolean }> => {
   try {
+    // Don't retry logout, just attempt once
     await api.post('/auth/logout');
   } catch (error) {
     console.error('Logout error:', error);
@@ -358,6 +546,15 @@ export const logout = async (): Promise<{ success: boolean }> => {
 
 export const loginWithProvider = async (provider: string): Promise<void> => {
   try {
+    // Check circuit state before initiating OAuth
+    if (circuitState === 'open') {
+      throw {
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'Authentication service is unavailable',
+        status: 503,
+      };
+    }
+    
     const redirectUrl = new URL('/auth/callback', window.location.origin);
     const authUrl = new URL(`/auth/provider/${provider}`, API_URL);
     
@@ -373,6 +570,54 @@ export const loginWithProvider = async (provider: string): Promise<void> => {
       status: 500,
     };
   }
+};
+
+// =====================================================================
+// Service Health Check
+// =====================================================================
+/**
+ * Check authentication service health without full verification
+ */
+export const checkAuthServiceHealth = async (): Promise<boolean> => {
+  try {
+    // Use a simple HEAD request to check service health
+    await api.head('/auth/healthcheck', {
+      timeout: 3000,
+      validateStatus: status => status < 500 // Any non-500 response is considered "available"
+    });
+    
+    // If successful, close circuit if in half-open state
+    if (circuitState === 'half-open') {
+      closeCircuit();
+    }
+    
+    return true;
+  } catch (error) {
+    console.warn('Auth service health check failed:', error);
+    
+    // If in half-open state and health check fails, reopen circuit
+    if (circuitState === 'half-open') {
+      openCircuit();
+    }
+    
+    return false;
+  }
+};
+
+// =====================================================================
+// Circuit Breaker Status
+// =====================================================================
+/**
+ * Get current circuit breaker state
+ */
+export const getCircuitState = (): { 
+  state: 'closed' | 'half-open' | 'open';
+  lastChanged: Date;
+} => {
+  return {
+    state: circuitState,
+    lastChanged: new Date(lastCircuitChange)
+  };
 };
 
 // =====================================================================
@@ -406,6 +651,8 @@ export const authService = {
   logout,
   verifyToken,
   loginWithProvider,
+  checkServiceHealth: checkAuthServiceHealth,
+  getCircuitState,
   client: api,
 };
 

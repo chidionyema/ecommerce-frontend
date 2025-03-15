@@ -4,17 +4,25 @@
 import { loadStripe, Stripe } from '@stripe/stripe-js';
 
 // Get the API URL from environment variables
-const API_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://api.local.ritualworks.com';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.local.ritualworks.com';
 const STRIPE_PUBLIC_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
 
-let stripePromise: Promise<Stripe | null>;
+// Initialize as null instead of immediately creating the promise
+let stripePromise: Promise<Stripe | null> | null = null;
 
 /**
  * Get the Stripe instance (singleton pattern)
+ * Now with improved error handling and lazy initialization
  */
 export const getStripe = () => {
   if (!stripePromise) {
-    stripePromise = loadStripe(STRIPE_PUBLIC_KEY);
+    // Create promise only when needed
+    stripePromise = loadStripe(STRIPE_PUBLIC_KEY).catch(error => {
+      console.error('Failed to load Stripe.js:', error);
+      // Reset promise so future calls will try again
+      stripePromise = null;
+      return null;
+    });
   }
   return stripePromise;
 };

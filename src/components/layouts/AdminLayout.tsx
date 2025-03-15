@@ -1,7 +1,8 @@
+"use client";
+
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import ProtectedRoute from '../auth/ProtectedRoute';
 
 interface AdminLayoutProps {
@@ -14,6 +15,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   title = 'Admin Dashboard' 
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Navigation items for the sidebar
@@ -28,11 +30,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-100">
-        <Head>
-          <title>{title}</title>
-        </Head>
-
-        {/* Mobile sidebar */}
+        {/* Mobile sidebar overlay */}
         <div 
           className={`fixed inset-0 bg-gray-600 bg-opacity-75 z-20 transition-opacity ${
             sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -40,6 +38,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           onClick={() => setSidebarOpen(false)}
         ></div>
 
+        {/* Sidebar */}
         <div 
           className={`fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform transition-transform z-30 ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -55,7 +54,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                 href={item.href} 
                 key={item.name}
                 className={`${
-                  router.pathname.startsWith(item.href)
+                  pathname && pathname.startsWith(item.href)
                     ? 'bg-gray-100 text-gray-900'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 } group flex items-center px-2 py-2 text-base font-medium rounded-md transition-colors`}
@@ -67,7 +66,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           </nav>
         </div>
 
+        {/* Main content */}
         <div className="md:pl-64 flex flex-col">
+          {/* Mobile header with menu button */}
           <div className="sticky top-0 z-10 md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-white">
             <button
               type="button"
@@ -93,6 +94,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
             </button>
           </div>
           
+          {/* Page content */}
           <main className="flex-1">
             <div className="py-6">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">

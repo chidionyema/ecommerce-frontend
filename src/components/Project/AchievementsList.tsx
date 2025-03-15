@@ -1,4 +1,4 @@
-'use client';
+;
 
 import { Grid, Typography, Stack } from '@mui/material';
 import { motion } from 'framer-motion';

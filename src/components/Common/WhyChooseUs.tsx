@@ -1,6 +1,6 @@
-'use client';
+;
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Box,
   Container,
@@ -14,6 +14,7 @@ import { Lightbulb, Rocket, ShieldCheck, TrendingUp } from 'lucide-react';
 import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
 import TechCard from '../Common/TechCard';
 import { motion, useInView } from 'framer-motion';
+import { CalendlyBooking } from '../CalendlyBooking';
 
 // Animation variants for consistent brand motion
 const ANIMATION_VARIANTS = {
@@ -87,6 +88,15 @@ const WhyChooseUs = () => {
   const styles = getSharedStyles(theme);
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const [isCalendlyOpen, setIsCalendlyOpen] = useState(false);
+
+  const handleConsultationClick = () => {
+    setIsCalendlyOpen(true);
+  };
+  
+  const handleCalendlyClose = () => {
+    setIsCalendlyOpen(false);
+  };
 
   return (
     <Box
@@ -219,7 +229,7 @@ const WhyChooseUs = () => {
                 variant="contained"
                 color="secondary"
                 size="large"
-                href="/contact"
+                onClick={handleConsultationClick}
                 sx={{
                   px: 5,
                   py: 1.6,
@@ -241,6 +251,17 @@ const WhyChooseUs = () => {
           </motion.div>
         </motion.div>
       </Container>
+
+      {/* Calendly Integration */}
+      <CalendlyBooking 
+        eventTypeUrl="https://calendly.com/glustack/consultation" 
+        prefill={{
+          name: "",
+          email: ""
+        }}
+        isOpen={isCalendlyOpen}
+        onClose={handleCalendlyClose}
+      />
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 // components/Common/CardGrid.tsx
-'use client';
+;
 
 import React from 'react';
 import { Grid, SxProps } from '@mui/material';

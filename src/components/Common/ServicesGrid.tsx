@@ -263,7 +263,7 @@ const ServicesGrid = () => {
                 variant="contained"
                 color="secondary"
                 size="large"
-                href="/services"
+                href="/solutions"
                 sx={{
                   px: 5,
                   py: 1.6,

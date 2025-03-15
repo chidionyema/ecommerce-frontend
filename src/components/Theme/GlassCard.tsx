@@ -1,4 +1,4 @@
-'use client';
+;
 
 import { styled, alpha } from '@mui/material/styles';
 import { motion } from 'framer-motion';

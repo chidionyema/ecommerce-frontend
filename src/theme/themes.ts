@@ -33,15 +33,28 @@ interface CyberAppBarThemeOptions {
   appBarUnderlineColor: string;
 }
 
-// Extend Material-UI theme with custom transitions and CyberAppBar options
+// Define ScrollNavigationOptions interface
+interface ScrollNavigationOptions {
+  backgroundGradient: string;
+  progressBarColor: string;
+  menuBackgroundColor: string;
+  activeItemColor: string;
+  buttonActiveColor: string;
+  buttonInactiveColor: string;
+  backdropBlur: string;
+}
+
+// Extend Material-UI theme with custom transitions, CyberAppBar options, and ScrollNavigation options
 declare module "@mui/material/styles" {
   interface Theme {
     customTransitions: CustomTransitions;
     cyberAppBar: CyberAppBarThemeOptions;
+    scrollNavigation: ScrollNavigationOptions;
   }
   interface ThemeOptions {
     customTransitions?: CustomTransitions;
     cyberAppBar?: Partial<CyberAppBarThemeOptions>;
+    scrollNavigation?: Partial<ScrollNavigationOptions>;
   }
 }
 
@@ -78,6 +91,39 @@ const baseThemeOptions: ThemeOptions = {
         },
       },
     },
+    // Add custom styling for the BackDrop component used in the navigation drawer
+    MuiBackdrop: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(8px)',
+        },
+      },
+    },
+    // Add custom styling for Drawer component
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundImage: 'none',
+        }
+      }
+    },
+    // Add custom styling for the tooltip component
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          fontSize: '0.75rem',
+          borderRadius: THEME_VARS.borderRadius,
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(8px)',
+          padding: '8px 12px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+        },
+        arrow: {
+          color: 'rgba(0, 0, 0, 0.85)',
+        }
+      }
+    },
   },
   customTransitions: {
     spring: { type: "spring", stiffness: 300, damping: 20, mass: 0.5 },
@@ -89,6 +135,16 @@ const baseThemeOptions: ThemeOptions = {
     appBarBorderColor: alpha(PALETTE.dark.primary, 0.2),
     appBarBoxShadow: `0 0 24px ${alpha(PALETTE.dark.primary, 0.2)}`,
     appBarUnderlineColor: GRADIENTS.tech,
+  },
+  // Add scroll navigation theme options
+  scrollNavigation: {
+    backgroundGradient: GRADIENTS.tech,
+    progressBarColor: PALETTE.dark.primary,
+    menuBackgroundColor: alpha(PALETTE.dark.paper, 0.95),
+    activeItemColor: PALETTE.dark.primary,
+    buttonActiveColor: PALETTE.dark.primary,
+    buttonInactiveColor: alpha(PALETTE.dark.paper, 0.9),
+    backdropBlur: '10px',
   },
 };
 
@@ -125,6 +181,16 @@ export const darkTheme = responsiveFontSizes(
       },
       divider: PALETTE.dark.divider,
     },
+    // Update the scroll navigation options for dark theme
+    scrollNavigation: {
+      backgroundGradient: `linear-gradient(135deg, ${PALETTE.dark.primary} 0%, ${PALETTE.dark.secondary} 100%)`,
+      progressBarColor: PALETTE.dark.primary,
+      menuBackgroundColor: alpha(PALETTE.dark.paper, 0.95),
+      activeItemColor: PALETTE.dark.primary,
+      buttonActiveColor: PALETTE.dark.primary,
+      buttonInactiveColor: alpha(PALETTE.dark.paper, 0.9),
+      backdropBlur: '10px',
+    },
   })
 );
 
@@ -155,6 +221,16 @@ export const lightTheme = responsiveFontSizes(
       },
       divider: PALETTE.light.divider,
     },
+    // Update the scroll navigation options for light theme
+    scrollNavigation: {
+      backgroundGradient: `linear-gradient(135deg, ${PALETTE.light.primary} 0%, ${PALETTE.light.secondary} 100%)`,
+      progressBarColor: PALETTE.light.primary,
+      menuBackgroundColor: alpha(PALETTE.light.paper, 0.95),
+      activeItemColor: PALETTE.light.primary,
+      buttonActiveColor: PALETTE.light.primary,
+      buttonInactiveColor: alpha(PALETTE.light.paper, 0.9),
+      backdropBlur: '10px',
+    },
   })
 );
 
@@ -181,6 +257,16 @@ export const techTheme = responsiveFontSizes(
         secondary: PALETTE.dark.textSecondary,
       },
       divider: PALETTE.dark.divider,
+    },
+    // Update the scroll navigation options for tech theme
+    scrollNavigation: {
+      backgroundGradient: GRADIENTS.tech,
+      progressBarColor: PALETTE.dark.primaryLight,
+      menuBackgroundColor: alpha(PALETTE.dark.paper, 0.95),
+      activeItemColor: PALETTE.dark.primaryLight,
+      buttonActiveColor: PALETTE.dark.primaryLight,
+      buttonInactiveColor: alpha(PALETTE.dark.paper, 0.9),
+      backdropBlur: '10px',
     },
   })
 );
@@ -219,6 +305,16 @@ export const cyberTheme = responsiveFontSizes(
         secondary: PALETTE.dark.textSecondary,
       },
       divider: PALETTE.dark.divider,
+    },
+    // Update the scroll navigation options for cyber theme with neon effect
+    scrollNavigation: {
+      backgroundGradient: GRADIENTS.tech,
+      progressBarColor: PALETTE.dark.primaryLight,
+      menuBackgroundColor: alpha(PALETTE.dark.primaryDark, 0.95),
+      activeItemColor: PALETTE.dark.primary,
+      buttonActiveColor: PALETTE.dark.primary,
+      buttonInactiveColor: alpha(PALETTE.dark.primaryDark, 0.9),
+      backdropBlur: '15px',
     },
   })
 );

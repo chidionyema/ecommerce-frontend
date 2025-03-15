@@ -1,4 +1,4 @@
-'use client';
+;
 
 import { ReactNode } from 'react';
 import { Box, useTheme } from '@mui/material';
@@ -7,7 +7,8 @@ import { alpha } from '@mui/material/styles';
 import dynamic from 'next/dynamic';
 
 // Dynamic imports to avoid SSR issues
-const NavBar = dynamic(() => import('../components/Shared/NavBar'), { ssr: false });
+import NavBar from '../components/Shared/Nav/NavBar';
+// Remove the dynamic import
 const Footer = dynamic(() => import('../components/Footer'), { ssr: false });
 
 interface GlobalLayoutProps {
@@ -20,6 +21,8 @@ const GlobalLayout = ({ children }: GlobalLayoutProps) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <NavBar />
+
+
       <MainContent component="main" sx={{ flex: 1 }}>
         {children}
       </MainContent>
