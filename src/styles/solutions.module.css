@@ -1,0 +1,207 @@
+/* ./src/styles/solutions.module.css */
+
+/* Hero Section */
+.heroSection {
+  position: relative;
+  width: 100%;
+  background-color: var(--primary-main);
+  background-image: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 600px) {
+  .heroSection {
+    height: 50vh;
+  }
+}
+
+@media (min-width: 601px) {
+  .heroSection {
+    height: 40vh;
+    border-radius: 0 0 40px 40px;
+  }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroTitle {
+  font-weight: 700;
+  color: white;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .heroTitle {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .heroTitle {
+    font-size: 3rem;
+  }
+}
+
+.heroSubtitle {
+  font-weight: 300;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 32px;
+}
+
+@media (max-width: 600px) {
+  .heroSubtitle {
+    font-size: 1.2rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .heroSubtitle {
+    font-size: 1.5rem;
+  }
+}
+
+.searchContainer {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .searchContainer {
+    flex-direction: column;
+  }
+}
+
+/* Search Input */
+.searchInput {
+  background-color: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #fff;
+  height: 56px;
+}
+
+.searchInput input {
+  color: #fff;
+}
+
+.searchInput fieldset {
+  border-color: rgba(255,255,255,0.3);
+}
+
+.selectInput {
+  background-color: rgba(255,255,255,0.15);
+  color: #fff;
+  height: 56px;
+  border-radius: 8px;
+}
+
+.selectInput fieldset {
+  border-color: rgba(255,255,255,0.3);
+}
+
+.selectInput svg {
+  color: rgba(255,255,255,0.7);
+}
+
+/* Filter Chips */
+.filtersContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+  justify-content: center;
+}
+
+.chip {
+  margin: 4px;
+}
+
+/* Statistics Boxes */
+.statisticBox {
+  text-align: center;
+  padding: 24px;
+  border-radius: 8px;
+  background-color: rgba(57, 73, 171, 0.05);
+}
+
+.statisticValue {
+  font-weight: 700;
+  color: #3949ab;
+}
+
+/* Industry Cards */
+.industryCard {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-radius: 10px;
+  height: 100%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.industryIconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: #3949ab;
+}
+
+.industryTitle {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.industryDescription {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* No Results */
+.noResultsContainer {
+  text-align: center;
+  padding: 64px 24px;
+  border-radius: 16px;
+  background-color: rgba(57, 73, 171, 0.05);
+  border: 1px dashed rgba(57, 73, 171, 0.2);
+}
+
+/* CTA Button */
+.ctaButton {
+  padding: 12px 32px;
+  border-radius: 30px;
+  font-weight: 600;
+}
+
+/* Industries Section */
+.industriesSection {
+  padding: 48px 0;
+  border-radius: 20px;
+  margin: 0 32px;
+}
+
+/* Dark mode overrides */
+:global(.darkMode) .industryCard {
+  background-color: #1e1e1e;
+}
+
+:global(.darkMode) .industryDescription {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+:global(.darkMode) .industriesSection {
+  background: linear-gradient(to bottom, #1a1a1a, #121212);
+}
+
+:global(.darkMode) .noResultsContainer {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}

@@ -1,4 +1,4 @@
-'use client';
+;
 
 import { Box, Typography, SvgIcon } from '@mui/material';
 import { motion } from 'framer-motion';

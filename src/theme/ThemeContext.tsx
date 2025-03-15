@@ -1,4 +1,4 @@
-'use client';
+;
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { darkTheme, lightTheme, techTheme, cyberTheme } from './themes';

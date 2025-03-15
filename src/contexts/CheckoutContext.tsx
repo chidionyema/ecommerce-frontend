@@ -1,6 +1,6 @@
 // File: contexts/CheckoutContext.tsx
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import { useAuth } from './AuthContext';
 import { getCart, clearCart } from '../utils/cart';
@@ -17,6 +17,8 @@ export const CheckoutProvider: React.FC<{children: React.ReactNode}> = ({ childr
   const [isGuestCheckout, setIsGuestCheckout] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   // Load cart on initial render
   useEffect(() => {
@@ -103,7 +105,7 @@ export const CheckoutProvider: React.FC<{children: React.ReactNode}> = ({ childr
 
     // If user is not authenticated and not doing guest checkout, prompt for login or guest checkout
     if (!user && !guestInfo && !isGuestCheckout) {
-      router.push(`/store/checkout?redirect=${encodeURIComponent(router.asPath)}`);
+      router.push(`/store/checkout?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
 
@@ -225,7 +227,8 @@ export const CheckoutProvider: React.FC<{children: React.ReactNode}> = ({ childr
     } finally {
       setIsProcessing(false);
     }
-  }, [user, cartItems, router, emptyCart, isGuestCheckout]);
+  }, [user, cartItems, router, emptyCart, isGuestCheckout, pathname]);
+
 // This function should accept cart items or product-quantity pairs
 const directCheckout = useCallback(async (
     items: Array<CartItem | {productId: string, quantity: number}>, 
@@ -240,7 +243,7 @@ const directCheckout = useCallback(async (
   
     // If user is not authenticated and not doing guest checkout, prompt for login or guest checkout
     if (!user && !guestInfo && !isGuestCheckout) {
-      router.push(`/store/checkout?redirect=${encodeURIComponent(router.asPath)}`);
+      router.push(`/store/checkout?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
   
@@ -368,13 +371,13 @@ const directCheckout = useCallback(async (
     } finally {
       setIsProcessing(false);
     }
-  }, [user, router, isGuestCheckout]);
+  }, [user, router, isGuestCheckout, pathname]);
 
   // Subscription checkout with specific plan
   const subscriptionCheckout = useCallback(async (plan: SubscriptionPlan, redirectPath = '/account/subscription') => {
     // Subscriptions still require authentication
     if (!user) {
-      router.push(`/login?redirect=${encodeURIComponent(router.asPath)}`);
+      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
 
@@ -447,7 +450,7 @@ const directCheckout = useCallback(async (
     } finally {
       setIsProcessing(false);
     }
-  }, [user, router]);
+  }, [user, router, pathname]);
 
   // Provide context value
   const value: CheckoutContextType = {

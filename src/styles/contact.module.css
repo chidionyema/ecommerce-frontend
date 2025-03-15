@@ -1,0 +1,420 @@
+/* contact.module.css */
+
+/* Hero Section */
+.heroContainer {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.heroTitle {
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+@media (max-width: 600px) {
+  .heroTitle {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+  .heroTitle {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 901px) {
+  .heroTitle {
+    font-size: 3.5rem;
+  }
+}
+
+.heroSubtitle {
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* Main Contact Grid */
+.contactGrid {
+  display: grid;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: stretch;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (min-width: 901px) {
+  .contactGrid {
+    grid-template-columns: 1fr 1.5fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+}
+
+/* Contact Info Section */
+.contactInfoBox {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 901px) {
+  .contactInfoBox {
+    padding: 1.5rem;
+  }
+}
+
+.contactInfoAccent {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+}
+
+.contactInfoHeader {
+  display: flex;
+  align-items: center;
+}
+
+.iconCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+}
+
+.contactInfoTitle {
+  font-weight: 700;
+  font-size: 1.8rem;
+}
+
+@media (min-width: 901px) {
+  .contactInfoTitle {
+    font-size: 2.2rem;
+  }
+}
+
+.contactInfoSubtitle {
+  margin-top: 0.5rem;
+}
+
+.contactInfoDescription {
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+/* Contact Items List */
+.contactItemsList {
+  list-style: none;
+  padding: 0;
+}
+
+.contactItem {
+  margin-bottom: 0.5rem;
+}
+
+.contactItemIcon {
+  min-width: 42px;
+}
+
+.contactItemCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.contactItemPrimary {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.contactItemSecondary {
+  font-weight: 600;
+}
+
+/* Contact Form */
+.formCard {
+  padding: 1rem;
+  border-radius: 1rem;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.formCard:hover {
+  transform: translateY(-4px);
+}
+
+@media (min-width: 600px) {
+  .formCard {
+    padding: 1.25rem;
+  }
+}
+
+@media (min-width: 901px) {
+  .formCard {
+    padding: 1.5rem;
+  }
+}
+
+.formHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.formIconCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 0.75rem;
+}
+
+.formTitle {
+  font-weight: 800;
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+
+@media (min-width: 901px) {
+  .formTitle {
+    font-size: 2.2rem;
+  }
+}
+
+.formSubtitle {
+  text-align: center;
+  max-width: 500px;
+}
+
+.formFieldsContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.textField {
+  width: 100%;
+}
+
+.textFieldInput {
+  border-radius: 0.5rem;
+  height: 54px;
+  background-color: white;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+@media (min-width: 901px) {
+  .textFieldInput {
+    height: 60px;
+  }
+}
+
+.messageField {
+  width: 100%;
+}
+
+.messageFieldInput {
+  border-radius: 0.5rem;
+  height: auto;
+  min-height: 150px;
+  background-color: white;
+  align-items: flex-start;
+  padding: 16px 14px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+@media (min-width: 901px) {
+  .messageFieldInput {
+    min-height: 180px;
+  }
+}
+
+.submitButton {
+  width: 100%;
+  padding: 0.75rem 0;
+  margin-top: 0.5rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: none;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-2px);
+}
+
+.submitButton:active {
+  transform: translateY(1px);
+}
+
+/* Testimonials Section */
+.testimonialsSection {
+  padding: 1.5rem 0;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 901px) {
+  .testimonialsSection {
+    margin-bottom: 3rem;
+  }
+}
+
+.testimonialsSectionTitle {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+  font-size: 2.2rem;
+}
+
+@media (min-width: 901px) {
+  .testimonialsSectionTitle {
+    font-size: 2.8rem;
+  }
+}
+
+.testimonialsSectionSubtitle {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.testimonialCard {
+  padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.testimonialCard:hover {
+  transform: translateY(-8px);
+}
+
+.starsContainer {
+  display: flex;
+  margin-bottom: 0.75rem;
+}
+
+.testimonialContent {
+  font-style: italic;
+  margin-bottom: 1rem;
+  line-height: 1.8;
+  flex: 1;
+  font-size: 1.05rem;
+}
+
+.testimonialAuthor {
+  display: flex;
+  align-items: center;
+}
+
+.testimonialAvatar {
+  width: 56px;
+  height: 56px;
+  margin-right: 0.5rem;
+}
+
+.testimonialName {
+  font-weight: 700;
+}
+
+/* Back to top button */
+.backToTopButton {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  transition: transform 0.3s ease;
+  z-index: 1100;
+}
+
+.backToTopButton:hover {
+  transform: scale(1.1);
+}
+
+/* Success View */
+.successContainer {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.successIconCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.successTitle {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.successMessage {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.successButton {
+  margin: 0.5rem 0;
+  padding: 0.375rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: none;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.successButton:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}

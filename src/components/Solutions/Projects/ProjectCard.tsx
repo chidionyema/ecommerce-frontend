@@ -1,19 +1,25 @@
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
+import Chip from '@mui/material/Chip';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
 import useTheme from '@mui/material/styles/useTheme';
 import { alpha } from '@mui/material/styles';
 import ArrowRightAltRounded from '@mui/icons-material/ArrowRightAltRounded';
 import StarRounded from '@mui/icons-material/StarRounded';
 import ExpandMoreRounded from '@mui/icons-material/ExpandMoreRounded';
 import ExpandLessRounded from '@mui/icons-material/ExpandLessRounded';
-import OpenInNewRounded from '@mui/icons-material/OpenInNewRounded';
-import TechnologyChip from './TechnologyChip';
-import dynamic from 'next/dynamic';
+import TimerOutlined from '@mui/icons-material/TimerOutlined';
+import AccessibilityNewOutlined from '@mui/icons-material/AccessibilityNewOutlined';
+import CloudSyncOutlined from '@mui/icons-material/CloudSyncOutlined';
+import InsightsOutlined from '@mui/icons-material/InsightsOutlined';
 import { Code as DefaultIcon } from 'lucide-react';
 
 // Types
@@ -27,16 +33,19 @@ export interface Project {
   id: string;
   name: string;
   description: string;
+  bannerImage?: string;
+  bannerText?: string;
   icon: React.ElementType | null;
   iconColor?: string;
   clientName: string;
-  metrics: Metric[];
-  technologies: string[];
+  metrics: Metric;
+  technologies: string;
   featured?: boolean;
-  imageUrl?: string;
   brandColor?: string;
-  tags?: string[];
+  tags?: string;
   background?: string;
+  impact?: string;
+  challenges?: string;
 }
 
 export interface ProjectCardProps {
@@ -47,76 +56,9 @@ export interface ProjectCardProps {
   onSelect?: (id: string) => void;
 }
 
-interface FallbackButtonProps {
-  brandColor: string;
-}
-
-interface ParticleEffectProps {
-  color: string;
-}
-
-// Dynamic imports for performance
-const StylizedButton = dynamic(() => import('./StylizedButton'), { loading: () => <div>Loading...</div> });
-const MetricCounter = dynamic(() => import('./MetricCounter'), { loading: () => <div>Loading...</div> });
-
-// Helper components
-const FallbackButton = ({ brandColor }: FallbackButtonProps) => (
-  <Box sx={{ mt: 'auto', py: 1.5, px: 3, textAlign: 'center', borderRadius: 3, 
-    background: `linear-gradient(90deg, ${brandColor}, ${alpha(brandColor, 0.8)})`, color: '#fff', fontWeight: 700 }}>
-    View Case Study
-  </Box>
-);
-
-const ParticleEffect = ({ color }: ParticleEffectProps) => {
-  const particles = Array.from({ length: 12 }, (_, i) => i);
-  
-  return (
-    <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
-      {particles.map((_, index) => {
-        const size = Math.floor(Math.random() * 3) + 2;
-        const duration = Math.floor(Math.random() * 15) + 10;
-        
-        return (
-          <Box
-            key={index}
-            component={motion.div}
-            sx={{
-              position: 'absolute',
-              width: `${size}px`,
-              height: `${size}px`,
-              borderRadius: '50%',
-              backgroundColor: color,
-              filter: `blur(${size > 3 ? 1 : 0}px)`,
-              opacity: Math.random() * 0.5 + 0.2,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-            }}
-            initial={{ y: 0, x: 0 }}
-            animate={{
-              y: [0, -(Math.random() * 50 + 20), 0],
-              x: [0, (Math.random() * 40 - 20), 0],
-            }}
-            transition={{
-              duration,
-              repeat: Infinity,
-              delay: Math.random() * 5,
-              ease: "easeInOut",
-              times: [0, 0.5, 1]
-            }}
-          />
-        );
-      })}
-    </Box>
-  );
-};
-
-// Utility function
-const hexToRgb = (hex: string): string => {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '75, 123, 236';
-};
-
-// Main component
+/**
+ * Refined ProjectCard component with minimalist design and purposeful interactions
+ */
 const ProjectCard = ({
   project,
   sx = {},
@@ -125,177 +67,126 @@ const ProjectCard = ({
   onSelect
 }: ProjectCardProps) => {
   const theme = useTheme();
-  // Fixed cardRef type to properly handle HTMLDivElement
-  const cardRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [showSpotlight, setShowSpotlight] = useState(false);
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1, rootMargin: "50px 0px" });
-  
-  // Computed values
-  const imageUrl = project.imageUrl || '/images/placeholder.jpg';
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
+
+  // Design constants
+  const SPACING = 2.5; // Reduced spacing
+  const RADIUS = 10; // Reduced radius for more rectangular appearance
+  const TRANSITION = {
+    standard: 'all 0.35s cubic-bezier(0.2, 0, 0, 1)',
+    spring: { type: 'spring', stiffness: 70, damping: 18 }
+  };
+
+  // Design variables
+  const bannerImage = project.bannerImage
+    ? `/images/${project.bannerImage}`
+    : '/images/placeholder.jpg';
+
   const brandColor = project.brandColor || theme.palette.primary.main;
   const brandColorLight = alpha(brandColor, 0.15);
   const isDarkMode = theme.palette.mode === 'dark';
-  
-  // Effects and handlers
+
+  // Image loading effect
   useEffect(() => {
     if (priority || inView) {
       const img = new Image();
-      img.src = imageUrl;
-      img.onload = img.onerror = () => setImageLoaded(true);
-      if (project.background && !project.imageUrl) setImageLoaded(true);
+      img.src = bannerImage;
+      img.onload = () => setImageLoaded(true);
+      img.onerror = () => setImageLoaded(true);
+      if (project.background && !project.bannerImage) setImageLoaded(true);
     }
-    if (cardRef.current) cardRef.current.style.setProperty('--primary-rgb', hexToRgb(brandColor));
-  }, [priority, inView, imageUrl, project.background, brandColor]);
+  }, [priority, inView, bannerImage, project.background]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    if (!showSpotlight) setShowSpotlight(true);
-  };
-  
-  const handleMouseLeave = () => {
-    setIsHovering(false);
-    setShowSpotlight(false);
-  };
-
+  // Event handlers
   const toggleExpand = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setExpanded(!expanded);
   };
 
-  const handleCardClick = () => {
-    if (onSelect) onSelect(project.id);
-  };
-
+  // Helper functions
   const renderIcon = () => {
     try {
       if (project.icon) {
         const Icon = project.icon;
-        return <Icon size={24} color={project.iconColor || brandColor} />;
+        return <Icon size={20} color={project.iconColor || brandColor} />;
       }
-      return <DefaultIcon size={24} color={brandColor} />;
-    } catch (error) {
-      return <DefaultIcon size={24} color={brandColor} />;
+      return <DefaultIcon size={20} color={brandColor} />;
+    } catch {
+      return <DefaultIcon size={20} color={brandColor} />;
     }
   };
 
-  // 3D rotation values
-  const rotateX = isHovering ? ((mousePosition.y / (cardRef.current?.clientHeight || 1)) - 0.5) * 5 : 0;
-  const rotateY = isHovering ? ((mousePosition.x / (cardRef.current?.clientWidth || 1)) - 0.5) * -5 : 0;
+  const getMetricIcon = (label: string) => {
+    const lowerLabel = label.toLowerCase();
+    if (lowerLabel.includes('time')) return <TimerOutlined fontSize="small" />;
+    if (lowerLabel.includes('accessibility')) return <AccessibilityNewOutlined fontSize="small" />;
+    if (lowerLabel.includes('deployment') || lowerLabel.includes('frequency')) return <CloudSyncOutlined fontSize="small" />;
+    return <InsightsOutlined fontSize="small" />;
+  };
+
+  const getTechIcon = (techName: string) => {
+    const techMapping: Record<string, string> = {
+      'React': '/images/tech/react.svg',
+      'TypeScript': '/images/tech/typescript.svg',
+      'Node.js': '/images/tech/nodejs.svg',
+      'JavaScript': '/images/tech/javascript.svg',
+      'HTML': '/images/tech/html.svg',
+      'CSS': '/images/tech/css.svg',
+    };
+
+    return techMapping[techName] || null;
+  };
 
   // Early return if not in view
-  if (!inView) return <Box ref={ref} sx={{ ...sx, m: { xs: 1, sm: 2 } }} />;
+  if (!inView) return <Box ref={ref} sx={{ ...sx, my: SPACING }} />;
 
-  // Card content
   return (
-    <Box ref={ref} sx={{ perspective: '1200px', m: { xs: 1, sm: 2 }, transition: 'all 0.3s ease', transformStyle: 'preserve-3d', ...sx }}>
+    <Box ref={ref} sx={{ width: '100%', my: SPACING, ...sx }}>
       <motion.div
-        initial={{ opacity: 0, y: 50, rotateX: 5 }}
-        animate={{ opacity: 1, y: 0, rotateX: 0 }}
-        transition={{ type: 'spring', stiffness: 100, damping: 20, delay: delay * 0.1 }}
-        style={{ transformStyle: 'preserve-3d', transform: `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`, transition: 'transform 0.1s ease' }}
+        initial={{ opacity: 0, y: 15 }} // Reduced animation distance
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...TRANSITION.spring, delay: delay * 0.1 }}
       >
-        <Box
-          ref={cardRef}
-          onClick={handleCardClick}
+        <Card
+          elevation={0}
           onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={handleMouseLeave}
-          onMouseMove={handleMouseMove}
+          onMouseLeave={() => setIsHovering(false)}
+          onClick={() => onSelect?.(project.id)}
           sx={{
-            width: { xs: '320px', sm: '360px', md: '380px' },
-            height: expanded ? 'auto' : { xs: '450px', sm: '480px', md: '500px' },
-            borderRadius: 4,
-            position: 'relative',
+            width: '100%',
+            height: { xs: 'auto', sm: 'auto', md: '620px', lg: '680px' }, // Adjusted card height
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: RADIUS,
             overflow: 'hidden',
-            cursor: 'pointer',
-            boxShadow: isHovering 
-              ? `0 25px 50px -12px ${alpha(brandColor, 0.35)}, 0 0 30px ${alpha(brandColor, 0.1)}`
-              : `0 15px 30px -5px ${alpha(theme.palette.common.black, 0.2)}`,
-            transition: 'all 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67)',
-            transform: isHovering ? 'translateY(-10px) scale(1.02)' : 'translateY(0) scale(1)',
-            '&::before': project.featured ? {
-              content: '""',
-              position: 'absolute',
-              inset: 0,
-              zIndex: 0,
-              borderRadius: 'inherit',
-              padding: '2px',
-              background: `linear-gradient(45deg, ${brandColor}, ${alpha(theme.palette.secondary.main, 0.7)})`,
-              backgroundSize: '400% 400%',
-              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-              WebkitMaskComposite: 'xor',
-              maskComposite: 'exclude',
-            } : {},
+            transition: TRANSITION.standard,
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: isHovering
+              ? `0 10px 20px -6px ${alpha(theme.palette.common.black, 0.12)}, 0 4px 12px -4px ${alpha(theme.palette.common.black, 0.08)}`
+              : `0 4px 12px -6px ${alpha(theme.palette.common.black, 0.06)}`,
+            border: project.featured ? `1px solid ${alpha(brandColor, 0.15)}` : `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+            transform: isHovering ? 'translateY(-4px)' : 'none', // Reduced hover lift
           }}
         >
-          {/* Spotlight effect */}
-          {showSpotlight && (
-            <Box sx={{
-              position: 'absolute',
-              top: mousePosition.y,
-              left: mousePosition.x,
-              width: '350px',
-              height: '350px',
-              borderRadius: '50%',
-              background: `radial-gradient(circle, ${alpha(brandColor, 0.15)} 0%, transparent 70%)`,
-              transform: 'translate(-50%, -50%)',
-              pointerEvents: 'none',
-              zIndex: 1,
-              opacity: 0.8,
-            }} />
-          )}
-
-          {/* Particle effect for featured projects */}
-          {project.featured && <ParticleEffect color={brandColor} />}
-
-          {/* Featured Badge */}
-          {project.featured && (
-            <Box
-              component={motion.div}
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3, type: 'spring', stiffness: 100 }}
-              sx={{
-                position: 'absolute',
-                top: 16,
-                right: 16,
-                zIndex: 9,
-                px: 2,
-                py: 0.8,
-                borderRadius: '30px',
-                background: `linear-gradient(135deg, ${alpha('#FFD700', 0.95)}, ${alpha('#FFA500', 0.95)})`,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.8,
-                color: '#000',
-                fontWeight: 700,
-                fontSize: '0.8rem',
-                transform: isHovering ? 'scale(1.05)' : 'scale(1)',
-                transition: 'transform 0.3s ease',
-              }}
-            >
-              <motion.div animate={{ rotate: [0, 5, 0, -5, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}>
-                <StarRounded sx={{ fontSize: '1rem', color: '#000' }} />
-              </motion.div>
-              <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.85rem' }}>Featured</Typography>
-            </Box>
-          )}
-
-          {/* Image/Background Section */}
-          <Box sx={{ height: '200px', width: '100%', position: 'relative', overflow: 'hidden' }}>
+          {/* Banner Image Section */}
+          <Box sx={{ position: 'relative', width: '100%', height: { xs: '220px', sm: '260px', md: '320px' }, overflow: 'hidden' }}> {/* Increased banner height */}
             {/* Loading Skeleton */}
             {!imageLoaded && (
-              <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', 
-                bgcolor: alpha(theme.palette.background.default, 0.1), }} />
+              <Box sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                bgcolor: alpha(theme.palette.background.default, 0.08),
+              }} />
             )}
 
-            {/* Background/Image */}
+            {/* Banner Image with Overlay */}
             {imageLoaded && (
               <Box sx={{
                 position: 'absolute',
@@ -304,13 +195,20 @@ const ProjectCard = ({
                 width: '100%',
                 height: '100%',
                 background: project.background || 'transparent',
-                transform: isHovering ? 'scale(1.08)' : 'scale(1)',
-                transition: 'transform 0.7s cubic-bezier(0.17, 0.67, 0.83, 0.67)',
               }}>
-                {!project.background && (
-                  <Box component="img" src={imageUrl} alt={project.name} 
-                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                )}
+                <Box
+                  component="img"
+                  src={bannerImage}
+                  alt={project.name}
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                    transition: 'transform 0.5s ease',
+                    transform: isHovering ? 'scale(1.02)' : 'scale(1)', // Subtle scale effect
+                  }}
+                />
 
                 {/* Gradient overlay */}
                 <Box sx={{
@@ -319,170 +217,170 @@ const ProjectCard = ({
                   left: 0,
                   width: '100%',
                   height: '100%',
-                  background: `linear-gradient(to bottom, 
-                      ${alpha(theme.palette.common.black, isHovering ? 0.2 : 0.3)}, 
-                      ${alpha(theme.palette.common.black, isHovering ? 0.7 : 0.8)})`,
-                  transition: 'all 0.5s ease',
-                  zIndex: 1,
+                  background: `linear-gradient(to bottom,
+                    ${alpha(theme.palette.common.black, 0)},
+                    ${alpha(theme.palette.common.black, 0.3)} 60%,
+                    ${alpha(theme.palette.common.black, 0.7)})`, // Adjusted overlay
                 }} />
               </Box>
             )}
 
-            {/* Client Info Overlay */}
+            {/* Banner Overlay Content */}
             <Box sx={{
               position: 'absolute',
               bottom: 0,
               left: 0,
-              p: 2.5,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.5,
-              zIndex: 2,
               width: '100%',
+              p: SPACING,
+              zIndex: 2,
             }}>
-              <Box
-                component={motion.div}
-                whileHover={{ scale: 1.15, rotateZ: [0, -5, 5, 0], transition: { duration: 0.5 } }}
-                sx={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: '12px',
-                  bgcolor: alpha('#fff', 0.92),
+              {/* Featured Badge */}
+              {project.featured && (
+                <Chip
+                  icon={<StarRounded sx={{ color: '#000 !important', fontSize: '1rem' }} />}
+                  label="Featured"
+                  size="small"
+                  sx={{
+                    mb: 1.5, // Reduced margin
+                    height: '24px', // Smaller badge
+                    fontWeight: 600,
+                    fontSize: '0.7rem', // Smaller text
+                    background: `linear-gradient(135deg, ${alpha('#FFD700', 0.95)}, ${alpha('#FFA500', 0.95)})`,
+                    color: '#000',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    '& .MuiChip-icon': { color: '#000' }
+                  }}
+                />
+              )}
+
+              {/* Banner Text */}
+              {project.bannerText && (
+                <Typography
+                  variant="h6" // Reduced from h5
+                  component="h2"
+                  sx={{
+                    color: '#fff',
+                    fontWeight: 700,
+                    mb: 1, // Reduced margin
+                    textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                    letterSpacing: '-0.01em',
+                    fontSize: '1.1rem', // Controlled font size
+                  }}
+                >
+                  {project.bannerText}
+                </Typography>
+              )}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}> {/* Reduced gap */}
+                <Box sx={{
+                  width: 32, // Smaller icon container
+                  height: 32,
+                  borderRadius: RADIUS / 2,
+                  bgcolor: alpha('#fff', 0.95),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: `0 4px 15px ${alpha(theme.palette.common.black, 0.25)}`,
-                  border: `1px solid ${alpha(brandColor, 0.6)}`,
-                  transform: isHovering ? 'scale(1.1) translateY(-4px)' : 'scale(1) translateY(0)',
-                  transition: 'all 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67)',
-                }}
-              >
-                {renderIcon()}
+                  boxShadow: `0 2px 6px ${alpha(theme.palette.common.black, 0.2)}`,
+                }}>
+                  {renderIcon()}
+                </Box>
+                <Typography
+                  variant="subtitle1" // Changed from h6
+                  sx={{
+                    color: '#fff',
+                    fontWeight: 600,
+                    textShadow: '0 1px 2px rgba(0,0,0,0.4)',
+                    fontSize: '0.95rem', // Controlled font size
+                  }}
+                >
+                  {project.clientName}
+                </Typography>
               </Box>
-
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  color: '#fff',
-                  fontWeight: 700,
-                  textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                  fontSize: '1.1rem',
-                  transform: isHovering ? 'translateY(-2px)' : 'translateY(0)',
-                  transition: 'all 0.4s ease',
-                }}
-              >
-                {project.clientName}
-              </Typography>
             </Box>
           </Box>
 
-          {/* Content Section */}
-          <Box
-            sx={{
-              p: 2.5,
-              pt: 3,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2.5,
-              position: 'relative',
-              background: isDarkMode 
-                ? `linear-gradient(to bottom, ${alpha(theme.palette.background.paper, 0.85)}, ${alpha(theme.palette.background.paper, 0.97)})`
-                : theme.palette.background.paper,
-              height: expanded ? 'auto' : 'calc(100% - 200px)',
-            }}
-          >
+          <CardContent sx={{
+            p: SPACING,
+            pt: 1.5, // Reduced top padding
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
             {/* Project Title */}
             <Typography
-              variant="h5"
-              component={motion.h2}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + delay * 0.1, duration: 0.5 }}
+              variant="h6" // Changed from h5
+              component="h2"
               sx={{
-                fontSize: { xs: '1.25rem', sm: '1.4rem' },
-                fontWeight: 800,
-                lineHeight: 1.3,
+                fontWeight: 700,
+                mb: 2, // Reduced margin
                 position: 'relative',
-                pb: 1.5,
+                pb: 1, // Reduced padding
+                letterSpacing: '-0.01em',
+                fontSize: '1.15rem', // Controlled font size
                 '&::after': {
                   content: '""',
                   position: 'absolute',
                   left: 0,
                   bottom: 0,
-                  width: isHovering ? '80px' : '60px',
-                  height: '4px',
-                  background: `linear-gradient(90deg, ${brandColor}, ${alpha(brandColor, 0.5)})`,
-                  borderRadius: '4px',
-                  transition: 'width 0.4s ease',
+                  width: '40px', // Shorter underline
+                  height: '2px', // Thinner underline
+                  background: brandColor,
+                  borderRadius: '2px',
                 }
               }}
             >
               {project.name}
             </Typography>
 
-            {/* Key Metrics */}
+            {/* Metrics Section */}
             {project.metrics?.length > 0 && (
               <Box
-                component={motion.div}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + delay * 0.1, duration: 0.5 }}
                 sx={{
-                  display: 'flex',
-                  gap: 2,
-                  justifyContent: 'space-between',
-                  px: 2,
-                  py: 2,
-                  borderRadius: 3,
-                  background: isDarkMode 
-                    ? alpha(theme.palette.background.default, 0.6)
-                    : alpha(theme.palette.background.default, 0.8),
-                  border: `1px solid ${alpha(brandColor, 0.2)}`,
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)', // Fixed 3-column grid for consistency
+                  gap: 1, // Reduced gap
+                  mb: 2, // Reduced margin
+                  p: 1.5, // Reduced padding
+                  borderRadius: RADIUS / 2,
+                  background: alpha(brandColorLight, 0.3),
                 }}
               >
-                {project.metrics.slice(0, 3).map((metric, index) => (
+                {project.metrics.map((metric, index) => (
                   <Tooltip key={index} title={metric.description || metric.label} arrow placement="top">
                     <Box
                       sx={{
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        flex: 1,
-                        position: 'relative',
-                        zIndex: 3,
-                        '&::after': index < project.metrics.length - 1 ? {
-                          content: '""',
-                          position: 'absolute',
-                          right: -8,
-                          top: '20%',
-                          height: '60%',
-                          width: '1px',
-                          background: alpha(theme.palette.divider, 0.6),
-                        } : {},
+                        textAlign: 'center',
+                        padding: 0.75, // Reduced padding
+                        borderRadius: 1,
+                        transition: 'all 0.2s ease',
                       }}
                     >
-                      <Suspense fallback={
-                        <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.3rem', color: brandColor }}>
-                          {metric.value}
-                        </Typography>
-                      }>
-                        <MetricCounter
-                          value={metric.value}
-                          color={brandColor}
-                          isVisible={inView}
-                          delay={index * 0.2 + 0.5}
-                          sx={{
-                            fontWeight: 800,
-                            fontSize: '1.3rem',
-                            background: `linear-gradient(90deg, ${brandColor}, ${theme.palette.secondary.main})`,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                          }}
-                        />
-                      </Suspense>
-                      <Typography variant="caption" sx={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600, 
-                        letterSpacing: 0.5, opacity: 0.8, mt: 0.5 }}>
-                        {metric.label.split(' ')[0]}
+                      <Box sx={{ color: brandColor, mb: 0.75 }}> {/* Reduced margin */}
+                        {getMetricIcon(metric.label)}
+                      </Box>
+                      <Typography
+                        variant="subtitle1" // Changed from h6
+                        sx={{
+                          fontWeight: 700,
+                          color: brandColor,
+                          mb: 0.25, // Reduced margin
+                          fontSize: '1rem', // Smaller font size
+                        }}
+                      >
+                        {metric.value}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          textTransform: 'uppercase',
+                          fontWeight: 600,
+                          letterSpacing: 0.5,
+                          fontSize: '0.65rem', // Smaller font size
+                        }}
+                      >
+                        {metric.label}
                       </Typography>
                     </Box>
                   </Tooltip>
@@ -490,213 +388,178 @@ const ProjectCard = ({
               </Box>
             )}
 
-            {/* Project Description */}
-            <Box 
-              component={motion.div}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + delay * 0.1, duration: 0.5 }}
-            >
-              <AnimatePresence initial={false}>
-                {expanded ? (
-                  <motion.div
-                    key="expanded"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.95rem', lineHeight: 1.7, pb: 1 }}>
-                      {project.description}
-                    </Typography>
-                  </motion.div>
-                ) : (
-                  <motion.div key="collapsed">
-                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.95rem', display: '-webkit-box',
-                      WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.7, mb: 1 }}>
-                      {project.description}
-                    </Typography>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </Box>
-
-            {/* Technology Stack */}
-            <Box
-              component={motion.div}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 + delay * 0.1, duration: 0.5 }}
+            {/* Description */}
+            <Typography
+              variant="body2" // Changed from body1
               sx={{
-                borderRadius: 3,
-                p: 2,
-                background: alpha(brandColorLight, isDarkMode ? 0.2 : 0.5),
-                border: `1px solid ${alpha(brandColor, 0.2)}`,
-                position: 'relative',
-                transition: 'all 0.3s ease',
-                transform: isHovering ? 'translateY(-4px)' : 'translateY(0)',
-                boxShadow: isHovering ? `0 8px 20px -5px ${alpha(brandColor, 0.25)}` : 'none',
+                mb: 2, // Reduced margin
+                fontSize: '0.875rem', // Smaller font
+                lineHeight: 1.6,
+                display: '-webkit-box',
+                WebkitLineClamp: 3, // Show fewer lines
+                WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
+                height: '4.2rem', // Reduced height
+                color: theme.palette.text.primary,
               }}
             >
+              {project.description}
+            </Typography>
+
+            {/* Expandable Content */}
+            <AnimatePresence initial={false}>
+              {expanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25 }} // Faster transition
+                >
+                  <Box sx={{ display: 'grid', gap: 2, mb: 2 }}> {/* Reduced spacing */}
+                    {/* Challenges Section */}
+                    {project.challenges && (
+                      <Box>
+                        <Typography variant="subtitle2" sx={{
+                          fontWeight: 700,
+                          mb: 0.75, // Reduced margin
+                          color: brandColor,
+                          fontSize: '0.8rem', // Smaller font
+                        }}>
+                          Challenges
+                        </Typography>
+                        <Typography variant="body2" sx={{
+                          lineHeight: 1.5,
+                          fontSize: '0.8rem', // Smaller font
+                        }}>
+                          {project.challenges}
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {/* Impact Section */}
+                    {project.impact && (
+                      <Box>
+                        <Typography variant="subtitle2" sx={{
+                          fontWeight: 700,
+                          mb: 0.75, // Reduced margin
+                          color: brandColor,
+                          fontSize: '0.8rem', // Smaller font
+                        }}>
+                          Impact
+                        </Typography>
+                        <Typography variant="body2" sx={{
+                          lineHeight: 1.5,
+                          fontSize: '0.8rem', // Smaller font
+                        }}>
+                          {project.impact}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Technology Stack */}
+            <Box sx={{ mb: 1.5, mt: 'auto' }}> {/* Reduced margin */}
               <Typography
-                variant="caption"
-                fontWeight={700}
+                variant="caption" // Changed from subtitle2
                 sx={{
-                  fontSize: '0.75rem',
-                  color: isDarkMode ? theme.palette.text.secondary : alpha(theme.palette.text.primary, 0.7),
-                  display: 'flex',
-                  alignItems: 'center',
-                  mb: 1.5,
-                  zIndex: 2,
-                  position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    display: 'inline-block',
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    background: brandColor,
-                    mr: 1,
-                  }
+                  fontWeight: 700,
+                  mb: 1, // Reduced margin
+                  color: alpha(theme.palette.text.primary, 0.7),
+                  display: 'block',
+                  fontSize: '0.7rem', // Smaller font
                 }}
               >
                 TECHNOLOGIES
               </Typography>
+              <Box sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 0.75, // Reduced gap
+                maxHeight: '66px', // Limited height
+                overflow: 'hidden'
+              }}>
+                {project.technologies.map((tech, index) => {
+                  const iconPath = getTechIcon(tech);
 
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 0.8,
-                  maxHeight: expanded ? '200px' : '80px',
-                  overflowY: expanded ? 'auto' : 'hidden',
-                  position: 'relative',
-                  zIndex: 2,
-                  '&::after': !expanded ? {
-                    content: '""',
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: '35px',
-                    background: `linear-gradient(to top, ${alpha(brandColorLight, 0.95)}, transparent)`,
-                    pointerEvents: 'none',
-                    zIndex: 1,
-                  } : {},
-                }}
-              >
-                {project.technologies.map((tech, index) => (
-                  <TechnologyChip
-                    key={index}
-                    tech={tech}
-                    isHovering={isHovering}
-                    brandColor={brandColor}
-                    index={index}
-                  />
-                ))}
-              </Box>
-
-              {/* Show more/less button */}
-              {project.technologies.length > 6 && (
-                <Box
-                  onClick={toggleExpand}
-                  component={motion.div}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 0.5,
-                    mt: 1.5,
-                    py: 0.8,
-                    borderRadius: 2,
-                    cursor: 'pointer',
-                    color: brandColor,
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
-                    background: alpha(brandColor, 0.05),
-                    '&:hover': { background: alpha(brandColor, 0.15) },
-                    zIndex: 2,
-                    position: 'relative',
-                  }}
-                >
-                  {expanded ? (
-                    <>
-                      <ExpandLessRounded sx={{ fontSize: '1.1rem' }} />
-                      Show Less
-                    </>
-                  ) : (
-                    <>
-                      <ExpandMoreRounded sx={{ fontSize: '1.1rem' }} />
-                      Show All ({project.technologies.length})
-                    </>
-                  )}
-                </Box>
-              )}
-            </Box>
-
-            {/* CTA Button */}
-            <Suspense fallback={<FallbackButton brandColor={brandColor} />}>
-              <Box component={motion.div}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + delay * 0.1, duration: 0.5 }}>
-                <StylizedButton
-                  href={`/projects/${project.id}`}
-                  label="View Case Study"
-                  endIcon={
-                    <ArrowRightAltRounded
+                  return (
+                    <Chip
+                      key={index}
+                      avatar={iconPath ? <Avatar src={iconPath} alt={tech} sx={{ bgcolor: 'transparent', width: 20, height: 20 }} /> : null}
+                      label={tech}
+                      size="small"
                       sx={{
-                        transition: 'transform 0.3s ease',
-                        transform: isHovering ? 'translateX(4px)' : 'translateX(0)',
+                        fontWeight: 500,
+                        fontSize: '0.7rem', // Smaller font
+                        height: '24px', // Smaller chip
+                        bgcolor: alpha(brandColor, 0.08),
+                        color: isDarkMode ? alpha(brandColor, 0.9) : brandColor,
+                        border: `1px solid ${alpha(brandColor, 0.15)}`,
+                        transition: 'all 0.2s ease',
+                        '& .MuiChip-label': {
+                          px: 1, // Reduced padding
+                        }
                       }}
                     />
-                  }
-                  isHovering={isHovering}
-                  brandColor={brandColor}
-                  sx={{ mt: 'auto', py: 1.5, borderRadius: 3, fontWeight: 700 }}
-                />
+                  );
+                })}
               </Box>
-            </Suspense>
-          </Box>
+            </Box>
+          </CardContent>
 
-          {/* Quick view button */}
-          {isHovering && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.2 }}
+          <CardActions sx={{
+            px: SPACING,
+            pb: SPACING,
+            pt: 0,
+            justifyContent: 'space-between',
+            borderTop: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+          }}>
+            <Button
+              onClick={toggleExpand}
+              startIcon={expanded ? <ExpandLessRounded fontSize="small" /> : <ExpandMoreRounded fontSize="small" />}
+              sx={{
+                color: alpha(theme.palette.text.primary, 0.7),
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.8rem', // Smaller font
+                '&:hover': {
+                  color: brandColor,
+                }
+              }}
             >
-              <IconButton
-                aria-label="Quick view"
-                component={motion.button}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={(e: React.MouseEvent) => {
-                  e.stopPropagation();
-                  handleCardClick();
-                }}
-                sx={{
-                  position: 'absolute',
-                  bottom: 16,
-                  right: 16,
-                  zIndex: 10,
-                  width: 44,
-                  height: 44,
-                  background: alpha(brandColor, 0.85),
-                  color: '#fff',
-                  boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.3)}`,
-                  '&:hover': { background: alpha(brandColor, 0.95) },
-                }}
-              >
-                <OpenInNewRounded fontSize="small" />
-              </IconButton>
-            </motion.div>
-          )}
-        </Box>
+              {expanded ? 'Show Less' : 'Learn More'}
+            </Button>
+
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onSelect?.(project.id);
+              }}
+              endIcon={<ArrowRightAltRounded fontSize="small" />}
+              variant="contained"
+              size="small" // Smaller button
+              sx={{
+                bgcolor: brandColor,
+                fontWeight: 600,
+                textTransform: 'none',
+                borderRadius: RADIUS / 2,
+                px: 1.5, // Reduced padding
+                boxShadow: 'none',
+                fontSize: '0.8rem', // Smaller font
+                '&:hover': {
+                  bgcolor: alpha(brandColor, 0.9),
+                  boxShadow: `0 2px 6px ${alpha(brandColor, 0.25)}`,
+                },
+                transition: TRANSITION.standard,
+              }}
+            >
+              Case Study
+            </Button>
+          </CardActions>
+        </Card>
       </motion.div>
     </Box>
   );

@@ -48,7 +48,7 @@ Generate a comprehensive, fully automated, secure, and highly available Kubernet
   - **On-Prem:** Rancher-managed clusters or K3s (v1.27+)
 
 - **Infrastructure as Code (IaC):**  
-  - **Terraform with Terragrunt** for modular, multi-cloud provisioning.
+  - **Terraform ** for modular, multi-cloud provisioning.
   - **Ansible or Puppet** for configuration management and on-prem automation (using Kubeadm or Rancher).
   - (Optional) **Pulumi** for cloud-native IaC.
   - **Kubernetes Cluster Federation (KubeFed)** for multi-cluster workload scheduling.
@@ -331,3 +331,7 @@ Generate a comprehensive, fully automated, secure, and highly available Kubernet
 ---
 
 🔥 **This prompt ensures that the LLM produces a fully comprehensive, production-ready Kubernetes infrastructure automation plan that covers every critical aspect—from infrastructure provisioning and security to CI/CD, observability, cost optimization, disaster recovery, and performance tuning—with no gaps or future dependencies.** 🚀
+
+
+CRITICAL ENPHASIS ON  TESTING, PROVING RESLIIENCCE, RELIABILITY, ROBUSTNES, SEANLESS USEr EPERIENCE , SECURITY AND CONPLIANCCE EVERYTHIG AUTONATED
+

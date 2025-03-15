@@ -1,5 +1,5 @@
 // components/Particles.tsx
-'use client';
+;
 
 import { useEffect, useRef } from 'react';
 import { alpha } from '@mui/material/styles';

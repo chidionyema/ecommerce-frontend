@@ -1,0 +1,12 @@
+// middleware.ts (Ultra-Minimal Matcher)
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export const config = {
+  matcher: '/:path*', // Match all paths
+}
+
+export function middleware(request: NextRequest) {
+  console.log('Minimal Middleware Intercepted:', request.nextUrl.pathname);
+  return NextResponse.next();
+}

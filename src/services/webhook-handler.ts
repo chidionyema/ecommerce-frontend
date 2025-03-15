@@ -68,7 +68,7 @@ async function handleInvoicePaymentSucceeded(event: Stripe.Event): Promise<boole
     console.log(`Processing invoice payment for subscription: ${invoice.subscription}`);
     
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/Subscription/webhook-update`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/Subscription/webhook-update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ async function handleSubscriptionUpdated(event: Stripe.Event): Promise<boolean> 
   console.log(`Processing subscription update: ${subscription.id}`);
   
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/Subscription/webhook-update`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/Subscription/webhook-update`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ async function handleSubscriptionDeleted(event: Stripe.Event): Promise<boolean> 
   console.log(`Processing subscription cancellation: ${subscription.id}`);
   
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/Subscription/webhook-cancel`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/Subscription/webhook-cancel`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -177,7 +177,7 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<boolea
   // Only process payment intents with metadata
   if (paymentIntent.metadata && paymentIntent.metadata.orderId) {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/Checkout/payment-success`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/Checkout/payment-success`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ async function notifyBackendOfSubscriptionCheckout(session: Stripe.Checkout.Sess
       throw new Error('No user ID found in session metadata');
     }
     
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/Subscription/webhook-update`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/Subscription/webhook-update`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -249,7 +249,7 @@ async function notifyBackendOfSubscriptionCheckout(session: Stripe.Checkout.Sess
 async function notifyBackendOfOneTimeCheckout(session: Stripe.Checkout.Session): Promise<boolean> {
   try {
     // For one-time checkouts, we need to notify our payment processing service
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/Checkout/session-completed`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/Checkout/session-completed`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,5 +1,5 @@
 // components/Timeline/ApproachTimeline.tsx
-'use client';
+;
 
 import { Box, Typography, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
