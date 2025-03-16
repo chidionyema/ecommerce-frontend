@@ -2,9 +2,9 @@
 ;
 
 import Head from 'next/head';
-import ProtectedRoute from '../components/auth/ProtectedRoute';
-import PricingTable from '../components/subscription/PricingTable';
-import { useAuth } from '../contexts/AuthContext';
+import ProtectedRoute from '../../components/auth/ProtectedRoute';
+import PricingTable from '../../components/subscription/PricingTable';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Sample pricing plans
 const plans = [
