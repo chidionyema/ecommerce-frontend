@@ -5,7 +5,7 @@ import { getSharedStyles, ANIMATIONS } from '../../utils/designSystem';
 import { Star, FileText, Download, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import TechCard from '../Common/TechCard';
 
-// Testimonials data remains unchanged
+// Testimonials data
 const testimonials = [
   { 
     id: 1, 
@@ -100,7 +100,7 @@ const TestimonialsSection = () => {
       <TechCard
         icon={avatarIcon}
         title=""
-        accentColor={theme.palette.secondary.main}
+        accentColor={theme.palette.primary.main} // Changed from secondary to primary
         importance="primary"
         sx={{
           pt: 5,
@@ -116,9 +116,9 @@ const TestimonialsSection = () => {
             position: 'absolute', 
             top: 8, 
             right: 8,
-            backgroundColor: alpha(theme.palette.secondary.main, 0.15),
-            borderColor: alpha(theme.palette.secondary.main, 0.2),
-            color: theme.palette.secondary.main, 
+            backgroundColor: alpha(theme.palette.primary.main, 0.15), // Changed from secondary to primary
+            borderColor: alpha(theme.palette.primary.main, 0.2), // Changed from secondary to primary
+            color: theme.palette.primary.main, // Changed from secondary to primary
             fontWeight: 600, 
             fontSize: '0.7rem',
           }} 
@@ -129,8 +129,8 @@ const TestimonialsSection = () => {
         <Rating 
           value={testimonial.rating} 
           readOnly 
-          icon={<Star style={{ color: theme.palette.secondary.main, fill: theme.palette.secondary.main }} size={18} />}
-          emptyIcon={<Star style={{ color: alpha(theme.palette.secondary.main, 0.3) }} size={18} />}
+          icon={<Star style={{ color: theme.palette.primary.main, fill: theme.palette.primary.main }} size={18} />} // Changed from secondary to primary
+          emptyIcon={<Star style={{ color: alpha(theme.palette.primary.main, 0.3) }} size={18} />} // Changed from secondary to primary
           sx={{ mb: 2, mt: 0.5, display: 'flex', justifyContent: 'center' }}
         />
         
@@ -162,7 +162,7 @@ const TestimonialsSection = () => {
             variant="h6" 
             sx={{
               fontWeight: 700, 
-              color: theme.palette.secondary.main, 
+              color: theme.palette.primary.main, // Changed from secondary to primary
               fontSize: '1.1rem',
             }}
           >
@@ -297,7 +297,7 @@ const TestimonialsSection = () => {
                 {/* Secondary CTA - View More/Less Testimonials */}
                 <Button 
                   variant="outlined" 
-                  color="secondary" 
+                  color="primary" // Changed from secondary to primary
                   onClick={() => setShowAll(!showAll)} 
                   endIcon={showAll ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   sx={{
