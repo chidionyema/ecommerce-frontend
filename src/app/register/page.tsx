@@ -1,8 +1,9 @@
+"use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
-import RegisterForm from '../components/auth/RegisterForm';
-import { useAuth } from '../contexts/AuthContext';
+import RegisterForm from '../../components/auth/RegisterForm';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function RegisterPage() {
   const router = useRouter();
