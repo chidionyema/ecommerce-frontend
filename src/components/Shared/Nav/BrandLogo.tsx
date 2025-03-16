@@ -1,4 +1,5 @@
-import { memo, useState } from 'react';
+// components/navigation/BrandLogo.tsx
+import React, { memo, useState } from 'react';
 import Link from 'next/link';
 import { Box, Paper, Stack, Typography, useTheme, alpha } from '@mui/material';
 import { Cpu } from 'lucide-react';
@@ -15,7 +16,7 @@ const BrandLogo = memo(() => {
         sx={{
           transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
           transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
-          cursor: 'pointer',
+          cursor: 'pointer', // Added for better UX
           textDecoration: 'none',
         }}
         onMouseEnter={() => { setIsHovered(true); setTextHovered(true); }}

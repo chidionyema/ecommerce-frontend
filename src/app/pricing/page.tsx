@@ -434,9 +434,10 @@ export default function PricingPage() {
                 <Paper elevation={0} sx={{
                   borderRadius: 3, p: 3, height: '100%', border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                   transition: 'all 0.2s ease',
+                  bgcolor: index % 2 === 0 ? 'background.paper' : alpha(theme.palette.primary.main, 0.1),
                   '&:hover': {
                     borderColor: alpha(theme.palette.primary.main, 0.2),
-                    bgcolor: alpha(theme.palette.primary.main, 0.02),
+                    bgcolor: index % 2 === 0 ? alpha(theme.palette.primary.main, 0.03) : alpha(theme.palette.primary.main, 0.15),
                     transform: 'translateY(-4px)',
                     boxShadow: '0 8px 28px rgba(0, 0, 0, 0.05)'
                   }

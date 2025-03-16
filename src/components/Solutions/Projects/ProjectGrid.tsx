@@ -165,8 +165,7 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({ projects = [], spacing = 6 })
         {useGridLayout ? (
           <Grid
             container
-            // Increase horizontal space by increasing columnSpacing value
-            columnSpacing={{ xs: spacing, md: spacing + 8 }}
+            columnSpacing={{ xs: spacing, md: spacing + 8 }} // Increased horizontal spacing here
             rowSpacing={spacing}
             sx={{ mt: 1 }}
           >
@@ -233,7 +232,9 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({ projects = [], spacing = 6 })
                   Loading more projects
                 </Typography>
               </Box>
-            ) : <Box sx={{ height: '50px' }} />}
+            ) : (
+              <Box sx={{ height: '50px' }} />
+            )}
           </Box>
         )}
 

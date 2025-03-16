@@ -1,5 +1,3 @@
-;
-
 import { useNavigation } from '../../../contexts/NavigationContext';
 import { Spinner } from '../Spinner';
 
@@ -15,13 +13,13 @@ export const NavLink = ({
   children,
   ...props
 }: NavLinkProps) => {
- 
+
 
   const handleClick = (e: React.MouseEvent) => {
-  
-    
+
+
     e.preventDefault();
-   
+
   };
 
   return (
