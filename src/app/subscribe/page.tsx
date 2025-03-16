@@ -13,10 +13,10 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import NextLink from 'next/link';
 import { loadStripe } from '@stripe/stripe-js';
-import { useAuth } from '../contexts/AuthContext';
-import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
-import PageSection from '../components/PageSection';
-import { getSharedStyles, SPACING } from '../utils/sharedStyles';
+import { useAuth } from '../../contexts/AuthContext';
+import ConsistentPageLayout from '../../components/Shared/ConsistentPageLayout';
+import PageSection from '../../components/PageSection';
+import { getSharedStyles, SPACING } from '../../utils/sharedStyles';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
