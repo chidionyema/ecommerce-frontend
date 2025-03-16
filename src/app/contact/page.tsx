@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEventHandler } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as yup from 'yup';
 import {
@@ -103,8 +103,8 @@ export default function Contact() {
     else if (custom) setFormData(prev => ({ ...prev, message: "I'm interested in discussing a custom solution for my business." }));
   }, [searchParams]);
 
-  // Form submission handler
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // Form submission handler - changed to match FormEventHandler<HTMLDivElement>
+  const handleSubmit: FormEventHandler<HTMLDivElement> = async (e) => {
     e.preventDefault();
     setErrors({});
 
