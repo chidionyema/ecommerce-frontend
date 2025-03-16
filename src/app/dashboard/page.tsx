@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import ProtectedRoute from '../components/auth/ProtectedRoute';
-import { useAuth } from '../contexts/AuthContext';
+import ProtectedRoute from '../../components/auth/ProtectedRoute';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function DashboardPage() {
   const { user, isSubscribed } = useAuth();
