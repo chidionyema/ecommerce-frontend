@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, FormEventHandler } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as yup from 'yup';
 import {
@@ -67,7 +67,7 @@ const BackToTopButton = () => {
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className={styles.backToTopButton}
         sx={{ 
-          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
           boxShadow: `0 4px 14px ${alpha('#000', 0.15)}`,
           transition: iveStyles.transition,
           '&:hover': { 
@@ -103,24 +103,27 @@ export default function Contact() {
     else if (custom) setFormData(prev => ({ ...prev, message: "I'm interested in discussing a custom solution for my business." }));
   }, [searchParams]);
 
-  // Form submission handler - changed to match FormEventHandler<HTMLDivElement>
-  const handleSubmit: FormEventHandler<HTMLDivElement> = async (e) => {
+  // Form submission handler
+  // Using a more generic event type to prevent conflicts
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     setErrors({});
 
-    try {
-      await validationSchema.validate(formData, { abortEarly: false });
-      setLoading(true);
-      setTimeout(() => { setLoading(false); setSuccess(true); }, 1500);
-    } catch (err) {
-      if (err instanceof yup.ValidationError) {
-        const validationErrors: Record<string, string> = {};
-        err.inner.forEach(error => { if (error.path) validationErrors[error.path] = error.message; });
-        setErrors(validationErrors);
-      } else {
-        setErrors({ form: 'An unexpected error occurred. Please try again.' });
+    (async () => {
+      try {
+        await validationSchema.validate(formData, { abortEarly: false });
+        setLoading(true);
+        setTimeout(() => { setLoading(false); setSuccess(true); }, 1500);
+      } catch (err) {
+        if (err instanceof yup.ValidationError) {
+          const validationErrors: Record<string, string> = {};
+          err.inner.forEach(error => { if (error.path) validationErrors[error.path] = error.message; });
+          setErrors(validationErrors);
+        } else {
+          setErrors({ form: 'An unexpected error occurred. Please try again.' });
+        }
       }
-    }
+    })();
   };
 
   // Input change handler
@@ -141,7 +144,7 @@ export default function Contact() {
     <Box sx={{ display: 'flex' }}>
       {Array(5).fill(0).map((_, i) => (
         <icons.starIcon key={i} sx={{ 
-          color: i < rating ? theme.palette.secondary.main : alpha(theme.palette.divider, 0.5),
+          color: i < rating ? theme.palette.primary.main : alpha(theme.palette.divider, 0.5),
           fontSize: '1.2rem', mr: 0.5
         }} />
       ))}
@@ -195,7 +198,7 @@ export default function Contact() {
               onClick={() => router.push('/')}
               className={styles.successButton}
               sx={{ 
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                 boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
                 borderRadius: '12px',
                 textTransform: 'none',
@@ -229,7 +232,7 @@ export default function Contact() {
                 component="h1"
                 className={styles.heroTitle}
                 sx={{ 
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   mb: 2,
@@ -272,7 +275,7 @@ export default function Contact() {
                 }
               }}>
                 <Box className={styles.contactInfoAccent} sx={{ 
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                   position: 'absolute',
                   top: 0,
                   left: 0,
@@ -402,7 +405,7 @@ export default function Contact() {
                 >
                   <Box className={styles.formHeader} sx={{ mb: 4, textAlign: 'center' }}>
                     <Box className={styles.formIconCircle} sx={{ 
-                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                       width: 64,
                       height: 64,
                       borderRadius: '50%',
@@ -509,7 +512,7 @@ export default function Contact() {
                         mt: 2,
                         height: 52,
                         borderRadius: '12px',
-                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                         boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
                         textTransform: 'none',
                         fontWeight: 600,
