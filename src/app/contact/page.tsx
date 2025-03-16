@@ -89,7 +89,7 @@ export default function Contact() {
   
   // State
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
@@ -104,7 +104,7 @@ export default function Contact() {
   }, [searchParams]);
 
   // Form submission handler
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrors({});
 
@@ -114,7 +114,7 @@ export default function Contact() {
       setTimeout(() => { setLoading(false); setSuccess(true); }, 1500);
     } catch (err) {
       if (err instanceof yup.ValidationError) {
-        const validationErrors = {};
+        const validationErrors: Record<string, string> = {};
         err.inner.forEach(error => { if (error.path) validationErrors[error.path] = error.message; });
         setErrors(validationErrors);
       } else {
@@ -124,7 +124,7 @@ export default function Contact() {
   };
 
   // Input change handler
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
@@ -137,7 +137,7 @@ export default function Contact() {
   };
 
   // Star rating helper
-  const renderStars = (rating) => (
+  const renderStars = (rating: number) => (
     <Box sx={{ display: 'flex' }}>
       {Array(5).fill(0).map((_, i) => (
         <icons.starIcon key={i} sx={{ 
