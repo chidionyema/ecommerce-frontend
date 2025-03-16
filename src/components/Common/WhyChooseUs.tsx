@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { Box, Container, Typography, Grid, useTheme, alpha, Button, Paper } from '@mui/material';
-import { Lightbulb, Rocket, ShieldCheck, TrendingUp, FileText, Video, Calendar } from 'lucide-react';
+import { Box, Container, Typography, Grid, useTheme, alpha, Button, Paper, Divider } from '@mui/material';
+import { Lightbulb, Rocket, ShieldCheck, TrendingUp, FileText, Video, Calendar, Download, ExternalLink } from 'lucide-react';
 import { getSharedStyles, ANIMATIONS } from '../../utils/designSystem';
 import TechCard from '../Common/TechCard';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
@@ -132,61 +132,113 @@ const WhyChooseUs = () => {
             ))}
           </Grid>
 
-          {/* Strategic blue CTA section - matching hero CTA card */}
+          {/* Combined CTA section */}
           <motion.div variants={ANIMATIONS.item}>
-            <Paper elevation={4} sx={styles.ctaCard}>
-              <Typography 
-                variant="h5" 
-                align="center" 
-                fontWeight={700} 
-                mb={2} 
-                color={theme.palette.primary.main}
-              >
-                Enterprise Resources Library
-              </Typography>
-              
-              <Grid container spacing={2} sx={{ mb: 3 }}>
-                {resources.map((resource, i) => (
-                  <Grid item xs={12} sm={6} key={i}>
-                    <BlueCheckmarkItem text={resource.title} Icon={resource.icon} />
+            <TechCard
+              title="Take the Next Step"
+              importance="primary"
+              sx={{
+                ...styles.ctaCard,
+                background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(theme.palette.background.paper, 0.8)})`,
+                mt: 6
+              }}
+            >
+              <Grid container spacing={3}>
+                {/* Left side: Resources */}
+                <Grid item xs={12} md={7} sx={{ 
+                  borderRight: { xs: 'none', md: `1px solid ${alpha(theme.palette.divider, 0.1)}` },
+                  pb: { xs: 3, md: 0 }
+                }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      color: theme.palette.primary.main, 
+                      mb: 2, 
+                      fontWeight: 600 
+                    }}
+                  >
+                    Enterprise Resources Library
+                  </Typography>
+                  
+                  <Grid container spacing={1}>
+                    {resources.map((resource, i) => (
+                      <Grid item xs={12} sm={6} key={i}>
+                        <BlueCheckmarkItem text={resource.title} Icon={resource.icon} />
+                      </Grid>
+                    ))}
                   </Grid>
-                ))}
+                  
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    startIcon={<Download size={16} />}
+                    href="/resources" 
+                    sx={{
+                      mt: 2,
+                      px: 3, 
+                      py: 1, 
+                      textTransform: 'none', 
+                      fontWeight: 600, 
+                      fontSize: '0.95rem', 
+                      borderRadius: 2,
+                    }}
+                  >
+                    Access Enterprise Resources
+                  </Button>
+                </Grid>
+                
+                {/* Right side: Consultation CTA */}
+                <Grid item xs={12} md={5} sx={{ 
+                  borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.1)}`, md: 'none' },
+                  pt: { xs: 3, md: 0 },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                  <Box sx={{ textAlign: 'center', maxWidth: '90%' }}>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        color: theme.palette.secondary.main, 
+                        mb: 2, 
+                        fontWeight: 600 
+                      }}
+                    >
+                      Ready to Transform Your Business?
+                    </Typography>
+                    
+                    <Typography 
+                      variant="body1" 
+                      sx={{ 
+                        mb: 3,
+                        color: theme.palette.text.primary 
+                      }}
+                    >
+                      Book a no-obligation consultation with our enterprise experts and discover tailored solutions for your specific challenges.
+                    </Typography>
+                    
+                    <Button 
+                      variant="contained" 
+                      color="secondary" 
+                      size="large"
+                      endIcon={<Calendar size={16} strokeWidth={2} />}
+                      onClick={() => setIsCalendlyOpen(true)} 
+                      sx={{
+                        px: 4,
+                        py: 1.5,
+                        textTransform: 'none', 
+                        fontWeight: 600, 
+                        fontSize: '1rem', 
+                        borderRadius: 2
+                      }}
+                    >
+                      Schedule a Consultation
+                    </Button>
+                  </Box>
+                </Grid>
               </Grid>
-              
-              <Box sx={{ textAlign: 'center' }}>
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  href="/resources" 
-                  sx={{
-                    px: 3, 
-                    py: 1, 
-                    textTransform: 'none', 
-                    fontWeight: 600, 
-                    fontSize: '0.95rem', 
-                    borderRadius: 2
-                  }}
-                >
-                  Access Enterprise Resources
-                </Button>
-              </Box>
-            </Paper>
-          </motion.div>
-
-          {/* CTA Button - matches hero button styling */}
-          <motion.div variants={ANIMATIONS.item}>
-            <Box sx={{ textAlign: 'center', mt: 4 }}>
-              <Button 
-                variant="contained" 
-                color="secondary" 
-                size="large" 
-                endIcon={<Calendar size={16} strokeWidth={2} />}
-                onClick={() => setIsCalendlyOpen(true)} 
-                sx={styles.primaryButton}
-              >
-                Schedule a Consultation
-              </Button>
-            </Box>
+            </TechCard>
           </motion.div>
         </motion.div>
       </Container>
