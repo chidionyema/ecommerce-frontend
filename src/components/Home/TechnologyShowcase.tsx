@@ -84,6 +84,14 @@ const TECH_ITEMS = [
   }
 ];
 
+// CTA resources data - styled with blue from CTA card
+const RESOURCE_ITEMS = [
+  'Weekly technical tutorials',
+  'Code snippets & templates',
+  'Architecture best practices',
+  'Security & performance tips'
+];
+
 // Sub-components with reduced complexity
 const FeatureItem = memo(({ icon: Icon, text }) => (
   <Box display="flex" alignItems="flex-start" gap={2} my={2}>
@@ -224,12 +232,47 @@ const CategoryButton = memo(({ category, isActive, onClick }) => (
   </Button>
 ));
 
+// Blue CTA-style checkmark component - styled like the CTA card
+const BlueCheckmarkItem = memo(({ text }) => {
+  const theme = useTheme();
+  
+  return (
+    <Box 
+      sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: 1.5,
+        mb: 1.5
+      }}
+    >
+      <Box 
+        sx={{ 
+          width: 20, 
+          height: 20, 
+          borderRadius: '50%', 
+          backgroundColor: theme.palette.primary.main,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontSize: '0.8rem',
+          fontWeight: 'bold'
+        }}
+      >
+        ✓
+      </Box>
+      <Typography color="white">{text}</Typography>
+    </Box>
+  );
+});
+
 // Set display names for debugging
 FeatureItem.displayName = 'FeatureItem';
 ExtraFeatureItem.displayName = 'ExtraFeatureItem';
 PlanCard.displayName = 'PlanCard';
 TechCardItem.displayName = 'TechCardItem';
 CategoryButton.displayName = 'CategoryButton';
+BlueCheckmarkItem.displayName = 'BlueCheckmarkItem';
 
 // Main component with simplified structure
 const TechnologyShowcase = () => {
@@ -316,9 +359,101 @@ const TechnologyShowcase = () => {
             ))}
           </Grid>
 
+          {/* Strategic blue CTA resource section - styled like the blue CTA card */}
+          <motion.div variants={ANIMATIONS.item}>
+            <Paper
+              elevation={4}
+              sx={{
+                mt: 6,
+                mb: 6,
+                mx: 'auto',
+                maxWidth: '800px',
+                p: 4,
+                borderRadius: 3,
+                background: alpha(theme.palette.background.paper, 0.95),
+                backdropFilter: 'blur(10px)',
+                boxShadow: `0 10px 30px ${alpha(theme.palette.common.black, 0.2)}`,
+                border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
+              }}
+            >
+              <Typography 
+                variant="h5" 
+                component="h3" 
+                fontWeight={700} 
+                mb={1}
+                align="center"
+                color={theme.palette.primary.main}
+              >
+                Free Enterprise Resources
+              </Typography>
+              
+              <Typography 
+                variant="body1" 
+                color={theme.palette.text.secondary} 
+                mb={3}
+                align="center"
+              >
+                Get access to free resources, tutorials, and code samples from our enterprise library.
+              </Typography>
+              
+              {/* Blue CTA-style resource features with grid layout */}
+              <Grid container spacing={2} sx={{ mb: 3 }}>
+                {RESOURCE_ITEMS.map((item, index) => (
+                  <Grid item xs={12} md={6} key={index}>
+                    <Box 
+                      sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 1.5,
+                        mb: 1.5
+                      }}
+                    >
+                      <Box 
+                        sx={{ 
+                          width: 20, 
+                          height: 20, 
+                          borderRadius: '50%', 
+                          backgroundColor: theme.palette.primary.main,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'white',
+                          fontSize: '0.8rem',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        ✓
+                      </Box>
+                      <Typography color={theme.palette.text.primary}>{item}</Typography>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+              
+              {/* Blue CTA-style button */}
+              <Box sx={{ textAlign: 'center' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  href="/resources"
+                  sx={{
+                    px: 4,
+                    py: 1.5,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    borderRadius: 2,
+                  }}
+                >
+                  Access Free Resources
+                </Button>
+              </Box>
+            </Paper>
+          </motion.div>
+
           {/* CTA Button */}
           <motion.div variants={ANIMATIONS.item}>
-            <Box sx={{ textAlign: 'center', mt: 8 }}>
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
               <Button
                 variant="contained"
                 color="secondary"

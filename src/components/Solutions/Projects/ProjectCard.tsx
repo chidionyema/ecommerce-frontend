@@ -5,11 +5,9 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
 import useTheme from '@mui/material/styles/useTheme';
 import { alpha } from '@mui/material/styles';
 import ArrowRightAltRounded from '@mui/icons-material/ArrowRightAltRounded';
@@ -21,6 +19,72 @@ import AccessibilityNewOutlined from '@mui/icons-material/AccessibilityNewOutlin
 import CloudSyncOutlined from '@mui/icons-material/CloudSyncOutlined';
 import InsightsOutlined from '@mui/icons-material/InsightsOutlined';
 import { Code as DefaultIcon } from 'lucide-react';
+
+// Import all technologyIconMap icons
+import {
+  Shield, Building2, DollarSign, Landmark, Cloud, CircuitBoard, Cpu, Server, Key, Settings, Mail,
+  Terminal, Database, Code2, GitBranch, Box as BoxIcon, Layers, Code, BarChart3, Network
+} from 'lucide-react';
+
+// Define technologyIconMap in the component since import might be failing
+const technologyIconMap = {
+  ".NET Core": { 
+    icon: Code,  
+    color: '#512bd4'  // .NET purple
+  },
+  "Java": {
+    icon: Terminal,
+    color: '#007396'  // Java blue
+  },
+  "AWS": {
+    icon: Cloud,
+    color: '#FF9900'  // AWS orange
+  },
+  "Docker": {
+    icon: Server,
+    color: '#2496ED'  // Docker blue
+  },
+  "Kubernetes": {
+    icon: Cloud,
+    color: '#326CE5'  // Kubernetes blue
+  },
+  "React": {
+    icon: CircuitBoard,
+    color: '#61DAFB'  // React cyan
+  },
+  "TypeScript": {
+    icon: Code2,
+    color: '#3178C6'  // TypeScript blue
+  },
+  "CQRS": {
+    icon: Database,
+    color: '#7B68EE'  // Medium slate blue
+  },
+  "Azure": {
+    icon: Cloud,
+    color: '#0078D4'  // Azure blue
+  },
+  "Terraform": {
+    icon: Settings,
+    color: '#7B42BC'  // Terraform purple
+  },
+  "RabbitMQ": {
+    icon: Network,
+    color: '#FF6600'  // RabbitMQ orange
+  },
+  "Microservices": {
+    icon: BoxIcon,
+    color: '#43A047'  // Green
+  },
+  "CI/CD": {
+    icon: GitBranch,
+    color: '#F05033'  // Git red
+  },
+  "Analytics": {
+    icon: BarChart3,
+    color: '#1976D2'  // Blue
+  }
+};
 
 // Types
 export interface Metric {
@@ -35,14 +99,14 @@ export interface Project {
   description: string;
   bannerImage?: string;
   bannerText?: string;
-  icon: React.ElementType | null;
+  icon?: React.ElementType | null;
   iconColor?: string;
-  clientName: string;
-  metrics: Metric;
-  technologies: string;
+  clientName?: string;
+  metrics?: Metric[];
+  technologies?: string[];
   featured?: boolean;
   brandColor?: string;
-  tags?: string;
+  tags?: string[];
   background?: string;
   impact?: string;
   challenges?: string;
@@ -56,9 +120,6 @@ export interface ProjectCardProps {
   onSelect?: (id: string) => void;
 }
 
-/**
- * Refined ProjectCard component with minimalist design and purposeful interactions
- */
 const ProjectCard = ({
   project,
   sx = {},
@@ -73,20 +134,20 @@ const ProjectCard = ({
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   // Design constants
-  const SPACING = 2.5; // Reduced spacing
-  const RADIUS = 10; // Reduced radius for more rectangular appearance
+  const SPACING = 2;
+  const RADIUS = 2; // Modern sharp edges
   const TRANSITION = {
-    standard: 'all 0.35s cubic-bezier(0.2, 0, 0, 1)',
-    spring: { type: 'spring', stiffness: 70, damping: 18 }
+    standard: 'all 0.3s cubic-bezier(0.2, 0, 0.2, 1)',
+    spring: { type: 'spring', stiffness: 60, damping: 15 }
   };
 
   // Design variables
-  const bannerImage = project.bannerImage
+  const bannerImage = project?.bannerImage
     ? `/images/${project.bannerImage}`
     : '/images/placeholder.jpg';
 
-  const brandColor = project.brandColor || theme.palette.primary.main;
-  const brandColorLight = alpha(brandColor, 0.15);
+  const brandColor = project?.brandColor || theme.palette.primary.main;
+  const brandColorLight = alpha(brandColor, 0.12);
   const isDarkMode = theme.palette.mode === 'dark';
 
   // Image loading effect
@@ -96,9 +157,9 @@ const ProjectCard = ({
       img.src = bannerImage;
       img.onload = () => setImageLoaded(true);
       img.onerror = () => setImageLoaded(true);
-      if (project.background && !project.bannerImage) setImageLoaded(true);
+      if (project?.background && !project?.bannerImage) setImageLoaded(true);
     }
-  }, [priority, inView, bannerImage, project.background]);
+  }, [priority, inView, bannerImage, project?.background]);
 
   // Event handlers
   const toggleExpand = (e: React.MouseEvent) => {
@@ -110,35 +171,47 @@ const ProjectCard = ({
   // Helper functions
   const renderIcon = () => {
     try {
-      if (project.icon) {
-        const Icon = project.icon;
-        return <Icon size={20} color={project.iconColor || brandColor} />;
+      if (project?.icon) {
+        // Instead of assuming icon is a component, render it explicitly
+        const iconColor = project?.iconColor || brandColor;
+        
+        // Handle both string color formats (like "text-blue-600") and regular colors
+        const colorValue = iconColor.startsWith('text-') 
+          ? iconColor // Use the text class directly if it's a Tailwind class
+          : iconColor; // Otherwise use the color value
+          
+        // Create the icon
+        return React.createElement(project.icon, { 
+          size: 28, 
+          color: colorValue,
+          className: iconColor.startsWith('text-') ? iconColor : undefined
+        });
       }
-      return <DefaultIcon size={20} color={brandColor} />;
-    } catch {
-      return <DefaultIcon size={20} color={brandColor} />;
+      return <DefaultIcon size={28} color={brandColor} />;
+    } catch (error) {
+      console.error('Error rendering icon:', error);
+      return <DefaultIcon size={28} color={brandColor} />;
     }
   };
 
   const getMetricIcon = (label: string) => {
     const lowerLabel = label.toLowerCase();
-    if (lowerLabel.includes('time')) return <TimerOutlined fontSize="small" />;
-    if (lowerLabel.includes('accessibility')) return <AccessibilityNewOutlined fontSize="small" />;
-    if (lowerLabel.includes('deployment') || lowerLabel.includes('frequency')) return <CloudSyncOutlined fontSize="small" />;
-    return <InsightsOutlined fontSize="small" />;
+    
+    // Apply color to metric icons
+    const iconColor = project?.brandColor || brandColor;
+    
+    if (lowerLabel.includes('time')) return <TimerOutlined fontSize="small" style={{ color: iconColor }} />;
+    if (lowerLabel.includes('accessibility')) return <AccessibilityNewOutlined fontSize="small" style={{ color: iconColor }} />;
+    if (lowerLabel.includes('deployment') || lowerLabel.includes('frequency')) return <CloudSyncOutlined fontSize="small" style={{ color: iconColor }} />;
+    return <InsightsOutlined fontSize="small" style={{ color: iconColor }} />;
   };
 
+  // Helper for tech icons
   const getTechIcon = (techName: string) => {
-    const techMapping: Record<string, string> = {
-      'React': '/images/tech/react.svg',
-      'TypeScript': '/images/tech/typescript.svg',
-      'Node.js': '/images/tech/nodejs.svg',
-      'JavaScript': '/images/tech/javascript.svg',
-      'HTML': '/images/tech/html.svg',
-      'CSS': '/images/tech/css.svg',
-    };
-
-    return techMapping[techName] || null;
+    if (technologyIconMap && technologyIconMap[techName]) {
+      return technologyIconMap[techName].icon;
+    }
+    return null;
   };
 
   // Early return if not in view
@@ -147,7 +220,7 @@ const ProjectCard = ({
   return (
     <Box ref={ref} sx={{ width: '100%', my: SPACING, ...sx }}>
       <motion.div
-        initial={{ opacity: 0, y: 15 }} // Reduced animation distance
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ...TRANSITION.spring, delay: delay * 0.1 }}
       >
@@ -155,10 +228,12 @@ const ProjectCard = ({
           elevation={0}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
-          onClick={() => onSelect?.(project.id)}
+          onClick={() => onSelect?.(project?.id)}
           sx={{
             width: '100%',
-            height: { xs: 'auto', sm: 'auto', md: '620px', lg: '680px' }, // Adjusted card height
+            maxWidth: '100%',
+            minHeight: { xs: '600px', sm: '680px', md: '720px' },
+            height: 'auto',
             display: 'flex',
             flexDirection: 'column',
             borderRadius: RADIUS,
@@ -166,14 +241,20 @@ const ProjectCard = ({
             transition: TRANSITION.standard,
             backgroundColor: theme.palette.background.paper,
             boxShadow: isHovering
-              ? `0 10px 20px -6px ${alpha(theme.palette.common.black, 0.12)}, 0 4px 12px -4px ${alpha(theme.palette.common.black, 0.08)}`
-              : `0 4px 12px -6px ${alpha(theme.palette.common.black, 0.06)}`,
-            border: project.featured ? `1px solid ${alpha(brandColor, 0.15)}` : `1px solid ${alpha(theme.palette.divider, 0.05)}`,
-            transform: isHovering ? 'translateY(-4px)' : 'none', // Reduced hover lift
+              ? `0 8px 24px -8px ${alpha(theme.palette.common.black, 0.1)}, 0 4px 8px -4px ${alpha(theme.palette.common.black, 0.06)}`
+              : `0 2px 12px -6px ${alpha(theme.palette.common.black, 0.04)}`,
+            border: project?.featured ? `1px solid ${alpha(brandColor, 0.12)}` : `1px solid ${alpha(theme.palette.divider, 0.04)}`,
+            transform: isHovering ? 'translateY(-3px)' : 'none',
+            aspectRatio: { xs: 'auto', md: '3/4' },
           }}
         >
           {/* Banner Image Section */}
-          <Box sx={{ position: 'relative', width: '100%', height: { xs: '220px', sm: '260px', md: '320px' }, overflow: 'hidden' }}> {/* Increased banner height */}
+          <Box sx={{ 
+            position: 'relative', 
+            width: '100%', 
+            paddingTop: '62.5%', // 8:5 ratio for banner (larger)
+            overflow: 'hidden'
+          }}>
             {/* Loading Skeleton */}
             {!imageLoaded && (
               <Box sx={{
@@ -182,7 +263,7 @@ const ProjectCard = ({
                 left: 0,
                 width: '100%',
                 height: '100%',
-                bgcolor: alpha(theme.palette.background.default, 0.08),
+                bgcolor: alpha(theme.palette.background.default, 0.06),
               }} />
             )}
 
@@ -194,19 +275,19 @@ const ProjectCard = ({
                 left: 0,
                 width: '100%',
                 height: '100%',
-                background: project.background || 'transparent',
+                background: project?.background || 'transparent',
               }}>
                 <Box
                   component="img"
                   src={bannerImage}
-                  alt={project.name}
+                  alt={project?.name || 'Project image'}
                   sx={{
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
                     objectPosition: 'center',
                     transition: 'transform 0.5s ease',
-                    transform: isHovering ? 'scale(1.02)' : 'scale(1)', // Subtle scale effect
+                    transform: isHovering ? 'scale(1.03)' : 'scale(1)',
                   }}
                 />
 
@@ -219,8 +300,8 @@ const ProjectCard = ({
                   height: '100%',
                   background: `linear-gradient(to bottom,
                     ${alpha(theme.palette.common.black, 0)},
-                    ${alpha(theme.palette.common.black, 0.3)} 60%,
-                    ${alpha(theme.palette.common.black, 0.7)})`, // Adjusted overlay
+                    ${alpha(theme.palette.common.black, 0.2)} 70%,
+                    ${alpha(theme.palette.common.black, 0.7)})`,
                 }} />
               </Box>
             )}
@@ -235,64 +316,65 @@ const ProjectCard = ({
               zIndex: 2,
             }}>
               {/* Featured Badge */}
-              {project.featured && (
+              {project?.featured && (
                 <Chip
-                  icon={<StarRounded sx={{ color: '#000 !important', fontSize: '1rem' }} />}
+                  icon={<StarRounded sx={{ color: '#000 !important', fontSize: '0.875rem' }} />}
                   label="Featured"
                   size="small"
                   sx={{
-                    mb: 1.5, // Reduced margin
-                    height: '24px', // Smaller badge
+                    mb: 1.5,
+                    height: '22px',
                     fontWeight: 600,
-                    fontSize: '0.7rem', // Smaller text
-                    background: `linear-gradient(135deg, ${alpha('#FFD700', 0.95)}, ${alpha('#FFA500', 0.95)})`,
+                    fontSize: '0.675rem',
+                    background: `linear-gradient(135deg, ${alpha('#FFD700', 0.92)}, ${alpha('#FFA500', 0.92)})`,
                     color: '#000',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                     '& .MuiChip-icon': { color: '#000' }
                   }}
                 />
               )}
 
               {/* Banner Text */}
-              {project.bannerText && (
+              {project?.bannerText && (
                 <Typography
-                  variant="h6" // Reduced from h5
+                  variant="h6"
                   component="h2"
                   sx={{
                     color: '#fff',
-                    fontWeight: 700,
-                    mb: 1, // Reduced margin
-                    textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-                    letterSpacing: '-0.01em',
-                    fontSize: '1.1rem', // Controlled font size
+                    fontWeight: 600,
+                    mb: 1,
+                    textShadow: '0 1px 2px rgba(0,0,0,0.4)',
+                    letterSpacing: '-0.02em',
+                    fontSize: '1.05rem',
                   }}
                 >
                   {project.bannerText}
                 </Typography>
               )}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}> {/* Reduced gap */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Box sx={{
-                  width: 32, // Smaller icon container
-                  height: 32,
-                  borderRadius: RADIUS / 2,
+                  width: 40,
+                  height: 40,
+                  borderRadius: '2px',
                   bgcolor: alpha('#fff', 0.95),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: `0 2px 6px ${alpha(theme.palette.common.black, 0.2)}`,
+                  boxShadow: `0 1px 4px ${alpha(theme.palette.common.black, 0.15)}`,
+                  overflow: 'visible', // Make sure icon isn't clipped
                 }}>
                   {renderIcon()}
                 </Box>
                 <Typography
-                  variant="subtitle1" // Changed from h6
+                  variant="subtitle2"
                   sx={{
                     color: '#fff',
-                    fontWeight: 600,
+                    fontWeight: 500,
                     textShadow: '0 1px 2px rgba(0,0,0,0.4)',
-                    fontSize: '0.95rem', // Controlled font size
+                    fontSize: '0.9rem',
                   }}
                 >
-                  {project.clientName}
+                  {project?.clientName || ''}
                 </Typography>
               </Box>
             </Box>
@@ -300,48 +382,50 @@ const ProjectCard = ({
 
           <CardContent sx={{
             p: SPACING,
-            pt: 1.5, // Reduced top padding
+            pt: 2,
+            pb: 0,
             flex: 1,
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            gap: 2,
           }}>
             {/* Project Title */}
             <Typography
-              variant="h6" // Changed from h5
+              variant="h4"
               component="h2"
               sx={{
-                fontWeight: 700,
-                mb: 2, // Reduced margin
+                fontWeight: 600,
                 position: 'relative',
-                pb: 1, // Reduced padding
+                pb: 2,
                 letterSpacing: '-0.01em',
-                fontSize: '1.15rem', // Controlled font size
+                fontSize: '1.5rem',
+                lineHeight: 1.3,
+                color: theme.palette.text.primary,
                 '&::after': {
                   content: '""',
                   position: 'absolute',
                   left: 0,
                   bottom: 0,
-                  width: '40px', // Shorter underline
-                  height: '2px', // Thinner underline
+                  width: '48px',
+                  height: '2px',
                   background: brandColor,
-                  borderRadius: '2px',
+                  borderRadius: 0,
                 }
               }}
             >
-              {project.name}
+              {project?.name || 'Project'}
             </Typography>
 
             {/* Metrics Section */}
-            {project.metrics?.length > 0 && (
+            {project?.metrics && Array.isArray(project.metrics) && project.metrics.length > 0 && (
               <Box
                 sx={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)', // Fixed 3-column grid for consistency
-                  gap: 1, // Reduced gap
-                  mb: 2, // Reduced margin
-                  p: 1.5, // Reduced padding
-                  borderRadius: RADIUS / 2,
-                  background: alpha(brandColorLight, 0.3),
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: 0.75,
+                  p: 1.5,
+                  borderRadius: 0,
+                  background: brandColorLight,
                 }}
               >
                 {project.metrics.map((metric, index) => (
@@ -352,21 +436,28 @@ const ProjectCard = ({
                         flexDirection: 'column',
                         alignItems: 'center',
                         textAlign: 'center',
-                        padding: 0.75, // Reduced padding
-                        borderRadius: 1,
+                        padding: 0.75,
+                        borderRadius: 0,
                         transition: 'all 0.2s ease',
                       }}
                     >
-                      <Box sx={{ color: brandColor, mb: 0.75 }}> {/* Reduced margin */}
-                        {getMetricIcon(metric.label)}
-                      </Box>
+              <Box 
+                sx={{ 
+                  color: brandColor, 
+                  mb: 0.5,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center' 
+                }}>
+                {getMetricIcon(metric.label)}
+              </Box>
                       <Typography
-                        variant="subtitle1" // Changed from h6
+                        variant="subtitle2"
                         sx={{
-                          fontWeight: 700,
+                          fontWeight: 600,
                           color: brandColor,
-                          mb: 0.25, // Reduced margin
-                          fontSize: '1rem', // Smaller font size
+                          mb: 0.25,
+                          fontSize: '0.95rem',
                         }}
                       >
                         {metric.value}
@@ -375,9 +466,10 @@ const ProjectCard = ({
                         variant="caption"
                         sx={{
                           textTransform: 'uppercase',
-                          fontWeight: 600,
+                          fontWeight: 500,
                           letterSpacing: 0.5,
-                          fontSize: '0.65rem', // Smaller font size
+                          fontSize: '0.62rem',
+                          opacity: 0.85,
                         }}
                       >
                         {metric.label}
@@ -390,20 +482,18 @@ const ProjectCard = ({
 
             {/* Description */}
             <Typography
-              variant="body2" // Changed from body1
+              variant="body1"
               sx={{
-                mb: 2, // Reduced margin
-                fontSize: '0.875rem', // Smaller font
+                fontSize: '1rem',
                 lineHeight: 1.6,
                 display: '-webkit-box',
-                WebkitLineClamp: 3, // Show fewer lines
+                WebkitLineClamp: 4,
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
-                height: '4.2rem', // Reduced height
-                color: theme.palette.text.primary,
+                color: alpha(theme.palette.text.primary, 0.9),
               }}
             >
-              {project.description}
+              {project?.description || 'No description available'}
             </Typography>
 
             {/* Expandable Content */}
@@ -413,23 +503,24 @@ const ProjectCard = ({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.25 }} // Faster transition
+                  transition={{ duration: 0.25 }}
                 >
-                  <Box sx={{ display: 'grid', gap: 2, mb: 2 }}> {/* Reduced spacing */}
+                  <Box sx={{ display: 'grid', gap: 2, my: 1 }}>
                     {/* Challenges Section */}
-                    {project.challenges && (
+                    {project?.challenges && (
                       <Box>
                         <Typography variant="subtitle2" sx={{
-                          fontWeight: 700,
-                          mb: 0.75, // Reduced margin
+                          fontWeight: 600,
+                          mb: 0.75,
                           color: brandColor,
-                          fontSize: '0.8rem', // Smaller font
+                          fontSize: '0.8rem',
                         }}>
                           Challenges
                         </Typography>
                         <Typography variant="body2" sx={{
                           lineHeight: 1.5,
-                          fontSize: '0.8rem', // Smaller font
+                          fontSize: '0.8rem',
+                          color: alpha(theme.palette.text.primary, 0.85),
                         }}>
                           {project.challenges}
                         </Typography>
@@ -437,19 +528,20 @@ const ProjectCard = ({
                     )}
 
                     {/* Impact Section */}
-                    {project.impact && (
+                    {project?.impact && (
                       <Box>
                         <Typography variant="subtitle2" sx={{
-                          fontWeight: 700,
-                          mb: 0.75, // Reduced margin
+                          fontWeight: 600,
+                          mb: 0.75,
                           color: brandColor,
-                          fontSize: '0.8rem', // Smaller font
+                          fontSize: '0.8rem',
                         }}>
                           Impact
                         </Typography>
                         <Typography variant="body2" sx={{
                           lineHeight: 1.5,
-                          fontSize: '0.8rem', // Smaller font
+                          fontSize: '0.8rem',
+                          color: alpha(theme.palette.text.primary, 0.85),
                         }}>
                           {project.impact}
                         </Typography>
@@ -461,15 +553,16 @@ const ProjectCard = ({
             </AnimatePresence>
 
             {/* Technology Stack */}
-            <Box sx={{ mb: 1.5, mt: 'auto' }}> {/* Reduced margin */}
+            <Box sx={{ mt: 'auto', pt: 1 }}>
               <Typography
-                variant="caption" // Changed from subtitle2
+                variant="caption"
                 sx={{
-                  fontWeight: 700,
-                  mb: 1, // Reduced margin
-                  color: alpha(theme.palette.text.primary, 0.7),
+                  fontWeight: 600,
+                  mb: 1,
+                  color: alpha(theme.palette.text.primary, 0.6),
                   display: 'block',
-                  fontSize: '0.7rem', // Smaller font
+                  fontSize: '0.65rem',
+                  letterSpacing: '0.03em',
                 }}
               >
                 TECHNOLOGIES
@@ -477,88 +570,107 @@ const ProjectCard = ({
               <Box sx={{
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: 0.75, // Reduced gap
-                maxHeight: '66px', // Limited height
+                gap: 0.75,
+                maxHeight: '60px',
                 overflow: 'hidden'
               }}>
-                {project.technologies.map((tech, index) => {
+                {Array.isArray(project?.technologies) ? project.technologies.map((tech, index) => {
+                  // Get icon and color from the technology mapping if available
+                  const iconInfo = technologyIconMap?.[tech];
                   const iconPath = getTechIcon(tech);
+                  const techColor = iconInfo?.color || brandColor;
+                  const TechIcon = iconInfo?.icon;
 
                   return (
                     <Chip
                       key={index}
-                      avatar={iconPath ? <Avatar src={iconPath} alt={tech} sx={{ bgcolor: 'transparent', width: 20, height: 20 }} /> : null}
+                      icon={TechIcon ? React.createElement(TechIcon, { 
+                        size: 16, 
+                        color: techColor, 
+                        style: { marginRight: -4, marginLeft: 4 } 
+                      }) : null}
                       label={tech}
                       size="small"
                       sx={{
                         fontWeight: 500,
-                        fontSize: '0.7rem', // Smaller font
-                        height: '24px', // Smaller chip
-                        bgcolor: alpha(brandColor, 0.08),
-                        color: isDarkMode ? alpha(brandColor, 0.9) : brandColor,
-                        border: `1px solid ${alpha(brandColor, 0.15)}`,
+                        fontSize: '0.675rem',
+                        height: '28px', // Slightly taller to accommodate icons
+                        bgcolor: alpha(techColor, 0.06),
+                        color: isDarkMode ? alpha(techColor, 0.9) : techColor,
+                        border: `1px solid ${alpha(techColor, 0.12)}`,
                         transition: 'all 0.2s ease',
                         '& .MuiChip-label': {
-                          px: 1, // Reduced padding
+                          px: 1,
                         }
                       }}
                     />
                   );
-                })}
+                }) : null}
               </Box>
+            </Box>
+            
+            {/* Toggle Button */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mb: 2, mt: 2 }}>
+              <Button
+                onClick={toggleExpand}
+                startIcon={expanded ? <ExpandLessRounded fontSize="small" /> : <ExpandMoreRounded fontSize="small" />}
+                sx={{
+                  color: alpha(theme.palette.text.primary, 0.7),
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  fontSize: '0.85rem',
+                  letterSpacing: '0.01em',
+                  '&:hover': {
+                    color: brandColor,
+                    background: 'transparent',
+                  }
+                }}
+              >
+                {expanded ? 'Show Less' : 'Learn More'}
+              </Button>
             </Box>
           </CardContent>
 
-          <CardActions sx={{
-            px: SPACING,
-            pb: SPACING,
-            pt: 0,
-            justifyContent: 'space-between',
-            borderTop: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-          }}>
-            <Button
-              onClick={toggleExpand}
-              startIcon={expanded ? <ExpandLessRounded fontSize="small" /> : <ExpandMoreRounded fontSize="small" />}
-              sx={{
-                color: alpha(theme.palette.text.primary, 0.7),
-                fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '0.8rem', // Smaller font
-                '&:hover': {
-                  color: brandColor,
-                }
-              }}
-            >
-              {expanded ? 'Show Less' : 'Learn More'}
-            </Button>
-
+          {/* Full-width CTA Footer */}
+          <Box 
+            sx={{
+              width: '100%',
+              mt: 'auto',
+              p: 0,
+              bgcolor: brandColor,
+            }}
+          >
             <Button
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                onSelect?.(project.id);
+                onSelect?.(project?.id);
               }}
-              endIcon={<ArrowRightAltRounded fontSize="small" />}
+              endIcon={<ArrowRightAltRounded fontSize="medium" />}
               variant="contained"
-              size="small" // Smaller button
+              fullWidth
+              size="large"
+              disableElevation
               sx={{
                 bgcolor: brandColor,
                 fontWeight: 600,
-                textTransform: 'none',
-                borderRadius: RADIUS / 2,
-                px: 1.5, // Reduced padding
+                textTransform: 'uppercase',
+                borderRadius: 0,
+                py: 2,
                 boxShadow: 'none',
-                fontSize: '0.8rem', // Smaller font
+                fontSize: '1rem',
+                letterSpacing: '0.1em',
+                color: '#FFFFFF', // Ensuring text is white for contrast
                 '&:hover': {
                   bgcolor: alpha(brandColor, 0.9),
-                  boxShadow: `0 2px 6px ${alpha(brandColor, 0.25)}`,
+                  boxShadow: 'none',
                 },
                 transition: TRANSITION.standard,
               }}
             >
-              Case Study
+              View Case Study
             </Button>
-          </CardActions>
+          </Box>
         </Card>
       </motion.div>
     </Box>

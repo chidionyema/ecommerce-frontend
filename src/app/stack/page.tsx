@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -20,7 +21,7 @@ import {
   SiMongodb, SiGithubactions, SiGraphql
 } from 'react-icons/si';
 
-import ConsistentPageLayout from '../components/Shared/ConsistentPageLayout';
+import ConsistentPageLayout from '../../components/Shared/ConsistentPageLayout';
 
 // Define technology categories and their tech items
 const TECH_CATEGORIES = [

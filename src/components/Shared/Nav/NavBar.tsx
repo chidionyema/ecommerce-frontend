@@ -1,3 +1,4 @@
+// components/navigation/NavBar.tsx
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -39,7 +40,7 @@ const StyledAppBar = styled(AppBar, {
 const NavBar = () => {
   const theme = useTheme();
   const router = useRouter();
-  const pathname = usePathname(); // Use the usePathname hook
+  const pathname = usePathname();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { isNavigating } = useNavigation();
 
@@ -57,8 +58,6 @@ const NavBar = () => {
     }
   }, [pathname]);
 
-  // In Next.js 15, we no longer need router.events
-  // Instead, rely on the isNavigating from your NavigationContext
   useEffect(() => {
     setNavigationPending(isNavigating);
   }, [isNavigating]);
@@ -107,7 +106,7 @@ const NavBar = () => {
             {mounted && !isMobile ? (
               <Stack direction="row" gap={1.5} alignItems="center">
                 {NAV_ITEMS.map((item) => (
-                  <NavItem key={item.path} {...item} />
+                  <NavItem key={item.path} {...item} isActive={pathname === item.path} />
                 ))}
               </Stack>
             ) : (
@@ -137,7 +136,7 @@ const NavBar = () => {
       </StyledAppBar>
 
       <NavigationProgress />
-      
+
       <MobileNav
         isOpen={menuOpen}
         onClose={handleCloseMenu}
