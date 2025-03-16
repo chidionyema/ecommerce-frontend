@@ -2,29 +2,17 @@ import React, { useRef, useState, memo, useMemo } from 'react';
 import { Box, Container, Typography, Grid, useTheme, Button, Paper } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import dynamic from 'next/dynamic';
-import { motion, useInView } from 'framer-motion';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
   SiAmazonaws, SiMicrosoftazure, SiDocker, SiKubernetes,
   SiTerraform, SiReact, SiNextdotjs, SiDotnet
 } from 'react-icons/si';
+import { ANIMATIONS, getSharedStyles } from '../../utils/designSystem';
 
 // Dynamic import with reduced SSR concerns
 const TechCard = dynamic(() => import('../Common/TechCard'), { ssr: false });
 
-// Simplified animation variants
-const ANIMATIONS = {
-  container: {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } }
-  },
-  item: {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } }
-  }
-};
-
-// Tech items data
+// Tech items data - unchanged from original
 const TECH_ITEMS = [
   {
     icon: <SiAmazonaws size={48} />,
@@ -84,7 +72,7 @@ const TECH_ITEMS = [
   }
 ];
 
-// CTA resources data - styled with blue from CTA card
+// CTA resources data
 const RESOURCE_ITEMS = [
   'Weekly technical tutorials',
   'Code snippets & templates',
@@ -92,81 +80,55 @@ const RESOURCE_ITEMS = [
   'Security & performance tips'
 ];
 
-// Sub-components with reduced complexity
-const FeatureItem = memo(({ icon: Icon, text }) => (
-  <Box display="flex" alignItems="flex-start" gap={2} my={2}>
-    <Box sx={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      backgroundColor: theme => alpha(theme.palette.primary.main, 0.08),
-      borderRadius: '16px',
-      width: 40, 
-      height: 40, 
-      minWidth: 40,
-      border: theme => `2px solid ${alpha(theme.palette.primary.main, 0.3)}`
-    }}>
-      <Icon sx={{ 
-        fontSize: 24, 
-        color: theme => theme.palette.primary.main, 
-        transform: 'rotate(-10deg)' 
-      }} />
-    </Box>
-    <Typography variant="body2" color="text.secondary">{text}</Typography>
-  </Box>
-));
-
-const ExtraFeatureItem = memo(({ text }) => (
-  <Box display="flex" alignItems="flex-start" gap={1.5} my={1.5}>
-    <CheckCircleIcon
-      fontSize="small"
-      sx={{ color: theme => theme.palette.success.main, mt: 0.5 }}
-    />
-    <Typography variant="body2" color="text.secondary">{text}</Typography>
-  </Box>
-));
-
-const PlanCard = memo(({ plan, handlePlanClick }) => (
-  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
-    <motion.div
-      style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      whileHover={{ y: -8, transition: { duration: 0.2 } }}
-      key={plan.title}
+// Category Button styled consistently with hero persona switcher
+const CategoryButton = memo(({ category, isActive, onClick }) => {
+  const theme = useTheme();
+  
+  return (
+    <Button 
+      size="small" 
+      onClick={onClick}
+      sx={{
+        py: 1, px: 2, 
+        borderRadius: 8, 
+        fontSize: '0.85rem', 
+        fontWeight: 500, 
+        background: isActive ? alpha(theme.palette.secondary.main, 0.15) : 'transparent',
+        border: `1px solid ${isActive ? theme.palette.secondary.main : alpha('#fff', 0.2)}`,
+        color: isActive ? theme.palette.secondary.main : alpha('#fff', 0.8),
+        '&:hover': { 
+          background: isActive ? alpha(theme.palette.secondary.main, 0.2) : alpha('#fff', 0.05),
+          transform: 'translateY(-2px)'
+        },
+        transition: 'all 0.25s cubic-bezier(0.2, 0, 0, 1)',
+        textTransform: 'none',
+        mx: 0.5
+      }}
     >
-      <Paper
-        elevation={4}
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          height: '100%',
-          p: 3,
-          borderRadius: 4,
-          position: 'relative',
-          background: theme => theme.palette.mode === 'light' ? 'white' : '#28282a',
-          border: theme => `1px solid ${alpha(theme.palette.divider, 0.2)}`
-        }}
-      >
-        <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <Typography variant="h5" fontWeight="bold" mb={1}>{plan.title}</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>{plan.description}</Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handlePlanClick(plan.title)}
-            sx={{ mt: 2, textTransform: 'none', fontWeight: 600 }}
-          >
-            Select {plan.title}
-          </Button>
-        </Box>
-      </Paper>
-    </motion.div>
-  </Box>
-));
+      {category}
+    </Button>
+  );
+});
 
+// Blue checkmark component like in hero section
+const BlueCheckmarkItem = memo(({ text }) => {
+  const theme = useTheme();
+  
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+      <Box sx={{ 
+        width: 20, height: 20, borderRadius: '50%', backgroundColor: theme.palette.primary.main,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: 'white', fontSize: '0.8rem', fontWeight: 'bold'
+      }}>
+        ✓
+      </Box>
+      <Typography color={theme.palette.text.primary}>{text}</Typography>
+    </Box>
+  );
+});
+
+// Tech Card Item with consistent hover effects
 const TechCardItem = memo(({ tech, isHovered, onMouseEnter, onMouseLeave }) => (
   <Grid
     item
@@ -185,7 +147,6 @@ const TechCardItem = memo(({ tech, isHovered, onMouseEnter, onMouseLeave }) => (
         accentColor={tech.color}
         category={tech.category}
         importance={isHovered ? 'primary' : 'secondary'}
-        sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
       >
         <Typography 
           variant="body2" 
@@ -205,78 +166,15 @@ const TechCardItem = memo(({ tech, isHovered, onMouseEnter, onMouseLeave }) => (
   </Grid>
 ));
 
-const CategoryButton = memo(({ category, isActive, onClick }) => (
-  <Button
-    variant={isActive ? 'contained' : 'outlined'}
-    onClick={onClick}
-    sx={{
-      borderColor: 'white',
-      color: 'white',
-      backgroundColor: theme => isActive ? alpha(theme.palette.secondary.main, 0.8) : 'transparent',
-      '&:hover': {
-        backgroundColor: theme => isActive ? 
-          alpha(theme.palette.secondary.main, 0.9) : 
-          alpha(theme.palette.common.white, 0.15),
-        transform: 'translateY(-2px)'
-      },
-      fontWeight: 600,
-      borderRadius: 10,
-      px: 3,
-      py: 1,
-      mx: 0.5,
-      transition: 'all 0.2s ease',
-      textTransform: 'none'
-    }}
-  >
-    {category}
-  </Button>
-));
-
-// Blue CTA-style checkmark component - styled like the CTA card
-const BlueCheckmarkItem = memo(({ text }) => {
-  const theme = useTheme();
-  
-  return (
-    <Box 
-      sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: 1.5,
-        mb: 1.5
-      }}
-    >
-      <Box 
-        sx={{ 
-          width: 20, 
-          height: 20, 
-          borderRadius: '50%', 
-          backgroundColor: theme.palette.primary.main,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '0.8rem',
-          fontWeight: 'bold'
-        }}
-      >
-        ✓
-      </Box>
-      <Typography color="white">{text}</Typography>
-    </Box>
-  );
-});
-
 // Set display names for debugging
-FeatureItem.displayName = 'FeatureItem';
-ExtraFeatureItem.displayName = 'ExtraFeatureItem';
-PlanCard.displayName = 'PlanCard';
-TechCardItem.displayName = 'TechCardItem';
 CategoryButton.displayName = 'CategoryButton';
 BlueCheckmarkItem.displayName = 'BlueCheckmarkItem';
+TechCardItem.displayName = 'TechCardItem';
 
-// Main component with simplified structure
+// Main component with standardized structure
 const TechnologyShowcase = () => {
   const theme = useTheme();
+  const styles = getSharedStyles(theme);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
   const [hoveredIndex, setHoveredIndex] = useState(-1);
@@ -298,41 +196,34 @@ const TechnologyShowcase = () => {
       component="section"
       ref={ref}
       sx={{
-        width: '100%',
-        py: 8,
-        background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${alpha(theme.palette.primary.main, 0.85)} 100%)`,
         position: 'relative',
+        py: 10,
+        background: 'linear-gradient(180deg, #18407F 0%, #1A438A 100%)', // Match hero section gradient exactly
         overflow: 'hidden'
       }}
     >
-      {/* Background pattern */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          opacity: 0.05,
-          backgroundImage: 'url("/images/grid-pattern.svg")',
-          willChange: 'transform'
-        }}
-      />
-
-      <Container sx={{ position: 'relative', zIndex: 2 }}>
+      <Container sx={styles.contentContainer}>
         <motion.div
           variants={ANIMATIONS.container}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
         >
-          {/* Header */}
+          {/* Header - consistent typography with hero */}
           <motion.div variants={ANIMATIONS.item}>
-            <Typography variant="h2" align="center" gutterBottom sx={{ color: 'white', fontWeight: 800 }}>
-              Enterprise-Grade Technology Stack
+            <Typography variant="h2" sx={styles.sectionTitle}>
+              Enterprise-Grade <Box component="span" sx={styles.accentText}>Technology Stack</Box>
             </Typography>
           </motion.div>
 
-          {/* Category filters */}
+          {/* Subtitle */}
+          <motion.div variants={ANIMATIONS.item}>
+            <Typography variant="subtitle1" sx={styles.sectionSubtitle}>
+              Leverage our experience from ASOS, Tesco, and Philip Morris to build 
+              <strong> scalable, secure, and efficient</strong> technology for your business
+            </Typography>
+          </motion.div>
+
+          {/* Category filters - styled like persona switcher in hero */}
           <motion.div variants={ANIMATIONS.item}>
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap', mb: 4 }}>
               {categories.map(category => (
@@ -359,22 +250,11 @@ const TechnologyShowcase = () => {
             ))}
           </Grid>
 
-          {/* Strategic blue CTA resource section - styled like the blue CTA card */}
+          {/* Strategic blue CTA resource section - styled like hero CTA card */}
           <motion.div variants={ANIMATIONS.item}>
             <Paper
               elevation={4}
-              sx={{
-                mt: 6,
-                mb: 6,
-                mx: 'auto',
-                maxWidth: '800px',
-                p: 4,
-                borderRadius: 3,
-                background: alpha(theme.palette.background.paper, 0.95),
-                backdropFilter: 'blur(10px)',
-                boxShadow: `0 10px 30px ${alpha(theme.palette.common.black, 0.2)}`,
-                border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
-              }}
+              sx={styles.ctaCard}
             >
               <Typography 
                 variant="h5" 
@@ -400,32 +280,7 @@ const TechnologyShowcase = () => {
               <Grid container spacing={2} sx={{ mb: 3 }}>
                 {RESOURCE_ITEMS.map((item, index) => (
                   <Grid item xs={12} md={6} key={index}>
-                    <Box 
-                      sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: 1.5,
-                        mb: 1.5
-                      }}
-                    >
-                      <Box 
-                        sx={{ 
-                          width: 20, 
-                          height: 20, 
-                          borderRadius: '50%', 
-                          backgroundColor: theme.palette.primary.main,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'white',
-                          fontSize: '0.8rem',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        ✓
-                      </Box>
-                      <Typography color={theme.palette.text.primary}>{item}</Typography>
-                    </Box>
+                    <BlueCheckmarkItem text={item} />
                   </Grid>
                 ))}
               </Grid>
@@ -451,28 +306,15 @@ const TechnologyShowcase = () => {
             </Paper>
           </motion.div>
 
-          {/* CTA Button */}
+          {/* CTA Button - matches hero button styling */}
           <motion.div variants={ANIMATIONS.item}>
-            <Box sx={{ textAlign: 'center', mt: 2 }}>
+            <Box sx={{ textAlign: 'center', mt: 4 }}>
               <Button
                 variant="contained"
                 color="secondary"
                 size="large"
                 href="/stack"
-                sx={{
-                  px: 5,
-                  py: 1.6,
-                  fontSize: '1.1rem',
-                  fontWeight: 700,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  boxShadow: `0 6px 20px ${alpha(theme.palette.secondary.main, 0.6)}, 0 2px 6px rgba(0, 0, 0, 0.3)`,
-                  '&:hover': {
-                    transform: 'translateY(-3px)',
-                    boxShadow: `0 10px 25px ${alpha(theme.palette.secondary.main, 0.7)}, 0 4px 10px rgba(0, 0, 0, 0.4)`
-                  },
-                  transition: 'all 0.3s ease'
-                }}
+                sx={styles.primaryButton}
               >
                 Explore Our Full Technology Stack
               </Button>

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Container, useTheme, alpha, Grid, Chip, Stack, Paper, TextField, Slider } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SiAmazonaws, SiMicrosoftazure, SiDocker, SiKubernetes, SiTerraform, SiGooglecloud } from 'react-icons/si';
-import { ShieldCheck, TrendingUp, DollarSign, Users, ArrowRight, Calendar, Clock, MessageCircle } from 'lucide-react';
+import { ShieldCheck, TrendingUp, DollarSign, Users, ArrowRight, Calendar, Clock, MessageCircle, Info } from 'lucide-react';
 import { CalendlyBooking } from '../CalendlyBooking';
 import Image from 'next/image';
 
@@ -255,20 +255,19 @@ const HeroSection = () => {
           </motion.div>
         </AnimatePresence>
 
-        {/* Interactive ROI Calculator */}
+        {/* Interactive ROI Calculator - COMPACT VERSION */}
         <motion.div {...animations.fadeIn(0.15)}>
-          <Paper elevation={0} sx={sx.roiCalculator}>
-            <Typography 
-              align="center" 
-              color={theme.palette.secondary.main} 
-              sx={{ fontWeight: 700, mb: 2, fontSize: '1.2rem' }}
-            >
-              Calculate Your Potential Savings
-            </Typography>
+          <Paper elevation={0} sx={{...sx.benefitCard, maxWidth: '900px', mx: 'auto', mb: 4}}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <DollarSign size={20} color="#4285f4" strokeWidth={2} />
+              <Typography color="#4285f4" fontWeight={700} sx={{ ml: 1.5, fontSize: '1.1rem' }}>
+                Enterprise Cost Savings Calculator
+              </Typography>
+            </Box>
             
-            <Grid container spacing={3} sx={{ mb: 2 }}>
+            <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item xs={12} sm={6}>
-                <Typography color="white" fontSize="0.9rem" mb={1}>Team Size</Typography>
+                <Typography color="white" fontSize="0.85rem" mb={0.5}>Team Size: {teamSize} ({teamSize * 10000}/mo)</Typography>
                 <Slider
                   value={teamSize}
                   onChange={(e, newValue) => setTeamSize(newValue)}
@@ -276,17 +275,13 @@ const HeroSection = () => {
                   max={50}
                   step={1}
                   valueLabelDisplay="auto"
+                  size="small"
                   aria-labelledby="team-size-slider"
-                  sx={{
-                    color: theme.palette.secondary.main,
-                    '& .MuiSlider-valueLabel': {
-                      backgroundColor: theme.palette.secondary.dark
-                    }
-                  }}
+                  sx={{ color: "#4285f4" }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <Typography color="white" fontSize="0.9rem" mb={1}>Estimated Savings</Typography>
+                <Typography color="white" fontSize="0.85rem" mb={0.5}>Efficiency Gain: {roi}%</Typography>
                 <Slider
                   value={roi}
                   onChange={(e, newValue) => setRoi(newValue)}
@@ -294,24 +289,19 @@ const HeroSection = () => {
                   max={60}
                   step={1}
                   valueLabelDisplay="auto"
-                  valueLabelFormat={value => `${value}%`}
+                  size="small"
                   aria-labelledby="roi-slider"
-                  sx={{
-                    color: theme.palette.secondary.main,
-                    '& .MuiSlider-valueLabel': {
-                      backgroundColor: theme.palette.secondary.dark
-                    }
-                  }}
+                  sx={{ color: "#4285f4" }}
                 />
               </Grid>
             </Grid>
             
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h5" color={theme.palette.secondary.main} fontWeight={700}>
-                ${annualSavings.toLocaleString()} / year
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Typography color={alpha('#fff', 0.85)} fontSize="0.9rem">
+                Annual savings with our solutions:
               </Typography>
-              <Typography color={alpha('#fff', 0.7)} fontSize="0.85rem">
-                Potential annual savings based on your inputs
+              <Typography variant="h6" color="#4285f4" fontWeight={700}>
+                ${annualSavings.toLocaleString()}
               </Typography>
             </Box>
           </Paper>

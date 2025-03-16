@@ -15,19 +15,21 @@ import ConsistentPageLayout from '../../components/Shared/ConsistentPageLayout';
 import { pricingPageContent, plans } from '../../data/pricingPageData';
 import { theme as brandKit } from '../../theme/brandKit';
 
+// Add an extra FAQ item
+pricingPageContent.faqSection.items.push({
+  question: "What is our guarantee?",
+  answer: "We offer a 30-day money-back guarantee to ensure complete satisfaction."
+});
+
 // Feature check component
 const FeatureCheck = ({ color = 'primary' }) => {
   const theme = useTheme();
   return (
     <Box sx={{
-      width: 22, height: 22, borderRadius: '50%', display: 'flex',
-      alignItems: 'center', justifyContent: 'center',
+      width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
       bgcolor: alpha(color === 'primary' ? theme.palette.primary.main : theme.palette.success.main, 0.1)
     }}>
-      <CheckCircleRounded sx={{
-        fontSize: 16,
-        color: color === 'primary' ? theme.palette.primary.main : theme.palette.success.main
-      }} />
+      <CheckCircleRounded sx={{ fontSize: 16, color: color === 'primary' ? theme.palette.primary.main : theme.palette.success.main }} />
     </Box>
   );
 };
@@ -63,7 +65,7 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
           transform: 'translateY(-8px)',
           boxShadow: isRecommended ? '0 16px 40px rgba(51, 102, 255, 0.18)' : '0 12px 28px rgba(0, 0, 0, 0.1)'
         }),
-        minHeight: 430 // Added fixed min-height to ensure all cards are the same size
+        minHeight: 430
       }}>
         <Typography variant="h5" sx={{
           fontWeight: 700, mb: 1,
@@ -124,7 +126,9 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
             })
           }}
           endIcon={<ArrowForwardRounded />}
-        >{isRecommended ? 'Get started' : 'Choose plan'}</Button>
+        >
+          {isRecommended ? 'Get started' : 'Choose plan'}
+        </Button>
 
         <Button
           variant="text" size="small" color="inherit" onClick={onViewFeatures}
@@ -134,7 +138,9 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
             '&:hover': { bgcolor: 'transparent', color: theme.palette.primary.main }
           }}
           endIcon={<KeyboardArrowRightRounded fontSize="small" />}
-        >View all features</Button>
+        >
+          View all features
+        </Button>
       </Paper>
     </motion.div>
   );
@@ -159,7 +165,9 @@ const FeatureCell = ({ value, plan, theme }) => {
     <Typography variant="body2" sx={{
       fontWeight: 500,
       color: plan.recommended ? theme.palette.primary.main : theme.palette.text.primary
-    }}>{value}</Typography>
+    }}>
+      {value}
+    </Typography>
   );
 };
 
@@ -178,6 +186,7 @@ export default function PricingPage() {
 
   const handlePlanClick = (planType) => router.push(`/contact?plan=${planType}`);
 
+  // Feature categories and data
   const categories = [
     { name: 'Core Features', id: 'core' },
     { name: 'Support', id: 'support' },
@@ -223,12 +232,13 @@ export default function PricingPage() {
                 fontSize: { xs: '2rem', md: '2.75rem' }, fontWeight: 800, mb: 2,
                 backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.01em'
-              }}>Simple, transparent pricing for every business</Typography>
+              }}>
+                Simple, transparent pricing for every business
+              </Typography>
 
-              <Typography variant="body1" sx={{
-                color: theme.palette.text.secondary, mb: 5, maxWidth: 540, mx: 'auto',
-                fontSize: '1.125rem', lineHeight: 1.6
-              }}>Choose the perfect plan that works for you with no hidden fees or complicated tiers.</Typography>
+              <Typography variant="body1" sx={{ color: theme.palette.text.secondary, mb: 5, maxWidth: 540, mx: 'auto', fontSize: '1.125rem', lineHeight: 1.6 }}>
+                Choose the perfect plan that works for you with no hidden fees or complicated tiers.
+              </Typography>
             </motion.div>
 
             {/* Billing toggle and comparison mode */}
@@ -246,7 +256,9 @@ export default function PricingPage() {
                     minWidth: 100, borderRadius: 4, textTransform: 'none', fontWeight: 600,
                     fontSize: '0.875rem', py: 1, color: billingCycle === 'monthly' ? '#fff' : theme.palette.text.primary
                   }}
-                >Monthly</Button>
+                >
+                  Monthly
+                </Button>
                 <Button
                   onClick={() => setBillingCycle('annual')}
                   variant={billingCycle === 'annual' ? 'contained' : 'text'}
@@ -261,7 +273,9 @@ export default function PricingPage() {
                     minWidth: 100, borderRadius: 4, textTransform: 'none', fontWeight: 600,
                     fontSize: '0.875rem', py: 1, color: billingCycle === 'annual' ? '#fff' : theme.palette.text.primary
                   }}
-                >Annual</Button>
+                >
+                  Annual
+                </Button>
               </Box>
 
               <Button
@@ -282,14 +296,16 @@ export default function PricingPage() {
                     } : {}
                   }} />
                 }
-              >{compareMode ? 'Hide comparison' : 'Compare all features'}</Button>
+              >
+                {compareMode ? 'Hide comparison' : 'Compare all features'}
+              </Button>
             </Stack>
           </Box>
         </Container>
 
         {/* Pricing Cards */}
         {!compareMode && (
-          <Container maxWidth="lg" sx={{ mb: 8 }}>
+          <Container maxWidth="lg" sx={{ mb: 20 }}>
             {/* Tab interface */}
             <Box sx={{ mb: 6, display: 'flex', justifyContent: 'center' }}>
               <Tabs
@@ -306,16 +322,14 @@ export default function PricingPage() {
             {/* Plan cards */}
             <Grid container spacing={4} justifyContent="center" sx={{ transition: 'all 0.3s ease' }}>
               {plans.map((plan) => {
-                const isRecommended =
-                  (activeTab === 0 && plan.type === 'consultation') ||
-                  (activeTab === 1 && plan.type === 'project') ||
-                  (activeTab === 2 && plan.type === 'enterprise') ||
-                  plan.recommended;
+                const isRecommended = (activeTab === 0 && plan.type === 'consultation') ||
+                                     (activeTab === 1 && plan.type === 'project') ||
+                                     (activeTab === 2 && plan.type === 'enterprise') ||
+                                     plan.recommended;
 
                 return (
                   <Grid item xs={12} sm={6} md={4} key={plan.type} sx={{
                     transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                    // Removed scale transform to keep all cards the same size
                     zIndex: isRecommended ? 2 : 1
                   }}>
                     <PlanCard
@@ -341,7 +355,7 @@ export default function PricingPage() {
               <Container maxWidth="lg">
                 <Paper elevation={0} sx={{
                   border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  borderRadius: 3, overflow: 'hidden', mb: 8
+                  borderRadius: 3, overflow: 'hidden', mb: 20
                 }}>
                   <Box sx={{ overflowX: 'auto' }}>
                     <Box sx={{ minWidth: 900, p: 2 }}>
@@ -418,8 +432,17 @@ export default function PricingPage() {
           )}
         </AnimatePresence>
 
-        {/* FAQ section */}
-        <Container maxWidth="md" sx={{ mb: 12 }}>
+        {/* FAQ section with improved spacing and visual separator */}
+        <Container maxWidth="md" sx={{ 
+          mb: 12, mt: { xs: 10, md: 24 }, pt: 8, position: 'relative'
+        }}> 
+          {/* Visual separator line */}
+          <Box sx={{
+            position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+            width: '120px', height: '4px', borderRadius: '2px',
+            background: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.1)}, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.1)})`
+          }} />
+
           <Typography variant="h2" align="center" sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' }, fontWeight: 700, mb: 2 }}>
             Frequently asked questions
           </Typography>
@@ -428,7 +451,8 @@ export default function PricingPage() {
             Everything you need to know about our pricing and plans
           </Typography>
 
-          <Grid container spacing={3}>
+          {/* FAQ cards with increased horizontal spacing */}
+          <Grid container spacing={10} sx={{ px: { xs: 0, md: 12 } }}>
             {pricingPageContent.faqSection.items.slice(0, 6).map((faq, index) => (
               <Grid item xs={12} md={6} key={index}>
                 <Paper elevation={0} sx={{
@@ -469,8 +493,7 @@ export default function PricingPage() {
               }}>Ready to transform your business?</Typography>
 
               <Typography variant="body1" sx={{
-                color: 'rgba(255, 255, 255, 0.9)', mb: 3,
-                fontSize: '1.125rem', lineHeight: 1.6
+                color: 'rgba(255, 255, 255, 0.9)', mb: 3, fontSize: '1.125rem', lineHeight: 1.6
               }}>Join thousands of growing businesses that trust our solutions to scale and succeed.</Typography>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -478,8 +501,7 @@ export default function PricingPage() {
                   bgcolor: '#fff', color: theme.palette.primary.main, textTransform: 'none',
                   fontWeight: 600, py: 1.5, px: 4, borderRadius: 2, boxShadow: '0 6px 12px rgba(0, 0, 0, 0.2)',
                   '&:hover': {
-                    bgcolor: '#fff', transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)'
+                    bgcolor: '#fff', transform: 'translateY(-2px)', boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)'
                   }
                 }}>Get started</Button>
 
@@ -487,8 +509,7 @@ export default function PricingPage() {
                   borderColor: 'rgba(255, 255, 255, 0.6)', color: '#fff', textTransform: 'none',
                   fontWeight: 600, py: 1.5, px: 4, borderRadius: 2,
                   '&:hover': {
-                    borderColor: '#fff', bgcolor: 'rgba(255, 255, 255, 0.1)',
-                    transform: 'translateY(-2px)'
+                    borderColor: '#fff', bgcolor: 'rgba(255, 255, 255, 0.1)', transform: 'translateY(-2px)'
                   }
                 }}>Request demo</Button>
               </Stack>
@@ -513,10 +534,9 @@ export default function PricingPage() {
                 ].map((stat, i) => (
                   <Grid item xs={6} key={i}>
                     <Box sx={{ p: 2, textAlign: 'center' }}>
-                      <Typography variant="h4" sx={{
-                        fontWeight: 800, color: '#fff', mb: 0.5,
-                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-                      }}>{stat.value}</Typography>
+                      <Typography variant="h4" sx={{ fontWeight: 800, color: '#fff', mb: 0.5, textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+                        {stat.value}
+                      </Typography>
                       <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                         {stat.label}
                       </Typography>

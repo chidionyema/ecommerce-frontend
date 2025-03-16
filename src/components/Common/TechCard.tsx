@@ -1,5 +1,3 @@
-;
-
 import React, { ReactElement, ReactNode, useRef, useState } from 'react';
 import { Typography, useTheme, Box } from '@mui/material';
 import { Theme, SxProps } from '@mui/material/styles';
@@ -26,32 +24,32 @@ export interface TechCardProps {
 }
 
 
-const NumberedCircle = ({ number, theme, accentColor }: { 
-  number: number; 
+const NumberedCircle = ({ number, theme, accentColor }: {
+  number: number;
   theme: Theme;
   accentColor?: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
     <motion.div
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      whileHover={{ scale: 1.15, rotate: 5 }}
+      whileHover={{ scale: 1.2, rotate: 8 }}
       whileTap={{ scale: 0.95 }}
     >
       <Box
         sx={{
-          width: 68,
-          height: 68,
+          width: 60,
+          height: 60,
           borderRadius: '50%',
-          background: `linear-gradient(135deg, ${accentColor || theme.palette.primary.main} 0%, ${alpha(accentColor || theme.palette.primary.dark, 0.8)} 100%)`,
-          boxShadow: `0 ${isHovered ? '8' : '4'}px ${isHovered ? '32' : '16'}px ${alpha(accentColor || theme.palette.primary.main, isHovered ? 0.6 : 0.35)}`,
+          background: `linear-gradient(135deg, ${accentColor || theme.palette.primary.main} 0%, ${alpha(accentColor || theme.palette.primary.dark, 0.85)} 100%)`,
+          boxShadow: `0 ${isHovered ? '10' : '5'}px ${isHovered ? '40' : '20'}px ${alpha(accentColor || theme.palette.primary.main, isHovered ? 0.7 : 0.4)}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           mb: 2,
-          transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+          transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -76,16 +74,16 @@ const NumberedCircle = ({ number, theme, accentColor }: {
             background: `radial-gradient(circle, ${alpha(accentColor || theme.palette.primary.light, 0.8)} 0%, transparent 70%)`,
           }}
         />
-        
-        <Typography 
-          variant="h6" 
-          fontWeight="bold" 
-          color="white" 
-          sx={{ 
-            fontSize: '1.35rem',
+
+        <Typography
+          variant="h6"
+          fontWeight="bold"
+          color="white"
+          sx={{
+            fontSize: '1.2rem',
             fontFamily: '"Space Grotesk", "Poppins", "Roboto", sans-serif',
-            letterSpacing: '0.5px',
-            textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+            letterSpacing: '0.6px',
+            textShadow: '0 2px 6px rgba(0, 0, 0, 0.4)',
           }}
         >
           {number}
@@ -110,7 +108,7 @@ const GlassBackdrop = styled(Box, {
   bottom: 0,
   backdropFilter: `blur(${blurAmount})`,
   backgroundColor: alpha(
-    theme.palette.mode === 'light' ? '#ffffff' : '#000000', 
+    theme.palette.mode === 'light' ? '#ffffff' : '#000000',
     opacityLevel
   ),
   borderRadius: 'inherit',
@@ -160,43 +158,47 @@ interface StyledTechCardProps {
 const StyledTechCard = styled(motion.div, {
   shouldForwardProp: (prop) => !['importance', 'accentColor'].includes(prop as string)
 })<StyledTechCardProps>(({ theme, importance, accentColor }) => {
+  const primaryShadow = `0px 8px 24px ${alpha(accentColor || theme.palette.primary.main, 0.2)}`;
+  const secondaryShadow = `0px 6px 16px ${alpha(theme.palette.grey[800], 0.15)}`;
+  const tertiaryShadow = `0px 4px 12px ${alpha(theme.palette.grey[800], 0.1)}`;
+  const hoverShadow = `0px 12px 32px ${alpha(accentColor || theme.palette.primary.main, 0.25)}`;
+
   const getImportanceStyles = () => {
     switch(importance) {
       case 'primary':
         return {
           borderWidth: 2,
-          boxShadow: `0px 20px 60px ${alpha(accentColor || theme.palette.primary.main, 0.25)}`,
-          transform: 'scale(1.05)',
+          borderColor: accentColor || theme.palette.primary.main,
+          boxShadow: primaryShadow,
+          transform: 'scale(1.03)',
         };
       case 'secondary':
         return {
           borderWidth: 1.5,
-          boxShadow: `0px 15px 35px ${alpha(theme.palette.grey[800], 0.18)}`,
+          borderColor: theme.palette.grey[400],
+          boxShadow: secondaryShadow,
           transform: 'scale(1)',
         };
       case 'tertiary':
       default:
         return {
           borderWidth: 1,
-          boxShadow: `0px 10px 20px ${alpha(theme.palette.grey[800], 0.12)}`,
+          borderColor: theme.palette.grey[300],
+          boxShadow: tertiaryShadow,
           transform: 'scale(1)',
         };
     }
   };
 
   const importanceStyles = getImportanceStyles();
-  
+
   return {
     position: 'relative',
     padding: theme.spacing(5),
     borderRadius: 24,
     height: '100%',
     background: 'transparent',
-    border: `${importanceStyles.borderWidth}px solid ${
-      theme.palette.mode === 'light'
-        ? alpha(accentColor || theme.palette.primary.light, 0.25)
-        : alpha(accentColor || theme.palette.primary.dark, 0.35)
-    }`,
+    border: `${importanceStyles.borderWidth}px solid ${importanceStyles.borderColor}`,
     transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
     display: 'flex',
     flexDirection: 'column',
@@ -207,10 +209,8 @@ const StyledTechCard = styled(motion.div, {
     boxShadow: importanceStyles.boxShadow,
     transform: importanceStyles.transform,
     '&:hover': {
-      transform: `translateY(-12px) ${importance === 'primary' ? 'scale(1.07)' : 'scale(1.02)'}`,
-      boxShadow: theme.palette.mode === 'light' 
-        ? `0px 30px 70px ${alpha(accentColor || theme.palette.primary.main, 0.3)}`
-        : `0px 30px 60px ${alpha(theme.palette.common.black, 0.5)}`,
+      transform: `translateY(-8px) ${importance === 'primary' ? 'scale(1.05)' : 'scale(1.02)'}`,
+      boxShadow: hoverShadow,
       '& .card-content': {
         transform: 'translateY(-8px)',
       },
@@ -221,13 +221,14 @@ const StyledTechCard = styled(motion.div, {
       top: 0,
       left: 0,
       width: '100%',
-      height: importance === 'primary' ? '15px' : '10px',
+      height: importance === 'primary' ? '4px' : '3px',
       background: `linear-gradient(90deg, ${accentColor || theme.palette.primary.main}, ${accentColor ? alpha(accentColor, 0.7) : theme.palette.primary.light})`,
-      opacity: 0.9,
-      transition: 'height 0.3s ease',
+      opacity: 0.8,
+      transition: 'height 0.3s ease, opacity 0.3s ease',
     },
     '&:hover::after': {
-      height: importance === 'primary' ? '18px' : '12px',
+      height: importance === 'primary' ? '6px' : '4px',
+      opacity: 1,
     },
     '@media (max-width: 599.95px)': {
       padding: theme.spacing(3),
@@ -253,36 +254,36 @@ const TechCard: React.FC<TechCardProps> = ({
   const inView = useInView(ref, { amount: 0.1, once: true });
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
+
   const cardVariants = {
     hidden: { opacity: 0, y: 80, scale: 0.9 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
+    visible: {
+      opacity: 1,
+      y: 0,
       scale: 1,
-      transition: { 
-        delay: index * 0.15, 
-        type: 'spring', 
-        stiffness: 80, 
-        damping: 20 
-      } 
+      transition: {
+        delay: index * 0.15,
+        type: 'spring',
+        stiffness: 80,
+        damping: 20
+      }
     },
-    hover: { 
+    hover: {
       scale: isMobile ? 1 : 1.03,
-      transition: { type: 'spring', stiffness: 400, damping: 25 } 
+      transition: { type: 'spring', stiffness: 400, damping: 25 }
     },
     tap: { scale: 0.98 }
   };
 
   const contentVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { 
+      transition: {
         delay: index * 0.15 + 0.2,
         duration: 0.5
-      } 
+      }
     }
   };
 
@@ -311,11 +312,11 @@ const TechCard: React.FC<TechCardProps> = ({
       sx={sx}
       {...rest}
     >
-      <GlassBackdrop 
+      <GlassBackdrop
         blurAmount={isHovered ? '24px' : blurAmount || GLASS_BLUR}
-        opacityLevel={isHovered ? (opacityLevel || GLASS_OPACITY) + 0.04 : opacityLevel || GLASS_OPACITY} 
+        opacityLevel={isHovered ? (opacityLevel || GLASS_OPACITY) + 0.04 : opacityLevel || GLASS_OPACITY}
       />
-      
+
       {theme.palette.mode === 'light' && (
         <AnimatePresence>
           {isHovered && (
@@ -327,9 +328,9 @@ const TechCard: React.FC<TechCardProps> = ({
           )}
         </AnimatePresence>
       )}
-      
+
       {category && <CategoryLabel category={category} theme={theme} />}
-      
+
       <Box className="card-content" sx={{ transition: 'transform 0.5s ease', zIndex: 2 }}>
         {index > 0 && (
           <NumberedCircle number={index} theme={theme} accentColor={accentColor} />
@@ -340,20 +341,21 @@ const TechCard: React.FC<TechCardProps> = ({
             variants={contentVariants}
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
-            whileHover={{ scale: 1.15, rotate: isHovered ? 5 : 0 }}
+            whileHover={{ scale: 1.2, rotate: isHovered ? 10 : 0, y: -5 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           >
             <Box sx={{ mb: 3, display: 'inline-block' }}>
               {React.cloneElement(icon, {
                 sx: {
-                  width: 60,
-                  height: 60,
-                  color: accentColor || 
+                  width: 56,
+                  height: 56,
+                  color: accentColor ||
                     (theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.primary.light),
-                  filter: `drop-shadow(0 4px 8px ${alpha(
-                    accentColor || theme.palette.primary.main, 
-                    0.5
+                  filter: `drop-shadow(0 6px 10px ${alpha(
+                    accentColor || theme.palette.primary.main,
+                    0.6
                   )})`,
-                  transition: 'all 0.4s ease',
+                  transition: 'all 0.3s ease-in-out',
                 }
               })}
             </Box>

@@ -18,8 +18,7 @@ export const NAV_ITEMS: NavItemType[] = [
   { label: 'Resources', path: '/resources', icon: Book },
   { label: 'Pricing', path: '/pricing', icon: Book },
   { label: 'Solutions', path: '/solutions', icon: Paid },
-  { label: 'Contact', path: '/contact', icon: Email },
-  { label: 'Test route', path: '/test-route-tsx', icon: Email },
+  { label: 'Contact', path: '/contact', icon: Email }
 
 ];
 

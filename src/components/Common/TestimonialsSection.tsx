@@ -1,25 +1,75 @@
 import React, { useState, useRef } from 'react';
-import { Box, Container, Typography, Grid, Avatar, useTheme, Button, alpha, Rating, Chip, Paper } from '@mui/material';
-import { motion, useInView } from 'framer-motion';
-import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
-import TechCard from '../Common/TechCard'; 
-import { Star, FileText, Download } from 'lucide-react';
+import { Box, Container, Typography, Grid, Avatar, useTheme, Button, alpha, Rating, Chip } from '@mui/material';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { getSharedStyles, ANIMATIONS } from '../../utils/designSystem';
+import { Star, FileText, Download, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import TechCard from '../Common/TechCard';
 
-// Compressed testimonials data
+// Testimonials data remains unchanged
 const testimonials = [
-  { id: 1, name: 'John Doe', role: 'CTO, TechCorp', content: "GLUStack's strategic approach transformed our entire development pipeline. Their enterprise expertise helped us resolve complex scaling issues that had plagued us for months.", avatar: '/avatar1.jpg', rating: 5, projectType: 'Cloud Migration' },
-  { id: 2, name: 'Jane Smith', role: 'VP Engineering, InnovateX', content: "The precision and expertise they brought to our Azure migration delivered exceptional ROI. We've seen a 40% decrease in infrastructure costs and significantly improved reliability.", avatar: '/avatar2.jpg', rating: 5, projectType: 'DevOps' },
-  { id: 3, name: 'Michael Johnson', role: 'Founder, StartupHub', content: "As a startup, we needed enterprise-level architecture but with a sustainable approach. GLUStack delivered exactly that, setting us up for sustainable growth without technical debt.", avatar: '/avatar3.jpg', rating: 5, projectType: 'Architecture' },
-  { id: 4, name: 'Emily Davis', role: 'Product Director, GlobalReach', content: "Their team's ability to seamlessly integrate microservices into our legacy system exceeded our expectations. The migration was smooth and the performance gains were immediate.", avatar: '/avatar4.jpg', rating: 5, projectType: 'Microservices' },
-  { id: 5, name: 'David Lee', role: 'Product Manager, AgileSolutions', content: "GLUStack's security implementation was remarkable. They identified vulnerabilities we weren't even aware of and implemented OAuth 2.0 with zero disruption to our customers.", avatar: '/avatar5.jpg', rating: 5, projectType: 'Security' },
-  { id: 6, name: 'Sarah Chen', role: 'Lead Developer, CodeCrafters', content: "The knowledge transfer and documentation during our Kubernetes migration was exemplary. Our team is now fully self-sufficient thanks to their systematic approach to training.", avatar: '/avatar6.jpg', rating: 4, projectType: 'Infrastructure' },
+  { 
+    id: 1, 
+    name: 'John Doe', 
+    role: 'CTO, TechCorp', 
+    content: "GLUStack's strategic approach transformed our entire development pipeline. Their enterprise expertise helped us resolve complex scaling issues that had plagued us for months.", 
+    avatar: '/avatar1.jpg', 
+    rating: 5, 
+    projectType: 'Cloud Migration' 
+  },
+  { 
+    id: 2, 
+    name: 'Jane Smith', 
+    role: 'VP Engineering, InnovateX', 
+    content: "The precision and expertise they brought to our Azure migration delivered exceptional ROI. We've seen a 40% decrease in infrastructure costs and significantly improved reliability.", 
+    avatar: '/avatar2.jpg', 
+    rating: 5, 
+    projectType: 'DevOps' 
+  },
+  { 
+    id: 3, 
+    name: 'Michael Johnson', 
+    role: 'Founder, StartupHub', 
+    content: "As a startup, we needed enterprise-level architecture but with a sustainable approach. GLUStack delivered exactly that, setting us up for sustainable growth without technical debt.", 
+    avatar: '/avatar3.jpg', 
+    rating: 5, 
+    projectType: 'Architecture' 
+  },
+  { 
+    id: 4, 
+    name: 'Emily Davis', 
+    role: 'Product Director, GlobalReach', 
+    content: "Their team's ability to seamlessly integrate microservices into our legacy system exceeded our expectations. The migration was smooth and the performance gains were immediate.", 
+    avatar: '/avatar4.jpg', 
+    rating: 5, 
+    projectType: 'Microservices' 
+  },
+  { 
+    id: 5, 
+    name: 'David Lee', 
+    role: 'Product Manager, AgileSolutions', 
+    content: "GLUStack's security implementation was remarkable. They identified vulnerabilities we weren't even aware of and implemented OAuth 2.0 with zero disruption to our customers.", 
+    avatar: '/avatar5.jpg', 
+    rating: 5, 
+    projectType: 'Security' 
+  },
+  { 
+    id: 6, 
+    name: 'Sarah Chen', 
+    role: 'Lead Developer, CodeCrafters', 
+    content: "The knowledge transfer and documentation during our Kubernetes migration was exemplary. Our team is now fully self-sufficient thanks to their systematic approach to training.", 
+    avatar: '/avatar6.jpg', 
+    rating: 4, 
+    projectType: 'Infrastructure' 
+  },
 ];
 
-// Simplified animation variants
-const ANIM = {
-  container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } } },
-  item: { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }
-};
+// Case study items for CTA section
+const caseStudies = [
+  'ASOS E-commerce Migration Study', 
+  'Tesco DevOps Transformation Guide', 
+  'Microservices Implementation Patterns', 
+  'Enterprise Security Playbook'
+];
 
 const TestimonialsSection = () => {
   const theme = useTheme();
@@ -27,128 +77,248 @@ const TestimonialsSection = () => {
   const [showAll, setShowAll] = useState(false);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+  
+  // Display limited testimonials by default
   const displayedTestimonials = showAll ? testimonials : testimonials.slice(0, 3);
 
-  // Case study items
-  const caseStudies = [
-    'ASOS E-commerce Migration Study', 
-    'Tesco DevOps Transformation Guide', 
-    'Microservices Implementation Patterns', 
-    'Enterprise Security Playbook'
-  ];
+  // Testimonial card using TechCard component
+  const TestimonialCard = ({ testimonial }) => {
+    // Create a custom icon for TechCard (the avatar)
+    const avatarIcon = (
+      <Avatar 
+        src={testimonial.avatar} 
+        sx={{
+          width: 80, 
+          height: 80,
+          border: `3px solid ${theme.palette.primary.main}`,
+          boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+        }} 
+      />
+    );
+
+    return (
+      <TechCard
+        icon={avatarIcon}
+        title=""
+        accentColor={theme.palette.secondary.main}
+        importance="primary"
+        sx={{
+          pt: 5,
+          position: 'relative',
+          overflow: 'visible',
+        }}
+      >
+        {/* Project type chip */}
+        <Chip 
+          label={testimonial.projectType} 
+          size="small" 
+          sx={{
+            position: 'absolute', 
+            top: 8, 
+            right: 8,
+            backgroundColor: alpha(theme.palette.secondary.main, 0.15),
+            borderColor: alpha(theme.palette.secondary.main, 0.2),
+            color: theme.palette.secondary.main, 
+            fontWeight: 600, 
+            fontSize: '0.7rem',
+          }} 
+          variant="outlined" 
+        />
+        
+        {/* Rating */}
+        <Rating 
+          value={testimonial.rating} 
+          readOnly 
+          icon={<Star style={{ color: theme.palette.secondary.main, fill: theme.palette.secondary.main }} size={18} />}
+          emptyIcon={<Star style={{ color: alpha(theme.palette.secondary.main, 0.3) }} size={18} />}
+          sx={{ mb: 2, mt: 0.5, display: 'flex', justifyContent: 'center' }}
+        />
+        
+        {/* Content */}
+        <Typography 
+          variant="body1" 
+          sx={{
+            fontWeight: 500, 
+            color: 'white', 
+            mb: 3, 
+            fontStyle: 'italic',
+            lineHeight: 1.6, 
+            fontSize: '0.95rem', 
+            height: '7rem', 
+            overflow: 'hidden',
+            textOverflow: 'ellipsis', 
+            display: '-webkit-box', 
+            WebkitLineClamp: 5, 
+            WebkitBoxOrient: 'vertical',
+            textAlign: 'center'
+          }}
+        >
+          "{testimonial.content}"
+        </Typography>
+        
+        {/* Name and role */}
+        <Box sx={{ textAlign: 'center', mt: 'auto' }}>
+          <Typography 
+            variant="h6" 
+            sx={{
+              fontWeight: 700, 
+              color: theme.palette.secondary.main, 
+              fontSize: '1.1rem',
+            }}
+          >
+            {testimonial.name}
+          </Typography>
+          <Typography 
+            variant="caption" 
+            sx={{
+              color: alpha('#fff', 0.9), 
+              display: 'block', 
+              fontWeight: 500,
+            }}
+          >
+            {testimonial.role}
+          </Typography>
+        </Box>
+      </TechCard>
+    );
+  };
+
+  // Blue checkmark component matching hero section styling
+  const BlueCheckmarkItem = ({ text, icon: Icon }) => (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+      <Box sx={{ 
+        width: 20, height: 20, borderRadius: '50%', backgroundColor: theme.palette.primary.main,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' 
+      }}>
+        {Icon ? <Icon size={12} /> : '✓'}
+      </Box>
+      <Typography color={theme.palette.text.primary}>{text}</Typography>
+    </Box>
+  );
 
   return (
-    <Box component="section" ref={ref} sx={{
-      width: '100%', py: SPACING.large * 1.5,
-      background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${alpha(theme.palette.primary.main, 0.85)} 100%)`,
-      position: 'relative', overflow: 'hidden',
-    }}>
-      {/* Background pattern */}
-      <Box sx={{ position: 'absolute', inset: 0, opacity: 0.05, 
-        backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' 
-      }} />
-
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
-        <motion.div variants={ANIM.container} initial="hidden" animate={isInView ? "visible" : "hidden"}>
-          <motion.div variants={ANIM.item}>
-            <Typography variant="h2" align="center" sx={{
-              ...styles.pageTitle, color: 'white', mb: 2, fontWeight: 800,
-              fontSize: { xs: '2.2rem', sm: '2.7rem', md: '3.2rem' },
-              letterSpacing: '-0.01em', textShadow: '0 4px 12px rgba(0,0,0,0.6)',
-            }}>Client Success Stories</Typography>
+    <Box 
+      component="section" 
+      ref={ref} 
+      sx={{
+        position: 'relative',
+        py: 10,
+        background: 'linear-gradient(180deg, #18407F 0%, #1A438A 100%)',
+        overflow: 'hidden'
+      }}
+    >
+      <Container maxWidth="lg" sx={styles.contentContainer}>
+        <motion.div 
+          variants={ANIMATIONS.container} 
+          initial="hidden" 
+          animate={isInView ? "visible" : "hidden"}
+        >
+          <motion.div variants={ANIMATIONS.item}>
+            <Typography variant="h2" sx={styles.sectionTitle}>
+              Client <Box component="span" sx={styles.accentText}>Success Stories</Box>
+            </Typography>
           </motion.div>
 
-          <motion.div variants={ANIM.item}>
-            <Typography variant="subtitle1" align="center" sx={{
-              color: alpha(theme.palette.common.white, 0.9), mb: 6, maxWidth: '800px', mx: 'auto',
-              textShadow: '0 2px 4px rgba(0,0,0,0.4)', fontSize: '1.2rem', lineHeight: 1.6, fontWeight: 500,
-            }}>See how our enterprise expertise has transformed businesses across industries</Typography>
+          <motion.div variants={ANIMATIONS.item}>
+            <Typography variant="subtitle1" sx={styles.sectionSubtitle}>
+              See how our <strong>enterprise expertise</strong> has transformed businesses across industries
+            </Typography>
           </motion.div>
 
           <Grid container spacing={4} justifyContent="center">
-            {displayedTestimonials.map((t) => (
-              <Grid item key={t.id} xs={12} sm={6} md={4}>
-                <motion.div variants={ANIM.item} whileHover={{ y: -8, transition: { duration: 0.3 } }}>
-                  <TechCard icon={null} title="">
-                    <Box sx={{ position: 'relative', pt: 4, pb: 2 }}>
-                      <Avatar src={t.avatar} sx={{
-                        width: 80, height: 80, position: 'absolute', top: -40, left: '50%', transform: 'translateX(-50%)',
-                        border: `3px solid ${theme.palette.primary.main}`,
-                        boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
-                      }} />
-                      
-                      <Chip label={t.projectType} size="small" sx={{
-                        position: 'absolute', top: 8, right: 8,
-                        backgroundColor: alpha(theme.palette.primary.main, 0.15),
-                        borderColor: alpha(theme.palette.primary.main, 0.2),
-                        color: theme.palette.primary.main, fontWeight: 600, fontSize: '0.7rem',
-                      }} variant="outlined" />
-                      
-                      <Rating value={t.rating} readOnly 
-                        icon={<Star style={{ color: theme.palette.secondary.main, fill: theme.palette.secondary.main }} size={18} />}
-                        emptyIcon={<Star style={{ color: alpha(theme.palette.secondary.main, 0.3) }} size={18} />}
-                        sx={{ mb: 2, mt: 0.5 }}
-                      />
-                      
-                      <Typography variant="body1" sx={{
-                        fontWeight: 500, color: theme.palette.text.primary, mb: 3, fontStyle: 'italic',
-                        lineHeight: 1.6, fontSize: '0.95rem', height: '7rem', overflow: 'hidden',
-                        textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical',
-                      }}>"{t.content}"</Typography>
-                      
-                      <Box sx={{ textAlign: 'center', mt: 'auto' }}>
-                        <Typography variant="h6" sx={{
-                          fontWeight: 700, color: theme.palette.primary.main, fontSize: '1.1rem',
-                        }}>{t.name}</Typography>
-                        <Typography variant="caption" sx={{
-                          color: alpha(theme.palette.text.secondary, 0.9), display: 'block', fontWeight: 500,
-                        }}>{t.role}</Typography>
-                      </Box>
-                    </Box>
-                  </TechCard>
+            {displayedTestimonials.map((testimonial) => (
+              <Grid item key={testimonial.id} xs={12} sm={6} md={4}>
+                <motion.div variants={ANIMATIONS.item} style={{ width: '100%', height: '100%' }}>
+                  <TestimonialCard testimonial={testimonial} />
                 </motion.div>
               </Grid>
             ))}
           </Grid>
 
-          {/* Strategic blue CTA section */}
-          <motion.div variants={ANIM.item}>
-            <Paper elevation={4} sx={{ mt: 6, mb: 4, mx: 'auto', maxWidth: '700px', p: 3, borderRadius: 3, 
-              background: alpha(theme.palette.background.paper, 0.95), backdropFilter: 'blur(10px)' }}>
-              <Typography variant="h5" align="center" fontWeight={700} mb={2} color={theme.palette.primary.main}>
-                Enterprise Case Studies
-              </Typography>
+          {/* Combined CTA section with testimonial toggle and case studies */}
+          <motion.div variants={ANIMATIONS.item}>
+            <TechCard
+              title="Enterprise Proof Points"
+              sx={{
+                ...styles.ctaCard,
+                background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(theme.palette.background.paper, 0.8)})`,
+                mt: 6
+              }}
+            >
+              {/* Case studies section */}
               <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid item xs={12}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      color: theme.palette.primary.main, 
+                      mb: 2, 
+                      fontWeight: 600 
+                    }}
+                  >
+                    Download Success Evidence:
+                  </Typography>
+                </Grid>
                 {caseStudies.map((item, i) => (
                   <Grid item xs={12} sm={6} key={i}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                      <Box sx={{ width: 20, height: 20, borderRadius: '50%', backgroundColor: theme.palette.primary.main,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                        <Download size={12} />
-                      </Box>
-                      <Typography>{item}</Typography>
-                    </Box>
+                    <BlueCheckmarkItem text={item} icon={FileText} />
                   </Grid>
                 ))}
               </Grid>
-              <Box sx={{ textAlign: 'center' }}>
-                <Button variant="contained" color="primary" href="/case-studies" sx={{
-                  px: 3, py: 1, textTransform: 'none', fontWeight: 600, fontSize: '0.95rem', borderRadius: 2,
-                }}>Download Case Studies</Button>
+              
+              {/* Combined CTA buttons */}
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 2
+              }}>
+                {/* Primary CTA - Download Case Studies */}
+                <Button 
+                  variant="contained" 
+                  color="primary" 
+                  href="/case-studies" 
+                  startIcon={<Download size={16} />}
+                  sx={{
+                    px: 3, 
+                    py: 1, 
+                    textTransform: 'none', 
+                    fontWeight: 600, 
+                    fontSize: '0.95rem', 
+                    borderRadius: 2,
+                    flexGrow: { xs: 1, sm: 0 },
+                    width: { xs: '100%', sm: 'auto' }
+                  }}
+                >
+                  Download Case Studies
+                </Button>
+                
+                {/* Secondary CTA - View More/Less Testimonials */}
+                <Button 
+                  variant="outlined" 
+                  color="secondary" 
+                  onClick={() => setShowAll(!showAll)} 
+                  endIcon={showAll ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  sx={{
+                    px: 3,
+                    py: 1,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    fontSize: '0.95rem',
+                    borderRadius: 2,
+                    borderWidth: 2,
+                    '&:hover': {
+                      borderWidth: 2
+                    },
+                    flexGrow: { xs: 1, sm: 0 },
+                    width: { xs: '100%', sm: 'auto' }
+                  }}
+                >
+                  {showAll ? 'Show Fewer Stories' : 'View All Testimonials'}
+                </Button>
               </Box>
-            </Paper>
-          </motion.div>
-
-          <motion.div variants={ANIM.item}>
-            <Box sx={{ textAlign: 'center', mt: 4 }}>
-              <Button variant="contained" color="secondary" size="large" onClick={() => setShowAll(!showAll)} sx={{
-                px: 5, py: 1.6, fontSize: '1.1rem', fontWeight: 700, borderRadius: 2, textTransform: 'none',
-                boxShadow: `0 6px 20px ${alpha(theme.palette.secondary.main, 0.6)}, 0 2px 6px rgba(0, 0, 0, 0.3)`,
-                '&:hover': { transform: 'translateY(-3px)', 
-                  boxShadow: `0 10px 25px ${alpha(theme.palette.secondary.main, 0.7)}, 0 4px 10px rgba(0, 0, 0, 0.4)` },
-                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-              }}>{showAll ? 'Show Less' : 'View More Success Stories'}</Button>
-            </Box>
+            </TechCard>
           </motion.div>
         </motion.div>
       </Container>
