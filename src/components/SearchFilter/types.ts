@@ -27,7 +27,7 @@ export interface FilterGroup {
 export interface SortOption {
   id: string;
   label: string;
-  description?: string;  /
+  description?: string;  
   defaultDirection?: SortDirection;
   allowDirectionChange?: boolean; // Whether this sort option supports direction change
 }

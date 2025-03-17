@@ -1,5 +1,4 @@
-
-;
+"use client";
 
 import Head from 'next/head';
 import ProtectedRoute from '../../components/auth/ProtectedRoute';

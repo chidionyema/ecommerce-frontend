@@ -14,9 +14,29 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { Fzf } from 'fzf';
-import { FilterType, FilterOption, FilterGroup, ColorConfig } from '../types';
+import { FilterOption, FilterGroup, ColorConfig } from '../types';
 
-export function FilterPanel(props) {
+// Define additional types needed for this component
+type FilterSelectionType = 'multi' | 'single';
+
+// Define props interface
+interface FilterPanelProps {
+  anchorEl: HTMLElement | null;
+  pendingFilters: Record<string, any>;
+  filterGroups: FilterGroup[];
+  handleFilterChange: (group: string, filter: string, value: any, type: FilterSelectionType) => void;
+  handleApplyFilters: () => void;
+  isOptionSelected: (group: string, option: string) => boolean;
+  hasPendingChanges: boolean;
+  closePanel: () => void;
+  colors: ColorConfig;
+  isMobile?: boolean;
+  liveFiltering?: boolean;
+  enableFilterSearch?: boolean;
+}
+
+export function FilterPanel(props: FilterPanelProps) {
+
   const {
     anchorEl,
     pendingFilters,
@@ -34,12 +54,12 @@ export function FilterPanel(props) {
 
   const theme = useTheme();
   
-  const [expandedGroups, setExpandedGroups] = useState({});
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const [searchTerm, setSearchTerm] = useState('');
   
   // Initialize expanded groups
   useEffect(() => {
-    const expanded = {};
+    const expanded: Record<string, boolean> = {};
     filterGroups.forEach((group, index) => {
       expanded[group.id] = index < 2;
     });
@@ -47,7 +67,7 @@ export function FilterPanel(props) {
   }, [filterGroups]);
   
   // Handle toggling group expansion
-  const toggleGroup = (groupId) => {
+  const toggleGroup = (groupId: string) => {
     setExpandedGroups(prev => ({
       ...prev,
       [groupId]: !prev[groupId]
@@ -60,7 +80,8 @@ export function FilterPanel(props) {
     
     const fzf = new Fzf(filterGroups, {
       selector: item => `${item.label} ${item.options?.map(o => o.label).join(' ')}`,
-      fuzzy: true,
+      fuzzy: "v2",
+
       limit: filterGroups.length
     });
     
@@ -68,13 +89,13 @@ export function FilterPanel(props) {
   }, [searchTerm, filterGroups, enableFilterSearch]);
   
   // Handle checkbox change
-  const handleCheckboxChange = (group, option) => {
+  const handleCheckboxChange = (group: FilterGroup, option: FilterOption) => {
     const isSelected = isOptionSelected(group.id, option.id);
     handleFilterChange(group.id, option.id, !isSelected, 'multi');
   };
   
   // Handle radio change
-  const handleRadioChange = (group, value) => {
+  const handleRadioChange = (group: FilterGroup, value: string) => {
     const isAlreadySelected = pendingFilters[group.id] === value;
     if (isAlreadySelected) {
       handleFilterChange(group.id, value, false, 'single');
@@ -84,7 +105,7 @@ export function FilterPanel(props) {
   };
   
   // Calculate the selected options count for a group
-  const getSelectedCount = (groupId) => {
+  const getSelectedCount = (groupId: string) => {
     if (!pendingFilters[groupId]) return 0;
     
     // For multi-select filters (checkbox)
@@ -110,7 +131,7 @@ export function FilterPanel(props) {
   };
   
   // Render checkbox group
-  const renderCheckboxGroup = (group) => (
+  const renderCheckboxGroup = (group: FilterGroup) => (
     <Box sx={{ pt: 1 }}>
       {group.options?.map(option => {
         const isSelected = isOptionSelected(group.id, option.id);
@@ -166,7 +187,7 @@ export function FilterPanel(props) {
   );
   
   // Render radio group
-  const renderRadioGroup = (group) => (
+  const renderRadioGroup = (group: FilterGroup) => (
     <RadioGroup
       value={pendingFilters[group.id] || ''}
       onChange={(e) => handleRadioChange(group, e.target.value)}
@@ -225,7 +246,7 @@ export function FilterPanel(props) {
   );
   
   // Render filter group content based on type
-  const renderGroupContent = (group) => {
+  const renderGroupContent = (group: FilterGroup) => {
     switch (group.type) {
       case 'checkbox':
         return renderCheckboxGroup(group);
@@ -438,7 +459,7 @@ export function FilterPanel(props) {
                 position: 'relative'
               }}
             >
-              {hasPendingChanges && totalSelectedCount > 0 ? `Apply (${totalSelectedCount})` : 'Apply'}
+              {hasPendingChanges && getTotalSelectedCount() > 0 ? `Apply (${getTotalSelectedCount()})` : 'Apply'}
             </Button>
           </Box>
         )}
@@ -446,3 +467,5 @@ export function FilterPanel(props) {
     </Popover>
   );
 }
+
+export default FilterPanel;

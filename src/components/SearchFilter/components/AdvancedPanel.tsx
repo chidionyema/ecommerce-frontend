@@ -45,11 +45,12 @@ export function AdvancedPanel({
   
   const handleToggleOption = (option: string, checked: boolean) => {
     handleFilterChange(
-      'advanced',
-      option,
-      checked,
-      'advanced'
-    );
+        'advanced',
+        option,
+        checked,
+        'advanced' as FilterType
+      );
+      
     
     if (liveFiltering) {
       // We need to delay this slightly to allow the state to update

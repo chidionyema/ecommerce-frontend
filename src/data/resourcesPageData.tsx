@@ -7,7 +7,8 @@ import {
   PictureAsPdf,
   DataObject,
   School,
-  Dashboard
+  Dashboard,
+  
 } from '@mui/icons-material';
 
 // Type definitions
@@ -55,28 +56,29 @@ interface ResourcesPageSections {
 }
 
 // Get icon based on resource type
-export const getTypeIcon = (type: string) => {
+export const getTypeIcon = (type: string, iconProps?: React.ComponentProps<typeof Article>) => {
   switch (type) {
     case 'article':
-      return <Article />;
+      return <Article {...iconProps} />;
     case 'guide':
-      return <Book />;
+      return <Book {...iconProps} />;
     case 'tutorial':
-      return <Code />;
+      return <Code {...iconProps} />;
     case 'video':
-      return <VideoLibrary />;
+      return <VideoLibrary {...iconProps} />;
     case 'ebook':
-      return <PictureAsPdf />;
+      return <PictureAsPdf {...iconProps} />;
     case 'template':
-      return <DataObject />;
+      return <DataObject {...iconProps} />;
     case 'course':
-      return <School />;
+      return <School {...iconProps} />;
     case 'tool':
-      return <Dashboard />;
+      return <Dashboard {...iconProps} />;
     default:
-      return <Article />;
+      return <Article {...iconProps} />;
   }
 };
+
 
 // Page section texts
 export const resourcesPageSections: ResourcesPageSections = {

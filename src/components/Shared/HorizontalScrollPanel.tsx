@@ -3,8 +3,9 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import ChevronUp from '@mui/icons-material/ChevronUp';
-import ChevronDown from '@mui/icons-material/ChevronDown';
+// Change to the correct imports from @mui/icons-material
+import KeyboardArrowUp from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 
 import throttle from 'lodash/throttle';
 
@@ -24,17 +25,14 @@ const VerticalScrollPanel: React.FC<VerticalScrollPanelProps> = ({
   const [canScrollDown, setCanScrollDown] = useState(true);
   const isMobile = useMediaQuery('(max-width: 600px)');
 
+  // Fixed useCallback with empty dependency array
   const updateScrollButtons = useCallback(() => {
     const el = scrollContainerRef.current;
     if (el) {
       setCanScrollUp(el.scrollTop > 0);
       setCanScrollDown(el.scrollTop < el.scrollHeight - el.clientHeight);
-      // console.log('scrollTop:', el.scrollTop);
-      // console.log('scrollHeight:', el.scrollHeight);
-      // console.log('clientHeight:', el.clientHeight);
-      // console.log('canScrollDown:', el.scrollTop < el.scrollHeight - el.clientHeight);
     }
-  },);
+  }, []); // Added empty dependency array
 
   const throttledUpdate = useMemo(
     () => throttle(updateScrollButtons, 100),
@@ -68,7 +66,7 @@ const VerticalScrollPanel: React.FC<VerticalScrollPanelProps> = ({
   };
 
   return (
-    <Box sx={{ position: 'relative', width: '100%', height: containerHeight }}> {/* Use containerHeight prop */}
+    <Box sx={{ position: 'relative', width: '100%', height: containerHeight }}>
       {canScrollUp && (
         <IconButton
           aria-label="Scroll up"
@@ -85,7 +83,7 @@ const VerticalScrollPanel: React.FC<VerticalScrollPanelProps> = ({
             ...(isMobile && { display: 'none' }),
           }}
         >
-          <ChevronUp />
+          <KeyboardArrowUp />
         </IconButton>
       )}
 
@@ -124,7 +122,7 @@ const VerticalScrollPanel: React.FC<VerticalScrollPanelProps> = ({
             ...(isMobile && { display: 'none' }),
           }}
         >
-          <ChevronDown />
+          <KeyboardArrowDown />
         </IconButton>
       )}
     </Box>
