@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import NextLink from 'next/link';
 import {
-  Box, Typography, Container, Grid, Tabs, Tab, Chip, useMediaQuery, useTheme, alpha, 
+  Box, Typography, Container, Grid, Tabs, Tab, Chip, useTheme, alpha, 
   Stack, Paper, Button, IconButton, Tooltip, Divider
 } from '@mui/material';
 import {
@@ -17,14 +17,114 @@ import { pricingPageContent, plans } from '../../data/pricingPageData';
 import { theme as brandKit } from '../../theme/brandKit';
 import { Theme } from '@mui/material/styles';
 
+// Define types for plan and feature structures
+interface Plan {
+  type: string;
+  title: string;
+  tagline: string;
+  price: string;
+  annualPrice?: string;
+  values?: string[];
+  recommended?: boolean;
+  icon?: string;
+}
+
+interface FeatureCellProps {
+  value: boolean | string;
+  plan: Plan;
+  theme: Theme;
+}
+
+interface PlanIconProps {
+  icon: string;
+  isRecommended: boolean;
+  theme: Theme;
+}
+
+interface PlanCardProps {
+  plan: Plan;
+  isRecommended: boolean;
+  billingCycle: 'monthly' | 'annual';
+  onClick: (planType: string) => void;
+  onViewFeatures: () => void;
+  isHovered: boolean;
+  onHover: (planType: string | null) => void;
+}
+
+interface FeatureCheckProps {
+  color?: 'primary' | 'success';
+  size?: 'small' | 'medium';
+}
+
+interface SectionHeadingProps {
+  label?: string;
+  title: string;
+  description?: string;
+}
+
+interface CTAButtonsProps {
+  primary: { text: string; href: string };
+  secondary: { text: string; href: string };
+  darkMode?: boolean;
+}
+
+interface StatsCardProps {
+  stats: Array<{
+    value: string;
+    label: string;
+    icon: React.ReactNode;
+  }>;
+  theme: Theme;
+}
+
+interface Feature {
+  name: string;
+  values: Record<string, boolean | string>;
+}
+
 // Add FAQ guarantee item
 pricingPageContent.faqSection.items.push({
   question: "What is our guarantee?",
   answer: "We offer a 30-day money-back guarantee to ensure complete satisfaction."
 });
 
+// Feature categories and matrix
+const categories = [
+  { name: 'Core Features', id: 'core', icon: <SpeedRounded fontSize="small" /> },
+  { name: 'Support', id: 'support', icon: <SupportRounded fontSize="small" /> },
+  { name: 'Security', id: 'security', icon: <ShieldRounded fontSize="small" /> },
+  { name: 'Advanced', id: 'advanced', icon: <StarRounded fontSize="small" /> }
+];
+
+const allFeatures: Record<string, Feature[]> = {
+  core: [
+    { name: 'Number of users', values: { consultation: '1 user', project: 'Up to 10 users', enterprise: 'Unlimited' } },
+    { name: 'Storage space', values: { consultation: '10 GB', project: '100 GB', enterprise: '1 TB' } },
+    { name: 'Projects', values: { consultation: '3', project: 'Unlimited', enterprise: 'Unlimited' } },
+    { name: 'API access', values: { consultation: false, project: true, enterprise: true } }
+  ],
+  support: [
+    { name: 'Email support', values: { consultation: true, project: true, enterprise: true } },
+    { name: 'Phone support', values: { consultation: false, project: true, enterprise: true } },
+    { name: 'Dedicated manager', values: { consultation: false, project: false, enterprise: true } },
+    { name: 'Response time', values: { consultation: '24 hours', project: '12 hours', enterprise: '4 hours' } }
+  ],
+  security: [
+    { name: 'Two-factor auth', values: { consultation: true, project: true, enterprise: true } },
+    { name: 'Advanced SSO', values: { consultation: false, project: true, enterprise: true } },
+    { name: 'Audit logs', values: { consultation: false, project: true, enterprise: true } },
+    { name: 'Custom security', values: { consultation: false, project: false, enterprise: true } }
+  ],
+  advanced: [
+    { name: 'Custom integrations', values: { consultation: false, project: false, enterprise: true } },
+    { name: 'Workflow automation', values: { consultation: false, project: true, enterprise: true } },
+    { name: 'Analytics dashboard', values: { consultation: 'Basic', project: 'Advanced', enterprise: 'Enterprise' } },
+    { name: 'White labeling', values: { consultation: false, project: false, enterprise: true } }
+  ]
+};
+
 // Reusable components
-const FeatureCheck = ({ color = 'primary', size = 'medium' }) => {
+const FeatureCheck: React.FC<FeatureCheckProps> = ({ color = 'primary', size = 'medium' }) => {
   const theme = useTheme();
   const dimensions = size === 'small' ? 18 : 22;
   const iconSize = size === 'small' ? 14 : 16;
@@ -44,7 +144,7 @@ const FeatureCheck = ({ color = 'primary', size = 'medium' }) => {
 };
 
 // Feature cell component for comparison table
-const FeatureCell = ({ value, plan, theme }) => {
+const FeatureCell: React.FC<FeatureCellProps> = ({ value, plan, theme }) => {
   if (value === true) {
     return (
       <Box sx={{
@@ -67,9 +167,9 @@ const FeatureCell = ({ value, plan, theme }) => {
 };
 
 // Plan icon component
-const PlanIcon = ({ icon, isRecommended, theme }) => {
+const PlanIcon: React.FC<PlanIconProps> = ({ icon, isRecommended, theme }) => {
   const iconColor = isRecommended ? theme.palette.primary.main : theme.palette.grey[700];
-  const iconMap = {
+  const iconMap: Record<string, React.ReactNode> = {
     star: <StarRounded sx={{ fontSize: 20, color: iconColor }} />,
     shield: <ShieldRounded sx={{ fontSize: 20, color: iconColor }} />,
     speed: <SpeedRounded sx={{ fontSize: 20, color: iconColor }} />,
@@ -88,7 +188,7 @@ const PlanIcon = ({ icon, isRecommended, theme }) => {
 };
 
 // Pricing card component
-const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, isHovered, onHover }) => {
+const PlanCard: React.FC<PlanCardProps> = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, isHovered, onHover }) => {
   const theme = useTheme();
   const monthlyCost = parseFloat(plan.price.replace(/[^0-9.]/g, ''));
   const annualCost = parseFloat((plan.annualPrice || plan.price).replace(/[^0-9.]/g, ''));
@@ -107,8 +207,7 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
         <Box sx={{
           position: 'absolute', top: 12, right: -30, transform: 'rotate(45deg)',
           bgcolor: theme.palette.primary.main, color: '#fff', px: 4, py: 0.5,
-          fontSize: '0.75rem', fontWeight: 600, zIndex: 1, boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          letterSpacing: '0.05em'
+          fontSize: '0.75rem', fontWeight: 600, zIndex: 1
         }}>RECOMMENDED</Box>
       )}
 
@@ -116,7 +215,7 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
         bgcolor: 'background.paper',
         border: `1px solid ${isRecommended ? alpha(theme.palette.primary.main, 0.25) : alpha(theme.palette.divider, 0.1)}`,
         borderRadius: 4, p: 3.5, height: '100%', display: 'flex', flexDirection: 'column',
-        transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0)', position: 'relative',
+        transition: 'all 0.3s', position: 'relative',
         boxShadow: isRecommended ? '0 8px 24px rgba(51, 102, 255, 0.15)' : '0 2px 12px rgba(0, 0, 0, 0.06)',
         ...(isHovered && {
           transform: 'translateY(-8px)',
@@ -128,7 +227,7 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
           {plan.icon && <PlanIcon icon={plan.icon} isRecommended={isRecommended} theme={theme} />}
           <Typography variant="h5" sx={{
             fontWeight: 700,
-            color: isRecommended ? theme.palette.primary.main : theme.palette.text.primary,
+            color: isRecommended ? theme.palette.primary.main : theme.palette.text.primary
           }}>{plan.title}</Typography>
         </Stack>
 
@@ -195,16 +294,14 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
           variant="text" size="small" color="inherit" onClick={onViewFeatures}
           sx={{ fontSize: '0.8rem', mt: 2, justifyContent: 'center' }}
           endIcon={<KeyboardArrowRightRounded fontSize="small" />}
-        >
-          View all features
-        </Button>
+        >View all features</Button>
       </Paper>
     </motion.div>
   );
 };
 
 // Reusable section components
-const SectionHeading = ({ label, title, description }) => {
+const SectionHeading: React.FC<SectionHeadingProps> = ({ label, title, description }) => {
   const theme = useTheme();
   
   return (
@@ -229,7 +326,7 @@ const SectionHeading = ({ label, title, description }) => {
 };
 
 // Stats component for CTA section
-const StatsCard = ({ stats, theme }) => (
+const StatsCard: React.FC<StatsCardProps> = ({ stats, theme }) => (
   <Paper elevation={0} sx={{
     backdropFilter: 'blur(10px)', bgcolor: alpha('#fff', 0.08),
     borderRadius: 4, border: `1px solid ${alpha('#fff', 0.2)}`,
@@ -253,8 +350,7 @@ const StatsCard = ({ stats, theme }) => (
             <Box sx={{ 
               p: 2, textAlign: 'center', bgcolor: alpha('#fff', 0.05), borderRadius: 3,
               border: `1px solid ${alpha('#fff', 0.1)}`, height: '100%',
-              display: 'flex', flexDirection: 'column', justifyContent: 'center',
-              '&:hover': { bgcolor: alpha('#fff', 0.1) }
+              display: 'flex', flexDirection: 'column', justifyContent: 'center'
             }}>
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1, opacity: 0.7 }}>{stat.icon}</Box>
               <Typography variant="h5" sx={{ fontWeight: 800, color: '#fff', mb: 0.5 }}>{stat.value}</Typography>
@@ -268,7 +364,7 @@ const StatsCard = ({ stats, theme }) => (
 );
 
 // UI for CTA buttons
-const CTAButtons = ({ primary, secondary, darkMode = false }) => {
+const CTAButtons: React.FC<CTAButtonsProps> = ({ primary, secondary, darkMode = false }) => {
   const theme = useTheme();
   return (
     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
@@ -276,8 +372,7 @@ const CTAButtons = ({ primary, secondary, darkMode = false }) => {
         component={NextLink} href={primary.href} size="large" variant="contained" 
         sx={{
           bgcolor: darkMode ? '#fff' : undefined, color: darkMode ? theme.palette.primary.dark : undefined, 
-          textTransform: 'none', fontWeight: 700, py: 1.75, px: 4, borderRadius: 3, 
-          '&:hover': { bgcolor: darkMode ? '#fff' : undefined, transform: 'translateY(-3px)' }
+          textTransform: 'none', fontWeight: 700, py: 1.75, px: 4, borderRadius: 3
         }}
       >{primary.text}</Button>
 
@@ -286,58 +381,21 @@ const CTAButtons = ({ primary, secondary, darkMode = false }) => {
         sx={{
           borderColor: darkMode ? alpha('#fff', 0.6) : undefined, color: darkMode ? '#fff' : undefined, 
           textTransform: 'none', fontWeight: 600, py: 1.75, px: 4, borderRadius: 3,
-          bgcolor: darkMode ? alpha('#fff', 0.05) : undefined,
-          '&:hover': { borderColor: darkMode ? '#fff' : undefined, transform: 'translateY(-3px)' }
+          bgcolor: darkMode ? alpha('#fff', 0.05) : undefined
         }}
       >{secondary.text}</Button>
     </Stack>
   );
 };
 
-// Feature categories and matrix
-const categories = [
-  { name: 'Core Features', id: 'core', icon: <SpeedRounded fontSize="small" /> },
-  { name: 'Support', id: 'support', icon: <SupportRounded fontSize="small" /> },
-  { name: 'Security', id: 'security', icon: <ShieldRounded fontSize="small" /> },
-  { name: 'Advanced', id: 'advanced', icon: <StarRounded fontSize="small" /> }
-];
-
-const allFeatures = {
-  core: [
-    { name: 'Number of users', values: { consultation: '1 user', project: 'Up to 10 users', enterprise: 'Unlimited' } },
-    { name: 'Storage space', values: { consultation: '10 GB', project: '100 GB', enterprise: '1 TB' } },
-    { name: 'Projects', values: { consultation: '3', project: 'Unlimited', enterprise: 'Unlimited' } },
-    { name: 'API access', values: { consultation: false, project: true, enterprise: true } }
-  ],
-  support: [
-    { name: 'Email support', values: { consultation: true, project: true, enterprise: true } },
-    { name: 'Phone support', values: { consultation: false, project: true, enterprise: true } },
-    { name: 'Dedicated manager', values: { consultation: false, project: false, enterprise: true } },
-    { name: 'Response time', values: { consultation: '24 hours', project: '12 hours', enterprise: '4 hours' } }
-  ],
-  security: [
-    { name: 'Two-factor auth', values: { consultation: true, project: true, enterprise: true } },
-    { name: 'Advanced SSO', values: { consultation: false, project: true, enterprise: true } },
-    { name: 'Audit logs', values: { consultation: false, project: true, enterprise: true } },
-    { name: 'Custom security', values: { consultation: false, project: false, enterprise: true } }
-  ],
-  advanced: [
-    { name: 'Custom integrations', values: { consultation: false, project: false, enterprise: true } },
-    { name: 'Workflow automation', values: { consultation: false, project: true, enterprise: true } },
-    { name: 'Analytics dashboard', values: { consultation: 'Basic', project: 'Advanced', enterprise: 'Enterprise' } },
-    { name: 'White labeling', values: { consultation: false, project: false, enterprise: true } }
-  ]
-};
-
 // Main component
 export default function PricingPage() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const router = useRouter();
-  const [billingCycle, setBillingCycle] = useState('annual');
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
   const [activeTab, setActiveTab] = useState(0);
   const [compareMode, setCompareMode] = useState(false);
-  const [hoverCard, setHoverCard] = useState(null);
+  const [hoverCard, setHoverCard] = useState<string | null>(null);
   const [animateIn, setAnimateIn] = useState(false);
 
   useEffect(() => { 
@@ -345,7 +403,7 @@ export default function PricingPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handlePlanClick = (planType) => router.push(`/contact?plan=${planType}`);
+  const handlePlanClick = (planType: string) => router.push(`/contact?plan=${planType}`);
 
   // Stats for testimonials
   const stats = [
@@ -367,7 +425,7 @@ export default function PricingPage() {
               transition={{ duration: 0.5 }}
             >
               <Typography variant="h1" sx={{
-                fontSize: { xs: '2.25rem', sm: '2.75rem', md: '3.25rem' }, fontWeight: 800, mb: 3,
+                fontSize: { xs: '2.25rem', md: '3.25rem' }, fontWeight: 800, mb: 3,
                 backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
               }}>
@@ -477,7 +535,7 @@ export default function PricingPage() {
                 const isRecommended = (activeTab === 0 && plan.type === 'consultation') ||
                                      (activeTab === 1 && plan.type === 'project') ||
                                      (activeTab === 2 && plan.type === 'enterprise') ||
-                                     plan.recommended;
+                                     !!plan.recommended;
 
                 // Add icon based on plan type
                 const enhancedPlan = {
@@ -545,7 +603,7 @@ export default function PricingPage() {
                               <Stack direction="row" spacing={1} alignItems="center">
                                 <PlanIcon 
                                   icon={plan.type === 'consultation' ? 'star' : plan.type === 'project' ? 'speed' : 'shield'} 
-                                  isRecommended={plan.recommended || false} 
+                                  isRecommended={!!plan.recommended} 
                                   theme={theme} 
                                 />
                                 <Typography variant="h6" sx={{ fontWeight: 700 }}>{plan.title}</Typography>
@@ -806,4 +864,4 @@ export default function PricingPage() {
       </ConsistentPageLayout>
     </Box>
   );
-} 
+}
