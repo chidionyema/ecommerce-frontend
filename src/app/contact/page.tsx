@@ -112,25 +112,23 @@ export default function Contact() {
   }, [searchParams]);
 
   // Form submission handler
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
-    (async () => {
-      try {
-        await validationSchema.validate(formData, { abortEarly: false });
-        setLoading(true);
-        setTimeout(() => { setLoading(false); setSuccess(true); }, 1500);
-      } catch (err) {
-        if (err instanceof yup.ValidationError) {
-          const validationErrors: Record<string, string> = {};
-          err.inner.forEach(error => { if (error.path) validationErrors[error.path] = error.message; });
-          setErrors(validationErrors);
-        } else {
-          setErrors({ form: 'An unexpected error occurred. Please try again.' });
-        }
+    try {
+      await validationSchema.validate(formData, { abortEarly: false });
+      setLoading(true);
+      setTimeout(() => { setLoading(false); setSuccess(true); }, 1500);
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        const validationErrors: Record<string, string> = {};
+        err.inner.forEach(error => { if (error.path) validationErrors[error.path] = error.message; });
+        setErrors(validationErrors);
+      } else {
+        setErrors({ form: 'An unexpected error occurred. Please try again.' });
       }
-    })();
+    }
   };
 
   // Input change handler
@@ -392,7 +390,7 @@ export default function Contact() {
               <Box sx={{ height: '100%' }}>
                 <GoldCard
                   component="form"
-                  onSubmit={handleSubmit}
+                  onSubmit={handleSubmit as React.FormEventHandler<HTMLDivElement>}
                   className={styles.formCard}
                   sx={{
                     backgroundColor: alpha(theme.palette.background.paper, 0.95),
