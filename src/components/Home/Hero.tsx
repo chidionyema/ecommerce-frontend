@@ -88,17 +88,30 @@ const HeroSection = () => {
   const theme = useTheme();
   const [isCalendlyOpen, setIsCalendlyOpen] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  const [selectedPersona, setSelectedPersona] = useState('developer');
+  const [selectedPersona, setSelectedPersona] = useState<'developer' | 'executive' | 'security'>('developer');
+
   const [roi, setRoi] = useState(30);
   const [teamSize, setTeamSize] = useState(5);
 
   // Detect user persona from URL or localStorage
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const personaParam = params.get('persona');
-    if (personaParam && DATA.personas[personaParam]) setSelectedPersona(personaParam);
-    else if (localStorage.getItem('userPersona')) setSelectedPersona(localStorage.getItem('userPersona'));
+    const personaParam = params.get('persona') as 'developer' | 'executive' | 'security' | null;
+    if (personaParam && DATA.personas[personaParam]) {
+      setSelectedPersona(personaParam);
+    } else {
+      const storedPersona = localStorage.getItem('userPersona');
+      if (
+        storedPersona === 'developer' ||
+        storedPersona === 'executive' ||
+        storedPersona === 'security'
+      ) {
+        setSelectedPersona(storedPersona);
+      }
+    }
   }, []);
+  
+  
 
   // Memoized calculations with more precise formula
   const annualSavings = useMemo(() => {
@@ -164,25 +177,36 @@ const HeroSection = () => {
       background: theme.palette.secondary.main, color: '#fff', boxShadow: `0 4px 18px ${alpha(theme.palette.secondary.main, 0.36)}`,
       '&:hover': { background: theme.palette.secondary.dark, transform: 'scale(1.04)' }},
     personaSwitcher: { display: 'flex', gap: 1, mb: 3, justifyContent: 'center' },
-    personaBtn: (isActive) => ({ py: 0.85, px: 1.85, borderRadius: 6, fontSize: '0.82rem', fontWeight: 500,
+    personaBtn: (isActive: boolean) => ({
+      py: 0.85,
+      px: 1.85,
+      borderRadius: 6,
+      fontSize: '0.82rem',
+      fontWeight: 500,
       background: isActive ? alpha(theme.palette.secondary.main, 0.13) : 'transparent',
       border: `1px solid ${isActive ? theme.palette.secondary.main : alpha('#fff', 0.17)}`,
       color: isActive ? theme.palette.secondary.main : alpha('#fff', 0.85),
       transition: 'all 0.28s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
-      '&:hover': { background: isActive ? alpha(theme.palette.secondary.main, 0.17) : alpha('#fff', 0.04),
-        transform: isActive ? 'translateY(-1px)' : 'none' }}),
-    chatbot: { position: 'fixed', bottom: 90, right: 24, width: 340, maxHeight: 480, borderRadius: 12, p: 2,
+      '&:hover': {
+        background: isActive ? alpha(theme.palette.secondary.main, 0.17) : alpha('#fff', 0.04),
+        transform: isActive ? 'translateY(-1px)' : 'none'
+      }
+    }),
+       chatbot: { position: 'fixed', bottom: 90, right: 24, width: 340, maxHeight: 480, borderRadius: 12, p: 2,
       background: alpha(theme.palette.background.paper, 0.94), backdropFilter: 'blur(10px)',
       border: `1px solid ${alpha('#fff', 0.17)}`, zIndex: 1000, boxShadow: `0 10px 36px ${alpha('#000', 0.17)}`, overflow: 'hidden' }
   };
 
   // Refined CheckItem component for enhanced visual consistency
-  const CheckItem = ({ text }) => (
+  const CheckItem: React.FC<{ text: string }> = ({ text }) => (
     <Box sx={sx.checkStyle}>
       <Box sx={sx.checkBox}>✓</Box>
-      <Typography color={alpha('#fff', 0.94)} fontSize="0.85rem" fontWeight={500} letterSpacing="0.01em">{text}</Typography>
+      <Typography color={alpha('#fff', 0.94)} fontSize="0.85rem" fontWeight={500} letterSpacing="0.01em">
+        {text}
+      </Typography>
     </Box>
   );
+  
 
   return (
     <Box component="section" sx={sx.heroContainer}>
@@ -196,11 +220,17 @@ const HeroSection = () => {
         {/* Persona Switcher */}
         <motion.div {...ANIM.fadeIn(0)}>
           <Box sx={sx.personaSwitcher}>
-            {Object.keys(DATA.personas).map(persona => (
-              <Button key={persona} size="small" onClick={() => setSelectedPersona(persona)} sx={sx.personaBtn(selectedPersona === persona)}>
-                For {persona.charAt(0).toUpperCase() + persona.slice(1)}s
-              </Button>
-            ))}
+          {(Object.keys(DATA.personas) as Array<keyof typeof DATA.personas>).map((persona) => (
+            <Button
+              key={persona}
+              size="small"
+              onClick={() => setSelectedPersona(persona)}
+              sx={sx.personaBtn(selectedPersona === persona)}
+            >
+              For {persona.charAt(0).toUpperCase() + persona.slice(1)}s
+            </Button>
+          ))}
+
           </Box>
         </motion.div>
 
@@ -275,11 +305,35 @@ const HeroSection = () => {
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item xs={12} sm={6}>
                 <Typography color="white" fontSize="0.825rem" mb={0.5}>Team Size: {teamSize} (${(teamSize * 10000).toLocaleString()}/mo)</Typography>
-                <Slider value={teamSize} onChange={(e, v) => setTeamSize(v)} min={1} max={50} step={1} valueLabelDisplay="auto" size="small" sx={{ color: "#4285f4" }} />
+                <Slider
+  value={teamSize}
+  onChange={(e, newValue) =>
+    setTeamSize(typeof newValue === 'number' ? newValue : newValue[0])
+  }
+  min={1}
+  max={50}
+  step={1}
+  valueLabelDisplay="auto"
+  size="small"
+  sx={{ color: "#4285f4" }}
+/>
+
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Typography color="white" fontSize="0.825rem" mb={0.5}>Efficiency Gain: {roi}%</Typography>
-                <Slider value={roi} onChange={(e, v) => setRoi(v)} min={10} max={60} step={1} valueLabelDisplay="auto" size="small" sx={{ color: "#4285f4" }} />
+                <Slider
+  value={roi}
+  onChange={(e, newValue) =>
+    setRoi(typeof newValue === 'number' ? newValue : newValue[0])
+  }
+  min={10}
+  max={60}
+  step={1}
+  valueLabelDisplay="auto"
+  size="small"
+  sx={{ color: "#4285f4" }}
+/>
+
               </Grid>
             </Grid>
 

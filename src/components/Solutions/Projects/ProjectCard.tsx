@@ -7,7 +7,7 @@ import { Code as DefaultIcon } from 'lucide-react';
 import { Cloud, CircuitBoard, Server, Settings, Terminal, Database, Code2, GitBranch, Box as BoxIcon, Network, BarChart3 } from 'lucide-react';
 
 // Consolidate static data
-const projectBackgrounds = {
+const projectBackgrounds: Record<string, string> = {
   '1': 'linear-gradient(135deg, #1a237e, #283593)', '2': 'linear-gradient(135deg, #4a148c, #6a1b9a)',
   '3': 'linear-gradient(135deg, #004d40, #00695c)', '4': 'linear-gradient(135deg, #0d47a1, #1565c0)',
   '5': 'linear-gradient(135deg, #006064, #00838f)', '6': 'linear-gradient(135deg, #b71c1c, #c62828)',
@@ -16,7 +16,12 @@ const projectBackgrounds = {
   '11': 'linear-gradient(135deg, #ff6f00, #ff8f00)'
 };
 
-const technologyIconMap = {
+interface TechnologyIconInfo {
+  icon: React.ElementType;
+  color: string;
+}
+
+const technologyIconMap: Record<string, TechnologyIconInfo> = {
   ".NET Core": { icon: Code2, color: '#7662EA' }, "Java": { icon: Terminal, color: '#FF7E50' },
   "AWS": { icon: Cloud, color: '#FF9D3B' }, "Docker": { icon: Server, color: '#5BBBFF' },
   "Kubernetes": { icon: Cloud, color: '#4C7BFF' }, "React": { icon: CircuitBoard, color: '#61DBFB' },
@@ -27,7 +32,41 @@ const technologyIconMap = {
   "Helm": { icon: Settings, color: '#0F1689' }
 };
 
-const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }) => {
+// Define types for the component props
+interface ProjectMetric {
+  label: string;
+  value: string | number;
+  description?: string;
+}
+
+interface Project {
+  id?: string;
+  name?: string;
+  clientName?: string;
+  industry?: string;
+  description?: string;
+  challenges?: string;
+  impact?: string;
+  bannerImage?: string;
+  background?: string;
+  brandColor?: string;
+  icon?: React.ElementType;
+  iconColor?: string;
+  featured?: boolean;
+  technologies?: string[];
+  technologyIcons?: React.ElementType[];
+  metrics?: ProjectMetric[];
+}
+
+interface ProjectCardProps {
+  project?: Project;
+  sx?: Record<string, any>;
+  delay?: number;
+  priority?: boolean;
+  onSelect?: (id: string) => void;
+}
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, priority = false, onSelect }) => {
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -35,15 +74,23 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   // Consolidated design variables and computed properties
-  const designVars = useMemo(() => ({
-    bannerImage: project?.bannerImage ? `/images/${project.bannerImage}` : '/images/placeholder.jpg',
-    brandColor: project?.brandColor || theme.palette.primary.main,
-    cardBg: '#000000',
-    projectBackground: (project?.id && projectBackgrounds[project?.id]) || project?.background || null,
-    hasDetailedContent: Boolean(project?.challenges || project?.impact || (project?.description?.length > 120)),
-    techCount: project?.technologies?.length || 0,
-    shouldCollapseTechs: (project?.technologies?.length || 0) > 5
-  }), [project, theme]);
+  const designVars = useMemo(() => {
+    // Fix for the type error - safely check description length
+    const descriptionLength = project?.description ? project.description.length : 0;
+    const hasLongDescription = descriptionLength > 120;
+    
+    return {
+      bannerImage: project?.bannerImage ? `/images/${project.bannerImage}` : '/images/placeholder.jpg',
+      brandColor: project?.brandColor || theme.palette.primary.main,
+      cardBg: '#000000',
+      projectBackground: (project?.id && project.id in projectBackgrounds ? projectBackgrounds[project.id] : null) || project?.background || null,
+      hasDetailedContent: Boolean(project?.challenges || project?.impact || hasLongDescription),
+      techCount: project?.technologies?.length || 0,
+      shouldCollapseTechs: (project?.technologies?.length || 0) > 5,
+      hasTechnologyIcons: Array.isArray(project?.technologyIcons) && project.technologyIcons.length > 0,
+      hasMetrics: Array.isArray(project?.metrics) && project.metrics.length > 0
+    };
+  }, [project, theme]);
 
   // Load image
   useEffect(() => {
@@ -81,8 +128,19 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
   }, [project?.icon, project?.iconColor, designVars.brandColor]);
 
   // Action handlers
-  const toggleExpanded = e => { if (e) { e.preventDefault(); e.stopPropagation(); } setExpanded(!expanded); };
-  const handleViewDetails = e => { e.preventDefault(); e.stopPropagation(); onSelect?.(project?.id || ''); };
+  const toggleExpanded = (e?: React.MouseEvent) => { 
+    if (e) { 
+      e.preventDefault(); 
+      e.stopPropagation(); 
+    } 
+    setExpanded(!expanded); 
+  };
+  
+  const handleViewDetails = (e: React.MouseEvent) => { 
+    e.preventDefault(); 
+    e.stopPropagation(); 
+    onSelect?.(project?.id || ''); 
+  };
 
   if (!inView) return <Box ref={ref} sx={{ ...sx, my: 4, width: 380, height: 680 }} />;
 
@@ -106,6 +164,11 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
     zIndex: expanded ? 10 : 1
   };
 
+  // Safe access to arrays
+  const technologyIcons = project?.technologyIcons || [];
+  const metrics = project?.metrics || [];
+  const technologies = project?.technologies || [];
+
   return (
     <Box ref={ref} sx={{ width: 380, my: expanded ? 5 : 4, mx: 4, ...sx }}>
       <motion.div 
@@ -123,9 +186,9 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
           sx={cardStyle}>
           
           {/* Technology Icons */}
-          {!expanded && project?.technologyIcons?.length > 0 && (
+          {!expanded && designVars.hasTechnologyIcons && (
             <Box sx={{ display: 'flex', gap: 1.25, position: 'absolute', top: 12, left: 12, zIndex: 5 }}>
-              {project.technologyIcons.slice(0, 4).map((Icon, index) => (
+              {technologyIcons.slice(0, 4).map((Icon, index) => (
                 <Box key={index} sx={{
                   width: 32, height: 32, borderRadius: '8px', display: 'flex',
                   alignItems: 'center', justifyContent: 'center', 
@@ -256,7 +319,7 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
                 display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical',
                 overflow: 'hidden', position: 'relative'
               }),
-              '&::after': !expanded && project?.description?.length > 120 ? {
+              '&::after': !expanded && project?.description && project.description.length > 120 ? {
                 content: '""', position: 'absolute', bottom: 0, right: 0, width: '40%', height: '1.5em',
                 background: 'linear-gradient(to right, rgba(0,0,0,0) 0%, #000000 80%)', pointerEvents: 'none'
               } : {}
@@ -265,18 +328,18 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
             </Typography>
 
             {/* Metrics */}
-            {project?.metrics?.length > 0 && (
+            {designVars.hasMetrics && (
               <Box sx={{ 
                 display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderRadius: '10px', 
                 background: 'rgba(25, 25, 35, 0.6)', overflow: 'hidden', 
                 mb: expanded ? 3.5 : 3, mt: expanded ? 1 : 0,
                 border: '1px solid rgba(255, 255, 255, 0.08)' 
               }}>
-                {project.metrics.map((metric, index) => (
+                {metrics.map((metric, index) => (
                   <Tooltip key={index} title={metric.description || metric.label} arrow>
                     <Box sx={{ 
                       display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1.75,
-                      borderRight: index < project.metrics.length - 1 ? '1px solid rgba(255, 255, 255, 0.08)' : 'none'
+                      borderRight: index < metrics.length - 1 ? '1px solid rgba(255, 255, 255, 0.08)' : 'none'
                     }}>
                       <Typography sx={{ fontSize: '17px', fontWeight: 600, color: designVars.brandColor, mb: 0.75 }}>
                         {metric.value}
@@ -334,7 +397,7 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
                   background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000000 90%)', pointerEvents: 'none'
                 } : {}
               }}>
-                {Array.isArray(project?.technologies) && project.technologies.map((tech, index) => {
+                {technologies.map((tech, index) => {
                   if (!expanded && designVars.shouldCollapseTechs && index >= 5) return null;
                   
                   const iconInfo = technologyIconMap[tech];
@@ -440,7 +503,7 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
 };
 
 // Helper function for rendering content sections (challenges, impact)
-const renderContentSection = (title, content, brandColor) => (
+const renderContentSection = (title: string, content: string, brandColor: string) => (
   <Box sx={{ mb: title === "Impact" ? 0 : 2.5 }}>
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
       <Box sx={{ 

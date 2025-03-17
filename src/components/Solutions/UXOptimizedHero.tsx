@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Typography, Box, Container, Chip, TextField, InputAdornment, 
   IconButton, FormControl, Select, MenuItem, Paper, Grid,
-  useTheme, alpha, Fade, CircularProgress
+  useTheme, alpha, Fade, CircularProgress, SelectChangeEvent
 } from '@mui/material';
 import { Search, Clear, TrendingUp, FilterList, SortOutlined } from '@mui/icons-material';
 import { motion } from 'framer-motion';
@@ -14,7 +14,37 @@ const MotionBox = motion(Box);
 const MotionPaper = motion(Paper);
 const MotionTypography = motion(Typography);
 
-const UXOptimizedHero = ({ 
+// Define types for sort options
+interface SortOption {
+  id: string;
+  label: string;
+  value?: string; // Add this property to match UXOptimizedHero's expected type
+  description?: string;
+  defaultDirection?: 'asc' | 'desc';
+}
+
+// Define types for statistics
+interface Stats {
+  totalCount: number;
+  featuredCount: number;
+  techCount: number;
+  [key: string]: number; // Allow for any additional stats
+}
+
+// Define props interface
+interface UXOptimizedHeroProps {
+  search: string;
+  setSearch: (search: string) => void;
+  sortBy: string;
+  setSortBy: (sortBy: string) => void;
+  sortOptions: SortOption[];
+  stats: Stats;
+  loading: boolean;
+  resultCount: number;
+  totalCount: number;
+}
+
+const UXOptimizedHero: React.FC<UXOptimizedHeroProps> = ({ 
   search, 
   setSearch, 
   sortBy, 
@@ -115,6 +145,11 @@ const UXOptimizedHero = ({
       />
     </>
   );
+
+  // Handle select change with proper type
+  const handleSortChange = (event: SelectChangeEvent<string>) => {
+    setSortBy(event.target.value);
+  };
   
   return (
     <Box 
@@ -237,7 +272,7 @@ const UXOptimizedHero = ({
                   <TextField
                     placeholder={expanded ? "Search case studies by name, technology, or description..." : "Search case studies..."}
                     value={search}
-                    onChange={e => setSearch(e.target.value)}
+                    onChange={(e) => setSearch(e.target.value)}
                     variant="outlined"
                     fullWidth
                     size={expanded ? "medium" : "small"}
@@ -251,7 +286,7 @@ const UXOptimizedHero = ({
                           )}
                         </InputAdornment>
                       ),
-                      endAdornment: search && (
+                      endAdornment: search ? (
                         <InputAdornment position="end">
                           <IconButton 
                             size="small" 
@@ -261,7 +296,7 @@ const UXOptimizedHero = ({
                             <Clear fontSize="small" />
                           </IconButton>
                         </InputAdornment>
-                      ),
+                      ) : undefined,
                       sx: {
                         borderRadius: '10px',
                         backgroundColor: isDark 
@@ -347,9 +382,9 @@ const UXOptimizedHero = ({
                           </Typography>
                           <Select
                             value={sortBy}
-                            onChange={e => setSortBy(e.target.value)}
+                            onChange={handleSortChange}
                             displayEmpty
-                            placeholder="Sort By"
+                            inputProps={{ 'aria-label': 'Sort By' }}
                             sx={{
                               borderRadius: '8px',
                               backgroundColor: isDark 
@@ -375,7 +410,9 @@ const UXOptimizedHero = ({
                             }
                           >
                             <MenuItem value=""><em>Default Sort</em></MenuItem>
-                            {sortOptions.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
+                            {sortOptions.map(o => (
+                              <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
+                            ))}
                           </Select>
                         </FormControl>
                       </Grid>

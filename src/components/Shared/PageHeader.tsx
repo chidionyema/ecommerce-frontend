@@ -39,8 +39,7 @@ interface PageHeaderProps {
 
 /**
  * Ultimate PageHeader - Creates an exquisitely crafted visual experience
- * with unparalleled attention to detail, perfect animation harmonics,
- * and responsive nuance at every breakpoint.
+ * with unparalleled attention to detail and responsive nuance.
  */
 const PageHeader: React.FC<PageHeaderProps> = ({
   title,
@@ -131,7 +130,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
     return () => { img.onload = null; };
   }, [backgroundImage]);
 
-  // Meticulously crafted animation variants
+  // Animation variants
   const ANIM = {
     fadeIn: (delay = 0, distance = 5) => ({
       initial: { opacity: 0, y: distance },
@@ -181,260 +180,41 @@ const PageHeader: React.FC<PageHeaderProps> = ({
     }
   };
 
-  // Precision-crafted styling system
-  const sx_ = {
-    // Base container with appearance variants
-    headerContainer: {
-      position: 'relative',
-      minHeight: { 
-        xs: `${380 * densityFactors.spacing}px`, 
-        sm: `${420 * densityFactors.spacing}px`, 
-        md: `${480 * densityFactors.spacing}px` 
-      },
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      pt: { xs: 8 * densityFactors.spacing, md: 10 * densityFactors.spacing },
-      pb: { xs: 8 * densityFactors.spacing, md: 10 * densityFactors.spacing },
-      overflow: 'hidden',
-      backgroundColor: theme.palette.primary.dark,
-      borderRadius: { xs: 0, sm: appearance === 'minimal' ? 0 : theme.shape.borderRadius * 1.5 },
-      boxShadow: appearance === 'elevated' 
-        ? `0 16px 50px -12px ${alpha(theme.palette.common.black, 0.3)}, 0 0 1px ${alpha(theme.palette.common.black, 0.4)}`
-        : appearance === 'minimal' ? 'none'
-        : `0 8px 32px ${alpha(theme.palette.common.black, 0.18)}`,
-      mt: 0,
-      mb: { xs: 4, sm: 5, md: 6 },
-      mx: { xs: 0, sm: appearance === 'minimal' ? 0 : 3, md: appearance === 'minimal' ? 0 : 4 },
-      isolation: 'isolate', // Create stacking context for z-index
-      ...sx
-    },
-    
-    // Backdrop elements
-    overlay: {
-      position: 'absolute',
-      inset: 0,
-      zIndex: 1,
-      background: `radial-gradient(ellipse at center, 
-        ${alpha(theme.palette.primary.dark, overlaySettings.gradient[0])} 0%, 
-        ${alpha(theme.palette.primary.main, overlaySettings.gradient[1])} 65%, 
-        ${alpha(theme.palette.primary.dark, overlaySettings.gradient[2])} 100%)`,
-      opacity: overlaySettings.opacity,
-      mixBlendMode: 'multiply', // Enhance color depth
-      backdropFilter: backgroundBlur ? 'blur(4px)' : 'none',
-    },
-    
-    backgroundBlur: {
-      position: 'absolute',
-      inset: 0,
-      zIndex: 0,
-      backdropFilter: 'blur(8px)',
-    },
-    
-    content: {
-      position: 'relative',
-      zIndex: 3,
-      my: 4 * densityFactors.spacing,
-      width: '100%',
-    },
-    
-    // Typography with precision scaling
-    headline: {
-      fontSize: { 
-        xs: `${2.5 * densityFactors.typography}rem`, 
-        sm: `${3 * densityFactors.typography}rem`, 
-        md: `${3.75 * densityFactors.typography}rem` 
-      },
-      lineHeight: 1.08,
-      fontWeight: 800,
-      letterSpacing: '-0.025em',
-      position: 'relative',
-      color: alpha('#fff', 0.98),
-      textAlign: 'center',
-      mb: 3,
-      overflowWrap: 'break-word',
-      hyphens: 'auto',
-      maxWidth: '96%',
-      mx: 'auto',
-      textShadow: appearance === 'glass' ? '0 2px 10px rgba(0,0,0,0.2)' : 'none',
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        bottom: -16,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: { xs: '60px', md: '80px' },
-        height: '2.5px',
-        background: `linear-gradient(90deg, 
-          ${alpha(theme.palette.secondary.main, 0.05)}, 
-          ${theme.palette.secondary.main}, 
-          ${alpha(theme.palette.secondary.main, 0.05)})`,
-        borderRadius: '1.25px'
-      }
-    },
-    
-    accentText: {
-      background: `linear-gradient(135deg, 
-        ${theme.palette.secondary.light}, 
-        ${theme.palette.secondary.main})`,
-      backgroundClip: 'text',
-      WebkitBackgroundClip: 'text',
-      color: 'transparent',
-      WebkitTextFillColor: 'transparent',
-      display: 'inline-block', // Prevent background clipping issues
-      transform: 'translateZ(0)', // Force GPU rendering for smoother gradients
-      fontWeight: 800,
-    },
-    
-    subheadline: {
-      fontSize: { 
-        xs: `${1.1 * densityFactors.typography}rem`, 
-        sm: `${1.2 * densityFactors.typography}rem`, 
-        md: `${1.3 * densityFactors.typography}rem` 
-      },
-      fontWeight: 400,
-      lineHeight: 1.55,
-      letterSpacing: '0.008em',
-      textAlign: 'center',
-      color: alpha('#ffffff', 0.9),
-      maxWidth: '800px',
-      mx: 'auto',
-      mt: 3 * densityFactors.spacing,
-      mb: 4 * densityFactors.spacing,
-      textShadow: appearance === 'glass' ? '0 1px 5px rgba(0,0,0,0.15)' : 'none',
-      '& strong': {
-        fontWeight: 600,
-        color: alpha(theme.palette.secondary.light, 0.98)
-      }
-    },
-    
-    // Refined button styles
-    buttonBase: {
-      borderRadius: 9,
-      fontWeight: 600,
-      fontSize: '0.95rem',
-      textTransform: 'none',
-      transition: 'all 0.32s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
-      position: 'relative',
-      letterSpacing: '0.01em',
-      lineHeight: 1.2,
-    },
-    
-    primaryButton: {
-      px: 4.5 * densityFactors.spacing,
-      py: 1.75 * densityFactors.spacing,
-      background: `linear-gradient(135deg, 
-        ${theme.palette.secondary.main}, 
-        ${alpha(theme.palette.secondary.dark, 0.92)})`,
-      color: '#fff',
-      boxShadow: `0 12px 20px ${alpha(theme.palette.secondary.main, 0.3)}, 0 2px 4px ${alpha(theme.palette.secondary.dark, 0.2)}`,
-      '&:before': {
-        content: '""',
-        position: 'absolute',
-        inset: 0,
-        borderRadius: 'inherit',
-        padding: 1,
-        background: `linear-gradient(135deg, ${alpha('#fff', 0.15)}, ${alpha('#fff', 0.05)})`,
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-      },
-      '&:hover': {
-        transform: 'translateY(-2px) scale(1.02)',
-        boxShadow: `0 16px 28px ${alpha(theme.palette.secondary.main, 0.4)}, 0 4px 8px ${alpha(theme.palette.secondary.dark, 0.2)}`,
-        background: `linear-gradient(135deg, 
-          ${theme.palette.secondary.main}, 
-          ${alpha(theme.palette.secondary.dark, 0.88)})`,
-      },
-      '&:active': {
-        transform: 'translateY(-1px) scale(1.01)',
-        boxShadow: `0 10px 14px ${alpha(theme.palette.secondary.main, 0.36)}, 0 2px 3px ${alpha(theme.palette.secondary.dark, 0.2)}`,
-      }
-    },
-    
-    secondaryButton: {
-      px: 3.5 * densityFactors.spacing,
-      py: 1.65 * densityFactors.spacing,
-      borderWidth: 1.5,
-      borderColor: alpha('#fff', 0.85),
-      color: '#fff',
-      backgroundColor: appearance === 'glass' ? alpha('#000', 0.08) : alpha('#000', 0.12),
-      backdropFilter: 'blur(10px)',
-      '&:hover': {
-        borderColor: '#fff',
-        backgroundColor: alpha('#fff', 0.08),
-        transform: 'translateY(-2px) scale(1.02)',
-        boxShadow: `0 8px 16px ${alpha('#000', 0.25)}`,
-      },
-      '&:active': {
-        transform: 'translateY(-1px) scale(1.01)',
-        backgroundColor: alpha('#fff', 0.05),
-        boxShadow: `0 4px 8px ${alpha('#000', 0.2)}`,
-      }
-    },
-    
-    // Exquisite highlight cards
-    highlightCard: {
-      p: 2.5 * densityFactors.spacing,
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: appearance === 'glass' 
-        ? alpha('#1a56db', 0.1)
-        : alpha('#1a56db', 0.13),
-      border: `1px solid ${alpha('#4285f4', appearance === 'glass' ? 0.2 : 0.25)}`,
-      borderRadius: 12,
-      backdropFilter: 'blur(12px)',
-      transition: 'all 0.38s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
-      boxShadow: `0 8px 16px ${alpha('#000', 0.14)}`,
-      '&:hover': {
-        transform: 'translateY(-3px) scale(1.02)',
-        background: alpha('#1a56db', appearance === 'glass' ? 0.14 : 0.17),
-        boxShadow: `0 18px 36px ${alpha('#000', 0.18)}`,
-        border: `1px solid ${alpha('#4285f4', 0.38)}`
-      },
-      '&:after': appearance === 'glass' ? {
-        content: '""',
-        position: 'absolute',
-        inset: 0,
-        borderRadius: 'inherit',
-        padding: 1,
-        background: `linear-gradient(135deg, ${alpha('#fff', 0.25)}, ${alpha('#fff', 0.05)})`,
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMaskComposite: 'xor',
-        maskComposite: 'exclude',
-        pointerEvents: 'none',
-      } : {}
-    },
-    
-    // Additional particle animations
-    particleBase: {
-      position: 'absolute',
-      borderRadius: '50%',
-      pointerEvents: 'none',
-    }
-  };
-
   return (
     <Box
       component="header"
       id={id}
       aria-labelledby={`${id}-title`}
       ref={headerRef}
-      sx={sx_.headerContainer}
+      sx={{
+        position: 'relative',
+        minHeight: { 
+          xs: `${380 * densityFactors.spacing}px`, 
+          sm: `${420 * densityFactors.spacing}px`, 
+          md: `${480 * densityFactors.spacing}px` 
+        },
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pt: { xs: 8 * densityFactors.spacing, md: 10 * densityFactors.spacing },
+        pb: { xs: 8 * densityFactors.spacing, md: 10 * densityFactors.spacing },
+        overflow: 'hidden',
+        backgroundColor: theme.palette.primary.dark,
+        borderRadius: { xs: 0, sm: appearance === 'minimal' ? 0 : theme.shape.borderRadius * 1.5 },
+        boxShadow: appearance === 'elevated' 
+          ? `0 16px 50px -12px ${alpha(theme.palette.common.black, 0.3)}, 0 0 1px ${alpha(theme.palette.common.black, 0.4)}`
+          : appearance === 'minimal' ? 'none'
+          : `0 8px 32px ${alpha(theme.palette.common.black, 0.18)}`,
+        mt: 0,
+        mb: { xs: 4, sm: 5, md: 6 },
+        mx: { xs: 0, sm: appearance === 'minimal' ? 0 : 3, md: appearance === 'minimal' ? 0 : 4 },
+        isolation: 'isolate',
+        ...(sx as any)
+      }}
     >
       {/* Background Image with Parallax */}
       {backgroundImage && (
-        <motion.div
-          style={{
-            y: isMobile ? 0 : backgroundY,
-            scale: backgroundScale,
-            opacity: imageLoaded ? 1 : 0
-          }}
-          transition={{ duration: 0.8 }}
+        <Box 
           sx={{
             position: 'absolute',
             inset: 0,
@@ -442,28 +222,45 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             overflow: 'hidden',
           }}
         >
-          <Image
-            src={backgroundImage}
-            alt=""
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
-            priority={true}
-            quality={95}
+          <Box
+            component={motion.div}
             style={{
-              objectFit: 'cover',
-              objectPosition: 'center',
-              filter: `brightness(${appearance === 'glass' ? 0.9 : 1}) contrast(1.2) saturate(${appearance === 'glass' ? 0.95 : 1.1})`,
+              position: 'absolute',
+              inset: 0,
+              y: isMobile ? 0 : backgroundY,
+              scale: backgroundScale,
+              opacity: imageLoaded ? 1 : 0,
             }}
-            onLoad={() => setImageLoaded(true)}
-          />
+            transition={{ duration: 0.8 }}
+          >
+            <Image
+              src={backgroundImage}
+              alt=""
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
+              priority={true}
+              quality={95}
+              style={{
+                objectFit: 'cover',
+                objectPosition: 'center',
+                filter: `brightness(${appearance === 'glass' ? 0.9 : 1}) contrast(1.2) saturate(${appearance === 'glass' ? 0.95 : 1.1})`,
+              }}
+              onLoad={() => setImageLoaded(true)}
+            />
+          </Box>
           
           {backgroundBlur && (
-            <Box sx={sx_.backgroundBlur} />
+            <Box sx={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 0,
+              backdropFilter: 'blur(8px)',
+            }} />
           )}
-        </motion.div>
+        </Box>
       )}
 
-      {/* Background pattern - Enhanced with depth and motion */}
+      {/* Background pattern */}
       {backgroundPattern && (
         <Box
           sx={{
@@ -475,7 +272,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             opacity: 0.35
           }}
         >
-          {/* Floating particles with varied sizes and motion patterns */}
+          {/* Floating particles */}
           {Array(isMobile ? 10 : 18).fill(null).map((_, index) => {
             const size = Math.random() * 4 + 2;
             const duration = Math.random() * 30 + 20;
@@ -486,9 +283,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             return (
               <Box
                 key={index}
-                component={motion.div}
                 sx={{
-                  ...sx_.particleBase,
+                  position: 'absolute',
+                  borderRadius: '50%',
+                  pointerEvents: 'none',
                   width: size,
                   height: size,
                   backgroundColor: alpha('#ffffff', 0.3 + (depth * 0.2)),
@@ -497,6 +295,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                   filter: `blur(${(1 - depth) * 1.5}px)`,
                   zIndex: Math.floor(depth * 10),
                 }}
+                component={motion.div}
                 animate={{
                   x: [0, Math.random() * 100 - 50],
                   y: [0, Math.random() * 100 - 50],
@@ -512,7 +311,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             );
           })}
           
-          {/* Add subtle accent glow */}
+          {/* Accent glow */}
           <Box
             sx={{
               position: 'absolute',
@@ -531,59 +330,172 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         </Box>
       )}
 
-      {/* Overlay with nuanced opacity */}
-      <Box sx={sx_.overlay} />
+      {/* Overlay */}
+      <Box sx={{
+        position: 'absolute',
+        inset: 0,
+        zIndex: 1,
+        background: `radial-gradient(ellipse at center, 
+          ${alpha(theme.palette.primary.dark, overlaySettings.gradient[0])} 0%, 
+          ${alpha(theme.palette.primary.main, overlaySettings.gradient[1])} 65%, 
+          ${alpha(theme.palette.primary.dark, overlaySettings.gradient[2])} 100%)`,
+        opacity: overlaySettings.opacity,
+        mixBlendMode: 'multiply',
+        backdropFilter: backgroundBlur ? 'blur(4px)' : 'none',
+      }} />
 
-      {/* Content container with parallax effect */}
-      <Container maxWidth="lg" sx={sx_.content}>
-        <motion.div
+      {/* Content container */}
+      <Container 
+        maxWidth="lg" 
+        sx={{
+          position: 'relative',
+          zIndex: 3,
+          my: 4 * densityFactors.spacing,
+          width: '100%',
+        }}
+      >
+        <Box
+          component={motion.div}
           style={{
             y: contentY,
             opacity: contentOpacity
           }}
         >
-          {/* Headline with precision typography */}
-          <motion.div {...ANIM.fadeIn(0)}>
+          {/* Headline */}
+          <Box
+            component={motion.div}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              transition: {
+                duration: 0.72,
+                delay: 0.05,
+                ease: [0.165, 0.015, 0.12, 0.995]
+              }
+            }}
+          >
             <Typography
               variant="h1"
               component="h1"
               id={`${id}-title`}
-              sx={sx_.headline}
+              sx={{
+                fontSize: { 
+                  xs: `${2.5 * densityFactors.typography}rem`, 
+                  sm: `${3 * densityFactors.typography}rem`, 
+                  md: `${3.75 * densityFactors.typography}rem` 
+                },
+                lineHeight: 1.08,
+                fontWeight: 800,
+                letterSpacing: '-0.025em',
+                position: 'relative',
+                color: alpha('#fff', 0.98),
+                textAlign: 'center',
+                mb: 3,
+                overflowWrap: 'break-word',
+                hyphens: 'auto',
+                maxWidth: '96%',
+                mx: 'auto',
+                textShadow: appearance === 'glass' ? '0 2px 10px rgba(0,0,0,0.2)' : 'none',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: -16,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: { xs: '60px', md: '80px' },
+                  height: '2.5px',
+                  background: `linear-gradient(90deg, 
+                    ${alpha(theme.palette.secondary.main, 0.05)}, 
+                    ${theme.palette.secondary.main}, 
+                    ${alpha(theme.palette.secondary.main, 0.05)})`,
+                  borderRadius: '1.25px'
+                }
+              }}
             >
               {accentText ? (
                 <>
                   {title.split(accentText)[0]}
-                  <Box component="span" sx={sx_.accentText}>{accentText}</Box>
+                  <Box 
+                    component="span" 
+                    sx={{
+                      background: `linear-gradient(135deg, 
+                        ${theme.palette.secondary.light}, 
+                        ${theme.palette.secondary.main})`,
+                      backgroundClip: 'text',
+                      WebkitBackgroundClip: 'text',
+                      color: 'transparent',
+                      WebkitTextFillColor: 'transparent',
+                      display: 'inline-block',
+                      transform: 'translateZ(0)',
+                      fontWeight: 800,
+                    }}
+                  >
+                    {accentText}
+                  </Box>
                   {title.split(accentText)[1]}
                 </>
               ) : (
                 title
               )}
             </Typography>
-          </motion.div>
+          </Box>
 
-          {/* Subheadline with enhanced text treatment */}
+          {/* Subheadline */}
           {subtitle && (
-            <motion.div {...ANIM.fadeIn(0.1)}>
+            <Box
+              component={motion.div}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                transition: {
+                  duration: 0.72,
+                  delay: 0.15,
+                  ease: [0.165, 0.015, 0.12, 0.995]
+                }
+              }}
+            >
               <Typography
                 variant="subtitle1"
-                sx={sx_.subheadline}
+                sx={{
+                  fontSize: { 
+                    xs: `${1.1 * densityFactors.typography}rem`, 
+                    sm: `${1.2 * densityFactors.typography}rem`, 
+                    md: `${1.3 * densityFactors.typography}rem` 
+                  },
+                  fontWeight: 400,
+                  lineHeight: 1.55,
+                  letterSpacing: '0.008em',
+                  textAlign: 'center',
+                  color: alpha('#ffffff', 0.9),
+                  maxWidth: '800px',
+                  mx: 'auto',
+                  mt: 3 * densityFactors.spacing,
+                  mb: 4 * densityFactors.spacing,
+                  textShadow: appearance === 'glass' ? '0 1px 5px rgba(0,0,0,0.15)' : 'none',
+                  '& strong': {
+                    fontWeight: 600,
+                    color: alpha(theme.palette.secondary.light, 0.98)
+                  }
+                }}
               >
                 {subtitle.split(' ').map((word, i, arr) =>
                   i === arr.length - 2 ? <strong key={i}>{word} </strong> :
                     i === arr.length - 1 ? <strong key={i}>{word}</strong> : word + ' '
                 )}
               </Typography>
-            </motion.div>
+            </Box>
           )}
 
-          {/* Highlights with refined animation sequencing */}
+          {/* Highlights */}
           {highlights.length > 0 && (
-            <motion.div
-              variants={ANIM.stagger.container}
+            <Box
+              component={motion.div}
               initial="initial"
               animate={isInView ? "animate" : "initial"}
-              style={{ width: '100%', marginBottom: 40 * densityFactors.spacing }}
+              variants={ANIM.stagger.container}
+              sx={{ width: '100%', mb: 5 * densityFactors.spacing }}
             >
               <Box sx={{ maxWidth: '900px', mx: 'auto', mb: 4 }}>
                 <Box
@@ -596,8 +508,49 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                   }}
                 >
                   {highlights.map((highlight, index) => (
-                    <motion.div key={index} variants={ANIM.stagger.item} style={{ flex: 1 }}>
-                      <Paper elevation={0} sx={sx_.highlightCard}>
+                    <Box 
+                      key={index} 
+                      component={motion.div} 
+                      variants={ANIM.stagger.item} 
+                      sx={{ flex: 1 }}
+                    >
+                      <Paper 
+                        elevation={0} 
+                        sx={{
+                          p: 2.5 * densityFactors.spacing,
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: appearance === 'glass' 
+                            ? alpha('#1a56db', 0.1)
+                            : alpha('#1a56db', 0.13),
+                          border: `1px solid ${alpha('#4285f4', appearance === 'glass' ? 0.2 : 0.25)}`,
+                          borderRadius: 12,
+                          backdropFilter: 'blur(12px)',
+                          transition: 'all 0.38s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
+                          boxShadow: `0 8px 16px ${alpha('#000', 0.14)}`,
+                          '&:hover': {
+                            transform: 'translateY(-3px) scale(1.02)',
+                            background: alpha('#1a56db', appearance === 'glass' ? 0.14 : 0.17),
+                            boxShadow: `0 18px 36px ${alpha('#000', 0.18)}`,
+                            border: `1px solid ${alpha('#4285f4', 0.38)}`
+                          },
+                          '&:after': appearance === 'glass' ? {
+                            content: '""',
+                            position: 'absolute',
+                            inset: 0,
+                            borderRadius: 'inherit',
+                            padding: 1,
+                            background: `linear-gradient(135deg, ${alpha('#fff', 0.25)}, ${alpha('#fff', 0.05)})`,
+                            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                            WebkitMaskComposite: 'xor',
+                            maskComposite: 'exclude',
+                            pointerEvents: 'none',
+                          } : {}
+                        }}
+                      >
                         <Typography
                           color="white"
                           sx={{
@@ -610,15 +563,27 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                           {highlight}
                         </Typography>
                       </Paper>
-                    </motion.div>
+                    </Box>
                   ))}
                 </Box>
               </Box>
-            </motion.div>
+            </Box>
           )}
 
-          {/* CTA Buttons with refined interactive states */}
-          <motion.div {...ANIM.fadeIn(0.2)}>
+          {/* CTA Buttons */}
+          <Box
+            component={motion.div}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              transition: {
+                duration: 0.72,
+                delay: 0.2,
+                ease: [0.165, 0.015, 0.12, 0.995]
+              }
+            }}
+          >
             <Box
               sx={{
                 display: 'flex',
@@ -635,7 +600,46 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 variant="contained"
                 endIcon={primaryCta.icon || <ArrowRight size={16} strokeWidth={2} />}
                 aria-label={primaryCta.ariaLabel || primaryCta.text}
-                sx={{ ...sx_.buttonBase, ...sx_.primaryButton }}
+                sx={{
+                  borderRadius: 9,
+                  fontWeight: 600,
+                  fontSize: '0.95rem',
+                  textTransform: 'none',
+                  transition: 'all 0.32s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
+                  position: 'relative',
+                  letterSpacing: '0.01em',
+                  lineHeight: 1.2,
+                  px: 4.5 * densityFactors.spacing,
+                  py: 1.75 * densityFactors.spacing,
+                  background: `linear-gradient(135deg, 
+                    ${theme.palette.secondary.main}, 
+                    ${alpha(theme.palette.secondary.dark, 0.92)})`,
+                  color: '#fff',
+                  boxShadow: `0 12px 20px ${alpha(theme.palette.secondary.main, 0.3)}, 0 2px 4px ${alpha(theme.palette.secondary.dark, 0.2)}`,
+                  '&:before': {
+                    content: '""',
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: 'inherit',
+                    padding: 1,
+                    background: `linear-gradient(135deg, ${alpha('#fff', 0.15)}, ${alpha('#fff', 0.05)})`,
+                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                    WebkitMaskComposite: 'xor',
+                    maskComposite: 'exclude',
+                    pointerEvents: 'none',
+                  },
+                  '&:hover': {
+                    transform: 'translateY(-2px) scale(1.02)',
+                    boxShadow: `0 16px 28px ${alpha(theme.palette.secondary.main, 0.4)}, 0 4px 8px ${alpha(theme.palette.secondary.dark, 0.2)}`,
+                    background: `linear-gradient(135deg, 
+                      ${theme.palette.secondary.main}, 
+                      ${alpha(theme.palette.secondary.dark, 0.88)})`,
+                  },
+                  '&:active': {
+                    transform: 'translateY(-1px) scale(1.01)',
+                    boxShadow: `0 10px 14px ${alpha(theme.palette.secondary.main, 0.36)}, 0 2px 3px ${alpha(theme.palette.secondary.dark, 0.2)}`,
+                  }
+                }}
               >
                 {primaryCta.text}
               </Button>
@@ -647,28 +651,56 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                   variant="outlined"
                   endIcon={secondaryCta.icon || <ArrowRight size={16} strokeWidth={2} />}
                   aria-label={secondaryCta.ariaLabel || secondaryCta.text}
-                  sx={{ ...sx_.buttonBase, ...sx_.secondaryButton }}
+                  sx={{
+                    borderRadius: 9,
+                    fontWeight: 600,
+                    fontSize: '0.95rem',
+                    textTransform: 'none',
+                    transition: 'all 0.32s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
+                    position: 'relative',
+                    letterSpacing: '0.01em',
+                    lineHeight: 1.2,
+                    px: 3.5 * densityFactors.spacing,
+                    py: 1.65 * densityFactors.spacing,
+                    borderWidth: 1.5,
+                    borderColor: alpha('#fff', 0.85),
+                    color: '#fff',
+                    backgroundColor: appearance === 'glass' ? alpha('#000', 0.08) : alpha('#000', 0.12),
+                    backdropFilter: 'blur(10px)',
+                    '&:hover': {
+                      borderColor: '#fff',
+                      backgroundColor: alpha('#fff', 0.08),
+                      transform: 'translateY(-2px) scale(1.02)',
+                      boxShadow: `0 8px 16px ${alpha('#000', 0.25)}`,
+                    },
+                    '&:active': {
+                      transform: 'translateY(-1px) scale(1.01)',
+                      backgroundColor: alpha('#fff', 0.05),
+                      boxShadow: `0 4px 8px ${alpha('#000', 0.2)}`,
+                    }
+                  }}
                 >
                   {secondaryCta.text}
                 </Button>
               )}
             </Box>
-          </motion.div>
-        </motion.div>
+          </Box>
+        </Box>
       </Container>
 
-      {/* Child components with enhanced entrance animation */}
+      {/* Child components */}
       {children && (
         <Box sx={{ position: 'relative', zIndex: 5, width: '100%' }}>
           <AnimatePresence>
-            <motion.div
+            <Box
+              component={motion.div}
               variants={ANIM.appearWithBlur}
               initial="initial"
               animate={isInView ? "animate" : "initial"}
               transition={{ delay: 0.3 }}
             >
               {children}
-            </motion.div>
+            </Box>
           </AnimatePresence>
         </Box>
       )}

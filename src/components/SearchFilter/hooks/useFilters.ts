@@ -1,7 +1,10 @@
 // src/components/SearchFilter/hooks/useFilters.ts
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { FilterGroup, FilterType } from '../types';
+import { FilterGroup } from '../types';
+
+// Define local filter selection type
+type FilterSelectionType = 'multi' | 'single' | 'range' | 'advanced' | 'text';
 
 export const useFilters = (
   initialFilters: Record<string, any> = {},
@@ -27,7 +30,7 @@ export const useFilters = (
     group: string,
     filter: string,
     value: any,
-    type: FilterType
+    type: FilterSelectionType
   ) => {
     setPendingFilters(prev => {
       const newFilters = { ...prev };
