@@ -5,31 +5,86 @@ import { useRouter } from 'next/navigation';
 import NextLink from 'next/link';
 import {
   Box, Typography, Container, Grid, Tabs, Tab, Chip, useMediaQuery, useTheme, alpha, 
-  Stack, Paper, Button, IconButton, Tooltip
+  Stack, Paper, Button, IconButton, Tooltip, Divider
 } from '@mui/material';
 import {
-  ArrowForwardRounded, CheckCircleRounded, InfoOutlined, KeyboardArrowRightRounded
+  ArrowForwardRounded, CheckCircleRounded, InfoOutlined, KeyboardArrowRightRounded,
+  StarRounded, ShieldRounded, SupportRounded, SpeedRounded
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import ConsistentPageLayout from '../../components/Shared/ConsistentPageLayout';
 import { pricingPageContent, plans } from '../../data/pricingPageData';
 import { theme as brandKit } from '../../theme/brandKit';
 
-// Add an extra FAQ item
+// Add FAQ guarantee item
 pricingPageContent.faqSection.items.push({
   question: "What is our guarantee?",
   answer: "We offer a 30-day money-back guarantee to ensure complete satisfaction."
 });
 
-// Feature check component
-const FeatureCheck = ({ color = 'primary' }) => {
+// Reusable components
+const FeatureCheck = ({ color = 'primary', size = 'medium' }) => {
   const theme = useTheme();
+  const dimensions = size === 'small' ? 18 : 22;
+  const iconSize = size === 'small' ? 14 : 16;
+  
   return (
     <Box sx={{
-      width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      bgcolor: alpha(color === 'primary' ? theme.palette.primary.main : theme.palette.success.main, 0.1)
+      width: dimensions, height: dimensions, borderRadius: '50%', 
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      bgcolor: alpha(color === 'primary' ? theme.palette.primary.main : theme.palette.success.main, 0.12)
     }}>
-      <CheckCircleRounded sx={{ fontSize: 16, color: color === 'primary' ? theme.palette.primary.main : theme.palette.success.main }} />
+      <CheckCircleRounded sx={{ 
+        fontSize: iconSize, 
+        color: color === 'primary' ? theme.palette.primary.main : theme.palette.success.main 
+      }} />
+    </Box>
+  );
+};
+
+// Feature cell component for comparison table
+const FeatureCell = ({ value, plan, theme }) => {
+  if (value === true) {
+    return (
+      <Box sx={{
+        width: 24, height: 24, borderRadius: '50%', bgcolor: alpha(theme.palette.success.main, 0.12),
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+      }}>
+        <CheckCircleRounded sx={{ fontSize: 16, color: theme.palette.success.main }} />
+      </Box>
+    );
+  }
+  if (value === false) {
+    return <Box component="span" sx={{ width: 16, height: 2, bgcolor: alpha(theme.palette.text.disabled, 0.3), 
+           display: 'inline-block', borderRadius: 1 }} />;
+  }
+  return (
+    <Typography variant="body2" sx={{
+      fontWeight: 600,
+      color: plan.recommended ? theme.palette.primary.main : theme.palette.text.primary
+    }}>
+      {value}
+    </Typography>
+  );
+};
+
+// Plan icon component
+const PlanIcon = ({ icon, isRecommended, theme }) => {
+  const iconColor = isRecommended ? theme.palette.primary.main : theme.palette.grey[700];
+  const iconMap = {
+    star: <StarRounded sx={{ fontSize: 20, color: iconColor }} />,
+    shield: <ShieldRounded sx={{ fontSize: 20, color: iconColor }} />,
+    speed: <SpeedRounded sx={{ fontSize: 20, color: iconColor }} />,
+    support: <SupportRounded sx={{ fontSize: 20, color: iconColor }} />
+  };
+  
+  return (
+    <Box sx={{
+      width: 32, height: 32, borderRadius: '50%', 
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      bgcolor: alpha(isRecommended ? theme.palette.primary.main : theme.palette.grey[500], 0.1)
+    }}>
+      {iconMap[icon] || <StarRounded sx={{ fontSize: 20, color: iconColor }} />}
     </Box>
   );
 };
@@ -37,11 +92,15 @@ const FeatureCheck = ({ color = 'primary' }) => {
 // Pricing card component
 const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, isHovered, onHover }) => {
   const theme = useTheme();
+  const monthlyCost = parseFloat(plan.price.replace(/[^0-9.]/g, ''));
+  const annualCost = parseFloat((plan.annualPrice || plan.price).replace(/[^0-9.]/g, ''));
+  const savingsPercent = monthlyCost > 0 ? Math.round(((monthlyCost * 12) - (annualCost * 12)) / (monthlyCost * 12) * 100) : 0;
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1.0] }}
       style={{ height: '100%' }}
       onMouseEnter={() => onHover(plan.type)}
       onMouseLeave={() => onHover(null)}
@@ -50,33 +109,37 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
         <Box sx={{
           position: 'absolute', top: 12, right: -30, transform: 'rotate(45deg)',
           bgcolor: theme.palette.primary.main, color: '#fff', px: 4, py: 0.5,
-          fontSize: '0.75rem', fontWeight: 600, zIndex: 1, boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-          letterSpacing: '0.5px'
+          fontSize: '0.75rem', fontWeight: 600, zIndex: 1, boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          letterSpacing: '0.05em'
         }}>RECOMMENDED</Box>
       )}
 
       <Paper elevation={0} sx={{
         bgcolor: 'background.paper',
-        border: `1px solid ${isRecommended ? alpha(theme.palette.primary.main, 0.2) : alpha(theme.palette.divider, 0.1)}`,
-        borderRadius: 3, p: 3, height: '100%', display: 'flex', flexDirection: 'column',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', position: 'relative',
-        boxShadow: isRecommended ? '0 8px 24px rgba(51, 102, 255, 0.12)' : '0 2px 12px rgba(0, 0, 0, 0.06)',
+        border: `1px solid ${isRecommended ? alpha(theme.palette.primary.main, 0.25) : alpha(theme.palette.divider, 0.1)}`,
+        borderRadius: 4, p: 3.5, height: '100%', display: 'flex', flexDirection: 'column',
+        transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0)', position: 'relative',
+        boxShadow: isRecommended ? '0 8px 24px rgba(51, 102, 255, 0.15)' : '0 2px 12px rgba(0, 0, 0, 0.06)',
         ...(isHovered && {
           transform: 'translateY(-8px)',
-          boxShadow: isRecommended ? '0 16px 40px rgba(51, 102, 255, 0.18)' : '0 12px 28px rgba(0, 0, 0, 0.1)'
+          boxShadow: isRecommended ? '0 16px 40px rgba(51, 102, 255, 0.2)' : '0 12px 28px rgba(0, 0, 0, 0.1)'
         }),
-        minHeight: 430
+        minHeight: 450
       }}>
-        <Typography variant="h5" sx={{
-          fontWeight: 700, mb: 1,
-          color: isRecommended ? theme.palette.primary.main : theme.palette.text.primary
-        }}>{plan.title}</Typography>
+        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+          {plan.icon && <PlanIcon icon={plan.icon} isRecommended={isRecommended} theme={theme} />}
+          <Typography variant="h5" sx={{
+            fontWeight: 700,
+            color: isRecommended ? theme.palette.primary.main : theme.palette.text.primary,
+            letterSpacing: '-0.01em'
+          }}>{plan.title}</Typography>
+        </Stack>
 
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3, minHeight: 48, opacity: 0.8 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3.5, minHeight: 48, opacity: 0.9, lineHeight: 1.6 }}>
           {plan.tagline}
         </Typography>
 
-        <Stack spacing={2} sx={{ mb: 3 }}>
+        <Stack spacing={2.5} sx={{ mb: 4 }}>
           {['Ideal for small teams', 'Quick setup', 'Basic support']
             .map((val, i) => plan.values?.[i] || val)
             .map((feature, i) => (
@@ -90,22 +153,28 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
             ))}
         </Stack>
 
-        <Box sx={{ borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`, my: 3 }} />
+        <Divider sx={{ borderColor: alpha(theme.palette.divider, 0.12), my: 3.5 }} />
 
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 3.5 }}>
           <Typography variant="h4" sx={{
             fontWeight: 800,
             color: isRecommended ? theme.palette.primary.main : theme.palette.text.primary,
-            display: 'inline-flex', alignItems: 'baseline', gap: 0.5
+            display: 'inline-flex', alignItems: 'baseline', gap: 1,
+            letterSpacing: '-0.02em'
           }}>
             {billingCycle === 'annual' && plan.annualPrice ? plan.annualPrice : plan.price}
+            
             {billingCycle === 'annual' && plan.annualPrice && (
               <Typography component="span" variant="caption" sx={{
                 fontWeight: 600, fontSize: '0.75rem', verticalAlign: 'super',
-                bgcolor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main,
-                px: 0.75, py: 0.25, borderRadius: 1
-              }}>SAVE 10%</Typography>
+                bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main,
+                px: 1, py: 0.5, borderRadius: 1.5
+              }}>SAVE {savingsPercent}%</Typography>
             )}
+          </Typography>
+          
+          <Typography variant="caption" sx={{ color: theme.palette.text.secondary, display: 'block', mt: 0.5 }}>
+            {billingCycle === 'annual' ? 'Billed annually' : 'Billed monthly'}
           </Typography>
         </Box>
 
@@ -114,15 +183,17 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
           fullWidth
           onClick={() => onClick(plan.type)}
           sx={{
-            textTransform: 'none', fontWeight: 600, borderRadius: 2, py: 1.5, mt: 'auto',
+            textTransform: 'none', fontWeight: 600, borderRadius: 2.5, py: 1.75, mt: 'auto',
+            fontSize: '0.95rem', transition: 'all 0.25s ease',
             ...(isRecommended && {
               background: brandKit.gradient.primary(theme),
-              boxShadow: '0 4px 14px rgba(51, 102, 255, 0.4)',
-              '&:hover': { boxShadow: '0 6px 20px rgba(51, 102, 255, 0.6)' }
+              boxShadow: '0 4px 14px rgba(51, 102, 255, 0.35)',
+              '&:hover': { boxShadow: '0 6px 20px rgba(51, 102, 255, 0.5)', transform: 'translateY(-2px)' }
             }),
             ...(!isRecommended && {
               borderColor: alpha(theme.palette.primary.main, 0.5),
-              '&:hover': { borderColor: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.04) }
+              '&:hover': { borderColor: theme.palette.primary.main, 
+              bgcolor: alpha(theme.palette.primary.main, 0.04), transform: 'translateY(-2px)' }
             })
           }}
           endIcon={<ArrowForwardRounded />}
@@ -133,7 +204,7 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
         <Button
           variant="text" size="small" color="inherit" onClick={onViewFeatures}
           sx={{
-            fontSize: '0.75rem', fontWeight: 500, textTransform: 'none', mt: 2,
+            fontSize: '0.8rem', fontWeight: 500, textTransform: 'none', mt: 2,
             color: theme.palette.text.secondary, justifyContent: 'center',
             '&:hover': { bgcolor: 'transparent', color: theme.palette.primary.main }
           }}
@@ -146,28 +217,180 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
   );
 };
 
-// Feature comparison row cell
-const FeatureCell = ({ value, plan, theme }) => {
-  if (value === true) {
-    return (
-      <Box sx={{
-        width: 24, height: 24, borderRadius: '50%', bgcolor: alpha(theme.palette.success.main, 0.1),
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
-      }}>
-        <CheckCircleRounded sx={{ fontSize: 16, color: theme.palette.success.main }} />
-      </Box>
-    );
-  }
-  if (value === false) {
-    return <Box component="span" sx={{ width: 16, height: 2, bgcolor: alpha(theme.palette.text.disabled, 0.3), display: 'inline-block' }} />;
-  }
+// Reusable section components
+const SectionHeading = ({ label, title, description }) => {
+  const theme = useTheme();
+  
   return (
-    <Typography variant="body2" sx={{
-      fontWeight: 500,
-      color: plan.recommended ? theme.palette.primary.main : theme.palette.text.primary
-    }}>
-      {value}
-    </Typography>
+    <Box sx={{ textAlign: 'center', mb: 6 }}>
+      {label && (
+        <Typography
+          component="span"
+          sx={{
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            color: theme.palette.primary.main,
+            bgcolor: alpha(theme.palette.primary.main, 0.1),
+            py: 0.75, px: 2, borderRadius: 5,
+            display: 'inline-block', mb: 2,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em'
+          }}
+        >
+          {label}
+        </Typography>
+      )}
+      
+      <Typography variant="h4" sx={{
+        fontWeight: 800,
+        mb: 2,
+        fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+        letterSpacing: '-0.01em'
+      }}>
+        {title}
+      </Typography>
+      
+      {description && (
+        <Typography variant="body1" color="text.secondary" sx={{
+          maxWidth: 600,
+          mx: 'auto',
+          fontSize: '1.125rem'
+        }}>
+          {description}
+        </Typography>
+      )}
+    </Box>
+  );
+};
+
+// Stats component for CTA section
+const StatsCard = ({ stats, theme }) => (
+  <Paper elevation={0} sx={{
+    backdropFilter: 'blur(10px)', 
+    bgcolor: alpha('#fff', 0.08),
+    borderRadius: 4, 
+    border: `1px solid ${alpha('#fff', 0.2)}`,
+    p: 4, width: '100%', 
+    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)'
+  }}>
+    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3.5 }}>
+      <Box sx={{
+        width: 36, height: 36, borderRadius: '50%', 
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        bgcolor: alpha('#fff', 0.15)
+      }}>
+        <StarRounded sx={{ fontSize: 20, color: '#fff' }} />
+      </Box>
+      <Typography variant="h6" sx={{ 
+        fontWeight: 700, color: '#fff', letterSpacing: '-0.01em',
+        fontSize: '1.25rem'
+      }}>
+        Trusted globally
+      </Typography>
+    </Stack>
+
+    <Grid container spacing={3}>
+      {stats.slice(0, 4).map((stat, i) => (
+        <Grid item xs={6} key={i}>
+          <motion.div whileHover={{ y: -5 }} transition={{ type: 'spring', stiffness: 400, damping: 10 }}>
+            <Box sx={{ 
+              p: 2, textAlign: 'center',
+              bgcolor: alpha('#fff', 0.05),
+              borderRadius: 3,
+              border: `1px solid ${alpha('#fff', 0.1)}`,
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              '&:hover': {
+                bgcolor: alpha('#fff', 0.1),
+                boxShadow: `0 10px 20px ${alpha('#000', 0.15)}`
+              }
+            }}>
+              <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                mb: 1,
+                opacity: 0.7
+              }}>
+                {stat.icon}
+              </Box>
+              <Typography variant="h5" sx={{ 
+                fontWeight: 800, color: '#fff', mb: 0.5, 
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+              }}>
+                {stat.value}
+              </Typography>
+              <Typography variant="body2" sx={{ 
+                color: alpha('#fff', 0.8),
+                fontSize: '0.75rem',
+                fontWeight: 500
+              }}>
+                {stat.label}
+              </Typography>
+            </Box>
+          </motion.div>
+        </Grid>
+      ))}
+    </Grid>
+  </Paper>
+);
+
+// UI for CTA buttons
+const CTAButtons = ({ primary, secondary, darkMode = false }) => {
+  const theme = useTheme();
+  return (
+    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
+      <Button 
+        component={NextLink} 
+        href={primary.href}
+        size="large" 
+        variant="contained" 
+        sx={{
+          bgcolor: darkMode ? '#fff' : undefined, 
+          color: darkMode ? theme.palette.primary.dark : undefined, 
+          textTransform: 'none',
+          fontWeight: 700, 
+          py: 1.75, px: 4, 
+          borderRadius: 3, 
+          boxShadow: darkMode ? '0 8px 20px rgba(0, 0, 0, 0.25)' : undefined,
+          fontSize: '1rem',
+          '&:hover': { 
+            bgcolor: darkMode ? '#fff' : undefined, 
+            transform: 'translateY(-3px)', 
+            boxShadow: darkMode ? '0 12px 28px rgba(0, 0, 0, 0.3)' : undefined
+          }
+        }}
+      >
+        {primary.text}
+      </Button>
+
+      <Button 
+        variant="outlined" 
+        component={NextLink} 
+        href={secondary.href}
+        size="large" 
+        sx={{
+          borderColor: darkMode ? alpha('#fff', 0.6) : undefined, 
+          color: darkMode ? '#fff' : undefined, 
+          textTransform: 'none',
+          fontWeight: 600, 
+          py: 1.75, px: 4, 
+          borderRadius: 3,
+          fontSize: '1rem',
+          borderWidth: darkMode ? 1.5 : undefined,
+          backdropFilter: darkMode ? 'blur(4px)' : undefined,
+          bgcolor: darkMode ? alpha('#fff', 0.05) : undefined,
+          '&:hover': {
+            borderColor: darkMode ? '#fff' : undefined, 
+            bgcolor: darkMode ? alpha('#fff', 0.1) : undefined, 
+            transform: 'translateY(-3px)'
+          }
+        }}
+      >
+        {secondary.text}
+      </Button>
+    </Stack>
   );
 };
 
@@ -182,18 +405,23 @@ export default function PricingPage() {
   const [hoverCard, setHoverCard] = useState(null);
   const [animateIn, setAnimateIn] = useState(false);
 
-  useEffect(() => { setAnimateIn(true); }, []);
+  // Animation trigger
+  useEffect(() => { 
+    const timer = setTimeout(() => { setAnimateIn(true); }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handlePlanClick = (planType) => router.push(`/contact?plan=${planType}`);
 
-  // Feature categories and data
+  // Feature categories
   const categories = [
-    { name: 'Core Features', id: 'core' },
-    { name: 'Support', id: 'support' },
-    { name: 'Security', id: 'security' },
-    { name: 'Advanced', id: 'advanced' }
+    { name: 'Core Features', id: 'core', icon: <SpeedRounded fontSize="small" /> },
+    { name: 'Support', id: 'support', icon: <SupportRounded fontSize="small" /> },
+    { name: 'Security', id: 'security', icon: <ShieldRounded fontSize="small" /> },
+    { name: 'Advanced', id: 'advanced', icon: <StarRounded fontSize="small" /> }
   ];
 
+  // Feature matrix
   const allFeatures = {
     core: [
       { name: 'Number of users', values: { consultation: '1 user', project: 'Up to 10 users', enterprise: 'Unlimited' } },
@@ -204,14 +432,14 @@ export default function PricingPage() {
     support: [
       { name: 'Email support', values: { consultation: true, project: true, enterprise: true } },
       { name: 'Phone support', values: { consultation: false, project: true, enterprise: true } },
-      { name: 'Dedicated account manager', values: { consultation: false, project: false, enterprise: true } },
+      { name: 'Dedicated manager', values: { consultation: false, project: false, enterprise: true } },
       { name: 'Response time', values: { consultation: '24 hours', project: '12 hours', enterprise: '4 hours' } }
     ],
     security: [
-      { name: 'Two-factor authentication', values: { consultation: true, project: true, enterprise: true } },
+      { name: 'Two-factor auth', values: { consultation: true, project: true, enterprise: true } },
       { name: 'Advanced SSO', values: { consultation: false, project: true, enterprise: true } },
       { name: 'Audit logs', values: { consultation: false, project: true, enterprise: true } },
-      { name: 'Custom security controls', values: { consultation: false, project: false, enterprise: true } }
+      { name: 'Custom security', values: { consultation: false, project: false, enterprise: true } }
     ],
     advanced: [
       { name: 'Custom integrations', values: { consultation: false, project: false, enterprise: true } },
@@ -221,126 +449,195 @@ export default function PricingPage() {
     ]
   };
 
+  // Stats for testimonials
+  const stats = [
+    { value: '97%', label: 'Customer satisfaction', icon: <StarRounded fontSize="small" /> },
+    { value: '5K+', label: 'Active customers', icon: <SpeedRounded fontSize="small" /> },
+    { value: '4.9', label: 'TrustPilot rating', icon: <ShieldRounded fontSize="small" /> },
+    { value: '24/7', label: 'Customer support', icon: <SupportRounded fontSize="small" /> }
+  ];
+  
+  // Company list for trust signals section
+  const companies = ['Acme Inc.', 'GlobalTech', 'Innovate AI', 'FutureCorp', 'TechGrowth', 'NextWave'];
+
   return (
-    <div>
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', position: 'relative', overflow: 'hidden', pb: 10 }}>
       <ConsistentPageLayout scrollOptions={{ showSectionMenu: false, showProgressIndicator: false }}>
         {/* Hero Section */}
-        <Container maxWidth="md" sx={{ mt: 6, mb: { xs: 6, md: 8 } }}>
+        <Container maxWidth="md" sx={{ mt: { xs: 8, md: 12 }, mb: { xs: 8, md: 10 } }}>
           <Box textAlign="center">
-            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 15 }} transition={{ duration: 0.4 }}>
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 15 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
+            >
               <Typography variant="h1" sx={{
-                fontSize: { xs: '2rem', md: '2.75rem' }, fontWeight: 800, mb: 2,
+                fontSize: { xs: '2.25rem', sm: '2.75rem', md: '3.25rem' }, fontWeight: 800, mb: 3,
                 backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.01em'
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.02em',
+                lineHeight: 1.1
               }}>
-                Simple, transparent pricing for every business
+                Transparent pricing <br className="hidden md:block" />
+                for every business
               </Typography>
 
-              <Typography variant="body1" sx={{ color: theme.palette.text.secondary, mb: 5, maxWidth: 540, mx: 'auto', fontSize: '1.125rem', lineHeight: 1.6 }}>
-                Choose the perfect plan that works for you with no hidden fees or complicated tiers.
+              <Typography variant="body1" sx={{ 
+                color: theme.palette.text.secondary, mb: 6, maxWidth: 600, mx: 'auto', 
+                fontSize: { xs: '1.1rem', md: '1.25rem' }, lineHeight: 1.6, px: { xs: 2, md: 0 }
+              }}>
+                Choose the perfect plan that fits your needs with no hidden fees or complicated tiers.
+                All plans include core platform features.
               </Typography>
             </motion.div>
 
-            {/* Billing toggle and comparison mode */}
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 1 }} justifyContent="center" alignItems="center" sx={{ mb: 6 }}>
-              <Box sx={{
-                bgcolor: alpha(theme.palette.primary.main, 0.05),
-                border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                borderRadius: 6, p: 0.5, display: 'inline-flex'
-              }}>
-                <Button
-                  onClick={() => setBillingCycle('monthly')}
-                  variant={billingCycle === 'monthly' ? 'contained' : 'text'}
-                  disableElevation
-                  sx={{
-                    minWidth: 100, borderRadius: 4, textTransform: 'none', fontWeight: 600,
-                    fontSize: '0.875rem', py: 1, color: billingCycle === 'monthly' ? '#fff' : theme.palette.text.primary
-                  }}
-                >
-                  Monthly
-                </Button>
-                <Button
-                  onClick={() => setBillingCycle('annual')}
-                  variant={billingCycle === 'annual' ? 'contained' : 'text'}
-                  disableElevation
-                  endIcon={billingCycle === 'annual' && (
-                    <Chip label="Save 10%" size="small" sx={{
-                      height: 20, fontSize: '0.625rem', fontWeight: 600,
-                      bgcolor: '#fff', color: theme.palette.primary.main
-                    }} />
-                  )}
-                  sx={{
-                    minWidth: 100, borderRadius: 4, textTransform: 'none', fontWeight: 600,
-                    fontSize: '0.875rem', py: 1, color: billingCycle === 'annual' ? '#fff' : theme.palette.text.primary
-                  }}
-                >
-                  Annual
-                </Button>
-              </Box>
-
-              <Button
-                variant="text" color="inherit" size="small" onClick={() => setCompareMode(!compareMode)}
-                sx={{
-                  textTransform: 'none', fontWeight: 500, fontSize: '0.875rem',
-                  color: theme.palette.text.secondary,
-                  '&:hover': { bgcolor: 'transparent', color: theme.palette.primary.main }
-                }}
-                startIcon={
-                  <Box component="span" sx={{
-                    width: 16, height: 16, borderRadius: '50%', border: '1px solid',
-                    borderColor: compareMode ? theme.palette.primary.main : theme.palette.text.disabled,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
-                    '&::after': compareMode ? {
-                      content: '""', position: 'absolute', width: 10, height: 10,
-                      borderRadius: '50%', bgcolor: theme.palette.primary.main
-                    } : {}
-                  }} />
-                }
+            {/* Billing toggle */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 15 }}
+              transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.1, 0.25, 1.0] }}
+            >
+              <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                spacing={{ xs: 3, sm: 2 }} 
+                justifyContent="center" alignItems="center" 
+                sx={{ mb: { xs: 6, md: 8 } }}
               >
-                {compareMode ? 'Hide comparison' : 'Compare all features'}
-              </Button>
-            </Stack>
+                <Box sx={{
+                  bgcolor: alpha(theme.palette.primary.main, 0.06),
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
+                  borderRadius: 10, p: 0.75, display: 'inline-flex'
+                }}>
+                  <Button
+                    onClick={() => setBillingCycle('monthly')}
+                    variant={billingCycle === 'monthly' ? 'contained' : 'text'}
+                    disableElevation
+                    sx={{
+                      minWidth: 120, borderRadius: 8, textTransform: 'none', fontWeight: 600,
+                      fontSize: '0.95rem', py: 1.25, px: 2.5,
+                      color: billingCycle === 'monthly' ? '#fff' : theme.palette.text.primary
+                    }}
+                  >
+                    Monthly
+                  </Button>
+                  <Button
+                    onClick={() => setBillingCycle('annual')}
+                    variant={billingCycle === 'annual' ? 'contained' : 'text'}
+                    disableElevation
+                    endIcon={billingCycle === 'annual' && (
+                      <Chip label="Save 10%" size="small" sx={{
+                        height: 20, fontSize: '0.675rem', fontWeight: 600,
+                        bgcolor: '#fff', color: theme.palette.primary.main
+                      }} />
+                    )}
+                    sx={{
+                      minWidth: 120, borderRadius: 8, textTransform: 'none', fontWeight: 600,
+                      fontSize: '0.95rem', py: 1.25, px: 2.5,
+                      color: billingCycle === 'annual' ? '#fff' : theme.palette.text.primary
+                    }}
+                  >
+                    Annual
+                  </Button>
+                </Box>
+
+                <Button
+                  variant="text" color="inherit" size="medium" onClick={() => setCompareMode(!compareMode)}
+                  sx={{
+                    textTransform: 'none', fontWeight: 500, fontSize: '0.95rem',
+                    color: compareMode ? theme.palette.primary.main : theme.palette.text.secondary,
+                    transition: 'all 0.2s ease', borderRadius: 2, py: 1, px: 2,
+                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), color: theme.palette.primary.main }
+                  }}
+                  startIcon={
+                    <Box component="span" sx={{
+                      width: 18, height: 18, borderRadius: '50%', border: '1.5px solid',
+                      borderColor: compareMode ? theme.palette.primary.main : theme.palette.text.disabled,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
+                      '&::after': compareMode ? {
+                        content: '""', position: 'absolute', width: 10, height: 10,
+                        borderRadius: '50%', bgcolor: theme.palette.primary.main
+                      } : {}
+                    }} />
+                  }
+                >
+                  {compareMode ? 'Hide comparison' : 'Compare all features'}
+                </Button>
+              </Stack>
+            </motion.div>
           </Box>
         </Container>
 
         {/* Pricing Cards */}
         {!compareMode && (
-          <Container maxWidth="lg" sx={{ mb: 20 }}>
+          <Container maxWidth="lg" sx={{ mb: { xs: 16, md: 20 } }}>
             {/* Tab interface */}
-            <Box sx={{ mb: 6, display: 'flex', justifyContent: 'center' }}>
-              <Tabs
-                value={activeTab}
-                onChange={(_, newValue) => setActiveTab(newValue)}
-                sx={{ '.MuiTabs-indicator': { height: 3, borderRadius: 1.5, bgcolor: theme.palette.primary.main } }}
+            <Box sx={{ mb: { xs: 6, md: 8 }, display: 'flex', justifyContent: 'center' }}>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 10 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
               >
-                {['For Startups', 'For Teams', 'For Enterprise'].map((label, index) => (
-                  <Tab key={index} label={label} sx={{ textTransform: 'none', fontWeight: 600, minWidth: 120, fontSize: '0.95rem' }} />
-                ))}
-              </Tabs>
+                <Tabs
+                  value={activeTab}
+                  onChange={(_, newValue) => setActiveTab(newValue)}
+                  sx={{ 
+                    '.MuiTabs-indicator': { 
+                      height: 3, borderRadius: 1.5, bgcolor: theme.palette.primary.main
+                    },
+                    '.MuiTab-root': {
+                      position: 'relative', overflow: 'visible',
+                      '&::after': {
+                        content: '""', position: 'absolute', bottom: 0, left: '50%', width: 0, height: 3,
+                        borderRadius: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.2),
+                        transform: 'translateX(-50%)', transition: 'width 0.2s ease', zIndex: -1
+                      },
+                      '&:hover::after': { width: '70%' }
+                    }
+                  }}
+                >
+                  {['For Startups', 'For Teams', 'For Enterprise'].map((label, index) => (
+                    <Tab 
+                      key={index} label={label} 
+                      sx={{ textTransform: 'none', fontWeight: 600, minWidth: 140, fontSize: '1rem', px: 3 }} 
+                    />
+                  ))}
+                </Tabs>
+              </motion.div>
             </Box>
 
             {/* Plan cards */}
-            <Grid container spacing={4} justifyContent="center" sx={{ transition: 'all 0.3s ease' }}>
-              {plans.map((plan) => {
+            <Grid container spacing={4} justifyContent="center">
+              {plans.map((plan, index) => {
                 const isRecommended = (activeTab === 0 && plan.type === 'consultation') ||
                                      (activeTab === 1 && plan.type === 'project') ||
                                      (activeTab === 2 && plan.type === 'enterprise') ||
                                      plan.recommended;
 
+                // Add icon based on plan type
+                const enhancedPlan = {
+                  ...plan,
+                  icon: plan.type === 'consultation' ? 'star' : plan.type === 'project' ? 'speed' : 'shield'
+                };
+                
                 return (
-                  <Grid item xs={12} sm={6} md={4} key={plan.type} sx={{
-                    transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                    zIndex: isRecommended ? 2 : 1
-                  }}>
-                    <PlanCard
-                      plan={plan}
-                      isRecommended={isRecommended}
-                      billingCycle={billingCycle}
-                      onClick={handlePlanClick}
-                      onViewFeatures={() => setCompareMode(true)}
-                      isHovered={hoverCard === plan.type}
-                      onHover={setHoverCard}
-                    />
+                  <Grid 
+                    item xs={12} sm={6} md={4} key={plan.type} 
+                    sx={{ zIndex: isRecommended ? 2 : 1 }}
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 20 }}
+                      transition={{ duration: 0.5, delay: 0.2 + (index * 0.1) }}
+                    >
+                      <PlanCard
+                        plan={enhancedPlan}
+                        isRecommended={isRecommended}
+                        billingCycle={billingCycle}
+                        onClick={handlePlanClick}
+                        onViewFeatures={() => setCompareMode(true)}
+                        isHovered={hoverCard === plan.type}
+                        onHover={setHoverCard}
+                      />
+                    </motion.div>
                   </Grid>
                 );
               })}
@@ -351,29 +648,58 @@ export default function PricingPage() {
         {/* Feature comparison table */}
         <AnimatePresence>
           {compareMode && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              exit={{ opacity: 0, y: 20 }} 
+              transition={{ duration: 0.4 }}
+            >
               <Container maxWidth="lg">
                 <Paper elevation={0} sx={{
                   border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  borderRadius: 3, overflow: 'hidden', mb: 20
+                  borderRadius: 4, overflow: 'hidden', mb: { xs: 10, md: 16 },
+                  boxShadow: '0 10px 40px rgba(0, 0, 0, 0.08)'
                 }}>
                   <Box sx={{ overflowX: 'auto' }}>
-                    <Box sx={{ minWidth: 900, p: 2 }}>
+                    <Box sx={{ minWidth: 900, p: 3 }}>
                       <Grid container>
                         {/* Plan headers */}
-                        <Grid item xs={4}><Box sx={{ height: 80 }} /></Grid>
+                        <Grid item xs={4}>
+                          <Box sx={{ height: 90, display: 'flex', alignItems: 'flex-end', pb: 2, pl: 2 }}>
+                            <Typography variant="subtitle1" sx={{
+                              fontWeight: 700, color: alpha(theme.palette.text.primary, 0.7),
+                              textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.75rem'
+                            }}>
+                              Plan Features
+                            </Typography>
+                          </Box>
+                        </Grid>
+                        
                         {plans.map((plan) => (
                           <Grid item xs={plans.length > 3 ? 2 : 8 / Number(plans.length)} key={`header-${plan.type}`}>
                             <Box sx={{
-                              height: 80, display: 'flex', flexDirection: 'column',
-                              justifyContent: 'center', alignItems: 'center', px: 2,
-                              bgcolor: plan.recommended ? alpha(theme.palette.primary.main, 0.05) : 'transparent'
+                              height: 90, display: 'flex', flexDirection: 'column',
+                              justifyContent: 'space-between', alignItems: 'center',
+                              px: 2, py: 1.5,
+                              bgcolor: plan.recommended ? alpha(theme.palette.primary.main, 0.06) : 'transparent',
+                              borderRadius: '12px 12px 0 0'
                             }}>
-                              <Typography variant="h6" sx={{
-                                fontWeight: 700,
-                                color: plan.recommended ? theme.palette.primary.main : theme.palette.text.primary
-                              }}>{plan.title}</Typography>
-                              <Typography variant="body2" color="text.secondary">
+                              <Stack direction="row" spacing={1} alignItems="center">
+                                <PlanIcon 
+                                  icon={plan.type === 'consultation' ? 'star' : plan.type === 'project' ? 'speed' : 'shield'} 
+                                  isRecommended={plan.recommended} 
+                                  theme={theme} 
+                                />
+                                <Typography variant="h6" sx={{
+                                  fontWeight: 700,
+                                  color: plan.recommended ? theme.palette.primary.main : theme.palette.text.primary
+                                }}>{plan.title}</Typography>
+                              </Stack>
+                              
+                              <Typography variant="body2" sx={{
+                                fontWeight: 600,
+                                color: plan.recommended ? theme.palette.primary.dark : theme.palette.text.secondary
+                              }}>
                                 {billingCycle === 'annual' && plan.annualPrice ? plan.annualPrice : plan.price}
                               </Typography>
                             </Box>
@@ -381,45 +707,74 @@ export default function PricingPage() {
                         ))}
 
                         {/* Features by category */}
-                        {categories.map((category) => (
+                        {categories.map((category, categoryIndex) => (
                           <React.Fragment key={category.id}>
                             {/* Category header */}
-                            <Grid item xs={4}>
-                              <Box sx={{ px: 3, pt: category.id === 'core' ? 0 : 4 }}>
+                            <Grid item xs={12} sx={{ mt: categoryIndex === 0 ? 2 : 5 }}>
+                              <Box sx={{ 
+                                px: 3, py: 1.5, display: 'flex', alignItems: 'center', gap: 1.5,
+                                borderRadius: 2, bgcolor: alpha(theme.palette.primary.main, 0.04),
+                                border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`, mb: 2
+                              }}>
+                                <Box sx={{
+                                  width: 28, height: 28, borderRadius: '50%', display: 'flex', 
+                                  alignItems: 'center', justifyContent: 'center',
+                                  bgcolor: alpha(theme.palette.primary.main, 0.12)
+                                }}>
+                                  {category.icon}
+                                </Box>
                                 <Typography variant="subtitle1" sx={{
-                                  fontWeight: 700, fontSize: '0.875rem', color: alpha(theme.palette.text.primary, 0.7),
-                                  mb: 2, textTransform: 'uppercase', letterSpacing: '0.05em'
+                                  fontWeight: 700, fontSize: '0.95rem', color: theme.palette.primary.dark
                                 }}>{category.name}</Typography>
-
-                                {/* Feature names */}
-                                {allFeatures[category.id].map((feature, i) => (
-                                  <Box key={i} sx={{ py: 2, borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`, pr: 2 }}>
+                              </Box>
+                            </Grid>
+                            
+                            {/* Features for this category */}
+                            {allFeatures[category.id].map((feature, featureIndex) => (
+                              <React.Fragment key={`${category.id}-feature-${featureIndex}`}>
+                                {/* Feature name column */}
+                                <Grid item xs={4}>
+                                  <Box sx={{ 
+                                    py: 2.5, pl: 3, pr: 2,
+                                    borderTop: featureIndex === 0 ? 'none' : `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                                    display: 'flex', alignItems: 'center',
+                                    bgcolor: featureIndex % 2 === 0 ? alpha(theme.palette.background.default, 0.4) : 'transparent'
+                                  }}>
                                     <Typography variant="body2" sx={{ fontWeight: 500, display: 'flex', alignItems: 'center' }}>
                                       {feature.name}
-                                      <Tooltip title="More information about this feature">
-                                        <IconButton size="small" sx={{ ml: 0.5, opacity: 0.6 }}>
-                                          <InfoOutlined fontSize="inherit" />
+                                      <Tooltip title={`More information about ${feature.name}`} arrow>
+                                        <IconButton size="small" sx={{ ml: 0.75, opacity: 0.6 }}>
+                                          <InfoOutlined sx={{ fontSize: 16 }} />
                                         </IconButton>
                                       </Tooltip>
                                     </Typography>
                                   </Box>
-                                ))}
-                              </Box>
-                            </Grid>
+                                </Grid>
 
-                            {/* Feature values by plan */}
-                            {plans.map((plan) => (
-                              <Grid item xs={plans.length > 3 ? 2 : 8 / Number(plans.length)} key={`${category.id}-${plan.type}`}>
-                                <Box sx={{ bgcolor: plan.recommended ? alpha(theme.palette.primary.main, 0.02) : 'transparent', pt: category.id === 'core' ? 0 : 4 }}>
-                                  <Box sx={{ py: 1.5, borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`, opacity: 0 }} />
-                                  {/* Feature values */}
-                                  {allFeatures[category.id].map((feature, i) => (
-                                    <Box key={i} sx={{ py: 2, borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`, textAlign: 'center' }}>
+                                {/* Feature values by plan */}
+                                {plans.map((plan) => (
+                                  <Grid item xs={plans.length > 3 ? 2 : 8 / Number(plans.length)} key={`${category.id}-${feature.name}-${plan.type}`}>
+                                    <Box sx={{ 
+                                      py: 2.5, 
+                                      borderTop: featureIndex === 0 ? 'none' : `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                                      textAlign: 'center',
+                                      bgcolor: featureIndex % 2 === 0 ? alpha(theme.palette.background.default, 0.4) : 'transparent',
+                                      position: 'relative',
+                                      '&::after': plan.recommended ? {
+                                        content: '""',
+                                        position: 'absolute',
+                                        left: 0,
+                                        top: 0,
+                                        bottom: 0,
+                                        width: 3,
+                                        bgcolor: alpha(theme.palette.primary.main, featureIndex % 2 === 0 ? 0.3 : 0.2)
+                                      } : {}
+                                    }}>
                                       <FeatureCell value={feature.values[plan.type]} plan={plan} theme={theme} />
                                     </Box>
-                                  ))}
-                                </Box>
-                              </Grid>
+                                  </Grid>
+                                ))}
+                              </React.Fragment>
                             ))}
                           </React.Fragment>
                         ))}
@@ -432,122 +787,301 @@ export default function PricingPage() {
           )}
         </AnimatePresence>
 
-        {/* FAQ section with improved spacing and visual separator */}
-        <Container maxWidth="md" sx={{ 
-          mb: 12, mt: { xs: 10, md: 24 }, pt: 8, position: 'relative'
-        }}> 
-          {/* Visual separator line */}
-          <Box sx={{
-            position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
-            width: '120px', height: '4px', borderRadius: '2px',
-            background: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.1)}, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.1)})`
-          }} />
-
-          <Typography variant="h2" align="center" sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' }, fontWeight: 700, mb: 2 }}>
-            Frequently asked questions
-          </Typography>
-
-          <Typography variant="body1" align="center" color="text.secondary" sx={{ mb: 6, maxWidth: 500, mx: 'auto', fontSize: '1.125rem' }}>
-            Everything you need to know about our pricing and plans
-          </Typography>
-
-          {/* FAQ cards with increased horizontal spacing */}
-          <Grid container spacing={10} sx={{ px: { xs: 0, md: 12 } }}>
-            {pricingPageContent.faqSection.items.slice(0, 6).map((faq, index) => (
-              <Grid item xs={12} md={6} key={index}>
-                <Paper elevation={0} sx={{
-                  borderRadius: 3, p: 3, height: '100%', border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  transition: 'all 0.2s ease',
-                  bgcolor: index % 2 === 0 ? 'background.paper' : alpha(theme.palette.primary.main, 0.1),
-                  '&:hover': {
-                    borderColor: alpha(theme.palette.primary.main, 0.2),
-                    bgcolor: index % 2 === 0 ? alpha(theme.palette.primary.main, 0.03) : alpha(theme.palette.primary.main, 0.15),
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 8px 28px rgba(0, 0, 0, 0.05)'
-                  }
-                }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1.5 }}>{faq.question}</Typography>
-                  <Typography variant="body2" color="text.secondary">{faq.answer}</Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-
-        {/* CTA section */}
+        {/* FAQ section */}
         <Box sx={{
-          position: 'relative', py: { xs: 6, md: 10 }, overflow: 'hidden', mb: 6,
-          backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-          borderRadius: { xs: 0, md: 3 }, mx: { xs: 0, md: 6 },
-          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.12)'
+          position: 'relative',
+          py: { xs: 12, md: 16 },
+          backgroundImage: `radial-gradient(circle at 10% 90%, ${alpha(theme.palette.primary.light, 0.08)} 0%, transparent 60%)`,
+          overflow: 'hidden'
         }}>
-          <Container maxWidth="md" sx={{
-            position: 'relative', zIndex: 1, py: { xs: 2, md: 4 },
-            display: 'flex', flexDirection: { xs: 'column', md: 'row' },
-            gap: 5, alignItems: 'center', justifyContent: 'space-between'
-          }}>
-            <Box maxWidth={460}>
-              <Typography variant="h2" sx={{
-                fontSize: { xs: '1.75rem', md: '2.25rem' }, fontWeight: 700,
-                color: '#fff', mb: 2, letterSpacing: '-0.01em'
-              }}>Ready to transform your business?</Typography>
-
-              <Typography variant="body1" sx={{
-                color: 'rgba(255, 255, 255, 0.9)', mb: 3, fontSize: '1.125rem', lineHeight: 1.6
-              }}>Join thousands of growing businesses that trust our solutions to scale and succeed.</Typography>
-
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <Button component={NextLink} href="/contact" size="large" variant="contained" sx={{
-                  bgcolor: '#fff', color: theme.palette.primary.main, textTransform: 'none',
-                  fontWeight: 600, py: 1.5, px: 4, borderRadius: 2, boxShadow: '0 6px 12px rgba(0, 0, 0, 0.2)',
-                  '&:hover': {
-                    bgcolor: '#fff', transform: 'translateY(-2px)', boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)'
-                  }
-                }}>Get started</Button>
-
-                <Button variant="outlined" component={NextLink} href="/contact?demo=true" size="large" sx={{
-                  borderColor: 'rgba(255, 255, 255, 0.6)', color: '#fff', textTransform: 'none',
-                  fontWeight: 600, py: 1.5, px: 4, borderRadius: 2,
-                  '&:hover': {
-                    borderColor: '#fff', bgcolor: 'rgba(255, 255, 255, 0.1)', transform: 'translateY(-2px)'
-                  }
-                }}>Request demo</Button>
-              </Stack>
-            </Box>
-
-            {/* Stats card */}
+          <Container maxWidth="md" sx={{ position: 'relative' }}> 
+            {/* Visual elements */}
             <Box sx={{
-              backdropFilter: 'blur(10px)', bgcolor: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.2)',
-              p: 3, maxWidth: 320, width: '100%', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
-            }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 3, color: '#fff', letterSpacing: '0.01em' }}>
-                Trusted by industry leaders
-              </Typography>
+              position: 'absolute',
+              top: -100,
+              right: -200,
+              width: 400,
+              height: 400,
+              borderRadius: '50%',
+              background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 70%)`,
+              zIndex: -1
+            }} />
+            
+            <Box sx={{
+              position: 'absolute',
+              bottom: -150,
+              left: -250,
+              width: 500,
+              height: 500,
+              borderRadius: '50%',
+              background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.04)} 0%, transparent 70%)`,
+              zIndex: -1
+            }} />
+            
+            {/* Section header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5 }}
+            >
+              <SectionHeading 
+                label="Support" 
+                title="Frequently asked questions" 
+                description="Everything you need to know about our pricing and plans" 
+              />
+            </motion.div>
 
-              <Grid container spacing={2}>
-                {[
-                  { value: '97%', label: 'Customer satisfaction' },
-                  { value: '5K+', label: 'Active customers' },
-                  { value: '4.9', label: 'TrustPilot rating' },
-                  { value: '24/7', label: 'Customer support' }
-                ].map((stat, i) => (
-                  <Grid item xs={6} key={i}>
-                    <Box sx={{ p: 2, textAlign: 'center' }}>
-                      <Typography variant="h4" sx={{ fontWeight: 800, color: '#fff', mb: 0.5, textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
-                        {stat.value}
+            {/* FAQ cards */}
+            <Grid container spacing={4}>
+              {pricingPageContent.faqSection.items.slice(0, 6).map((faq, index) => (
+                <Grid item xs={12} md={6} key={index}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.5, delay: 0.1 + (index * 0.1) }}
+                  >
+                    <Paper elevation={0} sx={{
+                      borderRadius: 4, 
+                      p: 3.5, 
+                      height: '100%', 
+                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                      transition: 'all 0.3s ease',
+                      bgcolor: index % 2 === 0 ? 
+                        alpha(theme.palette.background.paper, 0.8) : 
+                        alpha(theme.palette.primary.main, 0.05),
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&:hover': {
+                        borderColor: alpha(theme.palette.primary.main, 0.25),
+                        transform: 'translateY(-6px)',
+                        boxShadow: '0 12px 28px rgba(0, 0, 0, 0.08)'
+                      }
+                    }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                        {faq.question}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                        {stat.label}
+                      <Typography variant="body2" sx={{ color: alpha(theme.palette.text.primary, 0.7) }}>
+                        {faq.answer}
                       </Typography>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
+                    </Paper>
+                  </motion.div>
+                </Grid>
+              ))}
+            </Grid>
           </Container>
         </Box>
+
+        {/* CTA section */}
+        <Container maxWidth="lg" sx={{ mb: { xs: 10, md: 12 } }}>
+          <Box sx={{
+            position: 'relative', 
+            py: { xs: 8, md: 10 }, 
+            overflow: 'hidden',
+            backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+            borderRadius: 4,
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)'
+          }}>
+            {/* Decorative elements */}
+            <Box sx={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              width: { xs: 150, md: 250 },
+              height: { xs: 150, md: 250 },
+              background: `radial-gradient(circle, ${alpha('#fff', 0.12)} 0%, transparent 70%)`,
+              borderRadius: '50%',
+              transform: 'translate(30%, -30%)'
+            }} />
+            
+            <Box sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              width: { xs: 120, md: 200 },
+              height: { xs: 120, md: 200 },
+              background: `radial-gradient(circle, ${alpha('#fff', 0.08)} 0%, transparent 70%)`,
+              borderRadius: '50%',
+              transform: 'translate(-30%, 30%)'
+            }} />
+            
+            <Container maxWidth="md" sx={{
+              position: 'relative', 
+              zIndex: 1,
+              display: 'flex', 
+              flexDirection: { xs: 'column', md: 'row' },
+              gap: { xs: 6, md: 8 }, 
+              alignItems: 'center', 
+              justifyContent: 'space-between'
+            }}>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5 }}
+                style={{ maxWidth: 480 }}
+              >
+                <Typography 
+                  component="span" 
+                  sx={{ 
+                    fontSize: '0.875rem', 
+                    fontWeight: 600, 
+                    color: '#fff',
+                    bgcolor: alpha('#fff', 0.15),
+                    py: 0.75,
+                    px: 2,
+                    borderRadius: 5,
+                    display: 'inline-block',
+                    mb: 2.5,
+                    textTransform: 'uppercase',
+                    border: `1px solid ${alpha('#fff', 0.2)}`
+                  }}
+                >
+                  Get Started Today
+                </Typography>
+                
+                <Typography variant="h2" sx={{
+                  fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.75rem' }, 
+                  fontWeight: 800,
+                  color: '#fff', 
+                  mb: 3
+                }}>
+                  Ready to transform your business?
+                </Typography>
+
+                <Typography variant="body1" sx={{
+                  color: alpha('#fff', 0.9), 
+                  mb: 4, 
+                  fontSize: { xs: '1.05rem', md: '1.15rem' }
+                }}>
+                  Join thousands of growing businesses that trust our solutions to scale and succeed.
+                </Typography>
+
+                <CTAButtons 
+                  primary={{ text: "Get started now", href: "/contact" }}
+                  secondary={{ text: "Request demo", href: "/contact?demo=true" }}
+                  darkMode={true}
+                />
+              </motion.div>
+
+              {/* Stats card */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                style={{ width: '100%', maxWidth: 350 }}
+              >
+                <StatsCard stats={stats} theme={theme} />
+              </motion.div>
+            </Container>
+          </Box>
+        </Container>
+
+        {/* Support section */}
+        <Container maxWidth="md" sx={{ mb: { xs: 12, md: 16 } }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5 }}
+          >
+            <Paper elevation={0} sx={{
+              borderRadius: 4,
+              overflow: 'hidden',
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
+              bgcolor: alpha(theme.palette.background.paper, 0.8),
+              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.06)',
+              position: 'relative'
+            }}>
+              <Box sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 6,
+                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
+              }} />
+              
+              <Box sx={{ p: { xs: 3, md: 4 } }}>
+                <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
+                  <Box sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: theme.palette.primary.main
+                  }}>
+                    <SupportRounded />
+                  </Box>
+                  <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                    Have more questions?
+                  </Typography>
+                </Stack>
+                
+                <Typography variant="body1" sx={{ mb: 4, color: theme.palette.text.secondary }}>
+                  Our support team is here to help you find the right plan for your needs and answer any questions you may have about our pricing, features, or implementation.
+                </Typography>
+                
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <Button
+                      fullWidth
+                      component={NextLink}
+                      href="/contact"
+                      variant="outlined"
+                      size="large"
+                      sx={{
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        borderRadius: 2,
+                        py: 1.5
+                      }}
+                    >
+                      Contact sales
+                    </Button>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Button
+                      fullWidth
+                      component={NextLink}
+                      href="/contact?demo=true"
+                      variant="contained"
+                      size="large"
+                      sx={{
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        borderRadius: 2,
+                        py: 1.5
+                      }}
+                    >
+                      Schedule a demo
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Paper>
+          </motion.div>
+        </Container>
+
+        {/* Visual footer divider */}
+        <Box sx={{
+          height: 1,
+          width: '100%',
+          maxWidth: 1200,
+          mx: 'auto',
+          background: `linear-gradient(90deg, 
+            ${alpha(theme.palette.divider, 0)}, 
+            ${alpha(theme.palette.divider, 0.5)}, 
+            ${alpha(theme.palette.divider, 0)}
+          )`,
+          mb: 8
+        }} />
       </ConsistentPageLayout>
-    </div>
+    </Box>
   );
 }

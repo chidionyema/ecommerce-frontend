@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Box, Container, Typography, Grid, useTheme, alpha, Button, Divider, Stack } from '@mui/material';
+import { Box, Container, Typography, Grid, useTheme, alpha, Button, Divider } from '@mui/material';
 import { getSharedStyles, ANIMATIONS } from '../../utils/designSystem';
 import TechCard from '../Common/TechCard';
 import { motion, useInView } from 'framer-motion';
@@ -10,70 +10,62 @@ const services = [
   { 
     title: 'Enterprise Architecture', 
     content: 'Strategic design of scalable, maintainable systems based on our experience at ASOS and Tesco.', 
-    icon: <Layers strokeWidth={1.5} size={20} color="#FF5722" />, 
+    icon: <Layers strokeWidth={1.5} size={18} color="#FF5722" />, 
     color: '#FF5722',
-    gradient: 'linear-gradient(135deg, #FF9966, #FF5E62)',  
     ctaLink: '/services/enterprise-architecture' 
   },
   { 
     title: 'Cloud Migration', 
     content: 'Seamless transitions to AWS, Azure, and GCP with proven methodologies from StepStone and PMI.', 
-    icon: <Cloud strokeWidth={1.5} size={20} color="#2196F3" />, 
+    icon: <Cloud strokeWidth={1.5} size={18} color="#2196F3" />, 
     color: '#2196F3',
-    gradient: 'linear-gradient(135deg, #00C6FB, #005BEA)', 
     ctaLink: '/services/cloud-migration' 
   },
   { 
     title: 'DevOps & Infrastructure', 
     content: 'Automate deployment pipelines with Docker, Kubernetes, and Terraform for maximum efficiency.', 
-    icon: <Wrench strokeWidth={1.5} size={20} color="#4CAF50" />, 
+    icon: <Wrench strokeWidth={1.5} size={18} color="#4CAF50" />, 
     color: '#4CAF50',
-    gradient: 'linear-gradient(135deg, #38ef7d, #11998e)', 
     ctaLink: '/services/devops' 
   },
   { 
     title: 'Custom Software Development', 
     content: 'Full-stack solutions in .NET, React, Next.js, and more with enterprise-grade quality.', 
-    icon: <Code strokeWidth={1.5} size={20} color="#673AB7" />, 
+    icon: <Code strokeWidth={1.5} size={18} color="#673AB7" />, 
     color: '#673AB7',
-    gradient: 'linear-gradient(135deg, #6a11cb, #2575fc)', 
     ctaLink: '/services/development' 
   },
   { 
     title: 'Machine Learning Integration', 
     content: 'Practical AI implementation leveraging expertise from Imperial College certification.', 
-    icon: <Cpu strokeWidth={1.5} size={20} color="#E91E63" />, 
+    icon: <Cpu strokeWidth={1.5} size={18} color="#E91E63" />, 
     color: '#E91E63',
-    gradient: 'linear-gradient(135deg, #F857A6, #FF5858)', 
     ctaLink: '/services/machine-learning' 
   },
   { 
     title: 'Security & Authentication', 
     content: 'Implement OAuth 2.0, OpenID Connect, and secure architecture patterns from day one.', 
-    icon: <ShieldCheck strokeWidth={1.5} size={20} color="#FFC107" />, 
+    icon: <ShieldCheck strokeWidth={1.5} size={18} color="#FFC107" />, 
     color: '#FFC107',
-    gradient: 'linear-gradient(135deg, #FFD32D, #FF7A00)', 
     ctaLink: '/services/security' 
   },
   { 
     title: 'Microservices Architecture', 
     content: 'Design and implement scalable microservices with messaging systems like RabbitMQ and SQS.', 
-    icon: <Database strokeWidth={1.5} size={20} color="#00BCD4" />, 
+    icon: <Database strokeWidth={1.5} size={18} color="#00BCD4" />, 
     color: '#00BCD4',
-    gradient: 'linear-gradient(135deg, #21D4FD, #2152FF)', 
     ctaLink: '/services/microservices' 
   },
   { 
     title: 'Technical Documentation', 
     content: 'Comprehensive, accessible documentation that empowers your team for long-term success.', 
-    icon: <BookOpen strokeWidth={1.5} size={20} color="#9E9E9E" />, 
+    icon: <BookOpen strokeWidth={1.5} size={18} color="#9E9E9E" />, 
     color: '#9E9E9E',
-    gradient: 'linear-gradient(135deg, #A8B4CC, #7F8DAA)', 
     ctaLink: '/services/documentation' 
   },
 ];
 
-// Resources list for blue CTA - matching hero section pattern
+// Resources list for CTA
 const resources = [
   'Weekly technical tutorials', 
   'Code snippets & templates', 
@@ -87,24 +79,23 @@ const ServicesGrid = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
   const [hoveredIndex, setHoveredIndex] = useState(-1);
+  
+  // Purple color for the secondary button
+  const purpleColor = '#673AB7';
 
-  // Blue checkmark component matching hero section styling 
-  const BlueCheckmarkItem = ({ text, icon: Icon }) => (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+  // Refined elegant checkmark
+  const ElegantCheckmarkItem = ({ text, icon: Icon }) => (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 1.5 }}>
       <Box sx={{ 
-        width: 20, 
-        height: 20, 
-        borderRadius: '50%', 
-        backgroundColor: theme.palette.primary.main,
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        color: 'white', 
-        fontSize: '0.8rem' 
+        width: 16, height: 16, borderRadius: '50%', backgroundColor: theme.palette.primary.main,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white',
+        fontSize: '0.7rem'
       }}>
-        {Icon ? <Icon size={12} /> : '✓'}
+        {Icon ? <Icon size={8} /> : '✓'}
       </Box>
-      <Typography color={theme.palette.text.primary}>{text}</Typography>
+      <Typography color={theme.palette.text.primary} sx={{ fontSize: '0.9rem', letterSpacing: '0.015em' }}>
+        {text}
+      </Typography>
     </Box>
   );
 
@@ -125,21 +116,21 @@ const ServicesGrid = () => {
           initial="hidden" 
           animate={isInView ? "visible" : "hidden"}
         >
-          <motion.div variants={ANIMATIONS.item}>
-            <Typography variant="h2" sx={styles.sectionTitle}>
-              Enterprise Solutions for <Box component="span" sx={styles.accentText}>Growing Businesses</Box>
-            </Typography>
-          </motion.div>
+          {/* Header with proper professional spacing */}
+          <Box sx={{ mb: { xs: 5, md: 6 } }}>
+            <motion.div variants={ANIMATIONS.item}>
+              <Typography variant="h2" sx={{...styles.sectionTitle, letterSpacing: '-0.02em', fontWeight: 600, mb: 2}}>
+                Enterprise Solutions for <Box component="span" sx={styles.accentText}>Growing Businesses</Box>
+              </Typography>
+              <Typography variant="subtitle1" sx={{...styles.sectionSubtitle, letterSpacing: '0.01em', fontWeight: 400, maxWidth: '85%', mx: { xs: 'auto', md: 0 }}}>
+                Leverage our experience from <strong>ASOS, Tesco, and Philip Morris</strong> to build 
+                scalable, secure, and efficient technology for your growing company
+              </Typography>
+            </motion.div>
+          </Box>
 
-          <motion.div variants={ANIMATIONS.item}>
-            <Typography variant="subtitle1" sx={styles.sectionSubtitle}>
-              Leverage our experience from <strong>ASOS, Tesco, and Philip Morris</strong> to build 
-              scalable, secure, and efficient technology for your growing company
-            </Typography>
-          </motion.div>
-
-          {/* Service cards using TechCard */}
-          <Grid container spacing={4} justifyContent="center">
+          {/* Service cards using TechCard with refined styling */}
+          <Grid container spacing={3} justifyContent="center">
             {services.map((service, index) => (
               <Grid item xs={12} sm={6} md={3} key={index} sx={{ display: 'flex' }}
                 onMouseEnter={() => setHoveredIndex(index)} 
@@ -148,27 +139,29 @@ const ServicesGrid = () => {
                 <motion.div variants={ANIMATIONS.item} style={{ width: '100%', height: '100%' }}>
                   <TechCard
                     icon={hoveredIndex === index ? 
-                      React.cloneElement(service.icon, { strokeWidth: 2 }) : 
+                      React.cloneElement(service.icon, { strokeWidth: 1.75 }) : 
                       service.icon
                     }
                     title={service.title}
                     accentColor={service.color}
                     importance="primary"
                     sx={{
-                      background: `linear-gradient(145deg, ${alpha('#1a56db', 0.15)}, ${alpha('#1a56db', 0.07)})`,
-                      border: `1px solid ${alpha('#4285f4', 0.15)}`,
+                      background: `linear-gradient(145deg, ${alpha('#1a56db', 0.12)}, ${alpha('#1a56db', 0.05)})`,
+                      border: `1px solid ${alpha('#4285f4', 0.12)}`,
+                      boxShadow: `0 4px 20px ${alpha('#000', 0.05)}`,
                     }}
                   >
                     <Typography 
                       variant="body2" 
                       color={alpha('#fff', 0.9)} 
                       sx={{ 
-                        fontSize: '0.9rem', 
-                        lineHeight: 1.5, 
+                        fontSize: '0.85rem', 
+                        lineHeight: 1.6, 
                         letterSpacing: '0.01em',
                         flexGrow: 1,
                         textAlign: 'center',
-                        mb: 2
+                        mb: 2,
+                        fontWeight: 400
                       }}
                     >
                       {service.content}
@@ -176,23 +169,26 @@ const ServicesGrid = () => {
                     
                     <Divider sx={{ 
                       mb: 1.5, 
-                      borderColor: alpha('#fff', 0.2), 
-                      width: '80%', 
+                      borderColor: alpha('#fff', 0.15), 
+                      width: '70%', 
                       mx: 'auto' 
                     }} />
                     
                     <Button 
                       variant="text" 
                       color="inherit"
-                      endIcon={<ArrowRight size={16} />} 
+                      endIcon={<ArrowRight size={14} />} 
                       href={service.ctaLink} 
                       sx={{
                         textTransform: 'none', 
-                        fontWeight: 600, 
-                        fontSize: '0.9rem', 
-                        color: '#fff',
+                        fontWeight: 500, 
+                        fontSize: '0.85rem', 
+                        color: alpha('#fff', 0.95),
+                        py: 0.5,
+                        letterSpacing: '0.01em',
                         '&:hover': { 
-                          backgroundColor: alpha('#fff', 0.1)
+                          backgroundColor: alpha('#fff', 0.07),
+                          transform: 'translateY(-1px)'
                         },
                         transition: 'all 0.2s ease',
                       }}
@@ -205,21 +201,45 @@ const ServicesGrid = () => {
             ))}
           </Grid>
           
-          {/* Combined CTA section - Resources and All Services */}
+          {/* Refined combined CTA section - Resources and All Services */}
           <motion.div variants={ANIMATIONS.item}>
             <TechCard
               title="Enterprise Resources & Services"
               importance="primary"
               sx={{
-                ...styles.ctaCard,
-                background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(theme.palette.background.paper, 0.8)})`,
-                mt: 6
+                mt: { xs: 6, md: 8 },
+                borderRadius: '16px',
+                background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.95)}, ${alpha(theme.palette.background.paper, 0.85)})`,
+                backdropFilter: 'blur(8px)',
+                boxShadow: `0 8px 32px ${alpha('#000', 0.08)}`
               }}
             >
-              <Grid container spacing={3}>
+              <Typography 
+                variant="h5" 
+                component="h3" 
+                fontWeight={600} 
+                mb={1}
+                align="center"
+                color={theme.palette.primary.main}
+                sx={{ letterSpacing: '-0.01em', fontSize: '1.3rem' }}
+              >
+                Enterprise Resources & Services
+              </Typography>
+              
+              <Typography 
+                variant="body1" 
+                color={theme.palette.text.secondary} 
+                mb={4} 
+                align="center"
+                sx={{ letterSpacing: '0.01em', maxWidth: '85%', mx: 'auto', fontSize: '0.95rem' }}
+              >
+                Access free resources and explore our full range of enterprise solutions
+              </Typography>
+              
+              <Grid container spacing={4}>
                 {/* Left side: Resources list */}
                 <Grid item xs={12} md={6} sx={{ 
-                  borderRight: { xs: 'none', md: `1px solid ${alpha(theme.palette.divider, 0.1)}` },
+                  borderRight: { xs: 'none', md: `1px solid ${alpha(theme.palette.divider, 0.08)}` },
                   pb: { xs: 3, md: 0 }
                 }}>
                   <Typography 
@@ -227,16 +247,18 @@ const ServicesGrid = () => {
                     sx={{ 
                       color: theme.palette.primary.main, 
                       mb: 2, 
-                      fontWeight: 600 
+                      fontWeight: 600,
+                      fontSize: '1rem',
+                      letterSpacing: '0.01em'
                     }}
                   >
                     Free Enterprise Resources
                   </Typography>
                   
-                  <Grid container spacing={1}>
+                  <Grid container spacing={1.5}>
                     {resources.map((item, i) => (
                       <Grid item xs={12} sm={6} key={i}>
-                        <BlueCheckmarkItem text={item} icon={FileText} />
+                        <ElegantCheckmarkItem text={item} icon={FileText} />
                       </Grid>
                     ))}
                   </Grid>
@@ -244,16 +266,23 @@ const ServicesGrid = () => {
                   <Button 
                     variant="contained" 
                     color="primary" 
-                    startIcon={<Download size={16} />}
+                    startIcon={<Download size={14} />}
                     href="/resources" 
                     sx={{
-                      mt: 2,
-                      px: 3, 
-                      py: 1, 
+                      mt: 2.5,
+                      px: 2.5, 
+                      py: 0.8, 
                       textTransform: 'none', 
-                      fontWeight: 600, 
-                      fontSize: '0.95rem', 
-                      borderRadius: 2,
+                      fontWeight: 500, 
+                      fontSize: '0.85rem', 
+                      borderRadius: 6,
+                      letterSpacing: '0.01em',
+                      boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.25)}`,
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        transform: 'translateY(-1px)',
+                        boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`
+                      }
                     }}
                   >
                     Access Free Resources
@@ -262,18 +291,21 @@ const ServicesGrid = () => {
                 
                 {/* Right side: Services CTA */}
                 <Grid item xs={12} md={6} sx={{ 
-                  borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.1)}`, md: 'none' },
+                  borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.08)}`, md: 'none' },
                   pt: { xs: 3, md: 0 },
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  alignItems: { xs: 'center', md: 'flex-start' }
                 }}>
                   <Typography 
                     variant="h6" 
                     sx={{ 
-                      color: theme.palette.secondary.main, 
-                      mb: 2, 
-                      fontWeight: 600 
+                      color: purpleColor, 
+                      mb: 1.5, 
+                      fontWeight: 600,
+                      fontSize: '1rem',
+                      letterSpacing: '0.01em'
                     }}
                   >
                     Explore Our Enterprise Solutions
@@ -283,25 +315,36 @@ const ServicesGrid = () => {
                     variant="body1" 
                     sx={{ 
                       mb: 3,
-                      color: theme.palette.text.primary 
+                      color: theme.palette.text.secondary,
+                      fontSize: '0.9rem',
+                      letterSpacing: '0.01em',
+                      lineHeight: 1.6,
+                      maxWidth: { xs: '100%', md: '90%' }
                     }}
                   >
                     Discover our full range of enterprise-grade services designed to help your business scale efficiently and securely.
                   </Typography>
                   
                   <Button 
-                    variant="contained" 
-                    color="secondary" 
-                    endIcon={<ChevronRight size={16} strokeWidth={2} />}
+                    variant="contained"
+                    endIcon={<ChevronRight size={14} />}
                     href="/solutions" 
                     sx={{
-                      px: 3, 
-                      py: 1, 
+                      px: 2.5, 
+                      py: 0.8, 
                       textTransform: 'none', 
-                      fontWeight: 600, 
-                      fontSize: '0.95rem', 
-                      borderRadius: 2,
-                      alignSelf: { xs: 'center', md: 'flex-start' }
+                      fontWeight: 500, 
+                      fontSize: '0.85rem', 
+                      borderRadius: 6,
+                      letterSpacing: '0.01em',
+                      bgcolor: purpleColor,
+                      boxShadow: `0 2px 8px ${alpha(purpleColor, 0.3)}`,
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        bgcolor: alpha(purpleColor, 0.9),
+                        transform: 'translateY(-1px)',
+                        boxShadow: `0 4px 12px ${alpha(purpleColor, 0.35)}`
+                      }
                     }}
                   >
                     View All Enterprise Services
