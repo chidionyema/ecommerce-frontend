@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Typography, Box, Container, Chip, useMediaQuery, Button, Grid,
   alpha, useTheme, CircularProgress, Fade
@@ -20,69 +20,125 @@ import { solutionsPageData, caseStudiesFaqItems, industryIconMap } from '../../d
 // Import styles
 import styles from '../../styles/solutions.module.css';
 
-// IMPORTANT: Instead of trying to fix the SearchFilter component with complex wrapper code,
-// let's create a simplified placeholder component for now that doesn't cause type errors
+// Create a wrapper component for SearchFilter to handle additional required props
+import SearchFilter from '../../components/SearchFilter/SearchFilter';
+import { SearchFilterProps } from '../../components/SearchFilter/types';
 
-// This is a simplified placeholder component to replace SearchFilter temporarily
-const SimplifiedFilter = ({ 
-  onSearch, 
-  onFilter, 
-  filterGroups, 
-  initialValues,
-  loading
-}: {
-  onSearch: (query: string) => void;
-  onFilter: (filters: Record<string, any>) => void; 
-  filterGroups: any[];
-  initialValues?: { search?: string; filters?: Record<string, any> };
-  loading?: boolean;
-}) => {
-  const [searchQuery, setSearchQuery] = useState(initialValues?.search || '');
-  
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setSearchQuery(newValue);
-    onSearch(newValue);
+// Define SearchFilterWrapper component
+const SearchFilterWrapper: React.FC<SearchFilterProps> = (props) => {
+  const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [pendingFilters, setPendingFilters] = useState<Record<string, any>>(props.initialValues?.filters || {});
+  const [open, setOpen] = useState(false);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    setOpen(true);
   };
-  
-  const handleFilterChange = (filter: string) => {
-    onFilter({ ...initialValues?.filters, test: filter });
+
+  const handleClose = () => {
+    setAnchorEl(null);
+    setOpen(false);
   };
-  
+
+  const handleFilterChange = (category: string, value: any) => {
+    setPendingFilters(prev => ({
+      ...prev,
+      [category]: value
+    }));
+  };
+
+  const handleApplyFilters = () => {
+    if (props.onFilter) {
+      props.onFilter(pendingFilters);
+    }
+    handleClose();
+  };
+
+  const handleCancelFilters = () => {
+    setPendingFilters(props.initialValues?.filters || {});
+    handleClose();
+  };
+
+  const handleResetFilters = () => {
+    setPendingFilters({});
+    if (props.onFilter) {
+      props.onFilter({});
+    }
+  };
+
+  // Add the additional required properties
+  const isOptionSelected = (groupId: string, optionId: string): boolean => {
+    const groupValue = pendingFilters[groupId];
+    if (Array.isArray(groupValue)) {
+      return groupValue.includes(optionId);
+    }
+    return groupValue === optionId;
+  };
+
+  const hasPendingChanges = (): boolean => {
+    const initialFilters = props.initialValues?.filters || {};
+    // Compare pendingFilters with initialFilters
+    const pendingKeys = Object.keys(pendingFilters);
+    const initialKeys = Object.keys(initialFilters);
+
+    if (pendingKeys.length !== initialKeys.length) return true;
+
+    return pendingKeys.some(key => {
+      const pendingValue = pendingFilters[key];
+      const initialValue = initialFilters[key];
+
+      if (Array.isArray(pendingValue) && Array.isArray(initialValue)) {
+        if (pendingValue.length !== initialValue.length) return true;
+        return pendingValue.some(v => !initialValue.includes(v));
+      }
+
+      return pendingValue !== initialValue;
+    });
+  };
+
+  const closePanel = () => {
+    handleClose();
+  };
+
+  // Define the colors object
+  const colors = {
+    primary: theme.palette.primary.main,
+    secondary: theme.palette.secondary.main,
+    text: theme.palette.text.primary,
+    background: theme.palette.background.paper,
+    border: theme.palette.divider,
+  };
+
+  // Combine all props
+  const filterPanelProps = {
+    ...props,
+    anchorEl,
+    pendingFilters,
+    handleFilterChange,
+    handleApplyFilters,
+    handleCancelFilters,
+    handleResetFilters,
+    handleClose,
+    open,
+    isOptionSelected,
+    hasPendingChanges,
+    closePanel,
+    colors
+  };
+
   return (
-    <Box sx={{ p: 2, border: '1px solid #ccc', borderRadius: 1, mb: 2 }}>
-      <Typography variant="h6" gutterBottom>Advanced Search</Typography>
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={handleSearch}
-        placeholder="Search..."
-        style={{ 
-          width: '100%', 
-          padding: '8px', 
-          marginBottom: '16px',
-          borderRadius: '4px',
-          border: '1px solid #ccc'
-        }}
-        disabled={loading}
-      />
+    <div>
       <Button 
         variant="contained" 
         color="primary" 
-        sx={{ mr: 1 }}
-        disabled={loading}
-        onClick={() => handleFilterChange('option1')}
+        onClick={handleClick}
+        disabled={props.loading}
       >
-        Apply Filter
+        Filter & Sort
       </Button>
-      <Button 
-        variant="outlined"
-        disabled={loading}
-        onClick={() => onFilter({})}
-      >
-        Clear Filters
-      </Button>
-    </Box>
+      <SearchFilter {...filterPanelProps} />
+    </div>
   );
 };
 
@@ -114,7 +170,6 @@ interface FilterGroup {
 interface SortOption {
   id: string;
   label: string;
-  value?: string; // Add this property to match UXOptimizedHero's expected type
   description?: string;
   defaultDirection?: 'asc' | 'desc';
 }
@@ -231,25 +286,21 @@ const Solutions = () => {
     {
       id: 'name',
       label: 'Project Name',
-      value: 'name', // Add value property
       defaultDirection: 'asc'
     },
     {
       id: 'recent',
       label: 'Most Recent',
-      value: 'recent', // Add value property
       description: 'Sort by project completion date'
     },
     {
       id: 'impact',
       label: 'Highest Impact',
-      value: 'impact', // Add value property
       description: 'Sort by impact metrics'
     },
     {
       id: 'featured',
       label: 'Featured First',
-      value: 'featured', // Add value property
       description: 'Show featured projects first'
     }
   ];
@@ -376,7 +427,37 @@ const Solutions = () => {
   };
 
   // Create the dynamic filter groups from actual project data
-  const dynamicFilterGroups = useMemo(() => generateFilterGroups(), []);
+  const dynamicFilterGroups = generateFilterGroups();
+
+  // Prepare search filter props
+  const searchFilterProps: SearchFilterProps = {
+    onSearch: handleSearch,
+    onFilter: handleFilter,
+    onSort: handleSort,
+    onSortDirectionChange: handleSortDirectionChange,
+    filterGroups: dynamicFilterGroups,
+    sortOptions: formattedSortOptions,
+    initialValues: {
+      search: search,
+      filters: filters,
+      sort: sortBy,
+      sortDirection: sortDirection
+    },
+    loading: loading,
+    results: {
+      count: projects.length,
+      total: cvProjects.length
+    },
+    placeholder: "Search case studies by name, technology, or description...",
+    title: "Advanced Search & Filters",
+    primaryColor: theme.palette.primary.main,
+    showSearchHistory: true,
+    maxVisibleFilters: 3,
+    compact: isMobile,
+    debounceDelay: 300,
+    enableSortDirection: true,
+    enableFilterSearch: true
+  };
 
   return (
     <ConsistentPageLayout
@@ -399,17 +480,8 @@ const Solutions = () => {
         />
       ) : (
         <Container maxWidth="xl" sx={{ my: 3 }}>
-          {/* Use the simplified filter component instead */}
-          <SimplifiedFilter
-            onSearch={handleSearch}
-            onFilter={handleFilter}
-            filterGroups={dynamicFilterGroups}
-            initialValues={{
-              search: search,
-              filters: filters
-            }}
-            loading={loading}
-          />
+          {/* Use the wrapper component instead of directly using SearchFilter */}
+          <SearchFilterWrapper {...searchFilterProps} />
         </Container>
       )}
 
