@@ -20,6 +20,14 @@ import {
 } from '../../data/contactPageData';
 import styles from '@/styles/contact.module.css';
 
+// Define form data interface
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+}
+
 // Validation schema
 const validationSchema = yup.object().shape({
   name: yup.string()
@@ -87,8 +95,8 @@ export default function Contact() {
   const searchParams = useSearchParams();
   const theme = useTheme();
   
-  // State
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
+  // State with proper typing
+  const [formData, setFormData] = useState<FormData>({ name: '', email: '', phone: '', message: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -104,8 +112,7 @@ export default function Contact() {
   }, [searchParams]);
 
   // Form submission handler
-  // Using a more generic event type to prevent conflicts
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrors({});
 
@@ -456,7 +463,7 @@ export default function Contact() {
                         fullWidth
                         label={field.label}
                         name={field.name}
-                        value={formData[field.name]}
+                        value={formData[field.name as keyof FormData]}
                         onChange={handleInputChange}
                         error={!!errors[field.name]}
                         helperText={errors[field.name]}
