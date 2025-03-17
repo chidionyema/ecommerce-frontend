@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ConsistentPageLayout from '../../components/Shared/ConsistentPageLayout';
 import { pricingPageContent, plans } from '../../data/pricingPageData';
 import { theme as brandKit } from '../../theme/brandKit';
+import { Theme } from '@mui/material/styles';
 
 // Add FAQ guarantee item
 pricingPageContent.faqSection.items.push({
@@ -60,11 +61,8 @@ const FeatureCell = ({ value, plan, theme }) => {
   }
   return (
     <Typography variant="body2" sx={{
-      fontWeight: 600,
-      color: plan.recommended ? theme.palette.primary.main : theme.palette.text.primary
-    }}>
-      {value}
-    </Typography>
+      fontWeight: 600, color: plan.recommended ? theme.palette.primary.main : theme.palette.text.primary
+    }}>{value}</Typography>
   );
 };
 
@@ -100,7 +98,7 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1.0] }}
+      transition={{ duration: 0.4 }}
       style={{ height: '100%' }}
       onMouseEnter={() => onHover(plan.type)}
       onMouseLeave={() => onHover(null)}
@@ -131,11 +129,10 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
           <Typography variant="h5" sx={{
             fontWeight: 700,
             color: isRecommended ? theme.palette.primary.main : theme.palette.text.primary,
-            letterSpacing: '-0.01em'
           }}>{plan.title}</Typography>
         </Stack>
 
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3.5, minHeight: 48, opacity: 0.9, lineHeight: 1.6 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3.5, minHeight: 48 }}>
           {plan.tagline}
         </Typography>
 
@@ -159,14 +156,13 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
           <Typography variant="h4" sx={{
             fontWeight: 800,
             color: isRecommended ? theme.palette.primary.main : theme.palette.text.primary,
-            display: 'inline-flex', alignItems: 'baseline', gap: 1,
-            letterSpacing: '-0.02em'
+            display: 'inline-flex', alignItems: 'baseline', gap: 1
           }}>
             {billingCycle === 'annual' && plan.annualPrice ? plan.annualPrice : plan.price}
             
             {billingCycle === 'annual' && plan.annualPrice && (
               <Typography component="span" variant="caption" sx={{
-                fontWeight: 600, fontSize: '0.75rem', verticalAlign: 'super',
+                fontWeight: 600, fontSize: '0.75rem', 
                 bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main,
                 px: 1, py: 0.5, borderRadius: 1.5
               }}>SAVE {savingsPercent}%</Typography>
@@ -184,16 +180,10 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
           onClick={() => onClick(plan.type)}
           sx={{
             textTransform: 'none', fontWeight: 600, borderRadius: 2.5, py: 1.75, mt: 'auto',
-            fontSize: '0.95rem', transition: 'all 0.25s ease',
             ...(isRecommended && {
               background: brandKit.gradient.primary(theme),
               boxShadow: '0 4px 14px rgba(51, 102, 255, 0.35)',
               '&:hover': { boxShadow: '0 6px 20px rgba(51, 102, 255, 0.5)', transform: 'translateY(-2px)' }
-            }),
-            ...(!isRecommended && {
-              borderColor: alpha(theme.palette.primary.main, 0.5),
-              '&:hover': { borderColor: theme.palette.primary.main, 
-              bgcolor: alpha(theme.palette.primary.main, 0.04), transform: 'translateY(-2px)' }
             })
           }}
           endIcon={<ArrowForwardRounded />}
@@ -203,11 +193,7 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
 
         <Button
           variant="text" size="small" color="inherit" onClick={onViewFeatures}
-          sx={{
-            fontSize: '0.8rem', fontWeight: 500, textTransform: 'none', mt: 2,
-            color: theme.palette.text.secondary, justifyContent: 'center',
-            '&:hover': { bgcolor: 'transparent', color: theme.palette.primary.main }
-          }}
+          sx={{ fontSize: '0.8rem', mt: 2, justifyContent: 'center' }}
           endIcon={<KeyboardArrowRightRounded fontSize="small" />}
         >
           View all features
@@ -224,38 +210,17 @@ const SectionHeading = ({ label, title, description }) => {
   return (
     <Box sx={{ textAlign: 'center', mb: 6 }}>
       {label && (
-        <Typography
-          component="span"
-          sx={{
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            color: theme.palette.primary.main,
-            bgcolor: alpha(theme.palette.primary.main, 0.1),
-            py: 0.75, px: 2, borderRadius: 5,
-            display: 'inline-block', mb: 2,
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em'
-          }}
-        >
-          {label}
-        </Typography>
+        <Typography component="span" sx={{
+          fontSize: '0.875rem', fontWeight: 600, color: theme.palette.primary.main,
+          bgcolor: alpha(theme.palette.primary.main, 0.1), py: 0.75, px: 2, borderRadius: 5,
+          display: 'inline-block', mb: 2, textTransform: 'uppercase'
+        }}>{label}</Typography>
       )}
       
-      <Typography variant="h4" sx={{
-        fontWeight: 800,
-        mb: 2,
-        fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
-        letterSpacing: '-0.01em'
-      }}>
-        {title}
-      </Typography>
+      <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>{title}</Typography>
       
       {description && (
-        <Typography variant="body1" color="text.secondary" sx={{
-          maxWidth: 600,
-          mx: 'auto',
-          fontSize: '1.125rem'
-        }}>
+        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
           {description}
         </Typography>
       )}
@@ -266,12 +231,9 @@ const SectionHeading = ({ label, title, description }) => {
 // Stats component for CTA section
 const StatsCard = ({ stats, theme }) => (
   <Paper elevation={0} sx={{
-    backdropFilter: 'blur(10px)', 
-    bgcolor: alpha('#fff', 0.08),
-    borderRadius: 4, 
-    border: `1px solid ${alpha('#fff', 0.2)}`,
-    p: 4, width: '100%', 
-    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)'
+    backdropFilter: 'blur(10px)', bgcolor: alpha('#fff', 0.08),
+    borderRadius: 4, border: `1px solid ${alpha('#fff', 0.2)}`,
+    p: 4, width: '100%', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)'
   }}>
     <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3.5 }}>
       <Box sx={{
@@ -281,53 +243,22 @@ const StatsCard = ({ stats, theme }) => (
       }}>
         <StarRounded sx={{ fontSize: 20, color: '#fff' }} />
       </Box>
-      <Typography variant="h6" sx={{ 
-        fontWeight: 700, color: '#fff', letterSpacing: '-0.01em',
-        fontSize: '1.25rem'
-      }}>
-        Trusted globally
-      </Typography>
+      <Typography variant="h6" sx={{ fontWeight: 700, color: '#fff' }}>Trusted globally</Typography>
     </Stack>
 
     <Grid container spacing={3}>
       {stats.slice(0, 4).map((stat, i) => (
         <Grid item xs={6} key={i}>
-          <motion.div whileHover={{ y: -5 }} transition={{ type: 'spring', stiffness: 400, damping: 10 }}>
+          <motion.div whileHover={{ y: -5 }}>
             <Box sx={{ 
-              p: 2, textAlign: 'center',
-              bgcolor: alpha('#fff', 0.05),
-              borderRadius: 3,
-              border: `1px solid ${alpha('#fff', 0.1)}`,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              '&:hover': {
-                bgcolor: alpha('#fff', 0.1),
-                boxShadow: `0 10px 20px ${alpha('#000', 0.15)}`
-              }
+              p: 2, textAlign: 'center', bgcolor: alpha('#fff', 0.05), borderRadius: 3,
+              border: `1px solid ${alpha('#fff', 0.1)}`, height: '100%',
+              display: 'flex', flexDirection: 'column', justifyContent: 'center',
+              '&:hover': { bgcolor: alpha('#fff', 0.1) }
             }}>
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                mb: 1,
-                opacity: 0.7
-              }}>
-                {stat.icon}
-              </Box>
-              <Typography variant="h5" sx={{ 
-                fontWeight: 800, color: '#fff', mb: 0.5, 
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
-              }}>
-                {stat.value}
-              </Typography>
-              <Typography variant="body2" sx={{ 
-                color: alpha('#fff', 0.8),
-                fontSize: '0.75rem',
-                fontWeight: 500
-              }}>
-                {stat.label}
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1, opacity: 0.7 }}>{stat.icon}</Box>
+              <Typography variant="h5" sx={{ fontWeight: 800, color: '#fff', mb: 0.5 }}>{stat.value}</Typography>
+              <Typography variant="body2" sx={{ color: alpha('#fff', 0.8), fontSize: '0.75rem' }}>{stat.label}</Typography>
             </Box>
           </motion.div>
         </Grid>
@@ -342,56 +273,60 @@ const CTAButtons = ({ primary, secondary, darkMode = false }) => {
   return (
     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
       <Button 
-        component={NextLink} 
-        href={primary.href}
-        size="large" 
-        variant="contained" 
+        component={NextLink} href={primary.href} size="large" variant="contained" 
         sx={{
-          bgcolor: darkMode ? '#fff' : undefined, 
-          color: darkMode ? theme.palette.primary.dark : undefined, 
-          textTransform: 'none',
-          fontWeight: 700, 
-          py: 1.75, px: 4, 
-          borderRadius: 3, 
-          boxShadow: darkMode ? '0 8px 20px rgba(0, 0, 0, 0.25)' : undefined,
-          fontSize: '1rem',
-          '&:hover': { 
-            bgcolor: darkMode ? '#fff' : undefined, 
-            transform: 'translateY(-3px)', 
-            boxShadow: darkMode ? '0 12px 28px rgba(0, 0, 0, 0.3)' : undefined
-          }
+          bgcolor: darkMode ? '#fff' : undefined, color: darkMode ? theme.palette.primary.dark : undefined, 
+          textTransform: 'none', fontWeight: 700, py: 1.75, px: 4, borderRadius: 3, 
+          '&:hover': { bgcolor: darkMode ? '#fff' : undefined, transform: 'translateY(-3px)' }
         }}
-      >
-        {primary.text}
-      </Button>
+      >{primary.text}</Button>
 
       <Button 
-        variant="outlined" 
-        component={NextLink} 
-        href={secondary.href}
-        size="large" 
+        variant="outlined" component={NextLink} href={secondary.href} size="large" 
         sx={{
-          borderColor: darkMode ? alpha('#fff', 0.6) : undefined, 
-          color: darkMode ? '#fff' : undefined, 
-          textTransform: 'none',
-          fontWeight: 600, 
-          py: 1.75, px: 4, 
-          borderRadius: 3,
-          fontSize: '1rem',
-          borderWidth: darkMode ? 1.5 : undefined,
-          backdropFilter: darkMode ? 'blur(4px)' : undefined,
+          borderColor: darkMode ? alpha('#fff', 0.6) : undefined, color: darkMode ? '#fff' : undefined, 
+          textTransform: 'none', fontWeight: 600, py: 1.75, px: 4, borderRadius: 3,
           bgcolor: darkMode ? alpha('#fff', 0.05) : undefined,
-          '&:hover': {
-            borderColor: darkMode ? '#fff' : undefined, 
-            bgcolor: darkMode ? alpha('#fff', 0.1) : undefined, 
-            transform: 'translateY(-3px)'
-          }
+          '&:hover': { borderColor: darkMode ? '#fff' : undefined, transform: 'translateY(-3px)' }
         }}
-      >
-        {secondary.text}
-      </Button>
+      >{secondary.text}</Button>
     </Stack>
   );
+};
+
+// Feature categories and matrix
+const categories = [
+  { name: 'Core Features', id: 'core', icon: <SpeedRounded fontSize="small" /> },
+  { name: 'Support', id: 'support', icon: <SupportRounded fontSize="small" /> },
+  { name: 'Security', id: 'security', icon: <ShieldRounded fontSize="small" /> },
+  { name: 'Advanced', id: 'advanced', icon: <StarRounded fontSize="small" /> }
+];
+
+const allFeatures = {
+  core: [
+    { name: 'Number of users', values: { consultation: '1 user', project: 'Up to 10 users', enterprise: 'Unlimited' } },
+    { name: 'Storage space', values: { consultation: '10 GB', project: '100 GB', enterprise: '1 TB' } },
+    { name: 'Projects', values: { consultation: '3', project: 'Unlimited', enterprise: 'Unlimited' } },
+    { name: 'API access', values: { consultation: false, project: true, enterprise: true } }
+  ],
+  support: [
+    { name: 'Email support', values: { consultation: true, project: true, enterprise: true } },
+    { name: 'Phone support', values: { consultation: false, project: true, enterprise: true } },
+    { name: 'Dedicated manager', values: { consultation: false, project: false, enterprise: true } },
+    { name: 'Response time', values: { consultation: '24 hours', project: '12 hours', enterprise: '4 hours' } }
+  ],
+  security: [
+    { name: 'Two-factor auth', values: { consultation: true, project: true, enterprise: true } },
+    { name: 'Advanced SSO', values: { consultation: false, project: true, enterprise: true } },
+    { name: 'Audit logs', values: { consultation: false, project: true, enterprise: true } },
+    { name: 'Custom security', values: { consultation: false, project: false, enterprise: true } }
+  ],
+  advanced: [
+    { name: 'Custom integrations', values: { consultation: false, project: false, enterprise: true } },
+    { name: 'Workflow automation', values: { consultation: false, project: true, enterprise: true } },
+    { name: 'Analytics dashboard', values: { consultation: 'Basic', project: 'Advanced', enterprise: 'Enterprise' } },
+    { name: 'White labeling', values: { consultation: false, project: false, enterprise: true } }
+  ]
 };
 
 // Main component
@@ -405,49 +340,12 @@ export default function PricingPage() {
   const [hoverCard, setHoverCard] = useState(null);
   const [animateIn, setAnimateIn] = useState(false);
 
-  // Animation trigger
   useEffect(() => { 
     const timer = setTimeout(() => { setAnimateIn(true); }, 100);
     return () => clearTimeout(timer);
   }, []);
 
   const handlePlanClick = (planType) => router.push(`/contact?plan=${planType}`);
-
-  // Feature categories
-  const categories = [
-    { name: 'Core Features', id: 'core', icon: <SpeedRounded fontSize="small" /> },
-    { name: 'Support', id: 'support', icon: <SupportRounded fontSize="small" /> },
-    { name: 'Security', id: 'security', icon: <ShieldRounded fontSize="small" /> },
-    { name: 'Advanced', id: 'advanced', icon: <StarRounded fontSize="small" /> }
-  ];
-
-  // Feature matrix
-  const allFeatures = {
-    core: [
-      { name: 'Number of users', values: { consultation: '1 user', project: 'Up to 10 users', enterprise: 'Unlimited' } },
-      { name: 'Storage space', values: { consultation: '10 GB', project: '100 GB', enterprise: '1 TB' } },
-      { name: 'Projects', values: { consultation: '3', project: 'Unlimited', enterprise: 'Unlimited' } },
-      { name: 'API access', values: { consultation: false, project: true, enterprise: true } }
-    ],
-    support: [
-      { name: 'Email support', values: { consultation: true, project: true, enterprise: true } },
-      { name: 'Phone support', values: { consultation: false, project: true, enterprise: true } },
-      { name: 'Dedicated manager', values: { consultation: false, project: false, enterprise: true } },
-      { name: 'Response time', values: { consultation: '24 hours', project: '12 hours', enterprise: '4 hours' } }
-    ],
-    security: [
-      { name: 'Two-factor auth', values: { consultation: true, project: true, enterprise: true } },
-      { name: 'Advanced SSO', values: { consultation: false, project: true, enterprise: true } },
-      { name: 'Audit logs', values: { consultation: false, project: true, enterprise: true } },
-      { name: 'Custom security', values: { consultation: false, project: false, enterprise: true } }
-    ],
-    advanced: [
-      { name: 'Custom integrations', values: { consultation: false, project: false, enterprise: true } },
-      { name: 'Workflow automation', values: { consultation: false, project: true, enterprise: true } },
-      { name: 'Analytics dashboard', values: { consultation: 'Basic', project: 'Advanced', enterprise: 'Enterprise' } },
-      { name: 'White labeling', values: { consultation: false, project: false, enterprise: true } }
-    ]
-  };
 
   // Stats for testimonials
   const stats = [
@@ -456,9 +354,6 @@ export default function PricingPage() {
     { value: '4.9', label: 'TrustPilot rating', icon: <ShieldRounded fontSize="small" /> },
     { value: '24/7', label: 'Customer support', icon: <SupportRounded fontSize="small" /> }
   ];
-  
-  // Company list for trust signals section
-  const companies = ['Acme Inc.', 'GlobalTech', 'Innovate AI', 'FutureCorp', 'TechGrowth', 'NextWave'];
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', position: 'relative', overflow: 'hidden', pb: 10 }}>
@@ -469,21 +364,19 @@ export default function PricingPage() {
             <motion.div 
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 15 }}
-              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
+              transition={{ duration: 0.5 }}
             >
               <Typography variant="h1" sx={{
                 fontSize: { xs: '2.25rem', sm: '2.75rem', md: '3.25rem' }, fontWeight: 800, mb: 3,
                 backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.02em',
-                lineHeight: 1.1
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
               }}>
-                Transparent pricing <br className="hidden md:block" />
-                for every business
+                Transparent pricing <br className="hidden md:block" />for every business
               </Typography>
 
               <Typography variant="body1" sx={{ 
                 color: theme.palette.text.secondary, mb: 6, maxWidth: 600, mx: 'auto', 
-                fontSize: { xs: '1.1rem', md: '1.25rem' }, lineHeight: 1.6, px: { xs: 2, md: 0 }
+                fontSize: { xs: '1.1rem', md: '1.25rem' }
               }}>
                 Choose the perfect plan that fits your needs with no hidden fees or complicated tiers.
                 All plans include core platform features.
@@ -494,7 +387,7 @@ export default function PricingPage() {
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 15 }}
-              transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.1, 0.25, 1.0] }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
               <Stack 
                 direction={{ xs: 'column', sm: 'row' }} 
@@ -513,39 +406,31 @@ export default function PricingPage() {
                     disableElevation
                     sx={{
                       minWidth: 120, borderRadius: 8, textTransform: 'none', fontWeight: 600,
-                      fontSize: '0.95rem', py: 1.25, px: 2.5,
                       color: billingCycle === 'monthly' ? '#fff' : theme.palette.text.primary
                     }}
-                  >
-                    Monthly
-                  </Button>
+                  >Monthly</Button>
                   <Button
                     onClick={() => setBillingCycle('annual')}
                     variant={billingCycle === 'annual' ? 'contained' : 'text'}
                     disableElevation
                     endIcon={billingCycle === 'annual' && (
                       <Chip label="Save 10%" size="small" sx={{
-                        height: 20, fontSize: '0.675rem', fontWeight: 600,
+                        height: 20, fontSize: '0.675rem',
                         bgcolor: '#fff', color: theme.palette.primary.main
                       }} />
                     )}
                     sx={{
                       minWidth: 120, borderRadius: 8, textTransform: 'none', fontWeight: 600,
-                      fontSize: '0.95rem', py: 1.25, px: 2.5,
                       color: billingCycle === 'annual' ? '#fff' : theme.palette.text.primary
                     }}
-                  >
-                    Annual
-                  </Button>
+                  >Annual</Button>
                 </Box>
 
                 <Button
-                  variant="text" color="inherit" size="medium" onClick={() => setCompareMode(!compareMode)}
+                  variant="text" color="inherit" onClick={() => setCompareMode(!compareMode)}
                   sx={{
-                    textTransform: 'none', fontWeight: 500, fontSize: '0.95rem',
-                    color: compareMode ? theme.palette.primary.main : theme.palette.text.secondary,
-                    transition: 'all 0.2s ease', borderRadius: 2, py: 1, px: 2,
-                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), color: theme.palette.primary.main }
+                    textTransform: 'none', fontWeight: 500,
+                    color: compareMode ? theme.palette.primary.main : theme.palette.text.secondary
                   }}
                   startIcon={
                     <Box component="span" sx={{
@@ -558,9 +443,7 @@ export default function PricingPage() {
                       } : {}
                     }} />
                   }
-                >
-                  {compareMode ? 'Hide comparison' : 'Compare all features'}
-                </Button>
+                >{compareMode ? 'Hide comparison' : 'Compare all features'}</Button>
               </Stack>
             </motion.div>
           </Box>
@@ -579,26 +462,10 @@ export default function PricingPage() {
                 <Tabs
                   value={activeTab}
                   onChange={(_, newValue) => setActiveTab(newValue)}
-                  sx={{ 
-                    '.MuiTabs-indicator': { 
-                      height: 3, borderRadius: 1.5, bgcolor: theme.palette.primary.main
-                    },
-                    '.MuiTab-root': {
-                      position: 'relative', overflow: 'visible',
-                      '&::after': {
-                        content: '""', position: 'absolute', bottom: 0, left: '50%', width: 0, height: 3,
-                        borderRadius: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.2),
-                        transform: 'translateX(-50%)', transition: 'width 0.2s ease', zIndex: -1
-                      },
-                      '&:hover::after': { width: '70%' }
-                    }
-                  }}
+                  sx={{ '.MuiTabs-indicator': { height: 3, borderRadius: 1.5 } }}
                 >
                   {['For Startups', 'For Teams', 'For Enterprise'].map((label, index) => (
-                    <Tab 
-                      key={index} label={label} 
-                      sx={{ textTransform: 'none', fontWeight: 600, minWidth: 140, fontSize: '1rem', px: 3 }} 
-                    />
+                    <Tab key={index} label={label} sx={{ textTransform: 'none', fontWeight: 600 }} />
                   ))}
                 </Tabs>
               </motion.div>
@@ -619,10 +486,7 @@ export default function PricingPage() {
                 };
                 
                 return (
-                  <Grid 
-                    item xs={12} sm={6} md={4} key={plan.type} 
-                    sx={{ zIndex: isRecommended ? 2 : 1 }}
-                  >
+                  <Grid item xs={12} sm={6} md={4} key={plan.type} sx={{ zIndex: isRecommended ? 2 : 1 }}>
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 20 }}
@@ -651,14 +515,12 @@ export default function PricingPage() {
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
               animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: 20 }} 
-              transition={{ duration: 0.4 }}
+              exit={{ opacity: 0, y: 20 }}
             >
               <Container maxWidth="lg">
                 <Paper elevation={0} sx={{
                   border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  borderRadius: 4, overflow: 'hidden', mb: { xs: 10, md: 16 },
-                  boxShadow: '0 10px 40px rgba(0, 0, 0, 0.08)'
+                  borderRadius: 4, overflow: 'hidden', mb: { xs: 10, md: 16 }
                 }}>
                   <Box sx={{ overflowX: 'auto' }}>
                     <Box sx={{ minWidth: 900, p: 3 }}>
@@ -666,10 +528,7 @@ export default function PricingPage() {
                         {/* Plan headers */}
                         <Grid item xs={4}>
                           <Box sx={{ height: 90, display: 'flex', alignItems: 'flex-end', pb: 2, pl: 2 }}>
-                            <Typography variant="subtitle1" sx={{
-                              fontWeight: 700, color: alpha(theme.palette.text.primary, 0.7),
-                              textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.75rem'
-                            }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 700, textTransform: 'uppercase' }}>
                               Plan Features
                             </Typography>
                           </Box>
@@ -680,26 +539,19 @@ export default function PricingPage() {
                             <Box sx={{
                               height: 90, display: 'flex', flexDirection: 'column',
                               justifyContent: 'space-between', alignItems: 'center',
-                              px: 2, py: 1.5,
                               bgcolor: plan.recommended ? alpha(theme.palette.primary.main, 0.06) : 'transparent',
                               borderRadius: '12px 12px 0 0'
                             }}>
                               <Stack direction="row" spacing={1} alignItems="center">
                                 <PlanIcon 
                                   icon={plan.type === 'consultation' ? 'star' : plan.type === 'project' ? 'speed' : 'shield'} 
-                                  isRecommended={plan.recommended} 
+                                  isRecommended={plan.recommended || false} 
                                   theme={theme} 
                                 />
-                                <Typography variant="h6" sx={{
-                                  fontWeight: 700,
-                                  color: plan.recommended ? theme.palette.primary.main : theme.palette.text.primary
-                                }}>{plan.title}</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 700 }}>{plan.title}</Typography>
                               </Stack>
                               
-                              <Typography variant="body2" sx={{
-                                fontWeight: 600,
-                                color: plan.recommended ? theme.palette.primary.dark : theme.palette.text.secondary
-                              }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                 {billingCycle === 'annual' && plan.annualPrice ? plan.annualPrice : plan.price}
                               </Typography>
                             </Box>
@@ -720,12 +572,10 @@ export default function PricingPage() {
                                   width: 28, height: 28, borderRadius: '50%', display: 'flex', 
                                   alignItems: 'center', justifyContent: 'center',
                                   bgcolor: alpha(theme.palette.primary.main, 0.12)
-                                }}>
-                                  {category.icon}
-                                </Box>
-                                <Typography variant="subtitle1" sx={{
-                                  fontWeight: 700, fontSize: '0.95rem', color: theme.palette.primary.dark
-                                }}>{category.name}</Typography>
+                                }}>{category.icon}</Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                                  {category.name}
+                                </Typography>
                               </Box>
                             </Grid>
                             
@@ -758,17 +608,7 @@ export default function PricingPage() {
                                       py: 2.5, 
                                       borderTop: featureIndex === 0 ? 'none' : `1px solid ${alpha(theme.palette.divider, 0.08)}`,
                                       textAlign: 'center',
-                                      bgcolor: featureIndex % 2 === 0 ? alpha(theme.palette.background.default, 0.4) : 'transparent',
-                                      position: 'relative',
-                                      '&::after': plan.recommended ? {
-                                        content: '""',
-                                        position: 'absolute',
-                                        left: 0,
-                                        top: 0,
-                                        bottom: 0,
-                                        width: 3,
-                                        bgcolor: alpha(theme.palette.primary.main, featureIndex % 2 === 0 ? 0.3 : 0.2)
-                                      } : {}
+                                      bgcolor: featureIndex % 2 === 0 ? alpha(theme.palette.background.default, 0.4) : 'transparent'
                                     }}>
                                       <FeatureCell value={feature.values[plan.type]} plan={plan} theme={theme} />
                                     </Box>
@@ -791,34 +631,9 @@ export default function PricingPage() {
         <Box sx={{
           position: 'relative',
           py: { xs: 12, md: 16 },
-          backgroundImage: `radial-gradient(circle at 10% 90%, ${alpha(theme.palette.primary.light, 0.08)} 0%, transparent 60%)`,
-          overflow: 'hidden'
+          backgroundImage: `radial-gradient(circle at 10% 90%, ${alpha(theme.palette.primary.light, 0.08)} 0%, transparent 60%)`
         }}>
           <Container maxWidth="md" sx={{ position: 'relative' }}> 
-            {/* Visual elements */}
-            <Box sx={{
-              position: 'absolute',
-              top: -100,
-              right: -200,
-              width: 400,
-              height: 400,
-              borderRadius: '50%',
-              background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 70%)`,
-              zIndex: -1
-            }} />
-            
-            <Box sx={{
-              position: 'absolute',
-              bottom: -150,
-              left: -250,
-              width: 500,
-              height: 500,
-              borderRadius: '50%',
-              background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.04)} 0%, transparent 70%)`,
-              zIndex: -1
-            }} />
-            
-            {/* Section header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -843,28 +658,15 @@ export default function PricingPage() {
                     transition={{ duration: 0.5, delay: 0.1 + (index * 0.1) }}
                   >
                     <Paper elevation={0} sx={{
-                      borderRadius: 4, 
-                      p: 3.5, 
-                      height: '100%', 
+                      borderRadius: 4, p: 3.5, height: '100%', 
                       border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                      transition: 'all 0.3s ease',
                       bgcolor: index % 2 === 0 ? 
                         alpha(theme.palette.background.paper, 0.8) : 
                         alpha(theme.palette.primary.main, 0.05),
-                      position: 'relative',
-                      overflow: 'hidden',
-                      '&:hover': {
-                        borderColor: alpha(theme.palette.primary.main, 0.25),
-                        transform: 'translateY(-6px)',
-                        boxShadow: '0 12px 28px rgba(0, 0, 0, 0.08)'
-                      }
+                      '&:hover': { borderColor: alpha(theme.palette.primary.main, 0.25), transform: 'translateY(-6px)' }
                     }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                        {faq.question}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: alpha(theme.palette.text.primary, 0.7) }}>
-                        {faq.answer}
-                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>{faq.question}</Typography>
+                      <Typography variant="body2" sx={{ color: alpha(theme.palette.text.primary, 0.7) }}>{faq.answer}</Typography>
                     </Paper>
                   </motion.div>
                 </Grid>
@@ -878,37 +680,11 @@ export default function PricingPage() {
           <Box sx={{
             position: 'relative', 
             py: { xs: 8, md: 10 }, 
-            overflow: 'hidden',
             backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-            borderRadius: 4,
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)'
+            borderRadius: 4
           }}>
-            {/* Decorative elements */}
-            <Box sx={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              width: { xs: 150, md: 250 },
-              height: { xs: 150, md: 250 },
-              background: `radial-gradient(circle, ${alpha('#fff', 0.12)} 0%, transparent 70%)`,
-              borderRadius: '50%',
-              transform: 'translate(30%, -30%)'
-            }} />
-            
-            <Box sx={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              width: { xs: 120, md: 200 },
-              height: { xs: 120, md: 200 },
-              background: `radial-gradient(circle, ${alpha('#fff', 0.08)} 0%, transparent 70%)`,
-              borderRadius: '50%',
-              transform: 'translate(-30%, 30%)'
-            }} />
-            
             <Container maxWidth="md" sx={{
-              position: 'relative', 
-              zIndex: 1,
+              position: 'relative', zIndex: 1,
               display: 'flex', 
               flexDirection: { xs: 'column', md: 'row' },
               gap: { xs: 6, md: 8 }, 
@@ -922,38 +698,20 @@ export default function PricingPage() {
                 transition={{ duration: 0.5 }}
                 style={{ maxWidth: 480 }}
               >
-                <Typography 
-                  component="span" 
-                  sx={{ 
-                    fontSize: '0.875rem', 
-                    fontWeight: 600, 
-                    color: '#fff',
-                    bgcolor: alpha('#fff', 0.15),
-                    py: 0.75,
-                    px: 2,
-                    borderRadius: 5,
-                    display: 'inline-block',
-                    mb: 2.5,
-                    textTransform: 'uppercase',
-                    border: `1px solid ${alpha('#fff', 0.2)}`
-                  }}
-                >
-                  Get Started Today
-                </Typography>
+                <Typography component="span" sx={{ 
+                  fontSize: '0.875rem', fontWeight: 600, color: '#fff',
+                  bgcolor: alpha('#fff', 0.15), py: 0.75, px: 2, borderRadius: 5,
+                  display: 'inline-block', mb: 2.5, textTransform: 'uppercase',
+                  border: `1px solid ${alpha('#fff', 0.2)}`
+                }}>Get Started Today</Typography>
                 
                 <Typography variant="h2" sx={{
                   fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.75rem' }, 
-                  fontWeight: 800,
-                  color: '#fff', 
-                  mb: 3
-                }}>
-                  Ready to transform your business?
-                </Typography>
+                  fontWeight: 800, color: '#fff', mb: 3
+                }}>Ready to transform your business?</Typography>
 
                 <Typography variant="body1" sx={{
-                  color: alpha('#fff', 0.9), 
-                  mb: 4, 
-                  fontSize: { xs: '1.05rem', md: '1.15rem' }
+                  color: alpha('#fff', 0.9), mb: 4
                 }}>
                   Join thousands of growing businesses that trust our solutions to scale and succeed.
                 </Typography>
@@ -988,32 +746,22 @@ export default function PricingPage() {
             transition={{ duration: 0.5 }}
           >
             <Paper elevation={0} sx={{
-              borderRadius: 4,
-              overflow: 'hidden',
+              borderRadius: 4, overflow: 'hidden',
               border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
               bgcolor: alpha(theme.palette.background.paper, 0.8),
-              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.06)',
               position: 'relative'
             }}>
               <Box sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 6,
+                position: 'absolute', top: 0, left: 0, right: 0, height: 6,
                 background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
               }} />
               
               <Box sx={{ p: { xs: 3, md: 4 } }}>
                 <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
                   <Box sx={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
+                    width: 40, height: 40, borderRadius: '50%',
                     bgcolor: alpha(theme.palette.primary.main, 0.1),
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                     color: theme.palette.primary.main
                   }}>
                     <SupportRounded />
@@ -1030,37 +778,15 @@ export default function PricingPage() {
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <Button
-                      fullWidth
-                      component={NextLink}
-                      href="/contact"
-                      variant="outlined"
-                      size="large"
-                      sx={{
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        borderRadius: 2,
-                        py: 1.5
-                      }}
-                    >
-                      Contact sales
-                    </Button>
+                      fullWidth component={NextLink} href="/contact" variant="outlined" size="large"
+                      sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2, py: 1.5 }}
+                    >Contact sales</Button>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Button
-                      fullWidth
-                      component={NextLink}
-                      href="/contact?demo=true"
-                      variant="contained"
-                      size="large"
-                      sx={{
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        borderRadius: 2,
-                        py: 1.5
-                      }}
-                    >
-                      Schedule a demo
-                    </Button>
+                      fullWidth component={NextLink} href="/contact?demo=true" variant="contained" size="large"
+                      sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2, py: 1.5 }}
+                    >Schedule a demo</Button>
                   </Grid>
                 </Grid>
               </Box>
@@ -1070,16 +796,12 @@ export default function PricingPage() {
 
         {/* Visual footer divider */}
         <Box sx={{
-          height: 1,
-          width: '100%',
-          maxWidth: 1200,
-          mx: 'auto',
+          height: 1, width: '100%', maxWidth: 1200, mx: 'auto',
           background: `linear-gradient(90deg, 
             ${alpha(theme.palette.divider, 0)}, 
             ${alpha(theme.palette.divider, 0.5)}, 
             ${alpha(theme.palette.divider, 0)}
-          )`,
-          mb: 8
+          )`, mb: 8
         }} />
       </ConsistentPageLayout>
     </Box>
