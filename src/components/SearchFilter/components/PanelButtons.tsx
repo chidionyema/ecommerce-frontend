@@ -13,7 +13,7 @@ import { PanelType, ColorConfig } from '../types';
 
 interface PanelButtonsProps {
   activePanel: PanelType | null;
-  togglePanel: (panel: PanelType, event: React.MouseEvent<HTMLElement>) => void; // Updated to include event
+  togglePanel: (panel: PanelType, event?: React.MouseEvent<HTMLElement>) => void;
   activeFilterCount: number;
   activeSort: string;
   currentSortLabel: string;
@@ -23,6 +23,10 @@ interface PanelButtonsProps {
   isMobile?: boolean;
   colors: ColorConfig;
   loading?: boolean;
+  // Add the individual button refs
+  filterButtonRef: React.RefObject<HTMLButtonElement>;
+  sortButtonRef: React.RefObject<HTMLButtonElement>;
+  advancedButtonRef: React.RefObject<HTMLButtonElement>;
 }
 
 export function PanelButtons({
@@ -37,6 +41,10 @@ export function PanelButtons({
   isMobile = false,
   colors,
   loading = false,
+  // Use the individual button refs
+  filterButtonRef,
+  sortButtonRef,
+  advancedButtonRef
 }: PanelButtonsProps) {
   
   const getButtonStyle = (panel: PanelType) => ({
@@ -56,7 +64,7 @@ export function PanelButtons({
     pointerEvents: loading ? 'none' : 'auto',
   });
   
-  // Critical fix: Create proper event handlers with correct event passing
+  // Create event handlers with correct event passing
   const handleButtonClick = (panel: PanelType) => (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -76,6 +84,7 @@ export function PanelButtons({
         }}
       >
         <Button
+          ref={filterButtonRef}
           aria-label={`Filters${activeFilterCount > 0 ? ` (${activeFilterCount} active)` : ''}`}
           startIcon={
             <Badge badgeContent={activeFilterCount} 
@@ -105,6 +114,7 @@ export function PanelButtons({
         </Button>
         
         <Button
+          ref={sortButtonRef}
           aria-label={`Sort${activeSort ? `: ${currentSortLabel}` : ''}`}
           startIcon={<SortIcon fontSize={compact ? 'small' : 'medium'} />}
           onClick={handleButtonClick('sort')}
@@ -140,6 +150,7 @@ export function PanelButtons({
         
         <Tooltip title="Advanced Options">
           <Button
+            ref={advancedButtonRef}
             aria-label="Advanced Options"
             onClick={handleButtonClick('advanced')}
             sx={{

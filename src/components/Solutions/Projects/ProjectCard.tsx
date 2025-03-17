@@ -22,13 +22,20 @@ interface TechnologyIconInfo {
 }
 
 const technologyIconMap: Record<string, TechnologyIconInfo> = {
-  ".NET Core": { icon: Code2, color: '#7662EA' }, "Java": { icon: Terminal, color: '#FF7E50' },
-  "AWS": { icon: Cloud, color: '#FF9D3B' }, "Docker": { icon: Server, color: '#5BBBFF' },
-  "Kubernetes": { icon: Cloud, color: '#4C7BFF' }, "React": { icon: CircuitBoard, color: '#61DBFB' },
-  "TypeScript": { icon: Code2, color: '#5E8AFF' }, "CQRS": { icon: Database, color: '#9D8BFF' },
-  "Azure": { icon: Cloud, color: '#45AEF5' }, "Terraform": { icon: Settings, color: '#A26FF8' },
-  "RabbitMQ": { icon: Network, color: '#FF895D' }, "Microservices": { icon: BoxIcon, color: '#56D67E' },
-  "CI/CD": { icon: GitBranch, color: '#FF7878' }, "Analytics": { icon: BarChart3, color: '#4F9DF3' },
+  ".NET Core": { icon: Code2, color: '#512bd4' }, 
+  "Java": { icon: Terminal, color: '#007396' },
+  "AWS": { icon: Cloud, color: '#FF9900' }, 
+  "Docker": { icon: Server, color: '#2496ED' },
+  "Kubernetes": { icon: Cloud, color: '#326CE5' }, 
+  "React": { icon: CircuitBoard, color: '#61DAFB' },
+  "TypeScript": { icon: Code2, color: '#3178C6' }, 
+  "CQRS": { icon: Database, color: '#7B68EE' },
+  "Azure": { icon: Cloud, color: '#0078D4' }, 
+  "Terraform": { icon: Settings, color: '#7B42BC' },
+  "RabbitMQ": { icon: Network, color: '#FF6600' }, 
+  "Microservices": { icon: BoxIcon, color: '#43A047' },
+  "CI/CD": { icon: GitBranch, color: '#F05033' }, 
+  "Analytics": { icon: BarChart3, color: '#1976D2' },
   "Helm": { icon: Settings, color: '#0F1689' }
 };
 
@@ -152,13 +159,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
     flexDirection: 'column',
     borderRadius: '16px', 
     overflow: 'hidden', 
-    background: '#000000',
+    background: 'linear-gradient(135deg, rgba(240, 245, 255, 0.94), rgba(230, 238, 255, 0.92))',
     boxShadow: isHovering && !expanded
-      ? '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.12)' 
+      ? '0 20px 40px rgba(0, 30, 60, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.5)' 
       : expanded 
-        ? '0 24px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15)'
-        : '0 12px 28px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+        ? '0 24px 48px rgba(0, 20, 50, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.75), inset 0 0 0 1px rgba(255, 255, 255, 0.6)'
+        : '0 12px 28px rgba(0, 20, 50, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.65), inset 0 0 0 1px rgba(255, 255, 255, 0.4)',
+    border: '1px solid rgba(255, 255, 255, 0.8)',
+    backdropFilter: 'blur(8px)',
     transform: expanded ? 'scale(1.03)' : isHovering ? 'translateY(-4px) scale(1.01)' : 'none',
     position: 'relative',
     zIndex: expanded ? 10 : 1
@@ -188,17 +196,26 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
           {/* Technology Icons */}
           {!expanded && designVars.hasTechnologyIcons && (
             <Box sx={{ display: 'flex', gap: 1.25, position: 'absolute', top: 12, left: 12, zIndex: 5 }}>
-              {technologyIcons.slice(0, 4).map((Icon, index) => (
-                <Box key={index} sx={{
-                  width: 32, height: 32, borderRadius: '8px', display: 'flex',
-                  alignItems: 'center', justifyContent: 'center', 
-                  bgcolor: 'rgba(20, 20, 30, 0.85)', backdropFilter: 'blur(4px)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)', 
-                  '&:hover': { transform: 'translateY(-2px)' }
-                }}>
-                  {React.createElement(Icon, { size: 16, color: '#fff', strokeWidth: 1.75 })}
-                </Box>
-              ))}
+              {technologyIcons.slice(0, 4).map((Icon, index) => {
+                // Get the technology name from the project technologies array
+                const techName = technologies[index] || '';
+                // Get the technology icon info from the map
+                const iconInfo = technologyIconMap[techName];
+                // Use the specific color if available, otherwise default
+                const iconColor = iconInfo?.color || '#ffffff';
+                
+                return (
+                  <Box key={index} sx={{
+                    width: 32, height: 32, borderRadius: '8px', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', 
+                    bgcolor: 'rgba(20, 20, 30, 0.85)', backdropFilter: 'blur(4px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)', 
+                    '&:hover': { transform: 'translateY(-2px)' }
+                  }}>
+                    {React.createElement(Icon, { size: 16, color: iconColor, strokeWidth: 1.75 })}
+                  </Box>
+                );
+              })}
             </Box>
           )}
           
@@ -288,12 +305,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
           {/* Content Area */}
           <Box sx={{ 
             flex: expanded ? '0 0 auto' : 1, display: 'flex', flexDirection: 'column', 
-            px: 3, pt: 3, position: 'relative', background: '#000000'
+            px: 3, pt: 3, position: 'relative', background: 'transparent'
           }}>
             {/* Title with Quick Toggle */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
               <Typography component="h2" sx={{
-                fontWeight: 700, fontSize: '21px', lineHeight: 1.25, color: '#fff', 
+                fontWeight: 700, fontSize: '21px', lineHeight: 1.25, color: 'rgba(10, 20, 40, 0.9)', 
                 position: 'relative', paddingBottom: 1.75, flex: 1,
                 '&::after': { content: '""', position: 'absolute', bottom: 0, left: 0, 
                              width: '32px', height: '3px', borderRadius: '1.5px', 
@@ -314,14 +331,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
 
             {/* Description */}
             <Typography sx={{
-              fontSize: '14px', lineHeight: 1.5, color: 'rgba(255, 255, 255, 0.85)', mb: 2.5,
+              fontSize: '14px', lineHeight: 1.5, color: 'rgba(20, 30, 50, 0.85)', mb: 2.5,
               ...(expanded ? {} : {
                 display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical',
                 overflow: 'hidden', position: 'relative'
               }),
               '&::after': !expanded && project?.description && project.description.length > 120 ? {
                 content: '""', position: 'absolute', bottom: 0, right: 0, width: '40%', height: '1.5em',
-                background: 'linear-gradient(to right, rgba(0,0,0,0) 0%, #000000 80%)', pointerEvents: 'none'
+                background: 'linear-gradient(to right, rgba(240,245,255,0) 0%, rgba(240,245,255,0.95) 80%)', pointerEvents: 'none'
               } : {}
             }}>
               {project?.description || 'No description available'}
@@ -331,21 +348,22 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
             {designVars.hasMetrics && (
               <Box sx={{ 
                 display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderRadius: '10px', 
-                background: 'rgba(25, 25, 35, 0.6)', overflow: 'hidden', 
+                background: designVars.projectBackground || 'rgba(10, 30, 80, 0.03)', overflow: 'hidden', 
                 mb: expanded ? 3.5 : 3, mt: expanded ? 1 : 0,
-                border: '1px solid rgba(255, 255, 255, 0.08)' 
+                border: '1px solid rgba(10, 30, 80, 0.08)',
+                boxShadow: '0 2px 10px rgba(10, 30, 80, 0.02)'
               }}>
                 {metrics.map((metric, index) => (
                   <Tooltip key={index} title={metric.description || metric.label} arrow>
                     <Box sx={{ 
                       display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1.75,
-                      borderRight: index < metrics.length - 1 ? '1px solid rgba(255, 255, 255, 0.08)' : 'none'
+                      borderRight: index < metrics.length - 1 ? '1px solid rgba(255, 255, 255, 0.2)' : 'none'
                     }}>
-                      <Typography sx={{ fontSize: '17px', fontWeight: 600, color: designVars.brandColor, mb: 0.75 }}>
+                      <Typography sx={{ fontSize: '17px', fontWeight: 600, color: 'white', mb: 0.75 }}>
                         {metric.value}
                       </Typography>
                       <Typography sx={{ fontSize: '11px', textTransform: 'uppercase', 
-                                      color: 'rgba(255, 255, 255, 0.6)', fontWeight: 500 }}>
+                                      color: 'rgba(255, 255, 255, 0.8)', fontWeight: 500 }}>
                         {metric.label}
                       </Typography>
                     </Box>
@@ -358,7 +376,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
             {expanded && (
               <Box sx={{ mb: 3 }}>
                 <Box sx={{ height: '1px', 
-                         background: 'linear-gradient(to right, rgba(255,255,255,0.05), rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+                         background: 'linear-gradient(to right, rgba(10,30,80,0.02), rgba(10,30,80,0.08), rgba(10,30,80,0.02))',
                          my: 2 }} />
                 
                 {/* Challenges and Impact sections */}
@@ -375,12 +393,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
             <Box sx={{ mb: 3, mt: expanded ? 2 : 'auto', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.75 }}>
                 <Typography sx={{ fontWeight: 600, fontSize: '11px', textTransform: 'uppercase',
-                               color: 'rgba(255, 255, 255, 0.5)' }}>
+                               color: 'rgba(10, 30, 60, 0.6)' }}>
                   Technologies
                 </Typography>
                 
                 {expanded && designVars.shouldCollapseTechs && (
-                  <Typography sx={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.4)' }}>
+                  <Typography sx={{ fontSize: '11px', color: 'rgba(10, 30, 60, 0.5)' }}>
                     {designVars.techCount} total
                   </Typography>
                 )}
@@ -389,12 +407,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
               {/* Technology Pills */}
               <Box sx={{ 
                 display: 'flex', flexWrap: 'wrap', gap: 1.4, 
-                maxHeight: !expanded && designVars.shouldCollapseTechs ? '56px' : 'none',
+                maxHeight: !expanded && designVars.shouldCollapseTechs ? '84px' : 'none',
                 overflowY: !expanded && designVars.shouldCollapseTechs ? 'hidden' : 'visible', 
                 position: 'relative',
                 '&:after': !expanded && designVars.shouldCollapseTechs ? {
                   content: '""', position: 'absolute', bottom: 0, left: 0, right: 0, height: '30px',
-                  background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000000 90%)', pointerEvents: 'none'
+                  background: 'linear-gradient(to bottom, rgba(240,245,255,0) 0%, rgba(240,245,255,0.95) 90%)', pointerEvents: 'none'
                 } : {}
               }}>
                 {technologies.map((tech, index) => {
@@ -430,9 +448,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
                     endIcon={<KeyboardArrowDownRounded fontSize="small" />}
                     sx={{
                       minWidth: 120, height: '32px', borderRadius: '16px', fontSize: '11px',
-                      fontWeight: 500, textTransform: 'uppercase', color: 'rgba(255, 255, 255, 0.6)',
-                      border: '1px solid rgba(255, 255, 255, 0.12)', backgroundColor: 'rgba(30, 30, 40, 0.5)',
-                      '&:hover': { backgroundColor: 'rgba(40, 40, 50, 0.7)', color: 'rgba(255, 255, 255, 0.75)' }
+                      fontWeight: 500, textTransform: 'uppercase', color: 'rgba(10, 30, 60, 0.7)',
+                      border: '1px solid rgba(10, 30, 60, 0.15)', backgroundColor: 'rgba(240, 245, 255, 0.5)',
+                      '&:hover': { backgroundColor: 'rgba(220, 230, 250, 0.8)', color: 'rgba(10, 30, 60, 0.85)' }
                     }}
                   >
                     More Details
@@ -445,9 +463,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
                   startIcon={<KeyboardArrowUpRounded fontSize="small" />}
                   sx={{
                     minWidth: 100, height: '32px', borderRadius: '16px', fontSize: '11px',
-                    fontWeight: 500, textTransform: 'uppercase', color: 'rgba(255, 255, 255, 0.5)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)', backgroundColor: 'rgba(30, 30, 40, 0.4)',
-                    '&:hover': { backgroundColor: 'rgba(40, 40, 50, 0.6)', color: 'rgba(255, 255, 255, 0.7)' }
+                    fontWeight: 500, textTransform: 'uppercase', color: 'rgba(10, 30, 60, 0.6)',
+                    border: '1px solid rgba(10, 30, 60, 0.12)', backgroundColor: 'rgba(240, 245, 255, 0.5)',
+                    '&:hover': { backgroundColor: 'rgba(220, 230, 250, 0.8)', color: 'rgba(10, 30, 60, 0.8)' }
                   }}
                 >
                   Collapse
@@ -459,9 +477,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
           {/* CTA Section */}
           <Box sx={{ 
             px: 3, pb: 3, position: 'relative', zIndex: 1,
-            background: designVars.projectBackground || 'linear-gradient(120deg, #121221, #1a1a2e)',
+            background: designVars.projectBackground || 'linear-gradient(120deg, rgba(206, 217, 245, 0.85), rgba(226, 236, 255, 0.85))',
             borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px',
-            borderTop: expanded ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
+            borderTop: expanded ? '1px solid rgba(255, 255, 255, 0.35)' : 'none',
             mt: expanded ? 'auto' : 0
           }}>
             <motion.div whileHover={{ scale: 1.01, y: -1 }} 
@@ -471,9 +489,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
                 endIcon={
                   <Box sx={{ width: '24px', height: '24px', borderRadius: '50%', 
                            bgcolor: 'rgba(255, 255, 255, 0.95)', display: 'flex', 
-                           alignItems: 'center', justifyContent: 'center' }}>
+                           alignItems: 'center', justifyContent: 'center',
+                           boxShadow: '0 2px 4px rgba(0, 20, 50, 0.1)' }}>
                     <ArrowForwardRounded sx={{ 
-                      color: designVars.projectBackground ? 'rgba(0, 0, 0, 0.87)' : designVars.brandColor, 
+                      color: designVars.projectBackground ? 'rgba(10, 30, 60, 0.87)' : designVars.brandColor, 
                       fontSize: '14px' 
                     }} />
                   </Box>
@@ -481,14 +500,15 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
                 disableElevation
                 fullWidth
                 sx={{
-                  background: 'rgba(255, 255, 255, 0.15)', borderRadius: '12px', 
-                  height: '46px', fontWeight: 600, fontSize: '15px', color: '#fff', 
-                  textTransform: 'none', border: '1px solid rgba(255, 255, 255, 0.25)',
-                  boxShadow: expanded ? '0 6px 20px rgba(0, 0, 0, 0.25)' : '0 4px 16px rgba(0, 0, 0, 0.2)',
+                  background: 'rgba(255, 255, 255, 0.45)', borderRadius: '12px', 
+                  height: '46px', fontWeight: 600, fontSize: '15px', color: 'rgba(10, 30, 60, 0.9)', 
+                  textTransform: 'none', border: '1px solid rgba(255, 255, 255, 0.8)',
+                  boxShadow: expanded ? '0 6px 20px rgba(0, 20, 50, 0.1)' : '0 4px 16px rgba(0, 20, 50, 0.08)',
+                  backdropFilter: 'blur(4px)',
                   '&:hover': { 
-                    background: 'rgba(255, 255, 255, 0.2)',
-                    boxShadow: '0 6px 20px rgba(0, 0, 0, 0.3)',
-                    borderColor: 'rgba(255, 255, 255, 0.35)'
+                    background: 'rgba(255, 255, 255, 0.6)',
+                    boxShadow: '0 6px 20px rgba(0, 20, 50, 0.12)',
+                    borderColor: 'rgba(255, 255, 255, 0.9)'
                   }
                 }}
               >
@@ -514,11 +534,12 @@ const renderContentSection = (title: string, content: string, brandColor: string
       }}>
         <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: brandColor }} />
       </Box>
-      <Typography sx={{ fontWeight: 700, fontSize: '13px', color: brandColor, textTransform: 'uppercase' }}>
+      <Typography sx={{ fontWeight: 700, fontSize: '13px', color: brandColor, textTransform: 'uppercase',
+                                 textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)' }}>
         {title}
       </Typography>
     </Box>
-    <Typography sx={{ fontSize: '13px', lineHeight: 1.6, color: 'rgba(255, 255, 255, 0.78)' }}>
+    <Typography sx={{ fontSize: '13px', lineHeight: 1.6, color: 'rgba(10, 30, 60, 0.78)' }}>
       {content}
     </Typography>
   </Box>
