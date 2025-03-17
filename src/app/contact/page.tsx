@@ -46,13 +46,23 @@ const validationSchema = yup.object().shape({
     .max(validationConfig.message.maxLength, validationConfig.message.maxLengthMessage),
 });
 
-// Ive-inspired styles
+// Ive-inspired styles with precise animation values
 const iveStyles = {
-  transition: 'all 0.25s cubic-bezier(0.2, 0, 0.2, 1)',
+  transition: 'all 0.28s cubic-bezier(0.22, 0.01, 0.21, 1)',
   letterSpacing: { heading: '-0.01em', body: '0.01em' },
   hover: {
     transform: 'translateY(-2px)',
-    scale: 'scale(1.05)'
+    scale: 'scale(1.03)',
+  },
+  borderRadius: {
+    button: '12px',
+    card: '16px',
+    input: '10px'
+  },
+  shadows: {
+    subtle: (color: string) => `0 6px 16px ${alpha(color, 0.08)}`,
+    medium: (color: string) => `0 8px 24px ${alpha(color, 0.12)}`,
+    prominent: (color: string) => `0 10px 30px ${alpha(color, 0.18)}`
   }
 };
 
@@ -76,10 +86,10 @@ const BackToTopButton = () => {
         className={styles.backToTopButton}
         sx={{ 
           background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-          boxShadow: `0 4px 14px ${alpha('#000', 0.15)}`,
+          boxShadow: iveStyles.shadows.medium(theme.palette.primary.dark),
           transition: iveStyles.transition,
           '&:hover': { 
-            boxShadow: `0 6px 18px ${alpha('#000', 0.2)}`,
+            boxShadow: iveStyles.shadows.prominent(theme.palette.primary.dark),
             transform: iveStyles.hover.transform
           }
         }}
@@ -204,12 +214,15 @@ export default function Contact() {
               className={styles.successButton}
               sx={{ 
                 background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
-                borderRadius: '12px',
+                boxShadow: iveStyles.shadows.medium(theme.palette.primary.main),
+                borderRadius: iveStyles.borderRadius.button,
                 textTransform: 'none',
+                fontWeight: 600,
+                px: 4,
+                py: 1.5,
                 transition: iveStyles.transition,
                 '&:hover': { 
-                  boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  boxShadow: iveStyles.shadows.prominent(theme.palette.primary.main),
                   transform: iveStyles.hover.transform
                 }
               }}
@@ -255,7 +268,9 @@ export default function Contact() {
                 sx={{ 
                   color: theme.palette.text.secondary,
                   letterSpacing: iveStyles.letterSpacing.body,
-                  lineHeight: 1.6
+                  lineHeight: 1.6,
+                  maxWidth: '800px',
+                  mx: 'auto'
                 }}
               >
                 {heroSection.subtitle}
@@ -263,20 +278,20 @@ export default function Contact() {
             </Box>
           </Fade>
 
-          <Box className={styles.contactGrid} sx={{ mb: { xs: 6, md: 8 } }}>
+          <Box className={styles.contactGrid} sx={{ mb: { xs: 6, md: 8 }, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 4 }}>
             {/* Contact Information Section */}
             <Slide direction="right" in={animateIn} timeout={800}>
               <Box className={styles.contactInfoBox} sx={{
-                backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.8 : 0.95),
-                backdropFilter: 'blur(8px)',
-                boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
-                borderRadius: '16px',
+                backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.8 : 0.98),
+                backdropFilter: 'blur(10px)',
+                boxShadow: iveStyles.shadows.subtle(theme.palette.common.black),
+                borderRadius: iveStyles.borderRadius.card,
                 p: 4,
                 position: 'relative',
                 overflow: 'hidden',
                 transition: iveStyles.transition,
                 '&:hover': {
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
+                  boxShadow: iveStyles.shadows.medium(theme.palette.common.black)
                 }
               }}>
                 <Box className={styles.contactInfoAccent} sx={{ 
@@ -310,7 +325,8 @@ export default function Contact() {
                       className={styles.contactInfoTitle} 
                       sx={{ 
                         mb: 0.5,
-                        letterSpacing: iveStyles.letterSpacing.heading
+                        letterSpacing: iveStyles.letterSpacing.heading,
+                        fontWeight: 600
                       }}
                     >
                       {heroSection.contactInfoTitle}
@@ -393,18 +409,18 @@ export default function Contact() {
                   onSubmit={handleSubmit as React.FormEventHandler<HTMLDivElement>}
                   className={styles.formCard}
                   sx={{
-                    backgroundColor: alpha(theme.palette.background.paper, 0.95),
-                    backdropFilter: 'blur(8px)',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
-                    borderRadius: '16px',
+                    backgroundColor: alpha(theme.palette.background.paper, 0.98),
+                    backdropFilter: 'blur(10px)',
+                    boxShadow: iveStyles.shadows.medium(theme.palette.common.black),
+                    borderRadius: iveStyles.borderRadius.card,
                     p: 4,
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     transition: iveStyles.transition,
                     '&:hover': { 
-                      boxShadow: '0 12px 32px rgba(0,0,0,0.15)',
-                      transform: iveStyles.hover.transform
+                      boxShadow: iveStyles.shadows.prominent(theme.palette.common.black),
+                      transform: 'translateY(-3px)'
                     },
                   }}
                 >
@@ -419,7 +435,7 @@ export default function Contact() {
                       justifyContent: 'center',
                       margin: '0 auto',
                       mb: 2,
-                      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}`,
+                      boxShadow: iveStyles.shadows.subtle(theme.palette.primary.main),
                       transition: iveStyles.transition,
                       '&:hover': { transform: iveStyles.hover.scale }
                     }}>
@@ -431,7 +447,8 @@ export default function Contact() {
                       className={styles.formTitle} 
                       sx={{ 
                         mb: 1,
-                        letterSpacing: iveStyles.letterSpacing.heading
+                        letterSpacing: iveStyles.letterSpacing.heading,
+                        fontWeight: 600
                       }}
                     >
                       {heroSection.formTitle}
@@ -442,7 +459,9 @@ export default function Contact() {
                       sx={{ 
                         color: theme.palette.text.secondary,
                         letterSpacing: iveStyles.letterSpacing.body,
-                        lineHeight: 1.6
+                        lineHeight: 1.6,
+                        maxWidth: '90%',
+                        mx: 'auto'
                       }}
                     >
                       {heroSection.formSubtitle}
@@ -471,7 +490,7 @@ export default function Contact() {
                           startAdornment: (<InputAdornment position="start">{React.createElement(field.icon)}</InputAdornment>),
                           className: styles.textFieldInput,
                           sx: {
-                            borderRadius: '10px',
+                            borderRadius: iveStyles.borderRadius.input,
                             transition: iveStyles.transition,
                             '&.Mui-focused': {
                               boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`
@@ -496,7 +515,7 @@ export default function Contact() {
                       InputProps={{
                         className: styles.messageFieldInput,
                         sx: {
-                          borderRadius: '10px',
+                          borderRadius: iveStyles.borderRadius.input,
                           transition: iveStyles.transition,
                           '&.Mui-focused': {
                             boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`
@@ -515,16 +534,17 @@ export default function Contact() {
                       className={styles.submitButton}
                       sx={{
                         mt: 2,
-                        height: 52,
-                        borderRadius: '12px',
+                        height: 56,
+                        borderRadius: iveStyles.borderRadius.button,
                         background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                        boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
+                        boxShadow: iveStyles.shadows.medium(theme.palette.primary.main),
                         textTransform: 'none',
                         fontWeight: 600,
+                        fontSize: '1.05rem',
                         letterSpacing: iveStyles.letterSpacing.body,
                         transition: iveStyles.transition,
                         '&:hover': { 
-                          boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                          boxShadow: iveStyles.shadows.prominent(theme.palette.primary.main),
                           transform: iveStyles.hover.transform
                         },
                         '&:active': {
@@ -548,7 +568,9 @@ export default function Contact() {
               className={styles.testimonialsSectionTitle} 
               sx={{ 
                 mb: 1,
-                letterSpacing: iveStyles.letterSpacing.heading
+                letterSpacing: iveStyles.letterSpacing.heading,
+                fontWeight: 600,
+                textAlign: 'center'
               }}
             >
               {testimonialSection.title}
@@ -558,9 +580,12 @@ export default function Contact() {
               className={styles.testimonialsSectionSubtitle} 
               sx={{ 
                 color: theme.palette.text.secondary, 
-                mb: 4,
+                mb: 5,
                 letterSpacing: iveStyles.letterSpacing.body,
-                lineHeight: 1.6
+                lineHeight: 1.6,
+                textAlign: 'center',
+                maxWidth: '800px',
+                mx: 'auto'
               }}
             >
               {testimonialSection.subtitle}
@@ -578,11 +603,12 @@ export default function Contact() {
                         height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
-                        backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                        backgroundColor: theme.palette.background.paper,
                         borderRadius: '14px',
+                        border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
                         transition: iveStyles.transition,
                         '&:hover': { 
-                          boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                          boxShadow: iveStyles.shadows.medium(theme.palette.common.black),
                           transform: 'translateY(-3px)'
                         },
                       }}
@@ -597,7 +623,9 @@ export default function Contact() {
                           mb: 3, 
                           flexGrow: 1,
                           letterSpacing: iveStyles.letterSpacing.body,
-                          lineHeight: 1.6
+                          lineHeight: 1.6,
+                          color: theme.palette.text.primary,
+                          fontStyle: 'italic'
                         }}
                       >
                         "{testimonial.content}"
@@ -610,14 +638,24 @@ export default function Contact() {
                           sx={{ 
                             border: `2px solid ${theme.palette.primary.main}`, 
                             mr: 2,
-                            boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.1)}`
+                            width: 48,
+                            height: 48,
+                            boxShadow: iveStyles.shadows.subtle(theme.palette.common.black)
                           }}
                         />
                         <Box>
-                          <Typography variant="h6" className={styles.testimonialName} sx={{ fontSize: '1rem', fontWeight: 600, letterSpacing: iveStyles.letterSpacing.body }}>
+                          <Typography variant="h6" className={styles.testimonialName} sx={{ 
+                            fontSize: '1rem', 
+                            fontWeight: 600, 
+                            letterSpacing: iveStyles.letterSpacing.body,
+                            color: theme.palette.text.primary
+                          }}>
                             {testimonial.name}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ letterSpacing: iveStyles.letterSpacing.body }}>
+                          <Typography variant="body2" sx={{ 
+                            letterSpacing: iveStyles.letterSpacing.body,
+                            color: theme.palette.text.secondary
+                          }}>
                             {testimonial.role}
                           </Typography>
                         </Box>
