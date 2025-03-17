@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Box, Typography, Tooltip, Button, Card, useTheme, alpha, IconButton } from '@mui/material';
 import { ArrowForwardRounded, StarRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, InfoOutlined } from '@mui/icons-material';
 import { Code as DefaultIcon } from 'lucide-react';
-import { Cloud, CircuitBoard, Server, Settings, Terminal, Database, Code2, GitBranch, Box as BoxIcon, Code, BarChart3, Network } from 'lucide-react';
+import { Cloud, CircuitBoard, Server, Settings, Terminal, Database, Code2, GitBranch, Box as BoxIcon, Network, BarChart3 } from 'lucide-react';
 
-// Backgrounds and icon mappings
+// Consolidate static data
 const projectBackgrounds = {
   '1': 'linear-gradient(135deg, #1a237e, #283593)', '2': 'linear-gradient(135deg, #4a148c, #6a1b9a)',
   '3': 'linear-gradient(135deg, #004d40, #00695c)', '4': 'linear-gradient(135deg, #0d47a1, #1565c0)',
@@ -17,7 +17,7 @@ const projectBackgrounds = {
 };
 
 const technologyIconMap = {
-  ".NET Core": { icon: Code, color: '#7662EA' }, "Java": { icon: Terminal, color: '#FF7E50' },
+  ".NET Core": { icon: Code2, color: '#7662EA' }, "Java": { icon: Terminal, color: '#FF7E50' },
   "AWS": { icon: Cloud, color: '#FF9D3B' }, "Docker": { icon: Server, color: '#5BBBFF' },
   "Kubernetes": { icon: Cloud, color: '#4C7BFF' }, "React": { icon: CircuitBoard, color: '#61DBFB' },
   "TypeScript": { icon: Code2, color: '#5E8AFF' }, "CQRS": { icon: Database, color: '#9D8BFF' },
@@ -34,24 +34,16 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
   const [isHovering, setIsHovering] = useState(false);
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
-  // Design variables
+  // Consolidated design variables and computed properties
   const designVars = useMemo(() => ({
     bannerImage: project?.bannerImage ? `/images/${project.bannerImage}` : '/images/placeholder.jpg',
     brandColor: project?.brandColor || theme.palette.primary.main,
-    cardBg: '#000000'
+    cardBg: '#000000',
+    projectBackground: (project?.id && projectBackgrounds[project?.id]) || project?.background || null,
+    hasDetailedContent: Boolean(project?.challenges || project?.impact || (project?.description?.length > 120)),
+    techCount: project?.technologies?.length || 0,
+    shouldCollapseTechs: (project?.technologies?.length || 0) > 5
   }), [project, theme]);
-
-  // Project background
-  const projectBackground = useMemo(() => 
-    (project?.id && projectBackgrounds[project.id]) || project?.background || null, 
-    [project?.id, project?.background]
-  );
-
-  // Check if detailed content is available
-  const hasDetailedContent = useMemo(() => 
-    Boolean(project?.challenges || project?.impact || (project?.description?.length > 120)),
-    [project]
-  );
 
   // Load image
   useEffect(() => {
@@ -94,28 +86,7 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
 
   if (!inView) return <Box ref={ref} sx={{ ...sx, my: 4, width: 380, height: 680 }} />;
 
-  // Technology icons display
-  const renderTechnologyIcons = () => {
-    if (!project?.technologyIcons?.length) return null;
-    
-    return (
-      <Box sx={{ display: 'flex', gap: 1.25, position: 'absolute', top: 12, left: 12, zIndex: 5 }}>
-        {project.technologyIcons.slice(0, 4).map((Icon, index) => (
-          <Box key={index} sx={{
-            width: 32, height: 32, borderRadius: '8px', display: 'flex',
-            alignItems: 'center', justifyContent: 'center', 
-            bgcolor: 'rgba(20, 20, 30, 0.85)', backdropFilter: 'blur(4px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)', 
-            '&:hover': { transform: 'translateY(-2px)' }
-          }}>
-            {React.createElement(Icon, { size: 16, color: '#fff', strokeWidth: 1.75 })}
-          </Box>
-        ))}
-      </Box>
-    );
-  };
-
-  // Card style
+  // Card style based on state
   const cardStyle = {
     width: 380, 
     height: expanded ? 'auto' : 680, 
@@ -135,16 +106,12 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
     zIndex: expanded ? 10 : 1
   };
 
-  const techCount = project?.technologies?.length || 0;
-  const shouldCollapseTechs = techCount > 5;
-
   return (
     <Box ref={ref} sx={{ width: 380, my: expanded ? 5 : 4, mx: 4, ...sx }}>
       <motion.div 
         initial={{ opacity: 0, y: 16 }} 
         animate={{ opacity: 1, y: 0 }} 
-        transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-      >
+        transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}>
         <Card
           elevation={0}
           onMouseEnter={() => setIsHovering(true)}
@@ -153,10 +120,24 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
           component="article"
           role="button"
           tabIndex={0}
-          sx={cardStyle}
-        >
+          sx={cardStyle}>
+          
           {/* Technology Icons */}
-          {!expanded && renderTechnologyIcons()}
+          {!expanded && project?.technologyIcons?.length > 0 && (
+            <Box sx={{ display: 'flex', gap: 1.25, position: 'absolute', top: 12, left: 12, zIndex: 5 }}>
+              {project.technologyIcons.slice(0, 4).map((Icon, index) => (
+                <Box key={index} sx={{
+                  width: 32, height: 32, borderRadius: '8px', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', 
+                  bgcolor: 'rgba(20, 20, 30, 0.85)', backdropFilter: 'blur(4px)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)', 
+                  '&:hover': { transform: 'translateY(-2px)' }
+                }}>
+                  {React.createElement(Icon, { size: 16, color: '#fff', strokeWidth: 1.75 })}
+                </Box>
+              ))}
+            </Box>
+          )}
           
           {/* Featured badge */}
           {project?.featured && (
@@ -188,8 +169,7 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
                 initial={{ scale: 1 }}
                 animate={{ scale: isHovering && !expanded ? 1.02 : 1 }}
                 transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
-                style={{ width: '100%', height: '100%', position: 'relative' }}
-              >
+                style={{ width: '100%', height: '100%', position: 'relative' }}>
                 <Box
                   component="img"
                   src={designVars.bannerImage}
@@ -224,7 +204,7 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
             </Box>
             
             {/* Info/Expand Quick Action */}
-            {!expanded && hasDetailedContent && (
+            {!expanded && designVars.hasDetailedContent && (
               <IconButton 
                 onClick={toggleExpanded}
                 aria-label="Show project details"
@@ -236,8 +216,7 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
                   '&:hover': {
                     background: `linear-gradient(135deg, ${alpha(designVars.brandColor, 0.4)}, ${alpha(designVars.brandColor, 0.6)})`,
                   }
-                }}
-              >
+                }}>
                 <InfoOutlined fontSize="small" />
               </IconButton>
             )}
@@ -260,7 +239,6 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
                 {project?.name || 'Project'}
               </Typography>
               
-              {/* Quick toggle when expanded */}
               {expanded && (
                 <IconButton onClick={toggleExpanded} aria-label="Collapse details" size="small"
                   sx={{ mt: -0.5, color: 'rgba(255, 255, 255, 0.6)',
@@ -320,50 +298,12 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
                          background: 'linear-gradient(to right, rgba(255,255,255,0.05), rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
                          my: 2 }} />
                 
-                {/* Enhanced challenges section */}
-                {project?.challenges && (
-                  <Box sx={{ mb: 2.5 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                      <Box sx={{ 
-                        width: 16, height: 16, borderRadius: '50%', 
-                        background: `linear-gradient(135deg, ${alpha(designVars.brandColor, 0.15)}, ${alpha(designVars.brandColor, 0.3)})`,
-                        border: `1px solid ${alpha(designVars.brandColor, 0.4)}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                      }}>
-                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: designVars.brandColor }} />
-                      </Box>
-                      <Typography sx={{ fontWeight: 700, fontSize: '13px', color: designVars.brandColor,
-                                      textTransform: 'uppercase' }}>
-                        Challenges
-                      </Typography>
-                    </Box>
-                    <Typography sx={{ fontSize: '13px', lineHeight: 1.6, color: 'rgba(255, 255, 255, 0.78)' }}>
-                      {project.challenges}
-                    </Typography>
-                  </Box>
-                )}
-                
-                {/* Enhanced impact section */}
-                {project?.impact && (
-                  <Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                      <Box sx={{ 
-                        width: 16, height: 16, borderRadius: '50%', 
-                        background: `linear-gradient(135deg, ${alpha(designVars.brandColor, 0.15)}, ${alpha(designVars.brandColor, 0.3)})`,
-                        border: `1px solid ${alpha(designVars.brandColor, 0.4)}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                      }}>
-                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: designVars.brandColor }} />
-                      </Box>
-                      <Typography sx={{ fontWeight: 700, fontSize: '13px', color: designVars.brandColor,
-                                      textTransform: 'uppercase' }}>
-                        Impact
-                      </Typography>
-                    </Box>
-                    <Typography sx={{ fontSize: '13px', lineHeight: 1.6, color: 'rgba(255, 255, 255, 0.78)' }}>
-                      {project.impact}
-                    </Typography>
-                  </Box>
+                {/* Challenges and Impact sections */}
+                {(project?.challenges || project?.impact) && (
+                  <>
+                    {project?.challenges && renderContentSection("Challenges", project.challenges, designVars.brandColor)}
+                    {project?.impact && renderContentSection("Impact", project.impact, designVars.brandColor)}
+                  </>
                 )}
               </Box>
             )}
@@ -376,9 +316,9 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
                   Technologies
                 </Typography>
                 
-                {expanded && shouldCollapseTechs && (
+                {expanded && designVars.shouldCollapseTechs && (
                   <Typography sx={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.4)' }}>
-                    {techCount} total
+                    {designVars.techCount} total
                   </Typography>
                 )}
               </Box>
@@ -386,16 +326,16 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
               {/* Technology Pills */}
               <Box sx={{ 
                 display: 'flex', flexWrap: 'wrap', gap: 1.4, 
-                maxHeight: !expanded && shouldCollapseTechs ? '56px' : 'none',
-                overflowY: !expanded && shouldCollapseTechs ? 'hidden' : 'visible', 
+                maxHeight: !expanded && designVars.shouldCollapseTechs ? '56px' : 'none',
+                overflowY: !expanded && designVars.shouldCollapseTechs ? 'hidden' : 'visible', 
                 position: 'relative',
-                '&:after': !expanded && shouldCollapseTechs ? {
+                '&:after': !expanded && designVars.shouldCollapseTechs ? {
                   content: '""', position: 'absolute', bottom: 0, left: 0, right: 0, height: '30px',
                   background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000000 90%)', pointerEvents: 'none'
                 } : {}
               }}>
                 {Array.isArray(project?.technologies) && project.technologies.map((tech, index) => {
-                  if (!expanded && shouldCollapseTechs && index >= 5) return null;
+                  if (!expanded && designVars.shouldCollapseTechs && index >= 5) return null;
                   
                   const iconInfo = technologyIconMap[tech];
                   const techColor = iconInfo?.color || '#697dcf';
@@ -420,7 +360,7 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
             {/* Action Buttons */}
             <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2, mt: expanded ? 1 : 0.5 }}>
               {!expanded ? (
-                hasDetailedContent && (
+                designVars.hasDetailedContent && (
                   <Button
                     onClick={toggleExpanded}
                     variant="text"
@@ -456,7 +396,7 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
           {/* CTA Section */}
           <Box sx={{ 
             px: 3, pb: 3, position: 'relative', zIndex: 1,
-            background: projectBackground || 'linear-gradient(120deg, #121221, #1a1a2e)',
+            background: designVars.projectBackground || 'linear-gradient(120deg, #121221, #1a1a2e)',
             borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px',
             borderTop: expanded ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
             mt: expanded ? 'auto' : 0
@@ -470,7 +410,7 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
                            bgcolor: 'rgba(255, 255, 255, 0.95)', display: 'flex', 
                            alignItems: 'center', justifyContent: 'center' }}>
                     <ArrowForwardRounded sx={{ 
-                      color: projectBackground ? 'rgba(0, 0, 0, 0.87)' : designVars.brandColor, 
+                      color: designVars.projectBackground ? 'rgba(0, 0, 0, 0.87)' : designVars.brandColor, 
                       fontSize: '14px' 
                     }} />
                   </Box>
@@ -498,5 +438,27 @@ const ProjectCard = ({ project, sx = {}, delay = 0, priority = false, onSelect }
     </Box>
   );
 };
+
+// Helper function for rendering content sections (challenges, impact)
+const renderContentSection = (title, content, brandColor) => (
+  <Box sx={{ mb: title === "Impact" ? 0 : 2.5 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+      <Box sx={{ 
+        width: 16, height: 16, borderRadius: '50%', 
+        background: `linear-gradient(135deg, ${alpha(brandColor, 0.15)}, ${alpha(brandColor, 0.3)})`,
+        border: `1px solid ${alpha(brandColor, 0.4)}`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center'
+      }}>
+        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: brandColor }} />
+      </Box>
+      <Typography sx={{ fontWeight: 700, fontSize: '13px', color: brandColor, textTransform: 'uppercase' }}>
+        {title}
+      </Typography>
+    </Box>
+    <Typography sx={{ fontSize: '13px', lineHeight: 1.6, color: 'rgba(255, 255, 255, 0.78)' }}>
+      {content}
+    </Typography>
+  </Box>
+);
 
 export default ProjectCard;
