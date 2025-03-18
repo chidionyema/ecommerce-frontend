@@ -1,4 +1,4 @@
-'use client';
+'use client'; // Discover how we've helped organizations overcome challenges and achieve measurable results
 
 import React, { useState, useEffect } from 'react';
 import { 

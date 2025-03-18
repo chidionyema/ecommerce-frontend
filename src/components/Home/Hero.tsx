@@ -1,5 +1,13 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  Suspense,
+  lazy,
+  FC,
+  ReactNode
+} from "react";
 import {
   Box,
   Typography,
@@ -18,7 +26,6 @@ import {
 import { styled } from "@mui/material/styles";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-
 import {
   ShieldCheck,
   TrendingUp,
@@ -39,9 +46,43 @@ import {
   SiTerraform,
   SiGooglecloud
 } from "react-icons/si";
-import { CalendlyBooking } from "../CalendlyBooking";
 
-// -------------------- STYLES --------------------
+// Lazy load external components
+const CalendlyBooking = lazy(() => import('../CalendlyBooking'));
+
+// -------------------- ERROR BOUNDARY --------------------
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("Error caught by ErrorBoundary:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || <div>Something went wrong.</div>;
+    }
+    return this.props.children;
+  }
+}
+
+// -------------------- STYLED COMPONENTS --------------------
 const Section = styled(Box)(({ theme }) => ({
   position: "relative",
   display: "flex",
@@ -125,10 +166,16 @@ const OfferChip = styled(Chip)(({ theme }) => ({
   "& .MuiChip-icon": { color: alpha("#fff", 0.97) }
 }));
 
-// Use shouldForwardProp to prevent "active" from reaching the DOM
+// Prevent "active" prop from reaching the DOM
+interface PersonaButtonProps {
+  active?: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}
+
 const PersonaButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== "active"
-})<{ active?: boolean }>(({ theme, active }) => ({
+})<PersonaButtonProps>(({ theme, active }) => ({
   fontSize: "0.82rem",
   fontWeight: 500,
   borderRadius: 6,
@@ -165,12 +212,39 @@ const fadeVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
 };
 
-// -------------------- DATA --------------------
-const DATA = {
+// -------------------- DATA (Consider externalizing this constant) --------------------
+interface Persona {
+  headline: string;
+  subheadline: string;
+  benefits: string[];
+}
+
+interface Benefit {
+  icon: JSX.Element;
+  text: string;
+  subtext: string;
+  gradient: string;
+}
+
+interface Tech {
+  icon: React.ComponentType<{ color: string; size: number }>;
+  name: string;
+  color: string;
+}
+
+interface DataStructure {
+  personas: { [key: string]: Persona };
+  benefits: Benefit[];
+  techStack: Tech[];
+  successIndicators: string[];
+}
+
+const DATA: DataStructure = {
   personas: {
     developer: {
       headline: "Enterprise Solutions Delivered 10× Faster",
-      subheadline: "Accelerate development with meticulously crafted enterprise-grade architectures",
+      subheadline:
+        "Accelerate development with meticulously crafted enterprise-grade architectures",
       benefits: [
         "CI/CD Pipeline Integration",
         "Microservices Architecture",
@@ -180,7 +254,8 @@ const DATA = {
     },
     executive: {
       headline: "Enterprise Solutions with 47% Cost Reduction",
-      subheadline: "Optimize technology investments with precision-engineered enterprise solutions",
+      subheadline:
+        "Optimize technology investments with precision-engineered enterprise solutions",
       benefits: [
         "TCO Optimization",
         "Automated Workflows",
@@ -242,7 +317,11 @@ const DATA = {
 };
 
 // -------------------- HELPER COMPONENTS --------------------
-const CheckItem = ({ text }: { text: string }) => (
+interface CheckItemProps {
+  text: string;
+}
+
+const CheckItem: FC<CheckItemProps> = React.memo(({ text }) => (
   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
     <Box
       sx={{
@@ -260,32 +339,40 @@ const CheckItem = ({ text }: { text: string }) => (
     >
       ✓
     </Box>
-    <Typography sx={{ color: "rgba(255, 255, 255, 0.94)", fontSize: "0.85rem", fontWeight: 500 }}>
+    <Typography
+      sx={{
+        color: "rgba(255, 255, 255, 0.94)",
+        fontSize: "0.85rem",
+        fontWeight: 500
+      }}
+    >
       {text}
     </Typography>
   </Stack>
-);
+));
+CheckItem.displayName = "CheckItem";
 
 // -------------------- MAIN COMPONENT --------------------
-function HeroSection() {
-  const [isCalendlyOpen, setIsCalendlyOpen] = useState(false);
-  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  const [selectedPersona, setSelectedPersona] = useState<keyof typeof DATA.personas>("developer");
-  const [showCalculator, setShowCalculator] = useState(false);
-  const [teamSize, setTeamSize] = useState(5);
-  const [roi, setRoi] = useState(30);
+const HeroSection: FC = () => {
+  const [isCalendlyOpen, setIsCalendlyOpen] = useState<boolean>(false);
+  const [isChatbotOpen, setIsChatbotOpen] = useState<boolean>(false);
+  const [selectedPersona, setSelectedPersona] = useState<keyof DataStructure["personas"]>("developer");
+  const [showCalculator, setShowCalculator] = useState<boolean>(false);
+  const [teamSize, setTeamSize] = useState<number>(5);
+  const [roi, setRoi] = useState<number>(30);
 
-useEffect(() => {
-  const p = new URLSearchParams(window.location.search).get("persona");
-  if (p && (p === "developer" || p === "executive" || p === "security")) {
-    setSelectedPersona(p as keyof typeof DATA.personas);
-  } else {
-    const stored = localStorage.getItem("userPersona");
-    if (stored && (stored === "developer" || stored === "executive" || stored === "security")) {
-      setSelectedPersona(stored as keyof typeof DATA.personas);
+  // Validate URL parameter and local storage value
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search).get("persona");
+    if (p && ["developer", "executive", "security"].includes(p)) {
+      setSelectedPersona(p as keyof DataStructure["personas"]);
+    } else {
+      const stored = localStorage.getItem("userPersona");
+      if (stored && ["developer", "executive", "security"].includes(stored)) {
+        setSelectedPersona(stored as keyof DataStructure["personas"]);
+      }
     }
-  }
-}, []);
+  }, []);
 
   const personaData = DATA.personas[selectedPersona];
   const annualSavings = useMemo(() => {
@@ -300,7 +387,7 @@ useEffect(() => {
       <Box sx={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden" }}>
         <Image
           src="/images/istockphoto-realhero.jpg"
-          alt=""
+          alt="Enterprise background hero"
           layout="fill"
           objectFit="cover"
           priority
@@ -317,9 +404,7 @@ useEffect(() => {
               <Box
                 component="span"
                 sx={(theme) => ({
-                  background: `linear-gradient(135deg,
-                    ${theme.palette.secondary.light},
-                    ${theme.palette.secondary.main})`,
+                  background: `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.main})`,
                   WebkitBackgroundClip: "text",
                   color: "transparent"
                 })}
@@ -332,10 +417,17 @@ useEffect(() => {
             {/* CTA */}
             <Box sx={{ textAlign: "center", mb: 5 }}>
               <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
-                <OfferChip icon={<Clock size={14} strokeWidth={2} />} label="Limited Time: 2 Free Strategy Sessions" />
+                <OfferChip
+                  icon={<Clock size={14} strokeWidth={2} />}
+                  label="Limited Time: 2 Free Strategy Sessions"
+                />
               </Box>
               <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 3 }} justifyContent="center">
-                <CTAButton onClick={() => setIsCalendlyOpen(true)} endIcon={<Calendar size={16} strokeWidth={2} />}>
+                <CTAButton
+                  onClick={() => setIsCalendlyOpen(true)}
+                  endIcon={<Calendar size={16} strokeWidth={2} />}
+                  aria-label="Schedule your strategy session"
+                >
                   Schedule Your Strategy Session
                 </CTAButton>
                 <CTAButton
@@ -346,6 +438,7 @@ useEffect(() => {
                     background: "none",
                     border: `1.5px solid ${alpha("#fff", 0.85)}`
                   }}
+                  aria-label="View case studies"
                 >
                   View Case Studies
                 </CTAButton>
@@ -367,6 +460,8 @@ useEffect(() => {
                 p: 1,
                 backdropFilter: "blur(8px)"
               }}
+              role="radiogroup"
+              aria-label="Select your persona"
             >
               <Typography sx={{ color: "rgba(255,255,255,0.7)", mr: 2, alignSelf: "center", fontSize: "0.85rem" }}>
                 I am a:
@@ -376,7 +471,9 @@ useEffect(() => {
                   <PersonaButton
                     key={p}
                     active={selectedPersona === p}
-                    onClick={() => setSelectedPersona(p as keyof typeof DATA.personas)}
+                    onClick={() => setSelectedPersona(p as keyof DataStructure["personas"])}
+                    aria-checked={selectedPersona === p}
+                    role="radio"
                   >
                     {p.charAt(0).toUpperCase() + p.slice(1)}
                   </PersonaButton>
@@ -385,39 +482,48 @@ useEffect(() => {
             </Box>
           </motion.div>
 
-          {/* Benefits */}
-          <Box sx={{ mb: 6 }}>
-            <Typography
-              variant="h3"
-              sx={{ fontSize: "1.5rem", textAlign: "center", color: "white", mb: 3, fontWeight: 600 }}
-            >
-              Why Organizations Choose Our Solutions
+          {/* Benefits Grid */}
+  {/* Benefits Grid */}
+<Box sx={{ mb: 6 }}>
+  <Typography
+    variant="h3"
+    sx={{ fontSize: "1.5rem", textAlign: "center", color: "white", mb: 3, fontWeight: 600 }}
+  >
+    Why Organizations Choose Our Solutions
+  </Typography>
+  <Grid container spacing={2.5} sx={{ alignItems: "stretch" }}>
+    {DATA.benefits.map((b, i) => (
+      <Grid item xs={12} sm={6} md={3} key={i} sx={{ display: "flex" }}>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeVariants}
+          style={{ width: "100%" }}
+        >
+          <GlassPaper
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              "&:hover": { transform: "translateY(-3px)", background: alpha("#263B66", 0.17) }
+            }}
+          >
+            <IconCircle sx={{ background: b.gradient }}>{b.icon}</IconCircle>
+            <Typography sx={{ fontWeight: 600, color: "#fff", mb: 1, fontSize: "1.05rem" }}>
+              {b.text}
             </Typography>
-            <Grid container spacing={2.5}>
-              {DATA.benefits.map((b, i) => (
-                <Grid item xs={12} sm={6} md={3} key={i}>
-                  <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeVariants}>
-                    <GlassPaper
-                      sx={{
-                        "&:hover": {
-                          transform: "translateY(-3px)",
-                          background: alpha("#263B66", 0.17)
-                        }
-                      }}
-                    >
-                      <IconCircle sx={{ background: b.gradient }}>{b.icon}</IconCircle>
-                      <Typography sx={{ fontWeight: 600, color: "#fff", mb: 1, fontSize: "1.05rem" }}>
-                        {b.text}
-                      </Typography>
-                      <Typography sx={{ fontSize: "0.85rem", lineHeight: 1.5, color: "rgba(255,255,255,0.94)" }}>
-                        {b.subtext}
-                      </Typography>
-                    </GlassPaper>
-                  </motion.div>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
+            <Typography sx={{ fontSize: "0.85rem", lineHeight: 1.5, color: "rgba(255,255,255,0.94)" }}>
+              {b.subtext}
+            </Typography>
+          </GlassPaper>
+        </motion.div>
+      </Grid>
+    ))}
+  </Grid>
+</Box>
+
 
           {/* ROI Calculator */}
           <Box sx={{ mb: 6 }}>
@@ -431,6 +537,8 @@ useEffect(() => {
                     transition: "all 0.2s ease",
                     "&:hover": { transform: "translateY(-2px)", boxShadow: "0 8px 16px rgba(0,0,0,0.1)" }
                   }}
+                  role="button"
+                  aria-label="Open cost savings calculator"
                 >
                   <Stack direction="row" justifyContent="center" alignItems="center" spacing={1} sx={{ mb: 1 }}>
                     <DollarSign size={20} color="#4285f4" strokeWidth={2} />
@@ -454,7 +562,7 @@ useEffect(() => {
                       </Typography>
                     </Stack>
                     <Tooltip title="See methodology">
-                      <IconButton size="small" color="primary">
+                      <IconButton size="small" color="primary" aria-label="Methodology info">
                         <Info size={16} />
                       </IconButton>
                     </Tooltip>
@@ -474,6 +582,7 @@ useEffect(() => {
                         max={50}
                         step={1}
                         valueLabelDisplay="auto"
+                        aria-label="Team size slider"
                         sx={{ color: "#4285f4" }}
                       />
                     </Grid>
@@ -491,6 +600,7 @@ useEffect(() => {
                         max={60}
                         step={5}
                         valueLabelDisplay="auto"
+                        aria-label="Efficiency improvement slider"
                         sx={{ color: "#4285f4" }}
                       />
                     </Grid>
@@ -518,6 +628,7 @@ useEffect(() => {
                       color="primary"
                       onClick={() => setIsCalendlyOpen(true)}
                       sx={{ borderRadius: 2 }}
+                      aria-label="Get detailed analysis"
                     >
                       Get Detailed Analysis
                     </Button>
@@ -565,13 +676,11 @@ useEffect(() => {
             </motion.div>
           </Box>
 
-          {/* Tech Stack: Always Visible */}
+          {/* Tech Stack */}
           <Box sx={{ mb: 6 }}>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeVariants}>
               <GlassPaper>
-                <Typography
-                  sx={{ color: "#fff", textAlign: "center", mb: 3, fontWeight: 600, fontSize: "1rem" }}
-                >
+                <Typography sx={{ color: "#fff", textAlign: "center", mb: 3, fontWeight: 600, fontSize: "1rem" }}>
                   Pre-built architectures for leading enterprise technologies
                 </Typography>
                 <Grid container spacing={3} justifyContent="center" sx={{ mb: 3 }}>
@@ -605,7 +714,11 @@ useEffect(() => {
               <Typography sx={{ color: "#fff", fontSize: "1.5rem", fontWeight: 700, mb: 3, maxWidth: 600, mx: "auto" }}>
                 Ready to transform your enterprise technology?
               </Typography>
-              <CTAButton onClick={() => setIsCalendlyOpen(true)} endIcon={<Calendar size={16} strokeWidth={2} />}>
+              <CTAButton
+                onClick={() => setIsCalendlyOpen(true)}
+                endIcon={<Calendar size={16} strokeWidth={2} />}
+                aria-label="Schedule your strategy session"
+              >
                 Schedule Your Strategy Session
               </CTAButton>
             </motion.div>
@@ -613,7 +726,7 @@ useEffect(() => {
         </ContentArea>
       </Container>
 
-      {/* Chatbot */}
+      {/* Chatbot Button */}
       <IconButton
         onClick={() => setIsChatbotOpen(!isChatbotOpen)}
         sx={{
@@ -629,76 +742,91 @@ useEffect(() => {
           boxShadow: "0 4px 18px rgba(0,0,0,0.3)",
           "&:hover": { background: (theme) => theme.palette.secondary.dark, transform: "scale(1.05)" }
         }}
+        aria-label="Open chat assistant"
       >
         <MessageCircle size={24} />
       </IconButton>
 
       <AnimatePresence>
         {isChatbotOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.92 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.95 }}
-            transition={{ duration: 0.24, ease: "easeOut" }}
-          >
-            <Box
-              sx={{
-                position: "fixed",
-                bottom: 90,
-                right: 24,
-                width: 340,
-                maxHeight: 480,
-                borderRadius: 12,
-                p: 2,
-                background: "rgba(30,41,59,0.95)",
-                backdropFilter: "blur(10px)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                zIndex: 1000,
-                boxShadow: "0 10px 36px rgba(0,0,0,0.3)",
-                overflow: "hidden"
-              }}
+          <Suspense fallback={<div>Loading Chat...</div>}>
+            <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.92 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.95 }}
+              transition={{ duration: 0.24, ease: "easeOut" }}
             >
-              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography sx={{ color: "#4285f4", fontWeight: 700 }}>Enterprise AI Assistant</Typography>
-                <IconButton size="small" onClick={() => setIsChatbotOpen(false)} sx={{ color: "rgba(255,255,255,0.7)" }}>
-                  <ChevronDown size={18} />
-                </IconButton>
-              </Stack>
-              <Typography sx={{ color: "#fff", fontSize: "0.9rem", mb: 2 }}>
-                How can I help with your enterprise solution needs today?
-              </Typography>
-              <TextField
-                fullWidth
-                placeholder="Ask me anything..."
-                variant="outlined"
-                size="small"
+              <Box
                 sx={{
-                  mb: 2,
-                  "& .MuiOutlinedInput-root": {
-                    color: "white",
-                    "& fieldset": { borderColor: "rgba(255,255,255,0.2)" },
-                    "&:hover fieldset": { borderColor: "rgba(255,255,255,0.3)" },
-                    "&.Mui-focused fieldset": { borderColor: "#4285f4" }
-                  }
+                  position: "fixed",
+                  bottom: 90,
+                  right: 24,
+                  width: 340,
+                  maxHeight: 480,
+                  borderRadius: 12,
+                  p: 2,
+                  background: "rgba(30,41,59,0.95)",
+                  backdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  zIndex: 1000,
+                  boxShadow: "0 10px 36px rgba(0,0,0,0.3)",
+                  overflow: "hidden"
                 }}
-              />
-              <Button fullWidth variant="contained" color="primary" size="small">
-                Send
-              </Button>
-            </Box>
-          </motion.div>
+                role="dialog"
+                aria-modal="true"
+                aria-label="Enterprise AI Assistant Chat"
+              >
+                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                  <Typography sx={{ color: "#4285f4", fontWeight: 700 }}>
+                    Enterprise AI Assistant
+                  </Typography>
+                  <IconButton size="small" onClick={() => setIsChatbotOpen(false)} sx={{ color: "rgba(255,255,255,0.7)" }} aria-label="Close chat">
+                    <ChevronDown size={18} />
+                  </IconButton>
+                </Stack>
+                <Typography sx={{ color: "#fff", fontSize: "0.9rem", mb: 2 }}>
+                  How can I help with your enterprise solution needs today?
+                </Typography>
+                <TextField
+                  fullWidth
+                  placeholder="Ask me anything..."
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    mb: 2,
+                    "& .MuiOutlinedInput-root": {
+                      color: "white",
+                      "& fieldset": { borderColor: "rgba(255,255,255,0.2)" },
+                      "&:hover fieldset": { borderColor: "rgba(255,255,255,0.3)" },
+                      "&.Mui-focused fieldset": { borderColor: "#4285f4" }
+                    }
+                  }}
+                  inputProps={{ "aria-label": "Chat input" }}
+                />
+                <Button fullWidth variant="contained" color="primary" size="small" aria-label="Send message">
+                  Send
+                </Button>
+              </Box>
+            </motion.div>
+          </Suspense>
         )}
       </AnimatePresence>
 
-      {/* Calendly */}
-      <CalendlyBooking
-        isOpen={isCalendlyOpen}
-        onClose={() => setIsCalendlyOpen(false)}
-        eventTypeUrl="https://calendly.com/glustack/strategy-session"
-        prefill={{ name: "", email: "" }}
-      />
+      {/* Calendly Widget (Lazy Loaded with Error Boundary) */}
+      <ErrorBoundary fallback={<div>Calendly could not be loaded.</div>}>
+        {isCalendlyOpen && (
+          <Suspense fallback={<div>Loading Calendly...</div>}>
+            <CalendlyBooking
+              isOpen={isCalendlyOpen}
+              onClose={() => setIsCalendlyOpen(false)}
+              eventTypeUrl={process.env.NEXT_PUBLIC_CALENDLY_URL || "https://calendly.com/glustack/strategy-session"}
+              prefill={{ name: "", email: "" }}
+            />
+          </Suspense>
+        )}
+      </ErrorBoundary>
     </Section>
   );
-}
+};
 
 export default HeroSection;

@@ -136,102 +136,75 @@ const ElegantCheckmarkItem: React.FC<ElegantCheckmarkItemProps> = ({ text, icon:
 // Define props for TestimonialCard
 interface TestimonialCardProps {
   testimonial: Testimonial;
+  isHovered: boolean;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
 }
 
-const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial }) => {
+const TestimonialCard: React.FC<TestimonialCardProps> = ({ 
+  testimonial, 
+  isHovered,
+  onMouseEnter,
+  onMouseLeave
+}) => {
   const theme = useTheme();
-  const sxStyles = {
-    testimonialCard: {
-      pt: 4.5,
-      position: "relative",
-      overflow: "visible",
-      background: `linear-gradient(145deg, ${alpha("#1a56db", 0.12)}, ${alpha("#1a56db", 0.05)})`,
-      border: `1px solid ${alpha("#4285f4", 0.12)}`,
-      boxShadow: `0 4px 20px ${alpha("#000", 0.05)}`,
-      p: 2.5,
-      borderRadius: 2,
-      display: "flex",
-      flexDirection: "column"
-    },
-    testimonialRating: {
-      mb: 2,
-      mt: 0.5,
-      display: "flex",
-      justifyContent: "center"
-    },
-    testimonialContent: {
-      fontWeight: 400,
-      color: alpha("#fff", 0.95),
-      mb: 2.5,
-      fontStyle: "italic",
-      lineHeight: 1.7,
-      fontSize: "0.9rem",
-      minHeight: "7rem",
-      overflow: "auto",
-      textAlign: "left",
-      px: "0.5rem",
-      letterSpacing: "0.01em"
-    },
-    testimonialAuthor: {
-      textAlign: "center",
-      mt: "auto",
-      pt: 1,
-      borderTop: `1px solid ${alpha("#fff", 0.1)}`
-    },
-    testimonialName: {
-      fontWeight: 600,
-      color: theme.palette.primary.main,
-      fontSize: "0.95rem",
-      letterSpacing: "0.01em"
-    },
-    testimonialRole: {
-      color: alpha("#fff", 0.85),
-      display: "block",
-      fontWeight: 400,
-      fontSize: "0.75rem",
-      letterSpacing: "0.01em"
-    },
-    avatar: {
-      width: 70,
-      height: 70,
-      border: `2px solid ${theme.palette.primary.main}`,
-      boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.3)}`
-    }
-  };
-
+  
   return (
-    <TechCard
-      icon={<Avatar src={testimonial.avatar} alt={testimonial.name} sx={sxStyles.avatar} />}
-      title=""
-      accentColor={theme.palette.primary.main}
-      importance="primary"
-      sx={sxStyles.testimonialCard}
+    <Box 
+      sx={{ 
+        height: "100%",
+        width: "100%"
+      }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
-      <Box sx={sxStyles.testimonialRating}>
-        <Rating
-          value={testimonial.rating}
-          readOnly
-          icon={
-            <Star
-              style={{ color: theme.palette.primary.main, fill: theme.palette.primary.main }}
-              size={16}
-            />
-          }
-          emptyIcon={<Star style={{ color: alpha(theme.palette.primary.main, 0.2) }} size={16} />}
-        />
-      </Box>
-      <Typography variant="body1" sx={sxStyles.testimonialContent}>
-        "{testimonial.content}"
-      </Typography>
-      <Box sx={sxStyles.testimonialAuthor}>
-        <Typography variant="h6" sx={sxStyles.testimonialName}>
-          {testimonial.name}
+      <TechCard
+        icon={<Avatar src={testimonial.avatar} alt={testimonial.name} sx={{
+          width: 70,
+          height: 70,
+          border: `2px solid ${theme.palette.primary.main}`,
+          boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
+          mb: 1
+        }} />}
+        title={testimonial.name}
+        subtitle={testimonial.role}
+        category={testimonial.projectType}
+        accentColor={theme.palette.primary.main}
+        importance={isHovered ? "primary" : "secondary"}
+      >
+        <Box sx={{ textAlign: "center", mb: 2, mt: 0.5 }}>
+          <Rating
+            value={testimonial.rating}
+            readOnly
+            icon={
+              <Star
+                style={{ color: theme.palette.primary.main, fill: theme.palette.primary.main }}
+                size={16}
+              />
+            }
+            emptyIcon={<Star style={{ color: alpha(theme.palette.primary.main, 0.2) }} size={16} />}
+          />
+        </Box>
+        
+        <Typography 
+          variant="body2"
+          sx={{
+            fontStyle: "italic",
+            lineHeight: 1.6,
+            fontSize: "0.85rem",
+            color: alpha(theme.palette.text.primary, 0.95),
+            textAlign: "center",
+            letterSpacing: "0.01em",
+            minHeight: "7rem", // Ensuring consistent card height
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          "{testimonial.content}"
         </Typography>
-        <Typography variant="caption" sx={sxStyles.testimonialRole}>
-          {testimonial.role}
-        </Typography>
-      </Box>
-    </TechCard>
+      </TechCard>
+    </Box>
   );
 };
 
@@ -239,11 +212,15 @@ const TestimonialsSection: React.FC = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
   const [showAll, setShowAll] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState(-1);
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   // Display only first 3 testimonials unless showAll is true
   const displayedTestimonials = showAll ? DATA.testimonials : DATA.testimonials.slice(0, 3);
+
+  // Purple color for the button, matching TechnologyShowcase
+  const purpleColor = "#673AB7";
 
   // Styling for this section
   const sxStyles = {
@@ -253,20 +230,51 @@ const TestimonialsSection: React.FC = () => {
       background: "linear-gradient(180deg, #18407F 0%, #1A438A 100%)",
       overflow: "hidden"
     },
-    header: { mb: { xs: 5, md: 6 } },
     title: { ...styles.sectionTitle, letterSpacing: "-0.02em", fontWeight: 600, mb: 2 },
     subtitle: { ...styles.sectionSubtitle, letterSpacing: "0.01em", fontWeight: 400, maxWidth: "85%", mx: { xs: "auto", md: 0 } },
     ctaCard: {
-      mt: { xs: 6, md: 8 },
-      borderRadius: "16px",
+      mt: { xs: 6, md: 5 },
+      borderRadius: "14px",
       background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.95)}, ${alpha(theme.palette.background.paper, 0.85)})`,
       backdropFilter: "blur(8px)",
-      boxShadow: `0 8px 32px ${alpha("#000", 0.08)}`
+      boxShadow: `0 8px 32px ${alpha("#000", 0.08)}`,
+      maxWidth: 900,
+      mx: "auto",
+      py: 3,
+      px: { xs: 3, md: 4 }
     },
-    ctaTitle: { letterSpacing: "-0.01em", fontSize: "1.3rem", fontWeight: 600, mb: 1, textAlign: "center", color: theme.palette.primary.main },
-    ctaSubtitle: { letterSpacing: "0.01em", maxWidth: "85%", mx: "auto", fontSize: "0.95rem", mb: 4, textAlign: "center", color: theme.palette.text.secondary },
-    studiesHeading: { color: theme.palette.primary.main, mb: 2, fontWeight: 600, fontSize: "1rem", letterSpacing: "0.01em" },
-    buttonContainer: { display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "center", alignItems: "center", gap: 2, pt: 1 },
+    ctaTitle: { 
+      letterSpacing: "-0.01em", 
+      fontSize: "1.1rem", 
+      fontWeight: 600, 
+      mb: 1, 
+      textAlign: "center", 
+      color: theme.palette.primary.main 
+    },
+    ctaSubtitle: { 
+      letterSpacing: "0.01em", 
+      maxWidth: "75%", 
+      mx: "auto", 
+      fontSize: "0.85rem", 
+      mb: 3, 
+      textAlign: "center", 
+      color: theme.palette.text.secondary 
+    },
+    studiesHeading: { 
+      color: theme.palette.primary.main, 
+      mb: 2, 
+      fontWeight: 600, 
+      fontSize: "0.9rem", 
+      letterSpacing: "0.01em" 
+    },
+    buttonContainer: { 
+      display: "flex", 
+      flexDirection: { xs: "column", sm: "row" }, 
+      justifyContent: "center", 
+      alignItems: "center", 
+      gap: 2, 
+      pt: 1 
+    },
     primaryBtn: {
       px: 2.5,
       py: 0.8,
@@ -296,42 +304,15 @@ const TestimonialsSection: React.FC = () => {
       transition: "all 0.2s ease",
       flexGrow: { xs: 1, sm: 0 },
       width: { xs: "100%", sm: "auto" },
+      bgcolor: purpleColor,
+      color: "white",
+      boxShadow: `0 2px 6px ${alpha(purpleColor, 0.25)}`,
       "&:hover": {
-        borderWidth: 1,
         transform: "translateY(-1px)",
-        backgroundColor: alpha(theme.palette.primary.main, 0.05)
+        bgcolor: alpha(purpleColor, 0.9),
+        boxShadow: `0 4px 12px ${alpha(purpleColor, 0.35)}`
       }
-    },
-    testimonialCard: {
-      pt: 4.5,
-      position: "relative",
-      overflow: "visible",
-      background: `linear-gradient(145deg, ${alpha("#1a56db", 0.12)}, ${alpha("#1a56db", 0.05)})`,
-      border: `1px solid ${alpha("#4285f4", 0.12)}`,
-      boxShadow: `0 4px 20px ${alpha("#000", 0.05)}`,
-      p: 2.5,
-      borderRadius: 2,
-      display: "flex",
-      flexDirection: "column"
-    },
-    testimonialRating: { mb: 2, mt: 0.5, display: "flex", justifyContent: "center" },
-    testimonialContent: {
-      fontWeight: 400,
-      color: alpha("#fff", 0.95),
-      mb: 2.5,
-      fontStyle: "italic",
-      lineHeight: 1.7,
-      fontSize: "0.9rem",
-      minHeight: "7rem",
-      overflow: "auto",
-      textAlign: "left",
-      px: "0.5rem",
-      letterSpacing: "0.01em"
-    },
-    testimonialAuthor: { textAlign: "center", mt: "auto", pt: 1, borderTop: `1px solid ${alpha("#fff", 0.1)}` },
-    testimonialName: { fontWeight: 600, color: theme.palette.primary.main, fontSize: "0.95rem", letterSpacing: "0.01em" },
-    testimonialRole: { color: alpha("#fff", 0.85), display: "block", fontWeight: 400, fontSize: "0.75rem", letterSpacing: "0.01em" },
-    avatar: { width: 70, height: 70, border: `2px solid ${theme.palette.primary.main}`, boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.3)}` }
+    }
   };
 
   return (
@@ -352,10 +333,15 @@ const TestimonialsSection: React.FC = () => {
 
           {/* Testimonial Grid */}
           <Grid container spacing={3} justifyContent="center" sx={{ mb: { xs: 2, md: 3 } }}>
-            {displayedTestimonials.map((testimonial) => (
+            {displayedTestimonials.map((testimonial, index) => (
               <Grid item key={testimonial.id} xs={12} sm={6} md={4}>
                 <motion.div variants={ANIMATIONS.item} style={{ width: "100%", height: "100%" }}>
-                  <TestimonialCard testimonial={testimonial} />
+                  <TestimonialCard 
+                    testimonial={testimonial} 
+                    isHovered={hoveredIndex === index}
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(-1)}
+                  />
                 </motion.div>
               </Grid>
             ))}
@@ -363,25 +349,61 @@ const TestimonialsSection: React.FC = () => {
 
           {/* CTA Section */}
           <motion.div variants={ANIMATIONS.item}>
-            <TechCard title="Enterprise Proof Points" sx={sxStyles.ctaCard}>
+            <Box sx={sxStyles.ctaCard}>
               <Typography variant="h5" component="h3" sx={sxStyles.ctaTitle}>
                 Enterprise Proof Points
               </Typography>
               <Typography variant="body1" sx={sxStyles.ctaSubtitle}>
                 Explore our case studies and discover how we've helped businesses achieve success
               </Typography>
-              <Grid container spacing={2} sx={{ mb: 4 }}>
-                <Grid item xs={12}>
-                  <Typography variant="h6" sx={sxStyles.studiesHeading}>
+              <Grid container spacing={3} sx={{ mb: 3 }}>
+                <Grid item xs={12} md={7} sx={{
+                  borderRight: { xs: "none", md: `1px solid ${alpha(theme.palette.divider, 0.08)}` },
+                  pb: { xs: 2, md: 0 },
+                }}>
+                  <Typography variant="subtitle2" sx={sxStyles.studiesHeading}>
                     Success Evidence:
                   </Typography>
-                </Grid>
-                {DATA.caseStudies.map((item, i) => (
-                  <Grid item xs={12} sm={6} key={i}>
-                    <ElegantCheckmarkItem text={item} icon={FileText as React.ElementType<{ size?: number }>} />
+                  <Grid container spacing={2}>
+                    {DATA.caseStudies.map((item, i) => (
+                      <Grid item xs={12} sm={6} key={i}>
+                        <ElegantCheckmarkItem text={item} icon={FileText as React.ElementType<{ size?: number }>} />
+                      </Grid>
+                    ))}
                   </Grid>
-                ))}
+                </Grid>
+                
+                <Grid item xs={12} md={5} sx={{
+                  borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.08)}`, md: "none" },
+                  pt: { xs: 2, md: 0 },
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}>
+                  <Box sx={{ maxWidth: "90%" }}>
+                    <Typography variant="subtitle2" sx={{
+                      color: purpleColor,
+                      mb: 1,
+                      fontWeight: 600,
+                      fontSize: "0.9rem",
+                      letterSpacing: "0.01em",
+                    }}>
+                      Discover All Client Stories
+                    </Typography>
+                    
+                    <Typography variant="body2" sx={{
+                      mb: 1.5,
+                      color: theme.palette.text.secondary,
+                      fontSize: "0.8rem",
+                      letterSpacing: "0.01em",
+                      lineHeight: 1.4,
+                    }}>
+                      Learn how we've helped organizations across industries achieve their goals.
+                    </Typography>
+                  </Box>
+                </Grid>
               </Grid>
+              
               <Box sx={sxStyles.buttonContainer}>
                 <Button
                   variant="contained"
@@ -393,8 +415,7 @@ const TestimonialsSection: React.FC = () => {
                   Download Case Studies
                 </Button>
                 <Button
-                  variant="outlined"
-                  color="primary"
+                  variant="contained"
                   onClick={() => setShowAll(!showAll)}
                   endIcon={showAll ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                   sx={sxStyles.secondaryBtn}
@@ -402,7 +423,7 @@ const TestimonialsSection: React.FC = () => {
                   {showAll ? "Show Fewer Stories" : "View All Testimonials"}
                 </Button>
               </Box>
-            </TechCard>
+            </Box>
           </motion.div>
         </motion.div>
       </Container>

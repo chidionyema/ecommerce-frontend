@@ -17,6 +17,7 @@ export interface TechCardProps {
   children?: ReactNode;
   sx?: SxProps<Theme>;
   accentColor?: string;
+  subtitle?: string;
   category?: string;
   importance?: 'primary' | 'secondary' | 'tertiary';
   blurAmount?: string;

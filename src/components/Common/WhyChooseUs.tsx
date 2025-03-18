@@ -202,48 +202,51 @@ const WhyChooseUs: React.FC = () => {
             ))}
           </Grid>
 
-          {/* Combined CTA section */}
+          {/* Compact CTA section */}
           <motion.div variants={ANIMATIONS.item}>
             <Paper
               elevation={2}
               sx={{
                 ...styles.ctaCard,
-                mt: { xs: 5, md: 6 }, // Reduced from 6,8 to 5,6
-                borderRadius: "16px",
+                mt: { xs: 5, md: 6 },
+                mb: 5, // Added bottom margin
+                borderRadius: "14px",
                 background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.95)}, ${alpha(
                   theme.palette.background.paper,
                   0.85
                 )})`,
                 backdropFilter: "blur(8px)",
-                boxShadow: `0 8px 32px ${alpha("#000", 0.08)}`,
-                maxWidth: "900px", // Added max width constraint
-                mx: "auto" // Center the card
+                boxShadow: `0 8px 24px ${alpha("#000", 0.06)}`,
+                maxWidth: "900px",
+                mx: "auto",
+                py: 2.5, // Reduced padding
+                px: { xs: 2, md: 3 }
               }}
             >
               <Typography
-                variant="h5"
+                variant="h6" // Downgraded from h5
                 component="h3"
                 fontWeight={600}
-                mb={1}
+                mb={0.75} // Reduced margin
                 align="center"
                 color={theme.palette.primary.main}
-                sx={{ letterSpacing: "-0.01em", fontSize: "1.2rem" }} // Reduced from 1.3rem
+                sx={{ letterSpacing: "-0.01em", fontSize: "1.1rem" }}
               >
                 Take the Next Step
               </Typography>
 
               <Typography
-                variant="body1"
+                variant="body2" // Downgraded
                 color={theme.palette.text.secondary}
-                mb={3} // Reduced from 4
+                mb={1.5} // Reduced margin
                 align="center"
-                sx={{ letterSpacing: "0.01em", maxWidth: "75%", mx: "auto", fontSize: "0.9rem" }} // Reduced width and font size
+                sx={{ letterSpacing: "0.01em", maxWidth: "75%", mx: "auto", fontSize: "0.85rem" }}
               >
                 Explore our resources or schedule a consultation to discover how we can
                 help your business
               </Typography>
 
-              <Grid container spacing={3}> {/* Reduced from spacing={4} */}
+              <Grid container spacing={2}>
                 {/* Left side: Resources */}
                 <Grid
                   item
@@ -251,50 +254,69 @@ const WhyChooseUs: React.FC = () => {
                   md={4}
                   sx={{
                     borderRight: { xs: "none", md: `1px solid ${alpha(theme.palette.divider, 0.08)}` },
-                    pb: { xs: 2, md: 0 } // Reduced from 3
+                    pb: { xs: 1.5, md: 0 }
                   }}
                 >
                   <Typography
-                    variant="h6"
+                    variant="subtitle2" // Downgraded from h6
                     sx={{
                       color: theme.palette.primary.main,
-                      mb: 1.5, // Reduced from 2
+                      mb: 0.75, // Reduced margin
                       fontWeight: 600,
-                      fontSize: "0.95rem", // Reduced from 1rem
+                      fontSize: "0.9rem",
                       letterSpacing: "0.01em"
                     }}
                   >
                     Enterprise Resources Library
                   </Typography>
 
-                  <Grid container spacing={1}> {/* Reduced from 1.5 */}
+                  {/* More compact resource layout */}
+                  <Box sx={{ mb: 1.5 }}>
                     {resources.map((resource, i) => (
-                      <Grid item xs={12} sm={6} key={i}>
-                        <ElegantCheckmarkItem text={resource.title} Icon={resource.icon} />
-                      </Grid>
+                      <Box key={i} sx={{ display: "flex", alignItems: "flex-start", gap: 0.75, mb: 0.5 }}>
+                        <Box
+                          sx={{
+                            width: 14,
+                            height: 14,
+                            borderRadius: "50%",
+                            backgroundColor: theme.palette.primary.main,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "white",
+                            fontSize: "0.6rem",
+                            mt: 0.25,
+                            flexShrink: 0
+                          }}
+                        >
+                          {resource.icon ? <resource.icon size={7} /> : "✓"}
+                        </Box>
+                        <Typography
+                          color={theme.palette.text.primary}
+                          sx={{ fontSize: "0.75rem", letterSpacing: "0.01em", lineHeight: 1.3 }}
+                        >
+                          {resource.title}
+                        </Typography>
+                      </Box>
                     ))}
-                  </Grid>
+                  </Box>
 
                   <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<Download size={14} />}
+                    size="small"
+                    startIcon={<Download size={12} />}
                     href="/resources"
                     sx={{
-                      mt: 2, // Reduced from 2.5
-                      px: 2.5,
-                      py: 0.8,
+                      mt: 0.5,
+                      px: 1.5,
+                      py: 0.5,
                       textTransform: "none",
                       fontWeight: 500,
-                      fontSize: "0.85rem",
+                      fontSize: "0.75rem",
                       borderRadius: 6,
                       letterSpacing: "0.01em",
-                      boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.25)}`,
-                      transition: "all 0.2s ease",
-                      "&:hover": {
-                        transform: "translateY(-1px)",
-                        boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`
-                      }
+                      boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.2)}`,
                     }}
                   >
                     Access Enterprise Resources
@@ -308,21 +330,21 @@ const WhyChooseUs: React.FC = () => {
                   md={8}
                   sx={{
                     borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.08)}`, md: "none" },
-                    pt: { xs: 2, md: 0 }, // Reduced from 3
+                    pt: { xs: 1.5, md: 0 },
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center"
                   }}
                 >
-                  <Box sx={{ textAlign: "center", maxWidth: "85%" }}> {/* Reduced from 90% */}
+                  <Box sx={{ textAlign: "center", maxWidth: "85%" }}>
                     <Typography
-                      variant="h6"
+                      variant="subtitle2" // Downgraded from h6
                       sx={{
                         color: purpleColor,
-                        mb: 1, // Reduced from 1.5
+                        mb: 0.75, // Reduced margin
                         fontWeight: 600,
-                        fontSize: "0.95rem", // Reduced from 1rem
+                        fontSize: "0.9rem",
                         letterSpacing: "0.01em"
                       }}
                     >
@@ -330,13 +352,13 @@ const WhyChooseUs: React.FC = () => {
                     </Typography>
 
                     <Typography
-                      variant="body1"
+                      variant="body2" // Downgraded
                       sx={{
-                        mb: 2, // Reduced from 3
+                        mb: 1.5, // Reduced margin
                         color: theme.palette.text.secondary,
-                        fontSize: "0.85rem", // Reduced from 0.9rem
+                        fontSize: "0.8rem",
                         letterSpacing: "0.01em",
-                        lineHeight: 1.5 // Reduced from 1.6
+                        lineHeight: 1.3
                       }}
                     >
                       Book a no-obligation consultation with our enterprise experts and
@@ -345,24 +367,19 @@ const WhyChooseUs: React.FC = () => {
 
                     <Button
                       variant="contained"
-                      endIcon={<Calendar size={14} />}
+                      size="small"
+                      endIcon={<Calendar size={12} />}
                       onClick={() => setIsCalendlyOpen(true)}
                       sx={{
-                        px: 2.5,
-                        py: 0.8,
+                        px: 1.5,
+                        py: 0.5,
                         textTransform: "none",
                         fontWeight: 500,
-                        fontSize: "0.85rem",
+                        fontSize: "0.75rem",
                         borderRadius: 6,
                         letterSpacing: "0.01em",
                         bgcolor: purpleColor,
-                        boxShadow: `0 2px 8px ${alpha(purpleColor, 0.3)}`,
-                        transition: "all 0.2s ease",
-                        "&:hover": {
-                          bgcolor: alpha(purpleColor, 0.9),
-                          transform: "translateY(-1px)",
-                          boxShadow: `0 4px 12px ${alpha(purpleColor, 0.35)}`
-                        }
+                        boxShadow: `0 2px 6px ${alpha(purpleColor, 0.25)}`,
                       }}
                     >
                       Schedule a Consultation

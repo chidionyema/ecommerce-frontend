@@ -277,7 +277,9 @@ const TechnologyShowcase = () => {
 
           {/* Category filters */}
           <motion.div variants={ANIMATIONS.item}>
-            <Box sx={{ display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap", mb: 4 }}>
+            <Box
+              sx={{ display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap", mb: 4 }}
+            >
               {categories.map((category) => (
                 <CategoryButton
                   key={category}
@@ -302,74 +304,115 @@ const TechnologyShowcase = () => {
             ))}
           </Grid>
 
-          {/* Refined combined CTA card */}
+          {/* Refined combined CTA card with improved margins */}
           <motion.div variants={ANIMATIONS.item}>
             <Paper
               elevation={2}
               sx={{
                 ...styles.ctaCard,
-                mt: 5, // Reduced from 6
-                borderRadius: "16px",
-                background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.95)}, ${alpha(
+                mt: 5,
+                mb: 5, // Added bottom margin
+                borderRadius: "14px",
+                background: `linear-gradient(145deg, ${alpha(
                   theme.palette.background.paper,
-                  0.85
-                )})`,
+                  0.95
+                )}, ${alpha(theme.palette.background.paper, 0.85)})`,
                 backdropFilter: "blur(8px)",
-                boxShadow: `0 8px 32px ${alpha("#000", 0.08)}`,
-                maxWidth: "900px", // Added max width constraint
-                mx: "auto" // Center the card
+                boxShadow: `0 8px 24px ${alpha("#000", 0.06)}`,
+                maxWidth: "900px",
+                mx: "auto", // Center the card
+                py: 3, // Vertical padding
+                px: { xs: 3, md: 4 } // Increased horizontal padding
               }}
             >
               <Typography
-                variant="h5"
+                variant="h6"
                 component="h3"
                 fontWeight={600}
                 mb={1}
                 align="center"
                 color={theme.palette.primary.main}
-                sx={{ letterSpacing: "-0.01em", fontSize: "1.2rem" }} // Reduced font size
+                sx={{ letterSpacing: "-0.01em", fontSize: "1.1rem" }}
               >
                 Explore Our Technology Resources
               </Typography>
               <Typography
-                variant="body1"
+                variant="body2"
                 color={theme.palette.text.secondary}
-                mb={3} // Reduced from 4
+                mb={2}
                 align="center"
-                sx={{ letterSpacing: "0.01em", maxWidth: "75%", mx: "auto", fontSize: "0.9rem" }} // Reduced width and font size
+                sx={{ letterSpacing: "0.01em", maxWidth: "75%", mx: "auto", fontSize: "0.85rem" }}
               >
                 Discover our full technology stack and access free learning resources.
               </Typography>
 
               {/* Two-column layout */}
-              <Grid container spacing={3}> {/* Reduced spacing from 4 */}
+              <Grid container spacing={3}> {/* Increased spacing from 2 to 3 */}
                 {/* Left: Resources */}
                 <Grid
                   item
                   xs={12}
-                  md={6}
+                  md={7}
                   sx={{
                     borderRight: { xs: "none", md: `1px solid ${alpha(theme.palette.divider, 0.08)}` },
-                    pb: { xs: 2, md: 0 }, // Reduced padding
+                    pb: { xs: 2, md: 0 },
                   }}
                 >
                   <Typography
-                    variant="h6"
+                    variant="subtitle2"
                     sx={{
                       color: theme.palette.primary.main,
-                      mb: 1.5, // Reduced from 2
+                      mb: 1,
                       fontWeight: 600,
-                      fontSize: "0.95rem", // Reduced font size
+                      fontSize: "0.9rem",
                       letterSpacing: "0.01em",
                     }}
                   >
                     Free Enterprise Resources:
                   </Typography>
 
-                  <Grid container spacing={1}> {/* Reduced spacing from 1.5 */}
+                  <Grid container spacing={1}>
                     {RESOURCE_ITEMS.map((item, i) => (
                       <Grid item xs={12} sm={6} key={i}>
-                        <ElegantCheckmarkItem text={item} icon={FileText as React.ComponentType<{ size?: number }>} />
+                        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1, mb: 0.75 }}>
+                          <Box
+                            sx={{
+                              width: 14,
+                              height: 14,
+                              borderRadius: "50%",
+                              backgroundColor: alpha(theme.palette.primary.main, 0.9),
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "white",
+                              fontSize: "0.6rem",
+                              mt: 0.3
+                            }}
+                          >
+                         <Box
+                          sx={{
+                            width: 14,
+                            height: 14,
+                            borderRadius: "50%",
+                            backgroundColor: alpha(theme.palette.primary.main, 0.9),
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "white",
+                            fontSize: "0.6rem",
+                            mt: 0.3
+                          }}
+                        >
+                          <FileText size={7} />
+                        </Box>
+                          </Box>
+                          <Typography
+                            color={theme.palette.text.primary}
+                            sx={{ fontSize: "0.8rem", letterSpacing: "0.01em", lineHeight: 1.3 }}
+                          >
+                            {item}
+                          </Typography>
+                        </Box>
                       </Grid>
                     ))}
                   </Grid>
@@ -377,23 +420,19 @@ const TechnologyShowcase = () => {
                   <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<Download size={14} />}
+                    size="small"
+                    startIcon={<Download size={12} />}
                     href="/resources"
                     sx={{
-                      mt: 2, // Reduced from 2.5
-                      px: 2.5,
-                      py: 0.8,
+                      mt: 1.5,
+                      px: 2,
+                      py: 0.6,
                       textTransform: "none",
                       fontWeight: 500,
-                      fontSize: "0.85rem",
+                      fontSize: "0.8rem",
                       borderRadius: 6,
                       letterSpacing: "0.01em",
-                      boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.25)}`,
-                      transition: "all 0.2s ease",
-                      "&:hover": {
-                        transform: "translateY(-1px)",
-                        boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
-                      },
+                      boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.2)}`,
                     }}
                   >
                     Access Free Resources
@@ -404,24 +443,23 @@ const TechnologyShowcase = () => {
                 <Grid
                   item
                   xs={12}
-                  md={6}
+                  md={5}
                   sx={{
                     borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.08)}`, md: "none" },
-                    pt: { xs: 2, md: 0 }, // Reduced padding
+                    pt: { xs: 2, md: 0 },
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
-                    alignItems: "center",
                   }}
                 >
-                  <Box sx={{ textAlign: "center", maxWidth: "85%" }}>
+                  <Box sx={{ maxWidth: "90%" }}>
                     <Typography
-                      variant="h6"
+                      variant="subtitle2"
                       sx={{
                         color: purpleColor,
-                        mb: 1, // Reduced from 1.5
+                        mb: 1,
                         fontWeight: 600,
-                        fontSize: "0.95rem", // Reduced font size
+                        fontSize: "0.9rem",
                         letterSpacing: "0.01em",
                       }}
                     >
@@ -429,38 +467,34 @@ const TechnologyShowcase = () => {
                     </Typography>
 
                     <Typography
-                      variant="body1"
+                      variant="body2"
                       sx={{
-                        mb: 2, // Reduced from 3
+                        mb: 1.5,
                         color: theme.palette.text.secondary,
-                        fontSize: "0.85rem", // Reduced font size
+                        fontSize: "0.8rem",
                         letterSpacing: "0.01em",
-                        lineHeight: 1.5, // Reduced from 1.6
+                        lineHeight: 1.4,
                       }}
                     >
                       See our complete technology stack that powers enterprise solutions across industries.
                     </Typography>
 
+                    {/* Purple Explore button */}
                     <Button
                       variant="contained"
-                      endIcon={<ChevronRight size={14} />}
+                      size="small"
+                      endIcon={<ChevronRight size={12} />}
                       href="/stack"
                       sx={{
-                        px: 2.5,
-                        py: 0.8,
+                        px: 2,
+                        py: 0.6,
                         textTransform: "none",
                         fontWeight: 500,
-                        fontSize: "0.85rem",
+                        fontSize: "0.8rem",
                         borderRadius: 6,
                         letterSpacing: "0.01em",
                         bgcolor: purpleColor,
-                        boxShadow: `0 2px 8px ${alpha(purpleColor, 0.3)}`,
-                        transition: "all 0.2s ease",
-                        "&:hover": {
-                          bgcolor: alpha(purpleColor, 0.9),
-                          transform: "translateY(-1px)",
-                          boxShadow: `0 4px 12px ${alpha(purpleColor, 0.35)}`,
-                        },
+                        boxShadow: `0 2px 6px ${alpha(purpleColor, 0.25)}`,
                       }}
                     >
                       Explore Our Full Stack
