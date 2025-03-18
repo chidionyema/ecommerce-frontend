@@ -1,7 +1,9 @@
+"use client";
 import { useState, useEffect, useCallback } from 'react';
 import { Box, Dialog, IconButton, CircularProgress } from '@mui/material';
 import Close from '@mui/icons-material/Close';
 import Script from 'next/script';
+import { useRouter } from 'next/navigation';
 
 export interface CalendlyProps {
   eventTypeUrl: string;
@@ -30,6 +32,7 @@ export const CalendlyBooking = ({
   isOpen = false,
   onClose
 }: CalendlyProps) => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
   const initCalendly = useCallback(() => {
@@ -43,11 +46,13 @@ export const CalendlyBooking = ({
 
   useEffect(() => {
     if (isOpen) {
-      initCalendly();
+      // Minimal change: redirect to the contact page instead of opening Calendly
+      router.push('/contact');
+      setIsLoading(false);
     } else if (typeof window.Calendly !== 'undefined') {
       window.Calendly.closePopupWidget();
     }
-  }, [isOpen, initCalendly]);
+  }, [isOpen, router]);
 
   const handleClose = () => {
     if (typeof window.Calendly !== 'undefined') {
