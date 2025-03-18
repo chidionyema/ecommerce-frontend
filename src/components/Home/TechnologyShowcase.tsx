@@ -277,9 +277,7 @@ const TechnologyShowcase = () => {
 
           {/* Category filters */}
           <motion.div variants={ANIMATIONS.item}>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap", mb: 4 }}
-            >
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap", mb: 4 }}>
               {categories.map((category) => (
                 <CategoryButton
                   key={category}
@@ -310,14 +308,16 @@ const TechnologyShowcase = () => {
               elevation={2}
               sx={{
                 ...styles.ctaCard,
-                mt: 6,
+                mt: 5, // Reduced from 6
                 borderRadius: "16px",
-                background: `linear-gradient(145deg, ${alpha(
+                background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.95)}, ${alpha(
                   theme.palette.background.paper,
-                  0.95
-                )}, ${alpha(theme.palette.background.paper, 0.85)})`,
+                  0.85
+                )})`,
                 backdropFilter: "blur(8px)",
                 boxShadow: `0 8px 32px ${alpha("#000", 0.08)}`,
+                maxWidth: "900px", // Added max width constraint
+                mx: "auto" // Center the card
               }}
             >
               <Typography
@@ -327,50 +327,49 @@ const TechnologyShowcase = () => {
                 mb={1}
                 align="center"
                 color={theme.palette.primary.main}
-                sx={{ letterSpacing: "-0.01em", fontSize: "1.3rem" }}
+                sx={{ letterSpacing: "-0.01em", fontSize: "1.2rem" }} // Reduced font size
               >
                 Explore Our Technology Resources
               </Typography>
               <Typography
                 variant="body1"
                 color={theme.palette.text.secondary}
-                mb={4}
+                mb={3} // Reduced from 4
                 align="center"
-                sx={{ letterSpacing: "0.01em", maxWidth: "85%", mx: "auto", fontSize: "0.95rem" }}
+                sx={{ letterSpacing: "0.01em", maxWidth: "75%", mx: "auto", fontSize: "0.9rem" }} // Reduced width and font size
               >
                 Discover our full technology stack and access free learning resources.
               </Typography>
 
               {/* Two-column layout */}
-              <Grid container spacing={4}>
+              <Grid container spacing={3}> {/* Reduced spacing from 4 */}
                 {/* Left: Resources */}
                 <Grid
                   item
                   xs={12}
-                  md={7}
+                  md={6}
                   sx={{
                     borderRight: { xs: "none", md: `1px solid ${alpha(theme.palette.divider, 0.08)}` },
-                    pb: { xs: 3, md: 0 },
+                    pb: { xs: 2, md: 0 }, // Reduced padding
                   }}
                 >
                   <Typography
                     variant="h6"
                     sx={{
                       color: theme.palette.primary.main,
-                      mb: 2,
+                      mb: 1.5, // Reduced from 2
                       fontWeight: 600,
-                      fontSize: "1rem",
+                      fontSize: "0.95rem", // Reduced font size
                       letterSpacing: "0.01em",
                     }}
                   >
                     Free Enterprise Resources:
                   </Typography>
 
-                  <Grid container spacing={1.5}>
+                  <Grid container spacing={1}> {/* Reduced spacing from 1.5 */}
                     {RESOURCE_ITEMS.map((item, i) => (
                       <Grid item xs={12} sm={6} key={i}>
-                      <ElegantCheckmarkItem text={item} icon={FileText as React.ComponentType<{ size?: number }>} />
-
+                        <ElegantCheckmarkItem text={item} icon={FileText as React.ComponentType<{ size?: number }>} />
                       </Grid>
                     ))}
                   </Grid>
@@ -381,7 +380,7 @@ const TechnologyShowcase = () => {
                     startIcon={<Download size={14} />}
                     href="/resources"
                     sx={{
-                      mt: 2.5,
+                      mt: 2, // Reduced from 2.5
                       px: 2.5,
                       py: 0.8,
                       textTransform: "none",
@@ -405,24 +404,24 @@ const TechnologyShowcase = () => {
                 <Grid
                   item
                   xs={12}
-                  md={5}
+                  md={6}
                   sx={{
                     borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.08)}`, md: "none" },
-                    pt: { xs: 3, md: 0 },
+                    pt: { xs: 2, md: 0 }, // Reduced padding
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
                   }}
                 >
-                  <Box sx={{ textAlign: "center", maxWidth: "90%" }}>
+                  <Box sx={{ textAlign: "center", maxWidth: "85%" }}>
                     <Typography
                       variant="h6"
                       sx={{
                         color: purpleColor,
-                        mb: 1.5,
+                        mb: 1, // Reduced from 1.5
                         fontWeight: 600,
-                        fontSize: "1rem",
+                        fontSize: "0.95rem", // Reduced font size
                         letterSpacing: "0.01em",
                       }}
                     >
@@ -432,17 +431,16 @@ const TechnologyShowcase = () => {
                     <Typography
                       variant="body1"
                       sx={{
-                        mb: 3,
+                        mb: 2, // Reduced from 3
                         color: theme.palette.text.secondary,
-                        fontSize: "0.9rem",
+                        fontSize: "0.85rem", // Reduced font size
                         letterSpacing: "0.01em",
-                        lineHeight: 1.6,
+                        lineHeight: 1.5, // Reduced from 1.6
                       }}
                     >
                       See our complete technology stack that powers enterprise solutions across industries.
                     </Typography>
 
-                    {/* Purple Explore button */}
                     <Button
                       variant="contained"
                       endIcon={<ChevronRight size={14} />}

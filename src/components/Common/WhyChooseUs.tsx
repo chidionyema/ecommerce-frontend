@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   Box,
   Container,
@@ -69,14 +69,11 @@ const resources = [
   { title: "Case Study: Ecommerce Performance Tuning", icon: FileText }
 ];
 
-// Define props for the ElegantCheckmarkItem component
 interface ElegantCheckmarkItemProps {
   text: string;
-  // Allow the Icon prop to be any component that accepts a `size` prop of type number or string
   Icon?: React.ComponentType<{ size?: number | string }>;
 }
 
-// Refined elegant checkmark item component with explicit types
 const ElegantCheckmarkItem: React.FC<ElegantCheckmarkItemProps> = ({ text, Icon }) => {
   const theme = useTheme();
   return (
@@ -181,10 +178,7 @@ const WhyChooseUs: React.FC = () => {
                     accentColor={reason.color}
                     importance="primary"
                     sx={{
-                      background: `linear-gradient(145deg, ${alpha(
-                        "#1a56db",
-                        0.12
-                      )}, ${alpha("#1a56db", 0.05)})`,
+                      background: `linear-gradient(145deg, ${alpha("#1a56db", 0.12)}, ${alpha("#1a56db", 0.05)})`,
                       border: `1px solid ${alpha("#4285f4", 0.12)}`,
                       boxShadow: `0 4px 20px ${alpha("#000", 0.05)}`
                     }}
@@ -214,14 +208,16 @@ const WhyChooseUs: React.FC = () => {
               elevation={2}
               sx={{
                 ...styles.ctaCard,
-                mt: { xs: 6, md: 8 },
+                mt: { xs: 5, md: 6 }, // Reduced from 6,8 to 5,6
                 borderRadius: "16px",
-                background: `linear-gradient(145deg, ${alpha(
+                background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.95)}, ${alpha(
                   theme.palette.background.paper,
-                  0.95
-                )}, ${alpha(theme.palette.background.paper, 0.85)})`,
+                  0.85
+                )})`,
                 backdropFilter: "blur(8px)",
-                boxShadow: `0 8px 32px ${alpha("#000", 0.08)}`
+                boxShadow: `0 8px 32px ${alpha("#000", 0.08)}`,
+                maxWidth: "900px", // Added max width constraint
+                mx: "auto" // Center the card
               }}
             >
               <Typography
@@ -231,7 +227,7 @@ const WhyChooseUs: React.FC = () => {
                 mb={1}
                 align="center"
                 color={theme.palette.primary.main}
-                sx={{ letterSpacing: "-0.01em", fontSize: "1.3rem" }}
+                sx={{ letterSpacing: "-0.01em", fontSize: "1.2rem" }} // Reduced from 1.3rem
               >
                 Take the Next Step
               </Typography>
@@ -239,44 +235,39 @@ const WhyChooseUs: React.FC = () => {
               <Typography
                 variant="body1"
                 color={theme.palette.text.secondary}
-                mb={4}
+                mb={3} // Reduced from 4
                 align="center"
-                sx={{
-                  letterSpacing: "0.01em",
-                  maxWidth: "85%",
-                  mx: "auto",
-                  fontSize: "0.95rem"
-                }}
+                sx={{ letterSpacing: "0.01em", maxWidth: "75%", mx: "auto", fontSize: "0.9rem" }} // Reduced width and font size
               >
                 Explore our resources or schedule a consultation to discover how we can
                 help your business
               </Typography>
 
-              <Grid container spacing={4}>
+              <Grid container spacing={3}> {/* Reduced from spacing={4} */}
                 {/* Left side: Resources */}
                 <Grid
                   item
                   xs={12}
-                  md={7}
+                  md={4}
                   sx={{
                     borderRight: { xs: "none", md: `1px solid ${alpha(theme.palette.divider, 0.08)}` },
-                    pb: { xs: 3, md: 0 }
+                    pb: { xs: 2, md: 0 } // Reduced from 3
                   }}
                 >
                   <Typography
                     variant="h6"
                     sx={{
                       color: theme.palette.primary.main,
-                      mb: 2,
+                      mb: 1.5, // Reduced from 2
                       fontWeight: 600,
-                      fontSize: "1rem",
+                      fontSize: "0.95rem", // Reduced from 1rem
                       letterSpacing: "0.01em"
                     }}
                   >
                     Enterprise Resources Library
                   </Typography>
 
-                  <Grid container spacing={1.5}>
+                  <Grid container spacing={1}> {/* Reduced from 1.5 */}
                     {resources.map((resource, i) => (
                       <Grid item xs={12} sm={6} key={i}>
                         <ElegantCheckmarkItem text={resource.title} Icon={resource.icon} />
@@ -290,7 +281,7 @@ const WhyChooseUs: React.FC = () => {
                     startIcon={<Download size={14} />}
                     href="/resources"
                     sx={{
-                      mt: 2.5,
+                      mt: 2, // Reduced from 2.5
                       px: 2.5,
                       py: 0.8,
                       textTransform: "none",
@@ -314,24 +305,24 @@ const WhyChooseUs: React.FC = () => {
                 <Grid
                   item
                   xs={12}
-                  md={5}
+                  md={8}
                   sx={{
                     borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.08)}`, md: "none" },
-                    pt: { xs: 3, md: 0 },
+                    pt: { xs: 2, md: 0 }, // Reduced from 3
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center"
                   }}
                 >
-                  <Box sx={{ textAlign: "center", maxWidth: "90%" }}>
+                  <Box sx={{ textAlign: "center", maxWidth: "85%" }}> {/* Reduced from 90% */}
                     <Typography
                       variant="h6"
                       sx={{
                         color: purpleColor,
-                        mb: 1.5,
+                        mb: 1, // Reduced from 1.5
                         fontWeight: 600,
-                        fontSize: "1rem",
+                        fontSize: "0.95rem", // Reduced from 1rem
                         letterSpacing: "0.01em"
                       }}
                     >
@@ -341,11 +332,11 @@ const WhyChooseUs: React.FC = () => {
                     <Typography
                       variant="body1"
                       sx={{
-                        mb: 3,
+                        mb: 2, // Reduced from 3
                         color: theme.palette.text.secondary,
-                        fontSize: "0.9rem",
+                        fontSize: "0.85rem", // Reduced from 0.9rem
                         letterSpacing: "0.01em",
-                        lineHeight: 1.6
+                        lineHeight: 1.5 // Reduced from 1.6
                       }}
                     >
                       Book a no-obligation consultation with our enterprise experts and
@@ -384,7 +375,6 @@ const WhyChooseUs: React.FC = () => {
         </motion.div>
       </Container>
 
-      {/* Calendly Integration */}
       <CalendlyBooking
         eventTypeUrl="https://calendly.com/glustack/consultation"
         prefill={{ name: "", email: "" }}

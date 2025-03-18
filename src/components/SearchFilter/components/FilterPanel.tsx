@@ -76,12 +76,14 @@ export function FilterPanel({
   
   // Handle checkbox and radio changes
   const handleCheckboxChange = (group: FilterGroup, option: FilterOption) => {
-    handleFilterChange(group.id, option.id, !isOptionSelected(group.id, option.id), 'multi');
+    // Fix: Using the group.type directly, which should match FilterType
+    handleFilterChange(group.id, option.id, !isOptionSelected(group.id, option.id), group.type);
   };
   
   const handleRadioChange = (group: FilterGroup, value: string) => {
     const isAlreadySelected = pendingFilters[group.id] === value;
-    handleFilterChange(group.id, value, !isAlreadySelected, 'single');
+    // Fix: Using the group.type directly, which should match FilterType
+    handleFilterChange(group.id, value, !isAlreadySelected, group.type);
   };
   
   // Calculate selected counts

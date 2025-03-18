@@ -65,7 +65,7 @@ const allFeatures: Record<string, Feature[]> = {
   ]
 };
 
-// Components
+// Components with cleaner implementation
 const FeatureCheck = ({ color = 'primary', size = 'medium' }: { color?: 'primary' | 'success', size?: 'small' | 'medium' }) => {
   const theme = useTheme();
   const dims = size === 'small' ? 18 : 22;
@@ -164,7 +164,7 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
             : theme.palette.text.primary, display: 'inline-flex', alignItems: 'baseline', gap: 1 }}>
             {billingCycle === 'annual' && plan.annualPrice ? plan.annualPrice : plan.price}
             
-            {billingCycle === 'annual' && plan.annualPrice && (
+            {billingCycle === 'annual' && plan.annualPrice && savingsPercent > 0 && (
               <Typography component="span" variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem', 
                 bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main,
                 px: 1, py: 0.5, borderRadius: 1.5 }}>SAVE {savingsPercent}%</Typography>
@@ -213,7 +213,8 @@ const SectionHeading = ({ label, title, description }: { label?: string, title: 
 
 const StatsCard = ({ stats, theme }: { stats: Array<{ value: string, label: string, icon: React.ReactNode }>, theme: Theme }) => (
   <Paper elevation={0} sx={{ backdropFilter: 'blur(10px)', bgcolor: alpha('#fff', 0.08),
-    borderRadius: 4, border: `1px solid ${alpha('#fff', 0.2)}`, p: 4, width: '100%' }}>
+    borderRadius: 4, border: `1px solid ${alpha('#fff', 0.2)}`, p: 4, width: '100%',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
     <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3.5 }}>
       <Box sx={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', 
         justifyContent: 'center', bgcolor: alpha('#fff', 0.15) }}>
@@ -247,7 +248,8 @@ const CTAButtons = ({ primary, secondary, darkMode = false }:
     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
       <Button component={NextLink} href={primary.href} size="large" variant="contained" 
         sx={{ bgcolor: darkMode ? '#fff' : undefined, color: darkMode ? theme.palette.primary.dark : undefined, 
-          textTransform: 'none', fontWeight: 700, py: 1.75, px: 4, borderRadius: 3 }}>
+          textTransform: 'none', fontWeight: 700, py: 1.75, px: 4, borderRadius: 3,
+          boxShadow: '0 8px 20px rgba(0,0,0,0.15)' }}>
         {primary.text}
       </Button>
       <Button variant="outlined" component={NextLink} href={secondary.href} size="large" 
@@ -284,6 +286,13 @@ export default function PricingPage() {
     { value: '4.9', label: 'TrustPilot rating', icon: <ShieldRounded fontSize="small" /> },
     { value: '24/7', label: 'Customer support', icon: <SupportRounded fontSize="small" /> }
   ];
+
+  // Filter plans for current tab
+  const getTabPlans = () => {
+    if (activeTab === 0) return plans.filter(p => ['consultation', 'project'].includes(p.type));
+    if (activeTab === 1) return plans.filter(p => ['project', 'enterprise'].includes(p.type));
+    return plans.filter(p => p.type === 'enterprise' || p.recommended);
+  };
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', overflow: 'hidden', pb: 10 }}>
@@ -361,7 +370,7 @@ export default function PricingPage() {
 
             {/* Plan cards */}
             <Grid container spacing={4} justifyContent="center">
-              {plans.map((plan, index) => {
+              {getTabPlans().map((plan, index) => {
                 const isRecommended = (activeTab === 0 && plan.type === 'consultation') ||
                                      (activeTab === 1 && plan.type === 'project') ||
                                      (activeTab === 2 && plan.type === 'enterprise') ||
