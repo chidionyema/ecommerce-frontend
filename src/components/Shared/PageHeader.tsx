@@ -1,16 +1,81 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NextLink from 'next/link';
 import Image from 'next/image';
 import {
-  Box, Typography, Button, Container, useTheme, SxProps, Theme,
+  Box, Typography, Button, Container, useTheme, 
   alpha, useMediaQuery, Paper
 } from '@mui/material';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
+// Moved animations to a separate object
+const ANIMATIONS = {
+  fadeIn: (delay = 0, distance = 5) => ({
+    initial: { opacity: 0, y: distance },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.72,
+        delay: delay + 0.05,
+        ease: [0.165, 0.015, 0.12, 0.995]
+      }
+    }
+  }),
+  stagger: {
+    container: {
+      initial: {},
+      animate: {
+        transition: {
+          staggerChildren: 0.055,
+          delayChildren: 0.25,
+        }
+      }
+    },
+    item: {
+      initial: { opacity: 0, y: 8, scale: 0.98 },
+      animate: {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        transition: {
+          type: "spring",
+          stiffness: 100,
+          damping: 14,
+        }
+      }
+    }
+  },
+  appearWithBlur: {
+    initial: { opacity: 0, filter: "blur(12px)" },
+    animate: { 
+      opacity: 1, 
+      filter: "blur(0px)",
+      transition: { duration: 0.8, ease: [0.165, 0.015, 0.12, 0.995] }
+    }
+  }
+};
+
+// Overlay settings as a separate object
+const OVERLAY_SETTINGS = {
+  light: { gradient: [0.62, 0.52, 0.68], opacity: 0.92 },
+  medium: { gradient: [0.78, 0.65, 0.82], opacity: 0.95 },
+  strong: { gradient: [0.88, 0.75, 0.92], opacity: 0.97 },
+  premium: { gradient: [0.92, 0.82, 0.95], opacity: 0.98 }
+};
+
+// Density factors as a separate object
+const DENSITY_FACTORS = {
+  spacing: { compact: 0.8, comfortable: 1, spacious: 1.2 },
+  typography: { compact: 0.95, comfortable: 1, spacious: 1.05 }
+};
+
 // Types with precise documentation
+/**
+ * CTA Props Interface
+ */
 interface CTAProps {
   text: string;
   link: string;
@@ -19,11 +84,14 @@ interface CTAProps {
   secondary?: boolean;
 }
 
+/**
+ * PageHeader Props Interface
+ */
 interface PageHeaderProps {
   title: string;
   subtitle?: string;
   backgroundImage?: string;
-  sx?: SxProps<Theme>;
+  sx?: any;
   primaryCta?: CTAProps;
   secondaryCta?: CTAProps;
   children?: React.ReactNode;
@@ -38,8 +106,7 @@ interface PageHeaderProps {
 }
 
 /**
- * Ultimate PageHeader - Creates an exquisitely crafted visual experience
- * with unparalleled attention to detail and responsive nuance.
+ * PageHeader Component - Creates a visual header with customizable options
  */
 const PageHeader: React.FC<PageHeaderProps> = ({
   title,
@@ -60,63 +127,39 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
   
-  // Enhanced parallax effects with spring physics
+  // Simplified parallax effects
   const { scrollY } = useScroll({ target: headerRef });
-  const parallaxFactor = useMemo(() => isMobile ? 0.5 : 1, [isMobile]);
+  const parallaxFactor = isMobile ? 0.5 : 1;
+  const backgroundY = useTransform(scrollY, [0, 500], [0, 120 * parallaxFactor]);
+  const backgroundScale = useTransform(scrollY, [0, 400], [1, 1.12]);
+  const contentY = useTransform(scrollY, [0, 300], [0, -40 * parallaxFactor]);
+  const contentOpacity = useTransform(scrollY, [0, 250], [1, 0.78]);
   
-  const rawBackgroundY = useTransform(scrollY, [0, 500], [0, 120 * parallaxFactor]);
-  const rawBackgroundScale = useTransform(scrollY, [0, 400], [1, 1.12]);
-  const rawContentY = useTransform(scrollY, [0, 300], [0, -40 * parallaxFactor]);
-  const rawContentOpacity = useTransform(scrollY, [0, 250], [1, 0.78]);
+  // Get density factors for current visual density
+  const densityFactor = {
+    spacing: DENSITY_FACTORS.spacing[visualDensity],
+    typography: DENSITY_FACTORS.typography[visualDensity]
+  };
   
-  // Apply spring physics to create more organic movement
-  const backgroundY = useSpring(rawBackgroundY, { mass: 0.8, stiffness: 30, damping: 20 });
-  const backgroundScale = useSpring(rawBackgroundScale, { mass: 1, stiffness: 40, damping: 25 });
-  const contentY = useSpring(rawContentY, { mass: 0.6, stiffness: 50, damping: 20 });
-  const contentOpacity = useSpring(rawContentOpacity, { stiffness: 60, damping: 20 });
-  
-  // Nuanced overlay opacity based on strength
-  const overlaySettings = useMemo(() => {
-    const baseSettings = {
-      light: { gradient: [0.62, 0.52, 0.68], opacity: 0.92 },
-      medium: { gradient: [0.78, 0.65, 0.82], opacity: 0.95 },
-      strong: { gradient: [0.88, 0.75, 0.92], opacity: 0.97 },
-      premium: { gradient: [0.92, 0.82, 0.95], opacity: 0.98 }
-    };
-    return baseSettings[overlayStrength];
-  }, [overlayStrength]);
-  
-  // Visual density scaling factors
-  const densityFactors = useMemo(() => {
-    const base = {
-      spacing: { compact: 0.8, comfortable: 1, spacious: 1.2 },
-      typography: { compact: 0.95, comfortable: 1, spacious: 1.05 }
-    };
-    return {
-      spacing: base.spacing[visualDensity],
-      typography: base.typography[visualDensity]
-    };
-  }, [visualDensity]);
-  
-  // Handle intersection observation for enhanced entry animations
+  // Get overlay settings for current strength
+  const overlayConfig = OVERLAY_SETTINGS[overlayStrength];
+
+  // Handle intersection observation for animations
   useEffect(() => {
     if (!headerRef.current) return;
-    
     const observer = new IntersectionObserver(
       ([entry]) => setIsInView(entry.isIntersecting),
       { threshold: 0.2 }
     );
-    
     observer.observe(headerRef.current);
     return () => observer.disconnect();
   }, []);
   
-  // Optimized image loading with priority handling
+  // Handle image loading
   useEffect(() => {
     if (!backgroundImage) {
       setImageLoaded(true);
@@ -130,54 +173,44 @@ const PageHeader: React.FC<PageHeaderProps> = ({
     return () => { img.onload = null; };
   }, [backgroundImage]);
 
-  // Animation variants
-  const ANIM = {
-    fadeIn: (delay = 0, distance = 5) => ({
-      initial: { opacity: 0, y: distance },
-      animate: {
-        opacity: 1,
-        y: 0,
-        transition: {
-          duration: 0.72,
-          delay: delay + 0.05,
-          ease: [0.165, 0.015, 0.12, 0.995]
-        }
-      }
-    }),
-    stagger: {
-      container: {
-        initial: {},
-        animate: {
-          transition: {
-            staggerChildren: 0.055,
-            delayChildren: 0.25,
-            staggerDirection: 1
-          }
-        }
-      },
-      item: {
-        initial: { opacity: 0, y: 8, scale: 0.98 },
-        animate: {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          transition: {
-            type: "spring",
-            stiffness: 100,
-            damping: 14,
-            mass: 0.8
-          }
-        }
-      }
-    },
-    appearWithBlur: {
-      initial: { opacity: 0, filter: "blur(12px)" },
-      animate: { 
-        opacity: 1, 
-        filter: "blur(0px)",
-        transition: { duration: 0.8, ease: [0.165, 0.015, 0.12, 0.995] }
-      }
+  // Render title with optional accent
+  const renderTitle = () => {
+    if (accentText) {
+      const parts = title.split(accentText);
+      return (
+        <>
+          {parts[0]}
+          <Box 
+            component="span" 
+            sx={{
+              background: `linear-gradient(135deg, 
+                ${theme.palette.secondary.light}, 
+                ${theme.palette.secondary.main})`,
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              color: 'transparent',
+              WebkitTextFillColor: 'transparent',
+              display: 'inline-block',
+              fontWeight: 800,
+            }}
+          >
+            {accentText}
+          </Box>
+          {parts[1]}
+        </>
+      );
     }
+    return title;
+  };
+
+  // Get box shadow based on appearance
+  const getBoxShadow = () => {
+    if (appearance === 'elevated') {
+      return `0 16px 50px -12px ${alpha(theme.palette.common.black, 0.3)}, 0 0 1px ${alpha(theme.palette.common.black, 0.4)}`;
+    } else if (appearance === 'minimal') {
+      return 'none';
+    }
+    return `0 8px 32px ${alpha(theme.palette.common.black, 0.18)}`;
   };
 
   return (
@@ -189,22 +222,19 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       sx={{
         position: 'relative',
         minHeight: { 
-          xs: `${380 * densityFactors.spacing}px`, 
-          sm: `${420 * densityFactors.spacing}px`, 
-          md: `${480 * densityFactors.spacing}px` 
+          xs: `${380 * densityFactor.spacing}px`, 
+          sm: `${420 * densityFactor.spacing}px`, 
+          md: `${480 * densityFactor.spacing}px` 
         },
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        pt: { xs: 8 * densityFactors.spacing, md: 10 * densityFactors.spacing },
-        pb: { xs: 8 * densityFactors.spacing, md: 10 * densityFactors.spacing },
+        pt: { xs: 8 * densityFactor.spacing, md: 10 * densityFactor.spacing },
+        pb: { xs: 8 * densityFactor.spacing, md: 10 * densityFactor.spacing },
         overflow: 'hidden',
         backgroundColor: theme.palette.primary.dark,
         borderRadius: { xs: 0, sm: appearance === 'minimal' ? 0 : theme.shape.borderRadius * 1.5 },
-        boxShadow: appearance === 'elevated' 
-          ? `0 16px 50px -12px ${alpha(theme.palette.common.black, 0.3)}, 0 0 1px ${alpha(theme.palette.common.black, 0.4)}`
-          : appearance === 'minimal' ? 'none'
-          : `0 8px 32px ${alpha(theme.palette.common.black, 0.18)}`,
+        boxShadow: getBoxShadow(),
         mt: 0,
         mb: { xs: 4, sm: 5, md: 6 },
         mx: { xs: 0, sm: appearance === 'minimal' ? 0 : 3, md: appearance === 'minimal' ? 0 : 4 },
@@ -214,14 +244,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
     >
       {/* Background Image with Parallax */}
       {backgroundImage && (
-        <Box 
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 0,
-            overflow: 'hidden',
-          }}
-        >
+        <Box sx={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
           <Box
             component={motion.div}
             style={{
@@ -250,29 +273,15 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           </Box>
           
           {backgroundBlur && (
-            <Box sx={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 0,
-              backdropFilter: 'blur(8px)',
-            }} />
+            <Box sx={{ position: 'absolute', inset: 0, zIndex: 0, backdropFilter: 'blur(8px)' }} />
           )}
         </Box>
       )}
 
-      {/* Background pattern */}
+      {/* Background pattern - simplified */}
       {backgroundPattern && (
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 1,
-            pointerEvents: 'none',
-            overflow: 'hidden',
-            opacity: 0.35
-          }}
-        >
-          {/* Floating particles */}
+        <Box sx={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', overflow: 'hidden', opacity: 0.35 }}>
+          {/* Simplified floating particles */}
           {Array(isMobile ? 10 : 18).fill(null).map((_, index) => {
             const size = Math.random() * 4 + 2;
             const duration = Math.random() * 30 + 20;
@@ -336,54 +345,28 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         inset: 0,
         zIndex: 1,
         background: `radial-gradient(ellipse at center, 
-          ${alpha(theme.palette.primary.dark, overlaySettings.gradient[0])} 0%, 
-          ${alpha(theme.palette.primary.main, overlaySettings.gradient[1])} 65%, 
-          ${alpha(theme.palette.primary.dark, overlaySettings.gradient[2])} 100%)`,
-        opacity: overlaySettings.opacity,
+          ${alpha(theme.palette.primary.dark, overlayConfig.gradient[0])} 0%, 
+          ${alpha(theme.palette.primary.main, overlayConfig.gradient[1])} 65%, 
+          ${alpha(theme.palette.primary.dark, overlayConfig.gradient[2])} 100%)`,
+        opacity: overlayConfig.opacity,
         mixBlendMode: 'multiply',
         backdropFilter: backgroundBlur ? 'blur(4px)' : 'none',
       }} />
 
       {/* Content container */}
-      <Container 
-        maxWidth="lg" 
-        sx={{
-          position: 'relative',
-          zIndex: 3,
-          my: 4 * densityFactors.spacing,
-          width: '100%',
-        }}
-      >
-        <Box
-          component={motion.div}
-          style={{
-            y: contentY,
-            opacity: contentOpacity
-          }}
-        >
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 3, my: 4 * densityFactor.spacing, width: '100%' }}>
+        <Box component={motion.div} style={{ y: contentY, opacity: contentOpacity }}>
           {/* Headline */}
-          <Box
-            component={motion.div}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              transition: {
-                duration: 0.72,
-                delay: 0.05,
-                ease: [0.165, 0.015, 0.12, 0.995]
-              }
-            }}
-          >
+          <Box component={motion.div} variants={ANIMATIONS.fadeIn(0.05)} initial="initial" animate="animate">
             <Typography
               variant="h1"
               component="h1"
               id={`${id}-title`}
               sx={{
                 fontSize: { 
-                  xs: `${2.5 * densityFactors.typography}rem`, 
-                  sm: `${3 * densityFactors.typography}rem`, 
-                  md: `${3.75 * densityFactors.typography}rem` 
+                  xs: `${2.5 * densityFactor.typography}rem`, 
+                  sm: `${3 * densityFactor.typography}rem`, 
+                  md: `${3.75 * densityFactor.typography}rem` 
                 },
                 lineHeight: 1.08,
                 fontWeight: 800,
@@ -413,56 +396,20 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 }
               }}
             >
-              {accentText ? (
-                <>
-                  {title.split(accentText)[0]}
-                  <Box 
-                    component="span" 
-                    sx={{
-                      background: `linear-gradient(135deg, 
-                        ${theme.palette.secondary.light}, 
-                        ${theme.palette.secondary.main})`,
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      color: 'transparent',
-                      WebkitTextFillColor: 'transparent',
-                      display: 'inline-block',
-                      transform: 'translateZ(0)',
-                      fontWeight: 800,
-                    }}
-                  >
-                    {accentText}
-                  </Box>
-                  {title.split(accentText)[1]}
-                </>
-              ) : (
-                title
-              )}
+              {renderTitle()}
             </Typography>
           </Box>
 
           {/* Subheadline */}
           {subtitle && (
-            <Box
-              component={motion.div}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{
-                opacity: 1,
-                y: 0,
-                transition: {
-                  duration: 0.72,
-                  delay: 0.15,
-                  ease: [0.165, 0.015, 0.12, 0.995]
-                }
-              }}
-            >
+            <Box component={motion.div} variants={ANIMATIONS.fadeIn(0.15)} initial="initial" animate="animate">
               <Typography
                 variant="subtitle1"
                 sx={{
                   fontSize: { 
-                    xs: `${1.1 * densityFactors.typography}rem`, 
-                    sm: `${1.2 * densityFactors.typography}rem`, 
-                    md: `${1.3 * densityFactors.typography}rem` 
+                    xs: `${1.1 * densityFactor.typography}rem`, 
+                    sm: `${1.2 * densityFactor.typography}rem`, 
+                    md: `${1.3 * densityFactor.typography}rem` 
                   },
                   fontWeight: 400,
                   lineHeight: 1.55,
@@ -471,8 +418,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                   color: alpha('#ffffff', 0.9),
                   maxWidth: '800px',
                   mx: 'auto',
-                  mt: 3 * densityFactors.spacing,
-                  mb: 4 * densityFactors.spacing,
+                  mt: 3 * densityFactor.spacing,
+                  mb: 4 * densityFactor.spacing,
                   textShadow: appearance === 'glass' ? '0 1px 5px rgba(0,0,0,0.15)' : 'none',
                   '& strong': {
                     fontWeight: 600,
@@ -488,44 +435,37 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             </Box>
           )}
 
-          {/* Highlights */}
+          {/* Highlights - simplified rendering */}
           {highlights.length > 0 && (
             <Box
               component={motion.div}
               initial="initial"
               animate={isInView ? "animate" : "initial"}
-              variants={ANIM.stagger.container}
-              sx={{ width: '100%', mb: 5 * densityFactors.spacing }}
+              variants={ANIMATIONS.stagger.container}
+              sx={{ width: '100%', mb: 5 * densityFactor.spacing }}
             >
               <Box sx={{ maxWidth: '900px', mx: 'auto', mb: 4 }}>
                 <Box
                   sx={{
                     display: 'flex',
                     flexDirection: { xs: 'column', sm: highlights.length > 2 ? 'column' : 'row', md: 'row' },
-                    gap: 2 * densityFactors.spacing,
+                    gap: 2 * densityFactor.spacing,
                     justifyContent: 'center',
-                    mt: 4 * densityFactors.spacing,
+                    mt: 4 * densityFactor.spacing,
                   }}
                 >
                   {highlights.map((highlight, index) => (
-                    <Box 
-                      key={index} 
-                      component={motion.div} 
-                      variants={ANIM.stagger.item} 
-                      sx={{ flex: 1 }}
-                    >
+                    <Box key={index} component={motion.div} variants={ANIMATIONS.stagger.item} sx={{ flex: 1 }}>
                       <Paper 
                         elevation={0} 
                         sx={{
-                          p: 2.5 * densityFactors.spacing,
+                          p: 2.5 * densityFactor.spacing,
                           height: '100%',
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          background: appearance === 'glass' 
-                            ? alpha('#1a56db', 0.1)
-                            : alpha('#1a56db', 0.13),
+                          background: alpha('#1a56db', appearance === 'glass' ? 0.1 : 0.13),
                           border: `1px solid ${alpha('#4285f4', appearance === 'glass' ? 0.2 : 0.25)}`,
                           borderRadius: 12,
                           backdropFilter: 'blur(12px)',
@@ -536,26 +476,14 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                             background: alpha('#1a56db', appearance === 'glass' ? 0.14 : 0.17),
                             boxShadow: `0 18px 36px ${alpha('#000', 0.18)}`,
                             border: `1px solid ${alpha('#4285f4', 0.38)}`
-                          },
-                          '&:after': appearance === 'glass' ? {
-                            content: '""',
-                            position: 'absolute',
-                            inset: 0,
-                            borderRadius: 'inherit',
-                            padding: 1,
-                            background: `linear-gradient(135deg, ${alpha('#fff', 0.25)}, ${alpha('#fff', 0.05)})`,
-                            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                            WebkitMaskComposite: 'xor',
-                            maskComposite: 'exclude',
-                            pointerEvents: 'none',
-                          } : {}
+                          }
                         }}
                       >
                         <Typography
                           color="white"
                           sx={{
                             fontWeight: 600,
-                            fontSize: `${1 * densityFactors.typography}rem`,
+                            fontSize: `${1 * densityFactor.typography}rem`,
                             textAlign: 'center',
                             textShadow: appearance === 'glass' ? '0 1px 3px rgba(0,0,0,0.2)' : 'none',
                           }}
@@ -570,27 +498,15 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             </Box>
           )}
 
-          {/* CTA Buttons */}
-          <Box
-            component={motion.div}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              transition: {
-                duration: 0.72,
-                delay: 0.2,
-                ease: [0.165, 0.015, 0.12, 0.995]
-              }
-            }}
-          >
+          {/* CTA Buttons - simplified styling */}
+          <Box component={motion.div} variants={ANIMATIONS.fadeIn(0.2)} initial="initial" animate="animate">
             <Box
               sx={{
                 display: 'flex',
                 flexDirection: { xs: 'column', sm: 'row' },
-                gap: { xs: 2 * densityFactors.spacing, sm: 3 * densityFactors.spacing },
+                gap: { xs: 2 * densityFactor.spacing, sm: 3 * densityFactor.spacing },
                 justifyContent: 'center',
-                mt: 2 * densityFactors.spacing,
+                mt: 2 * densityFactor.spacing,
                 alignItems: 'center',
               }}
             >
@@ -606,38 +522,16 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                   fontSize: '0.95rem',
                   textTransform: 'none',
                   transition: 'all 0.32s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
-                  position: 'relative',
-                  letterSpacing: '0.01em',
-                  lineHeight: 1.2,
-                  px: 4.5 * densityFactors.spacing,
-                  py: 1.75 * densityFactors.spacing,
+                  px: 4.5 * densityFactor.spacing,
+                  py: 1.75 * densityFactor.spacing,
                   background: `linear-gradient(135deg, 
                     ${theme.palette.secondary.main}, 
                     ${alpha(theme.palette.secondary.dark, 0.92)})`,
                   color: '#fff',
-                  boxShadow: `0 12px 20px ${alpha(theme.palette.secondary.main, 0.3)}, 0 2px 4px ${alpha(theme.palette.secondary.dark, 0.2)}`,
-                  '&:before': {
-                    content: '""',
-                    position: 'absolute',
-                    inset: 0,
-                    borderRadius: 'inherit',
-                    padding: 1,
-                    background: `linear-gradient(135deg, ${alpha('#fff', 0.15)}, ${alpha('#fff', 0.05)})`,
-                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                    WebkitMaskComposite: 'xor',
-                    maskComposite: 'exclude',
-                    pointerEvents: 'none',
-                  },
+                  boxShadow: `0 12px 20px ${alpha(theme.palette.secondary.main, 0.3)}`,
                   '&:hover': {
                     transform: 'translateY(-2px) scale(1.02)',
-                    boxShadow: `0 16px 28px ${alpha(theme.palette.secondary.main, 0.4)}, 0 4px 8px ${alpha(theme.palette.secondary.dark, 0.2)}`,
-                    background: `linear-gradient(135deg, 
-                      ${theme.palette.secondary.main}, 
-                      ${alpha(theme.palette.secondary.dark, 0.88)})`,
-                  },
-                  '&:active': {
-                    transform: 'translateY(-1px) scale(1.01)',
-                    boxShadow: `0 10px 14px ${alpha(theme.palette.secondary.main, 0.36)}, 0 2px 3px ${alpha(theme.palette.secondary.dark, 0.2)}`,
+                    boxShadow: `0 16px 28px ${alpha(theme.palette.secondary.main, 0.4)}`,
                   }
                 }}
               >
@@ -657,11 +551,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                     fontSize: '0.95rem',
                     textTransform: 'none',
                     transition: 'all 0.32s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
-                    position: 'relative',
-                    letterSpacing: '0.01em',
-                    lineHeight: 1.2,
-                    px: 3.5 * densityFactors.spacing,
-                    py: 1.65 * densityFactors.spacing,
+                    px: 3.5 * densityFactor.spacing,
+                    py: 1.65 * densityFactor.spacing,
                     borderWidth: 1.5,
                     borderColor: alpha('#fff', 0.85),
                     color: '#fff',
@@ -671,12 +562,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                       borderColor: '#fff',
                       backgroundColor: alpha('#fff', 0.08),
                       transform: 'translateY(-2px) scale(1.02)',
-                      boxShadow: `0 8px 16px ${alpha('#000', 0.25)}`,
-                    },
-                    '&:active': {
-                      transform: 'translateY(-1px) scale(1.01)',
-                      backgroundColor: alpha('#fff', 0.05),
-                      boxShadow: `0 4px 8px ${alpha('#000', 0.2)}`,
                     }
                   }}
                 >
@@ -691,17 +576,14 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       {/* Child components */}
       {children && (
         <Box sx={{ position: 'relative', zIndex: 5, width: '100%' }}>
-          <AnimatePresence>
-            <Box
-              component={motion.div}
-              variants={ANIM.appearWithBlur}
-              initial="initial"
-              animate={isInView ? "animate" : "initial"}
-              transition={{ delay: 0.3 }}
-            >
-              {children}
-            </Box>
-          </AnimatePresence>
+          <Box
+            component={motion.div}
+            variants={ANIMATIONS.appearWithBlur}
+            initial="initial"
+            animate={isInView ? "animate" : "initial"}
+          >
+            {children}
+          </Box>
         </Box>
       )}
     </Box>

@@ -167,6 +167,7 @@ interface ResourceCardProps {
   resource: Resource;
 }
 
+// Modified ResourceCard component with header banner and improved content visibility
 const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
   const theme = useTheme();
   const [saved, setSaved] = useState(false);
@@ -206,16 +207,16 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
         flexDirection: "column",
         borderRadius: 2,
         boxShadow: `0 4px 16px ${alpha(color.bg, 0.08)}, 0 1px 4px ${alpha(color.bg, 0.05)}`,
-        height: 420,
+        height: 480, // Adjusted height to accommodate fixed button positioning
         position: "relative",
         overflow: "hidden",
         border: `1px solid ${alpha(color.border, 0.7)}`,
         transition: "all 0.3s ease",
         "&:hover": { borderColor: color.border },
-        "&:before": {
+        "&:after": {
           content: '""',
           position: "absolute",
-          top: 0,
+          bottom: 0,
           left: 0,
           right: 0,
           height: 4,
@@ -223,6 +224,101 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
         }
       }}
     >
+      {/* Header Banner - Fixed height with refined design */}
+      <Box
+        sx={{
+          position: "relative",
+          height: 80, // Fixed header banner height 
+          minHeight: 80, // Ensuring minimum height is also fixed
+          maxHeight: 80, // Ensuring maximum height is also fixed
+          background: `linear-gradient(145deg, ${color.bg}, ${color.hover})`,
+          display: "flex",
+          alignItems: "flex-end",
+          p: 2.5,
+          pb: 1.5,
+          overflow: "hidden", // Prevent content from expanding the box
+          "&:before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "100%",
+            background: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+            opacity: 0.3,
+            zIndex: 1
+          }
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            color: "#fff",
+            fontWeight: 700,
+            textShadow: "0 1px 3px rgba(0,0,0,0.2)",
+            fontSize: "1.1rem",
+            letterSpacing: "-0.01em",
+            zIndex: 2,
+            maxWidth: "80%",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            paddingBottom: "68px", // Making room for the fixed button container,
+            "&:after": {
+              content: '""',
+              position: "absolute",
+              bottom: -8,
+              left: 0,
+              width: 40,
+              height: 3,
+              backgroundColor: "rgba(255,255,255,0.6)",
+              borderRadius: 1.5
+            }
+          }}
+        >
+          {enhancedResource.title}
+        </Typography>
+        
+        {/* Decorative elements for banner */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            opacity: 0.2,
+            background: `radial-gradient(circle at 70% 30%, ${alpha("#fff", 0.6)}, transparent 50%)`,
+            zIndex: 1
+          }}
+        />
+        
+        {/* Save Button repositioned to header */}
+        <IconButton
+          component={motion.div}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          size="small"
+          onClick={() => setSaved(!saved)}
+          sx={{
+            position: "absolute",
+            right: 10,
+            top: 10,
+            color: saved ? "#fff" : alpha("#fff", 0.8),
+            p: 0.75,
+            "&:hover": { background: alpha("#fff", 0.1) }
+          }}
+        >
+          {saved ? (
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 15 }}>
+              <Bookmark fontSize="small" />
+            </motion.div>
+          ) : (
+            <BookmarkBorder fontSize="small" />
+          )}
+        </IconButton>
+      </Box>
+
       {enhancedResource.premium && (
         <Box
           component={motion.div}
@@ -231,7 +327,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
           sx={{
             position: "absolute",
             top: 14,
-            right: 14,
+            left: 14,
             zIndex: 2,
             display: "flex",
             alignItems: "center",
@@ -272,51 +368,20 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
         >
           {getTypeIcon(enhancedResource.type, { fontSize: "large" })}
         </Box>
-        <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", mr: enhancedResource.premium ? 6 : 0 }}>
+        <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.5 }}>
             <Typography
-              variant="subtitle1"
+              variant="subtitle2"
               sx={{
-                fontSize: "1.05rem",
-                fontWeight: 700,
                 lineHeight: 1.35,
-                height: 44,
-                overflow: "hidden",
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                color: theme.palette.text.primary,
+                color: theme.palette.text.secondary,
                 transition: "color 0.2s ease",
-                "&:hover": { color: color.bg },
                 letterSpacing: "-0.01em",
                 flex: 1,
-                mt: 0.2
               }}
             >
-              {enhancedResource.title}
+              {enhancedResource.type.charAt(0).toUpperCase() + enhancedResource.type.slice(1)}
             </Typography>
-            <IconButton
-              component={motion.div}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              size="small"
-              onClick={() => setSaved(!saved)}
-              sx={{
-                color: saved ? color.bg : cp.neutral[400],
-                p: 0.75,
-                ml: 1,
-                mt: -0.25,
-                "&:hover": { background: saved ? alpha(color.bg, 0.1) : alpha(cp.neutral[400], 0.1) }
-              }}
-            >
-              {saved ? (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 15 }}>
-                  <Bookmark fontSize="small" />
-                </motion.div>
-              ) : (
-                <BookmarkBorder fontSize="small" />
-              )}
-            </IconButton>
           </Box>
           <Box sx={{ display: "flex", gap: 1.5, height: 24, mt: 0.25 }}>
             {enhancedResource.readTime && (
@@ -383,20 +448,21 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
         </Box>
       )}
       <Divider sx={{ mx: 2.5, opacity: 0.8, background: alpha(color.border, 0.4) }} />
-      <Box sx={{ p: 2.5, pt: 2, flexGrow: 1, display: "flex", flexDirection: "column" }}>
+      <Box sx={{ p: 2.5, pt: 2, flexGrow: 1, display: "flex", flexDirection: "column", position: "relative" }}>
         <Typography
           variant="body2"
           sx={{
-            color: alpha(theme.palette.text.primary, 0.9),
-            lineHeight: 1.65,
-            mb: 2,
-            minHeight: 74,
+            color: alpha(theme.palette.text.primary, 1), // Increased opacity for better contrast
+            lineHeight: 1.7, // Increased line height for better readability
+            mb: 2.5, // More space below the description
+            minHeight: 90,
             overflow: "hidden",
             display: "-webkit-box",
             WebkitLineClamp: 3,
             WebkitBoxOrient: "vertical",
-            fontSize: "0.875rem",
-            letterSpacing: "0.01em"
+            fontSize: "0.9rem", // Slightly larger font
+            letterSpacing: "0.01em",
+            fontWeight: 400 // Ensuring normal font weight for readability
           }}
         >
           {enhancedResource.description}
@@ -508,52 +574,65 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
             </Box>
           )}
         </Box>
-        <Button
-          component={motion.div}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          variant="contained"
-          fullWidth
-          endIcon={
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                transition: "transform 0.2s ease",
-                transform: isHovered ? "translateX(2px)" : "translateX(0)"
-              }}
-            >
-              {enhancedResource.premium ? <Lock /> : <ArrowForward />}
-            </Box>
-          }
-          sx={{
-            mt: "auto",
-            fontWeight: 600,
-            textTransform: "none",
-            borderRadius: "10px",
-            height: 42,
-            background: `linear-gradient(135deg, ${color.bg}, ${color.hover})`,
-            "&:hover": {
-              background: `linear-gradient(135deg, ${color.hover}, ${color.bg})`,
-              boxShadow: `0 4px 12px ${alpha(color.bg, 0.4)}`
-            },
-            color: "#fff",
-            fontSize: "0.875rem",
-            letterSpacing: "0.02em",
-            boxShadow: `0 4px 10px ${alpha(color.bg, 0.25)}`
+        
+        {/* Fixed button container with absolute positioning */}
+        <Box 
+          sx={{ 
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: 2.5,
+            paddingTop: 1.5,
+            background: theme.palette.background.paper,
+            borderTop: `1px solid ${alpha(color.border, 0.1)}`,
           }}
         >
-          {enhancedResource.premium
-            ? "Unlock Premium"
-            : enhancedResource.downloadable
-            ? "Download"
-            : "Read Now"}
-        </Button>
+          <Button
+            component={motion.div}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            variant="contained"
+            fullWidth
+            endIcon={
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  transition: "transform 0.2s ease",
+                  transform: isHovered ? "translateX(2px)" : "translateX(0)"
+                }}
+              >
+                {enhancedResource.premium ? <Lock /> : <ArrowForward />}
+              </Box>
+            }
+            sx={{
+              fontWeight: 600,
+              textTransform: "none",
+              borderRadius: "10px",
+              height: 42,
+              background: `linear-gradient(135deg, ${color.bg}, ${color.hover})`,
+              "&:hover": {
+                background: `linear-gradient(135deg, ${color.hover}, ${color.bg})`,
+                boxShadow: `0 4px 12px ${alpha(color.bg, 0.4)}`
+              },
+              color: "#fff",
+              fontSize: "0.875rem",
+              letterSpacing: "0.02em",
+              boxShadow: `0 4px 10px ${alpha(color.bg, 0.25)}`
+            }}
+          >
+            {enhancedResource.premium
+              ? "Unlock Premium"
+              : enhancedResource.downloadable
+              ? "Download"
+              : "Read Now"}
+          </Button>
+        </Box>
       </Box>
     </Card>
   );
 };
-
 interface Field {
   xs: number;
   md?: number;

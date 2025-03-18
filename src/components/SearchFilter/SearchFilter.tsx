@@ -27,6 +27,9 @@ import {
   SortDirection
 } from './types';
 
+// Define FilterSelectionType to match what useFilters expects
+type FilterSelectionType = 'multi' | 'single' | 'range' | 'advanced' | 'text';
+
 export default function SearchFilter({
   // Core functionality props
   onSearch,
@@ -243,6 +246,18 @@ export default function SearchFilter({
     setSavedSearches(getSavedSearches());
   };
   
+  // Helper function to convert FilterType to FilterSelectionType
+  const convertFilterType = (type: FilterType): FilterSelectionType => {
+    switch(type) {
+      case 'checkbox': return 'multi';
+      case 'radio': return 'single';
+      case 'select': return 'single';
+      case 'range': return 'range';
+      case 'text': return 'text';
+      default: return 'single';
+    }
+  };
+  
   // Filter change with live filtering support
   const handleFilterChangeWithLive = useCallback((
     group: string,
@@ -250,7 +265,9 @@ export default function SearchFilter({
     value: any,
     type: FilterType
   ) => {
-    handleFilterChange(group, filter, value, type);
+    // Convert the FilterType to FilterSelectionType
+    const selectionType = convertFilterType(type);
+    handleFilterChange(group, filter, value, selectionType);
     
     if (liveFiltering) {
       // We need to delay this slightly to allow the state to update
