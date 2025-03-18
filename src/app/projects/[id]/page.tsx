@@ -14,15 +14,15 @@ import {
   Timeline, EmojiEvents, School
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cvProjects } from '@/data/cvProjects';
-import ConsistentPageLayout from '@/components/Shared/ConsistentPageLayout';
-import QuickFacts from '@/components/Project/QuickFacts';
-import { LessonsLearned } from '@/components/Project/LessonsLearned';
-import { ChallengeSection } from '@/components/Project/ChallengeSection';
-import { ApproachTimeline } from '@/components/Project/ApproachTimeline';
-import { MetricTilesContainer } from '@/components/Project/MetricsSection';
-import { AchievementsList } from '@/components/Project/AchievementsList';
-import { GlassCard } from '@/components/Theme/GlassCard';
+import { cvProjects } from '../../../data/cvProjects';
+import ConsistentPageLayout from '../../../components/Shared/ConsistentPageLayout';
+import QuickFacts from '../../../components/Project/QuickFacts';
+import { LessonsLearned } from '../../../components/Project/LessonsLearned';
+import { ChallengeSection } from '../../../components/Project/ChallengeSection';
+import { ApproachTimeline } from '../../../components/Project/ApproachTimeline';
+import { AchievementsList } from '../../../components/Project/AchievementsList';
+import { MetricTilesContainer } from '../../../components/Project/MetricsSection';
+import { GlassCard } from '../../../components/Theme/GlassCard';
 
 // Component interfaces
 interface TabPanelProps { children: ReactNode; value: number; index: number; }
