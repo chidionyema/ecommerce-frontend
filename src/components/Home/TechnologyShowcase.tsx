@@ -17,16 +17,30 @@ import {
 import { ChevronRight, FileText, Download } from "lucide-react";
 import { ANIMATIONS, getSharedStyles } from "../../utils/designSystem";
 
-// Dynamic import with reduced SSR concerns
-const TechCard = dynamic(() => import("../Common/TechCard"), { ssr: false });
+// Dynamic import with reduced SSR concerns and better loading experience
+const TechCard = dynamic(() => import("../Common/TechCard"), { 
+  ssr: false,
+  loading: () => (
+    <Box sx={{ 
+      height: 240, 
+      borderRadius: 3, 
+      background: "rgba(255,255,255,0.05)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
+    }}>
+      <Box sx={{ width: 42, height: 42, borderRadius: "50%", background: "rgba(255,255,255,0.1)" }} />
+    </Box>
+  )
+});
 
-// Tech items data
+// Tech items data with refined descriptions
 const TECH_ITEMS = [
   {
     icon: <SiAmazonaws size={42} />,
     title: "AWS Cloud",
     description:
-      "Enterprise-ready infrastructure with EC2, Lambda, S3, and ECS. We've built systems that handle millions of users and petabytes of data.",
+      "Enterprise-ready infrastructure with EC2, Lambda, S3, and ECS. Built to handle millions of users and petabytes of data.",
     color: "#FF9900",
     category: "Cloud",
   },
@@ -34,7 +48,7 @@ const TECH_ITEMS = [
     icon: <SiMicrosoftazure size={42} />,
     title: "Azure Services",
     description:
-      "Comprehensive solutions with Azure DevOps, Functions, AKS, and Azure AD. Perfect for businesses with existing Microsoft ecosystems.",
+      "Comprehensive solutions with Azure DevOps, Functions, AKS, and Azure AD. Ideal for businesses with existing Microsoft ecosystems.",
     color: "#0078D4",
     category: "Cloud",
   },
@@ -42,7 +56,7 @@ const TECH_ITEMS = [
     icon: <SiDocker size={42} />,
     title: "Containerization",
     description:
-      "Consistent, portable environments with Docker and Docker Compose. We implement best practices for security and performance.",
+      "Consistent, portable environments with Docker and Docker Compose. Implemented with security and performance best practices.",
     color: "#2496ED",
     category: "DevOps",
   },
@@ -50,7 +64,7 @@ const TECH_ITEMS = [
     icon: <SiKubernetes size={42} />,
     title: "Kubernetes",
     description:
-      "Production-grade container orchestration that scales from startups to enterprises. Our implementations focus on observability and resilience.",
+      "Production-grade container orchestration that scales from startups to enterprises. Focused on observability and resilience.",
     color: "#326CE5",
     category: "DevOps",
   },
@@ -58,7 +72,7 @@ const TECH_ITEMS = [
     icon: <SiTerraform size={42} />,
     title: "Infrastructure as Code",
     description:
-      "Automated, version-controlled infrastructure with Terraform. We create modular, reusable components that speed up future deployments.",
+      "Automated, version-controlled infrastructure with Terraform. Modular, reusable components that accelerate future deployments.",
     color: "#7B42BC",
     category: "DevOps",
   },
@@ -66,7 +80,7 @@ const TECH_ITEMS = [
     icon: <SiReact size={42} />,
     title: "React & Modern JS",
     description:
-      "Component-based frontend applications built for performance and maintainability. We follow enterprise patterns for state management.",
+      "Component-based frontend applications built for performance and maintainability. Enterprise patterns for state management.",
     color: "#61DAFB",
     category: "Frontend",
   },
@@ -74,7 +88,7 @@ const TECH_ITEMS = [
     icon: <SiNextdotjs size={42} />,
     title: "Next.js",
     description:
-      "SEO-friendly React apps with server-side rendering and static site generation. Our implementations follow the latest Next.js best practices.",
+      "SEO-friendly React apps with server-side rendering and static site generation. Implementing latest Next.js best practices.",
     color: "#000000",
     category: "Frontend",
   },
@@ -82,18 +96,18 @@ const TECH_ITEMS = [
     icon: <SiDotnet size={42} />,
     title: ".NET Core",
     description:
-      "Scalable, cross-platform backend systems with C# and ASP.NET. We implement clean architecture patterns developed at enterprise scale.",
+      "Scalable, cross-platform backend systems with C# and ASP.NET. Clean architecture patterns developed at enterprise scale.",
     color: "#512BD4",
     category: "Backend",
   },
 ];
 
-// CTA resources data
+// CTA resources data with more precise wording
 const RESOURCE_ITEMS = [
-  "Weekly technical tutorials",
-  "Code snippets & templates",
-  "Architecture best practices",
-  "Security & performance tips",
+  "Enterprise architecture patterns",
+  "Performance optimization guides",
+  "Security implementation tutorials",
+  "Infrastructure templates & blueprints",
 ];
 
 // Define an interface for CategoryButton props
@@ -103,7 +117,7 @@ interface CategoryButtonProps {
   onClick: () => void;
 }
 
-// Refined component definitions with Ive-inspired aesthetic
+// Refined category button with Jony Ive-inspired aesthetic
 const CategoryButton: React.FC<CategoryButtonProps> = memo(
   ({ category, isActive, onClick }) => {
     const theme = useTheme();
@@ -112,9 +126,9 @@ const CategoryButton: React.FC<CategoryButtonProps> = memo(
         size="small"
         onClick={onClick}
         sx={{
-          py: 0.8,
-          px: 1.8,
-          borderRadius: 6,
+          py: 0.75,
+          px: 2,
+          borderRadius: 12,
           fontSize: "0.85rem",
           fontWeight: 500,
           background: isActive ? alpha(theme.palette.primary.main, 0.1) : "transparent",
@@ -130,6 +144,7 @@ const CategoryButton: React.FC<CategoryButtonProps> = memo(
           textTransform: "none",
           mx: 0.5,
           letterSpacing: "0.01em",
+          boxShadow: isActive ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.25)}` : "none",
         }}
       >
         {category}
@@ -137,8 +152,9 @@ const CategoryButton: React.FC<CategoryButtonProps> = memo(
     );
   }
 );
+CategoryButton.displayName = "CategoryButton";
 
-// Refined minimal checkmark icon
+// Elegant checkmark item component
 const ElegantCheckmarkItem = memo(
   ({ text, icon: Icon }: { text: string; icon?: React.ComponentType<{ size?: number }> }) => {
     const theme = useTheme();
@@ -169,7 +185,9 @@ const ElegantCheckmarkItem = memo(
     );
   }
 );
+ElegantCheckmarkItem.displayName = "ElegantCheckmarkItem";
 
+// Tech card item component with refined hover effects
 const TechCardItem = memo(
   ({ tech, isHovered, onMouseEnter, onMouseLeave }: { 
     tech: { icon: JSX.Element; title: string; description: string; color: string; category: string };
@@ -192,6 +210,10 @@ const TechCardItem = memo(
         <motion.div
           variants={ANIMATIONS.item}
           style={{ width: "100%", height: "100%" }}
+          whileHover={{ 
+            y: -5,
+            transition: { duration: 0.2, ease: [0.26, 0.54, 0.32, 1] }
+          }}
         >
           <TechCard
             icon={tech.icon}
@@ -221,8 +243,46 @@ const TechCardItem = memo(
     );
   }
 );
+TechCardItem.displayName = "TechCardItem";
 
-// Main component with refined aesthetics
+// Resource item component for the CTA section
+const ResourceItem = memo(({ text }: { text: string }) => {
+  const theme = useTheme();
+  return (
+    <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1, mb: 1.2 }}>
+      <Box
+        sx={{
+          width: 14,
+          height: 14,
+          borderRadius: "50%",
+          backgroundColor: alpha(theme.palette.primary.main, 0.9),
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "white",
+          fontSize: "0.6rem",
+          mt: 0.3
+        }}
+      >
+        <FileText size={7} />
+      </Box>
+      <Typography
+        color={theme.palette.text.primary}
+        sx={{ 
+          fontSize: "0.85rem", 
+          letterSpacing: "0.01em", 
+          lineHeight: 1.4,
+          fontWeight: 500
+        }}
+      >
+        {text}
+      </Typography>
+    </Box>
+  );
+});
+ResourceItem.displayName = "ResourceItem";
+
+// Main component with refined aesthetics and performance optimizations
 const TechnologyShowcase = () => {
   const theme = useTheme();
   const styles = getSharedStyles(theme);
@@ -231,15 +291,46 @@ const TechnologyShowcase = () => {
   const [hoveredIndex, setHoveredIndex] = useState(-1);
   const [filter, setFilter] = useState("All");
 
-  // Derived data
+  // Derived data with memoization for performance
   const filteredTech = useMemo(
     () => (filter === "All" ? TECH_ITEMS : TECH_ITEMS.filter((tech) => tech.category === filter)),
     [filter]
   );
-  const categories = useMemo(() => ["All", ...Array.from(new Set(TECH_ITEMS.map((tech) => tech.category)))], []);
+  
+  const categories = useMemo(
+    () => ["All", ...Array.from(new Set(TECH_ITEMS.map((tech) => tech.category)))], 
+    []
+  );
 
-  // Purple color for the Explore button
+  // Custom purple accent color
   const purpleColor = "#673AB7";
+
+  // Animation variants with subtle spring physics
+  const refinedAnimations = useMemo(() => ({
+    container: {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: { 
+          staggerChildren: 0.1,
+          delayChildren: 0.1,
+          duration: 0.5,
+          ease: [0.22, 1, 0.36, 1]
+        }
+      }
+    },
+    item: {
+      hidden: { opacity: 0, y: 20 },
+      visible: {
+        opacity: 1,
+        y: 0,
+        transition: { 
+          duration: 0.5,
+          ease: [0.22, 1, 0.36, 1]
+        }
+      }
+    }
+  }), []);
 
   return (
     <Box
@@ -247,38 +338,84 @@ const TechnologyShowcase = () => {
       ref={ref}
       sx={{
         position: "relative",
-        py: 10,
+        py: { xs: 8, md: 10 },
         background: "linear-gradient(180deg, #18407F 0%, #1A438A 100%)",
         overflow: "hidden",
       }}
     >
+      {/* Subtle background pattern */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0.035,
+          backgroundImage: "url('/images/grid-pattern.svg')",
+          backgroundSize: "cover",
+          zIndex: 0,
+        }}
+      />
+
       <Container sx={styles.contentContainer}>
         <motion.div
-          variants={ANIMATIONS.container}
+          variants={refinedAnimations.container}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
-          {/* Header */}
-          <motion.div variants={ANIMATIONS.item}>
+          {/* Header with improved typography */}
+          <motion.div variants={refinedAnimations.item}>
             <Typography
               variant="h2"
-              sx={{ ...styles.sectionTitle, letterSpacing: "-0.02em", fontWeight: 600 }}
+              sx={{ 
+                ...styles.sectionTitle, 
+                letterSpacing: "-0.02em", 
+                fontWeight: 700,
+                fontSize: { xs: "2rem", sm: "2.25rem", md: "2.5rem" },
+                mb: 1.5,
+                textAlign: "center"
+              }}
             >
               Enterprise-Grade{" "}
-              <Box component="span" sx={styles.accentText}>
+              <Box component="span" sx={{
+                background: "linear-gradient(135deg, #673AB7, #3F51B5)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                color: "#673AB7",
+              }}>
                 Technology Stack
               </Box>
             </Typography>
-            <Typography variant="subtitle1" sx={{ ...styles.sectionSubtitle, letterSpacing: "0.01em", fontWeight: 400 }}>
+            <Typography 
+              variant="subtitle1" 
+              sx={{ 
+                ...styles.sectionSubtitle, 
+                letterSpacing: "0.01em", 
+                fontWeight: 400,
+                fontSize: { xs: "0.95rem", sm: "1rem", md: "1.1rem" },
+                mb: 4,
+                textAlign: "center",
+                maxWidth: "800px",
+                mx: "auto"
+              }}
+            >
               Leverage our experience from ASOS, Tesco, and Philip Morris to build
-              <strong> scalable, secure, and efficient</strong> technology for your business
+              <Box component="span" sx={{ fontWeight: 600 }}> scalable, secure, and efficient</Box> technology for your business
             </Typography>
           </motion.div>
 
-          {/* Category filters */}
-          <motion.div variants={ANIMATIONS.item}>
+          {/* Category filters with refined styling */}
+          <motion.div variants={refinedAnimations.item}>
             <Box
-              sx={{ display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap", mb: 4 }}
+              sx={{ 
+                display: "flex", 
+                justifyContent: "center", 
+                gap: 1, 
+                flexWrap: "wrap", 
+                mb: 4,
+                px: 2
+              }}
             >
               {categories.map((category) => (
                 <CategoryButton
@@ -291,8 +428,13 @@ const TechnologyShowcase = () => {
             </Box>
           </motion.div>
 
-          {/* Tech cards grid */}
-          <Grid container spacing={3} justifyContent="center">
+          {/* Tech cards grid with improved spacing */}
+          <Grid 
+            container 
+            spacing={3} 
+            justifyContent="center"
+            sx={{ mb: 5 }}
+          >
             {filteredTech.map((tech, index) => (
               <TechCardItem
                 key={tech.title}
@@ -304,50 +446,64 @@ const TechnologyShowcase = () => {
             ))}
           </Grid>
 
-          {/* Refined combined CTA card with improved margins */}
-          <motion.div variants={ANIMATIONS.item}>
+          {/* Refined CTA card with elegantly separated sections */}
+          <motion.div variants={refinedAnimations.item}>
             <Paper
-              elevation={2}
+              elevation={0}
               sx={{
                 ...styles.ctaCard,
-                mt: 5,
-                mb: 5, // Added bottom margin
-                borderRadius: "14px",
+                mt: 6,
+                mb: 2,
+                borderRadius: "16px",
                 background: `linear-gradient(145deg, ${alpha(
                   theme.palette.background.paper,
-                  0.95
-                )}, ${alpha(theme.palette.background.paper, 0.85)})`,
-                backdropFilter: "blur(8px)",
-                boxShadow: `0 8px 24px ${alpha("#000", 0.06)}`,
+                  0.97
+                )}, ${alpha(theme.palette.background.paper, 0.87)})`,
+                backdropFilter: "blur(10px)",
+                boxShadow: `0 10px 30px ${alpha("#000", 0.08)}`,
                 maxWidth: "900px",
-                mx: "auto", // Center the card
-                py: 3, // Vertical padding
-                px: { xs: 3, md: 4 } // Increased horizontal padding
+                mx: "auto",
+                p: 0,
+                overflow: "hidden",
+                border: `1px solid ${alpha(theme.palette.divider, 0.05)}`
               }}
             >
-              <Typography
-                variant="h6"
-                component="h3"
-                fontWeight={600}
-                mb={1}
-                align="center"
-                color={theme.palette.primary.main}
-                sx={{ letterSpacing: "-0.01em", fontSize: "1.1rem" }}
+              {/* Header with subtle gradient background */}
+              <Box
+                sx={{
+                  p: 3,
+                  background: `linear-gradient(to right, ${alpha(theme.palette.primary.main, 0.05)}, ${alpha(purpleColor, 0.05)})`,
+                  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.05)}`
+                }}
               >
-                Explore Our Technology Resources
-              </Typography>
-              <Typography
-                variant="body2"
-                color={theme.palette.text.secondary}
-                mb={2}
-                align="center"
-                sx={{ letterSpacing: "0.01em", maxWidth: "75%", mx: "auto", fontSize: "0.85rem" }}
-              >
-                Discover our full technology stack and access free learning resources.
-              </Typography>
+                <Typography
+                  variant="h6"
+                  component="h3"
+                  fontWeight={600}
+                  align="center"
+                  color={theme.palette.primary.main}
+                  sx={{ letterSpacing: "-0.01em", fontSize: "1.1rem", mb: 1 }}
+                >
+                  Explore Our Technology Resources
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color={theme.palette.text.secondary}
+                  align="center"
+                  sx={{ 
+                    letterSpacing: "0.01em", 
+                    maxWidth: "75%", 
+                    mx: "auto", 
+                    fontSize: "0.85rem",
+                    lineHeight: 1.6
+                  }}
+                >
+                  Discover our full technology stack and access free learning resources to accelerate your enterprise development.
+                </Typography>
+              </Box>
 
-              {/* Two-column layout */}
-              <Grid container spacing={3}> {/* Increased spacing from 2 to 3 */}
+              {/* Two-column layout with content */}
+              <Grid container>
                 {/* Left: Resources */}
                 <Grid
                   item
@@ -355,64 +511,26 @@ const TechnologyShowcase = () => {
                   md={7}
                   sx={{
                     borderRight: { xs: "none", md: `1px solid ${alpha(theme.palette.divider, 0.08)}` },
-                    pb: { xs: 2, md: 0 },
+                    p: 3,
                   }}
                 >
                   <Typography
                     variant="subtitle2"
                     sx={{
                       color: theme.palette.primary.main,
-                      mb: 1,
+                      mb: 2,
                       fontWeight: 600,
-                      fontSize: "0.9rem",
+                      fontSize: "0.95rem",
                       letterSpacing: "0.01em",
                     }}
                   >
-                    Free Enterprise Resources:
+                    Free Enterprise Resources
                   </Typography>
 
-                  <Grid container spacing={1}>
+                  <Grid container spacing={2}>
                     {RESOURCE_ITEMS.map((item, i) => (
                       <Grid item xs={12} sm={6} key={i}>
-                        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1, mb: 0.75 }}>
-                          <Box
-                            sx={{
-                              width: 14,
-                              height: 14,
-                              borderRadius: "50%",
-                              backgroundColor: alpha(theme.palette.primary.main, 0.9),
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              color: "white",
-                              fontSize: "0.6rem",
-                              mt: 0.3
-                            }}
-                          >
-                         <Box
-                          sx={{
-                            width: 14,
-                            height: 14,
-                            borderRadius: "50%",
-                            backgroundColor: alpha(theme.palette.primary.main, 0.9),
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "white",
-                            fontSize: "0.6rem",
-                            mt: 0.3
-                          }}
-                        >
-                          <FileText size={7} />
-                        </Box>
-                          </Box>
-                          <Typography
-                            color={theme.palette.text.primary}
-                            sx={{ fontSize: "0.8rem", letterSpacing: "0.01em", lineHeight: 1.3 }}
-                          >
-                            {item}
-                          </Typography>
-                        </Box>
+                        <ResourceItem text={item} />
                       </Grid>
                     ))}
                   </Grid>
@@ -420,19 +538,23 @@ const TechnologyShowcase = () => {
                   <Button
                     variant="contained"
                     color="primary"
-                    size="small"
-                    startIcon={<Download size={12} />}
+                    startIcon={<Download size={14} />}
                     href="/resources"
                     sx={{
-                      mt: 1.5,
-                      px: 2,
-                      py: 0.6,
+                      mt: 2.5,
+                      px: 2.5,
+                      py: 0.75,
                       textTransform: "none",
                       fontWeight: 500,
-                      fontSize: "0.8rem",
-                      borderRadius: 6,
+                      fontSize: "0.85rem",
+                      borderRadius: 8,
                       letterSpacing: "0.01em",
-                      boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.2)}`,
+                      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}`,
+                      "&:hover": {
+                        boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.35)}`,
+                        transform: "translateY(-2px)"
+                      },
+                      transition: "all 0.2s cubic-bezier(0.2, 0, 0, 1)"
                     }}
                   >
                     Access Free Resources
@@ -446,10 +568,11 @@ const TechnologyShowcase = () => {
                   md={5}
                   sx={{
                     borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.08)}`, md: "none" },
-                    pt: { xs: 2, md: 0 },
+                    p: 3,
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
+                    background: { xs: "transparent", md: alpha(purpleColor, 0.03) }
                   }}
                 >
                   <Box sx={{ maxWidth: "90%" }}>
@@ -457,9 +580,9 @@ const TechnologyShowcase = () => {
                       variant="subtitle2"
                       sx={{
                         color: purpleColor,
-                        mb: 1,
+                        mb: 2,
                         fontWeight: 600,
-                        fontSize: "0.9rem",
+                        fontSize: "0.95rem",
                         letterSpacing: "0.01em",
                       }}
                     >
@@ -469,32 +592,37 @@ const TechnologyShowcase = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        mb: 1.5,
+                        mb: 2.5,
                         color: theme.palette.text.secondary,
-                        fontSize: "0.8rem",
+                        fontSize: "0.85rem",
                         letterSpacing: "0.01em",
-                        lineHeight: 1.4,
+                        lineHeight: 1.6,
                       }}
                     >
-                      See our complete technology stack that powers enterprise solutions across industries.
+                      Explore our complete technology stack that powers enterprise solutions across financial services, healthcare, and retail industries.
                     </Typography>
 
-                    {/* Purple Explore button */}
+                    {/* Purple explore button with refined styling */}
                     <Button
                       variant="contained"
-                      size="small"
-                      endIcon={<ChevronRight size={12} />}
+                      endIcon={<ChevronRight size={14} />}
                       href="/stack"
                       sx={{
-                        px: 2,
-                        py: 0.6,
+                        px: 2.5,
+                        py: 0.75,
                         textTransform: "none",
                         fontWeight: 500,
-                        fontSize: "0.8rem",
-                        borderRadius: 6,
+                        fontSize: "0.85rem",
+                        borderRadius: 8,
                         letterSpacing: "0.01em",
                         bgcolor: purpleColor,
-                        boxShadow: `0 2px 6px ${alpha(purpleColor, 0.25)}`,
+                        "&:hover": {
+                          bgcolor: alpha(purpleColor, 0.9),
+                          boxShadow: `0 6px 16px ${alpha(purpleColor, 0.35)}`,
+                          transform: "translateY(-2px)"
+                        },
+                        transition: "all 0.2s cubic-bezier(0.2, 0, 0, 1)",
+                        boxShadow: `0 4px 12px ${alpha(purpleColor, 0.25)}`
                       }}
                     >
                       Explore Our Full Stack

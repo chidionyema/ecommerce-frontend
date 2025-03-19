@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useMemo } from "react";
 import {
   Box,
   Container,
@@ -18,12 +18,34 @@ import {
   FileText,
   Video,
   Calendar,
-  Download
+  Download,
+  ChevronRight
 } from "lucide-react";
 import { getSharedStyles, ANIMATIONS } from "../../utils/designSystem";
 import TechCard from "../Common/TechCard";
 import { motion, useInView } from "framer-motion";
-import { CalendlyBooking } from "../CalendlyBooking";
+import dynamic from "next/dynamic";
+
+// Dynamically import Calendly to improve initial load time
+const CalendlyBooking = dynamic(() => import("../CalendlyBooking"), {
+  ssr: false,
+  loading: () => (
+    <Box sx={{ 
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      bgcolor: "rgba(0,0,0,0.7)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 9999
+    }}>
+      <Typography color="white">Loading scheduling tool...</Typography>
+    </Box>
+  )
+});
 
 // Enhanced benefit-oriented reasons with refined styling
 const reasons = [
@@ -31,7 +53,7 @@ const reasons = [
     id: 1,
     text: "Deep Enterprise Expertise",
     description:
-      "Benefit from the insights of seasoned consultants with extensive experience at ASOS, Tesco, and Philip Morris International. Our team brings practical knowledge from scaling systems that serve millions of users.",
+      "Benefit from insights of seasoned consultants with experience at ASOS, Tesco, and Philip Morris. Our team brings practical knowledge from scaling systems for millions of users.",
     icon: <Lightbulb strokeWidth={1.5} size={18} color="#FF5722" />,
     color: "#FF5722"
   },
@@ -39,7 +61,7 @@ const reasons = [
     id: 2,
     text: "Tailored, Battle-Tested Solutions",
     description:
-      "Receive custom-crafted strategies and proven solutions designed specifically for your unique challenges and growth goals. We don't reinvent the wheel—we apply patterns that work in enterprise environments.",
+      "Receive custom-crafted strategies and proven solutions designed specifically for your unique challenges. We apply patterns that work in enterprise environments.",
     icon: <Rocket strokeWidth={1.5} size={18} color="#2196F3" />,
     color: "#2196F3"
   },
@@ -55,7 +77,7 @@ const reasons = [
     id: 4,
     text: "Scalable Architecture for Growth",
     description:
-      "Deploy future-proof solutions architected for scalability, supporting your business as it expands. We design systems that can grow from thousands to millions of users without requiring complete rewrites.",
+      "Deploy future-proof solutions architected for scalability as your business expands. We design systems that grow from thousands to millions of users without requiring rewrites.",
     icon: <TrendingUp strokeWidth={1.5} size={18} color="#E91E63" />,
     color: "#E91E63"
   }
@@ -63,41 +85,50 @@ const reasons = [
 
 // Resources for CTA
 const resources = [
-  { title: "Video Walkthrough: Microservices at Scale", icon: Video },
-  { title: "White Paper: Cloud Migration Patterns", icon: FileText },
-  { title: "Technical Guide: OAuth 2.0 Implementation", icon: FileText },
-  { title: "Case Study: Ecommerce Performance Tuning", icon: FileText }
+  { title: "Microservices Architecture at Scale", icon: Video, color: "#2196F3" },
+  { title: "Cloud Migration Patterns", icon: FileText, color: "#4CAF50" },
+  { title: "OAuth 2.0 Implementation Guide", icon: FileText, color: "#FF5722" },
+  { title: "Performance Optimization Techniques", icon: FileText, color: "#9C27B0" }
 ];
 
-interface ElegantCheckmarkItemProps {
-  text: string;
-  Icon?: React.ComponentType<{ size?: number | string }>;
+interface ResourceItemProps {
+  title: string;
+  Icon: React.ComponentType<{ size?: number | string, color?: string }>;
+  color: string;
 }
 
-const ElegantCheckmarkItem: React.FC<ElegantCheckmarkItemProps> = ({ text, Icon }) => {
+const ResourceItem: React.FC<ResourceItemProps> = ({ title, Icon, color }) => {
   const theme = useTheme();
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1.2, mb: 1.5 }}>
+    <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1, mb: 1 }}>
       <Box
         sx={{
-          width: 16,
-          height: 16,
+          width: 18,
+          height: 18,
           borderRadius: "50%",
-          backgroundColor: theme.palette.primary.main,
+          backgroundColor: alpha(color, 0.9),
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           color: "white",
-          fontSize: "0.7rem"
+          fontSize: "0.6rem",
+          mt: 0.25,
+          flexShrink: 0,
+          boxShadow: `0 2px 4px ${alpha(color, 0.3)}`
         }}
       >
-        {Icon ? <Icon size={8} /> : "✓"}
+        <Icon size={10} color="white" />
       </Box>
       <Typography
         color={theme.palette.text.primary}
-        sx={{ fontSize: "0.9rem", letterSpacing: "0.015em" }}
+        sx={{ 
+          fontSize: "0.85rem", 
+          letterSpacing: "0.01em", 
+          lineHeight: 1.4,
+          fontWeight: 500
+        }}
       >
-        {text}
+        {title}
       </Typography>
     </Box>
   );
@@ -112,6 +143,53 @@ const WhyChooseUs: React.FC = () => {
 
   // Purple color for the consultation button
   const purpleColor = "#673AB7";
+  
+  // Custom animations with refined physics
+  const refinedAnimations = useMemo(() => ({
+    container: {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: { 
+          staggerChildren: 0.1,
+          delayChildren: 0.05,
+          duration: 0.6,
+          ease: [0.22, 1, 0.36, 1]
+        }
+      }
+    },
+    item: {
+      hidden: { opacity: 0, y: 20 },
+      visible: {
+        opacity: 1,
+        y: 0,
+        transition: { 
+          duration: 0.5,
+          ease: [0.22, 1, 0.36, 1]
+        }
+      }
+    },
+    card: {
+      hidden: { opacity: 0, y: 20 },
+      visible: {
+        opacity: 1,
+        y: 0,
+        transition: { 
+          duration: 0.5,
+          ease: [0.22, 1, 0.36, 1]
+        }
+      },
+      hover: {
+        y: -6,
+        boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
+        transition: {
+          type: "spring",
+          stiffness: 400,
+          damping: 20
+        }
+      }
+    }
+  }), []);
 
   return (
     <Box
@@ -119,31 +197,56 @@ const WhyChooseUs: React.FC = () => {
       ref={ref}
       sx={{
         position: "relative",
-        py: 10,
+        py: { xs: 8, md: 10 },
         background: "linear-gradient(180deg, #18407F 0%, #1A438A 100%)",
         overflow: "hidden"
       }}
     >
-      <Container maxWidth="lg" sx={styles.contentContainer}>
+      {/* Subtle background pattern for depth */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0.035,
+          backgroundImage: "url('/images/grid-pattern.svg')",
+          backgroundSize: "cover",
+          zIndex: 0,
+        }}
+      />
+      
+      <Container maxWidth="lg" sx={{ 
+        ...styles.contentContainer,
+        position: "relative", 
+        zIndex: 1 
+      }}>
         <motion.div
-          variants={ANIMATIONS.container}
+          variants={refinedAnimations.container}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
-          {/* Header */}
-          <Box sx={{ mb: { xs: 5, md: 6 } }}>
-            <motion.div variants={ANIMATIONS.item}>
+          {/* Header with refined typography */}
+          <Box sx={{ mb: { xs: 5, md: 6 }, textAlign: "center" }}>
+            <motion.div variants={refinedAnimations.item}>
               <Typography
                 variant="h2"
                 sx={{
                   ...styles.sectionTitle,
                   letterSpacing: "-0.02em",
-                  fontWeight: 600,
-                  mb: 2
+                  fontWeight: 700,
+                  fontSize: { xs: "2rem", sm: "2.25rem", md: "2.5rem" },
+                  mb: 1.5
                 }}
               >
                 Why Partner with{" "}
-                <Box component="span" sx={styles.accentText}>
+                <Box component="span" sx={{
+                  background: "linear-gradient(135deg, #673AB7, #3F51B5)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  color: "#673AB7",
+                }}>
                   GLUStack
                 </Box>
                 ?
@@ -154,23 +257,26 @@ const WhyChooseUs: React.FC = () => {
                   ...styles.sectionSubtitle,
                   letterSpacing: "0.01em",
                   fontWeight: 400,
-                  maxWidth: "85%",
-                  mx: { xs: "auto", md: 0 }
+                  maxWidth: "700px",
+                  fontSize: { xs: "0.95rem", sm: "1rem", md: "1.1rem" },
+                  mx: "auto"
                 }}
               >
-                We bring <strong>enterprise-grade expertise</strong> and solutions to
+                We bring <Box component="span" sx={{ fontWeight: 600 }}>enterprise-grade expertise</Box> and solutions to
                 growing businesses
               </Typography>
             </motion.div>
           </Box>
 
-          {/* Benefit cards */}
-          <Grid container spacing={3} justifyContent="center">
-            {reasons.map((reason) => (
+          {/* Benefit cards with improved layout and hover states */}
+          <Grid container spacing={3} justifyContent="center" sx={{ mb: 6 }}>
+            {reasons.map((reason, index) => (
               <Grid item key={reason.id} xs={12} sm={6} md={3} sx={{ display: "flex" }}>
                 <motion.div
-                  variants={ANIMATIONS.item}
+                  variants={refinedAnimations.card}
+                  whileHover="hover"
                   style={{ width: "100%", height: "100%" }}
+                  transition={{ delay: index * 0.08 }}
                 >
                   <TechCard
                     icon={reason.icon}
@@ -178,20 +284,30 @@ const WhyChooseUs: React.FC = () => {
                     accentColor={reason.color}
                     importance="primary"
                     sx={{
-                      background: `linear-gradient(145deg, ${alpha("#1a56db", 0.12)}, ${alpha("#1a56db", 0.05)})`,
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      background: `linear-gradient(145deg, ${alpha("#1a56db", 0.1)}, ${alpha("#1a56db", 0.05)})`,
                       border: `1px solid ${alpha("#4285f4", 0.12)}`,
-                      boxShadow: `0 4px 20px ${alpha("#000", 0.05)}`
+                      boxShadow: `0 8px 24px ${alpha("#000", 0.07)}`,
+                      borderRadius: "16px",
+                      transition: "all 0.3s cubic-bezier(0.2, 0, 0, 1)",
+                      "&:hover": {
+                        transform: "translateY(-4px)",
+                        boxShadow: `0 12px 28px ${alpha("#000", 0.12)}`
+                      }
                     }}
                   >
                     <Typography
                       variant="body2"
                       color={alpha("#fff", 0.9)}
                       sx={{
-                        fontSize: "0.85rem",
+                        fontSize: "0.875rem",
                         lineHeight: 1.6,
                         letterSpacing: "0.01em",
                         textAlign: "center",
-                        fontWeight: 400
+                        fontWeight: 400,
+                        mt: 1
                       }}
                     >
                       {reason.description}
@@ -202,121 +318,121 @@ const WhyChooseUs: React.FC = () => {
             ))}
           </Grid>
 
-          {/* Compact CTA section */}
-          <motion.div variants={ANIMATIONS.item}>
+          {/* Refined CTA section with elegant styling */}
+          <motion.div variants={refinedAnimations.item}>
             <Paper
-              elevation={2}
+              elevation={0}
               sx={{
                 ...styles.ctaCard,
-                mt: { xs: 5, md: 6 },
-                mb: 5, // Added bottom margin
-                borderRadius: "14px",
-                background: `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.95)}, ${alpha(
+                mt: { xs: 2, md: 4 },
+                mb: 2,
+                borderRadius: "16px",
+                background: `linear-gradient(145deg, ${alpha(
                   theme.palette.background.paper,
-                  0.85
-                )})`,
-                backdropFilter: "blur(8px)",
-                boxShadow: `0 8px 24px ${alpha("#000", 0.06)}`,
+                  0.97
+                )}, ${alpha(theme.palette.background.paper, 0.87)})`,
+                backdropFilter: "blur(10px)",
+                boxShadow: `0 10px 30px ${alpha("#000", 0.08)}`,
                 maxWidth: "900px",
                 mx: "auto",
-                py: 2.5, // Reduced padding
-                px: { xs: 2, md: 3 }
+                p: 0,
+                overflow: "hidden",
+                border: `1px solid ${alpha(theme.palette.divider, 0.05)}`
               }}
             >
-              <Typography
-                variant="h6" // Downgraded from h5
-                component="h3"
-                fontWeight={600}
-                mb={0.75} // Reduced margin
-                align="center"
-                color={theme.palette.primary.main}
-                sx={{ letterSpacing: "-0.01em", fontSize: "1.1rem" }}
+              {/* Header with subtle gradient background */}
+              <Box
+                sx={{
+                  p: 3,
+                  background: `linear-gradient(to right, ${alpha(theme.palette.primary.main, 0.05)}, ${alpha(purpleColor, 0.05)})`,
+                  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.05)}`
+                }}
               >
-                Take the Next Step
-              </Typography>
+                <Typography
+                  variant="h6"
+                  component="h3"
+                  fontWeight={600}
+                  align="center"
+                  color={theme.palette.primary.main}
+                  sx={{ letterSpacing: "-0.01em", fontSize: "1.1rem", mb: 1 }}
+                >
+                  Take the Next Step
+                </Typography>
+                
+                <Typography
+                  variant="body2"
+                  color={theme.palette.text.secondary}
+                  align="center"
+                  sx={{ 
+                    letterSpacing: "0.01em", 
+                    maxWidth: "75%", 
+                    mx: "auto", 
+                    fontSize: "0.85rem",
+                    lineHeight: 1.6
+                  }}
+                >
+                  Explore our resources or schedule a consultation to discover how we can
+                  help your business achieve its technology goals
+                </Typography>
+              </Box>
 
-              <Typography
-                variant="body2" // Downgraded
-                color={theme.palette.text.secondary}
-                mb={1.5} // Reduced margin
-                align="center"
-                sx={{ letterSpacing: "0.01em", maxWidth: "75%", mx: "auto", fontSize: "0.85rem" }}
-              >
-                Explore our resources or schedule a consultation to discover how we can
-                help your business
-              </Typography>
-
-              <Grid container spacing={2}>
+              {/* Two-column layout with content */}
+              <Grid container>
                 {/* Left side: Resources */}
                 <Grid
                   item
                   xs={12}
-                  md={4}
+                  md={6}
                   sx={{
                     borderRight: { xs: "none", md: `1px solid ${alpha(theme.palette.divider, 0.08)}` },
-                    pb: { xs: 1.5, md: 0 }
+                    p: 3,
                   }}
                 >
                   <Typography
-                    variant="subtitle2" // Downgraded from h6
+                    variant="subtitle2"
                     sx={{
                       color: theme.palette.primary.main,
-                      mb: 0.75, // Reduced margin
+                      mb: 2,
                       fontWeight: 600,
-                      fontSize: "0.9rem",
-                      letterSpacing: "0.01em"
+                      fontSize: "0.95rem",
+                      letterSpacing: "0.01em",
                     }}
                   >
                     Enterprise Resources Library
                   </Typography>
 
-                  {/* More compact resource layout */}
-                  <Box sx={{ mb: 1.5 }}>
+                  <Grid container spacing={1.5}>
                     {resources.map((resource, i) => (
-                      <Box key={i} sx={{ display: "flex", alignItems: "flex-start", gap: 0.75, mb: 0.5 }}>
-                        <Box
-                          sx={{
-                            width: 14,
-                            height: 14,
-                            borderRadius: "50%",
-                            backgroundColor: theme.palette.primary.main,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "white",
-                            fontSize: "0.6rem",
-                            mt: 0.25,
-                            flexShrink: 0
-                          }}
-                        >
-                          {resource.icon ? <resource.icon size={7} /> : "✓"}
-                        </Box>
-                        <Typography
-                          color={theme.palette.text.primary}
-                          sx={{ fontSize: "0.75rem", letterSpacing: "0.01em", lineHeight: 1.3 }}
-                        >
-                          {resource.title}
-                        </Typography>
-                      </Box>
+                      <Grid item xs={12} sm={6} key={i}>
+                        <ResourceItem 
+                          title={resource.title} 
+                          Icon={resource.icon} 
+                          color={resource.color} 
+                        />
+                      </Grid>
                     ))}
-                  </Box>
+                  </Grid>
 
                   <Button
                     variant="contained"
                     color="primary"
-                    size="small"
-                    startIcon={<Download size={12} />}
+                    startIcon={<Download size={14} />}
                     href="/resources"
                     sx={{
-                      mt: 0.5,
-                      px: 1.5,
-                      py: 0.5,
+                      mt: 2.5,
+                      px: 2.5,
+                      py: 0.75,
                       textTransform: "none",
                       fontWeight: 500,
-                      fontSize: "0.75rem",
-                      borderRadius: 6,
+                      fontSize: "0.85rem",
+                      borderRadius: 8,
                       letterSpacing: "0.01em",
-                      boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.2)}`,
+                      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}`,
+                      "&:hover": {
+                        boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.35)}`,
+                        transform: "translateY(-2px)"
+                      },
+                      transition: "all 0.2s cubic-bezier(0.2, 0, 0, 1)"
                     }}
                   >
                     Access Enterprise Resources
@@ -327,59 +443,65 @@ const WhyChooseUs: React.FC = () => {
                 <Grid
                   item
                   xs={12}
-                  md={8}
+                  md={6}
                   sx={{
                     borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.08)}`, md: "none" },
-                    pt: { xs: 1.5, md: 0 },
+                    p: 3,
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
-                    alignItems: "center"
+                    alignItems: "center",
+                    background: { xs: "transparent", md: alpha(purpleColor, 0.03) }
                   }}
                 >
-                  <Box sx={{ textAlign: "center", maxWidth: "85%" }}>
+                  <Box sx={{ textAlign: "center", maxWidth: "90%" }}>
                     <Typography
-                      variant="subtitle2" // Downgraded from h6
+                      variant="subtitle2"
                       sx={{
                         color: purpleColor,
-                        mb: 0.75, // Reduced margin
+                        mb: 2,
                         fontWeight: 600,
-                        fontSize: "0.9rem",
-                        letterSpacing: "0.01em"
+                        fontSize: "0.95rem",
+                        letterSpacing: "0.01em",
                       }}
                     >
                       Ready to Transform Your Business?
                     </Typography>
 
                     <Typography
-                      variant="body2" // Downgraded
+                      variant="body2"
                       sx={{
-                        mb: 1.5, // Reduced margin
+                        mb: 2.5,
                         color: theme.palette.text.secondary,
-                        fontSize: "0.8rem",
+                        fontSize: "0.85rem",
                         letterSpacing: "0.01em",
-                        lineHeight: 1.3
+                        lineHeight: 1.6,
                       }}
                     >
                       Book a no-obligation consultation with our enterprise experts and
-                      discover tailored solutions for your specific challenges.
+                      discover tailored solutions for your specific technology challenges.
                     </Typography>
 
                     <Button
                       variant="contained"
-                      size="small"
-                      endIcon={<Calendar size={12} />}
+                      endIcon={<ChevronRight size={14} />}
                       onClick={() => setIsCalendlyOpen(true)}
                       sx={{
-                        px: 1.5,
-                        py: 0.5,
+                        px: 2.5,
+                        py: 0.75,
                         textTransform: "none",
                         fontWeight: 500,
-                        fontSize: "0.75rem",
-                        borderRadius: 6,
+                        fontSize: "0.85rem",
+                        borderRadius: 8,
                         letterSpacing: "0.01em",
                         bgcolor: purpleColor,
-                        boxShadow: `0 2px 6px ${alpha(purpleColor, 0.25)}`,
+                        "&:hover": {
+                          bgcolor: alpha(purpleColor, 0.9),
+                          boxShadow: `0 6px 16px ${alpha(purpleColor, 0.35)}`,
+                          transform: "translateY(-2px)"
+                        },
+                        transition: "all 0.2s cubic-bezier(0.2, 0, 0, 1)",
+                        boxShadow: `0 4px 12px ${alpha(purpleColor, 0.25)}`
                       }}
                     >
                       Schedule a Consultation
@@ -392,12 +514,15 @@ const WhyChooseUs: React.FC = () => {
         </motion.div>
       </Container>
 
-      <CalendlyBooking
-        eventTypeUrl="https://calendly.com/glustack/consultation"
-        prefill={{ name: "", email: "" }}
-        isOpen={isCalendlyOpen}
-        onClose={() => setIsCalendlyOpen(false)}
-      />
+      {/* Calendly integration */}
+      {isCalendlyOpen && (
+        <CalendlyBooking
+          eventTypeUrl="https://calendly.com/glustack/consultation"
+          prefill={{ name: "", email: "" }}
+          isOpen={isCalendlyOpen}
+          onClose={() => setIsCalendlyOpen(false)}
+        />
+      )}
     </Box>
   );
 };
