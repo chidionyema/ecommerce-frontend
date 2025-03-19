@@ -15,24 +15,12 @@ import {
   SiAmazonaws, SiMicrosoftazure, SiDocker, SiKubernetes, SiTerraform, SiGooglecloud
 } from "react-icons/si";
 
-// Lazy load external components
+// Lazy load external component
 const CalendlyBooking = lazy(() => import('../CalendlyBooking'));
 
-// -------------------- ERROR BOUNDARY --------------------
-interface ErrorBoundaryProps {
-  children: ReactNode;
-  fallback?: ReactNode;
-}
-
-interface ErrorBoundaryState {
-  hasError: boolean;
-}
-
-class ErrorBoundary extends React.Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
-  constructor(props: ErrorBoundaryProps) {
+// ErrorBoundary Component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
     super(props);
     this.state = { hasError: false };
   }
@@ -41,8 +29,8 @@ class ErrorBoundary extends React.Component<
     return { hasError: true };
   }
   
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("Error caught by ErrorBoundary:", error, errorInfo);
+  componentDidCatch(error, errorInfo) {
+    console.error("Error caught:", error, errorInfo);
   }
   
   render() {
@@ -64,8 +52,7 @@ class ErrorBoundary extends React.Component<
   }
 }
 
-// -------------------- STYLED COMPONENTS & COMMON STYLES --------------------
-// Common styles to reduce repetition
+// Styles object
 const styles = {
   gradients: {
     primary: "linear-gradient(135deg, #6366F1, #8B5CF6)",
@@ -93,27 +80,18 @@ const styles = {
   }
 };
 
-// Motion animation variants
+// Animation variants
 const fadeVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { 
     opacity: 1, 
     y: 0, 
-    transition: { 
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1]
-    } 
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } 
   }
 };
 
-// Reusable fade-in motion component
-interface FadeInViewProps {
-  children: ReactNode;
-  delay?: number;
-  once?: boolean;
-}
-
-const FadeInView: FC<FadeInViewProps> = ({ children, delay = 0, once = false }) => (
+// FadeInView component
+const FadeInView = ({ children, delay = 0, once = false }) => (
   <motion.div 
     initial="hidden" 
     animate={!once ? "visible" : undefined}
@@ -126,7 +104,7 @@ const FadeInView: FC<FadeInViewProps> = ({ children, delay = 0, once = false }) 
   </motion.div>
 );
 
-// Section components
+// Styled components
 const Section = styled(Box)(({ theme }) => ({
   position: "relative",
   display: "flex",
@@ -156,7 +134,6 @@ const ContentArea = styled(Box)({
   marginBottom: 48
 });
 
-// Typography components
 const Headline = styled(Typography)(({ theme }) => ({
   fontSize: "3rem",
   lineHeight: 1.2,
@@ -182,14 +159,9 @@ const Subheadline = styled(Typography)(({ theme }) => ({
   }
 }));
 
-// Button and interactive components
-interface CTAButtonProps {
-  secondary?: boolean;
-}
-
 const CTAButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== 'secondary'
-})<CTAButtonProps>(({ theme, secondary }) => ({
+})(({ theme, secondary }) => ({
   color: styles.colors.text,
   fontWeight: 600,
   borderRadius: 8,
@@ -207,12 +179,7 @@ const CTAButton = styled(Button, {
 }));
 
 // CTA Button Group component
-interface CTAButtonGroupProps {
-  onSchedule: () => void;
-  onCaseStudies: () => void;
-}
-
-const CTAButtonGroup: FC<CTAButtonGroupProps> = ({ onSchedule, onCaseStudies }) => (
+const CTAButtonGroup = ({ onSchedule, onCaseStudies }) => (
   <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 3 }} justifyContent="center">
     <CTAButton
       onClick={onSchedule}
@@ -242,26 +209,19 @@ const OfferChip = styled(Chip)({
   "& .MuiChip-icon": { color: alpha(styles.colors.text, 0.97) }
 });
 
-// Refined Persona Button with improved styling
-interface PersonaButtonProps {
-  active?: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}
-
 const PersonaButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== "active"
-})<PersonaButtonProps>(({ theme, active }) => ({
+})(({ theme, active }) => ({
   fontSize: "0.875rem",
-  fontWeight: 600, // Increased from 500 for better visibility
-  letterSpacing: "0.02em", // Slightly improved letter spacing
+  fontWeight: 600,
+  letterSpacing: "0.02em",
   borderRadius: 12,
   transition: styles.animations.medium,
-  padding: theme.spacing(0.9, 2.5), // Increased padding for better clickable area
-  minWidth: 110, // Ensure consistent width across tabs
+  padding: theme.spacing(0.9, 2.5),
+  minWidth: 110,
   ...(active
     ? {
-        background: styles.gradients.primary, // Use gradient for active state
+        background: styles.gradients.primary,
         boxShadow: styles.shadows.primary,
         color: styles.colors.text,
         "&:hover": { 
@@ -271,8 +231,8 @@ const PersonaButton = styled(Button, {
       }
     : {
         background: "rgba(255, 255, 255, 0.08)",
-        border: "1px solid rgba(255, 255, 255, 0.15)", // Added subtle border
-        color: alpha(styles.colors.text, 0.9), // Increased opacity for better visibility
+        border: "1px solid rgba(255, 255, 255, 0.15)",
+        color: alpha(styles.colors.text, 0.9),
         "&:hover": { 
           background: "rgba(255, 255, 255, 0.15)", 
           transform: "translateY(-1px)",
@@ -281,12 +241,11 @@ const PersonaButton = styled(Button, {
       })
 }));
 
-// Consistent and improved benefit card
 const BenefitCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3.5), // Increased padding
+  padding: theme.spacing(3.5),
   borderRadius: 16,
-  height: "100%", // This ensures the height is always 100% of the parent container
-  minHeight: 180, // Set a minimum height for consistency
+  height: "100%",
+  minHeight: 220, // Increased for consistent height
   display: "flex",
   flexDirection: "column",
   transition: styles.animations.medium,
@@ -297,107 +256,62 @@ const BenefitCard = styled(Paper)(({ theme }) => ({
   "&:hover": {
     transform: "translateY(-4px)",
     boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)",
-    border: "1px solid rgba(255, 255, 255, 0.1)" // Subtle border enhancement on hover
+    border: "1px solid rgba(255, 255, 255, 0.1)"
   }
 }));
 
-// Improved icon circle with consistent size and better appearance
 const IconCircle = styled(Box)({
-  width: 60, // Slightly increased from 56
-  height: 60, // Slightly increased from 56
+  width: 60,
+  height: 60,
   borderRadius: "50%",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   marginBottom: 20,
   boxShadow: "0 8px 16px rgba(0, 0, 0, 0.15)",
-  border: "1px solid rgba(255, 255, 255, 0.15)" // Added subtle border
+  border: "1px solid rgba(255, 255, 255, 0.15)"
 });
 
-// -------------------- DATA --------------------
-interface Persona {
-  headline: string;
-  subheadline: string;
-  benefits: string[];
-}
-
-interface Benefit {
-  icon: JSX.Element;
-  text: string;
-  subtext: string;
-  gradient: string;
-}
-
-interface Tech {
-  icon: React.ComponentType<{ color: string; size: number }>;
-  name: string;
-  color: string;
-}
-
-interface DataStructure {
-  personas: { [key: string]: Persona };
-  benefits: Benefit[];
-  techStack: Tech[];
-  successIndicators: string[];
-}
-
-const DATA: DataStructure = {
+// Data structure
+const DATA = {
   personas: {
     developer: {
       headline: "Enterprise Solutions Delivered 10× Faster",
-      subheadline:
-        "Accelerate development with meticulously crafted enterprise-grade architectures",
-      benefits: [
-        "CI/CD Pipeline Integration",
-        "Microservices Architecture",
-        "Containerization",
-        "Infrastructure as Code"
-      ]
+      subheadline: "Accelerate development with meticulously crafted enterprise-grade architectures",
+      benefits: ["CI/CD Pipeline Integration", "Microservices Architecture", "Containerization", "Infrastructure as Code"]
     },
     executive: {
       headline: "Enterprise Solutions with 47% Cost Reduction",
-      subheadline:
-        "Optimize technology investments with precision-engineered enterprise solutions",
-      benefits: [
-        "TCO Optimization",
-        "Automated Workflows",
-        "Resource Optimization",
-        "Reduced Maintenance"
-      ]
+      subheadline: "Optimize technology investments with precision-engineered enterprise solutions",
+      benefits: ["TCO Optimization", "Automated Workflows", "Resource Optimization", "Reduced Maintenance"]
     },
     security: {
       headline: "Enterprise Solutions with Enterprise-Grade Security",
-      subheadline:
-        "Deploy secure enterprise solutions with comprehensive protection built from first principles",
-      benefits: [
-        "SOC 2 Type II Compliance",
-        "Data Encryption",
-        "Security Scanning",
-        "Role-Based Access"
-      ]
+      subheadline: "Deploy secure enterprise solutions with comprehensive protection built from first principles",
+      benefits: ["SOC 2 Type II Compliance", "Data Encryption", "Security Scanning", "Role-Based Access"]
     }
   },
   benefits: [
     {
-      icon: <TrendingUp size={22} strokeWidth={1.5} />, // Slightly larger icon
+      icon: <TrendingUp size={22} strokeWidth={1.5} />,
       text: "73% Faster Deployment",
       subtext: "From concept to production in weeks",
       gradient: styles.gradients.primary
     },
     {
-      icon: <ShieldCheck size={22} strokeWidth={1.5} />, // Slightly larger icon
+      icon: <ShieldCheck size={22} strokeWidth={1.5} />,
       text: "Enterprise Security",
       subtext: "SOC 2, GDPR & ISO 27001 compliant",
       gradient: styles.gradients.accent1
     },
     {
-      icon: <DollarSign size={22} strokeWidth={1.5} />, // Slightly larger icon
+      icon: <DollarSign size={22} strokeWidth={1.5} />,
       text: "47% Cost Reduction",
       subtext: "Optimized infrastructure & reduced overhead",
       gradient: styles.gradients.accent2
     },
     {
-      icon: <Users size={22} strokeWidth={1.5} />, // Slightly larger icon
+      icon: <Users size={22} strokeWidth={1.5} />,
       text: "99.99% Uptime SLA",
       subtext: "Built for enterprise-grade reliability",
       gradient: "linear-gradient(135deg, #8B5CF6, #6366F1)"
@@ -418,12 +332,8 @@ const DATA: DataStructure = {
   ]
 };
 
-// -------------------- HELPER COMPONENTS --------------------
-interface CheckItemProps {
-  text: string;
-}
-
-const CheckItem: FC<CheckItemProps> = React.memo(({ text }) => (
+// CheckItem component
+const CheckItem = React.memo(({ text }) => (
   <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1.5 }}>
     <Box
       sx={{
@@ -452,41 +362,42 @@ const CheckItem: FC<CheckItemProps> = React.memo(({ text }) => (
     </Typography>
   </Stack>
 ));
-CheckItem.displayName = "CheckItem";
 
-// -------------------- MAIN COMPONENT --------------------
-const HeroSection: FC = () => {
-  const [isCalendlyOpen, setIsCalendlyOpen] = useState<boolean>(false);
-  const [selectedPersona, setSelectedPersona] = useState<keyof DataStructure["personas"]>("executive");
-  const [teamSize, setTeamSize] = useState<number>(5);
-  const [roi, setRoi] = useState<number>(30);
+// Main Component
+const HeroSection = () => {
+  const [isCalendlyOpen, setIsCalendlyOpen] = useState(false);
+  const [selectedPersona, setSelectedPersona] = useState("executive");
+  const [teamSize, setTeamSize] = useState(5);
+  const [roi, setRoi] = useState(30);
 
-  // Track persona in URL and localStorage
+  // Load persona from URL or localStorage
   useEffect(() => {
     const p = new URLSearchParams(window.location.search).get("persona");
     if (p && ["developer", "executive", "security"].includes(p)) {
-      setSelectedPersona(p as keyof DataStructure["personas"]);
+      setSelectedPersona(p);
     } else {
       const stored = localStorage.getItem("userPersona");
       if (stored && ["developer", "executive", "security"].includes(stored)) {
-        setSelectedPersona(stored as keyof DataStructure["personas"]);
+        setSelectedPersona(stored);
       }
     }
   }, []);
 
-  // Update localStorage when persona changes - Fixed TypeScript error with type assertion
+  // Save persona to localStorage
   useEffect(() => {
-    localStorage.setItem("userPersona", selectedPersona as string);
+    localStorage.setItem("userPersona", selectedPersona);
   }, [selectedPersona]);
 
   const personaData = DATA.personas[selectedPersona];
+  
+  // Calculate annual savings
   const annualSavings = useMemo(() => {
     const monthlyCost = teamSize * 10000;
     const rate = selectedPersona === "executive" ? 47 : roi;
     return Math.round(monthlyCost * 12 * (rate / 100));
   }, [teamSize, roi, selectedPersona]);
 
-  // Handle actions
+  // Event handlers
   const handleOpenCalendly = () => setIsCalendlyOpen(true);
   const handleCloseCalendly = () => setIsCalendlyOpen(false);
   const handleViewCaseStudies = () => window.open("/case-studies", "_self");
@@ -509,7 +420,7 @@ const HeroSection: FC = () => {
 
   return (
     <Section>
-      {/* Background with improved quality */}
+      {/* Background */}
       <Box sx={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden" }}>
         <Image
           src="/images/istockphoto-realhero.jpg"
@@ -517,8 +428,8 @@ const HeroSection: FC = () => {
           layout="fill"
           objectFit="cover"
           priority
-          style={{ filter: "saturate(1.1) brightness(0.75)", opacity: 0.95 }} // Slightly enhanced saturation
-          quality={95} // Increased from 90
+          style={{ filter: "saturate(1.1) brightness(0.75)", opacity: 0.95 }}
+          quality={95}
         />
       </Box>
       <BgOverlay />
@@ -535,7 +446,7 @@ const HeroSection: FC = () => {
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   color: styles.colors.primary,
-                  textShadow: "0 2px 10px rgba(139, 92, 246, 0.3)" // Subtle text glow
+                  textShadow: "0 2px 10px rgba(139, 92, 246, 0.3)"
                 }}
               >
                 47% Cost Reduction
@@ -543,7 +454,7 @@ const HeroSection: FC = () => {
             </Headline>
             <Subheadline>{personaData.subheadline}</Subheadline>
 
-            {/* CTA with improved spacing */}
+            {/* CTA */}
             <Box sx={{ textAlign: "center", mb: 5 }}>
               <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
                 <OfferChip
@@ -551,14 +462,11 @@ const HeroSection: FC = () => {
                   label="Limited Time: 2 Free Strategy Sessions"
                 />
               </Box>
-              <CTAButtonGroup 
-                onSchedule={handleOpenCalendly} 
-                onCaseStudies={handleViewCaseStudies} 
-              />
+              <CTAButtonGroup onSchedule={handleOpenCalendly} onCaseStudies={handleViewCaseStudies} />
             </Box>
           </FadeInView>
 
-          {/* Improved Persona Selector Tab Section */}
+          {/* Persona Selector */}
           <FadeInView delay={0.1}>
             <Box
               sx={{
@@ -567,10 +475,10 @@ const HeroSection: FC = () => {
                 flexDirection: { xs: "column", sm: "row" },
                 alignItems: "center",
                 justifyContent: "center",
-                p: 1.5, // Added padding around the entire section
+                p: 1.5,
                 borderRadius: 3,
-                background: "rgba(255,255,255,0.03)", // Very subtle background
-                border: "1px solid rgba(255,255,255,0.06)" // Subtle border
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.06)"
               }}
             >
               <Typography 
@@ -586,7 +494,7 @@ const HeroSection: FC = () => {
               </Typography>
               <Stack 
                 direction="row" 
-                spacing={1.5} // Increased spacing between buttons
+                spacing={1.5}
                 sx={{
                   flexWrap: { xs: "wrap", sm: "nowrap" },
                   justifyContent: "center"
@@ -596,7 +504,7 @@ const HeroSection: FC = () => {
                   <PersonaButton
                     key={p}
                     active={selectedPersona === p}
-                    onClick={() => setSelectedPersona(p as keyof DataStructure["personas"])}
+                    onClick={() => setSelectedPersona(p)}
                     aria-checked={selectedPersona === p}
                     role="radio"
                   >
@@ -607,12 +515,12 @@ const HeroSection: FC = () => {
             </Box>
           </FadeInView>
 
-          {/* Improved Benefits Grid with consistent sizing */}
+          {/* Benefits Grid */}
           <Box sx={{ mb: 6 }}>
             <Typography
               variant="h3"
               sx={{ 
-                fontSize: "1.625rem", // Slightly larger 
+                fontSize: "1.625rem",
                 textAlign: "center", 
                 color: "white", 
                 mb: 4, 
@@ -621,7 +529,7 @@ const HeroSection: FC = () => {
                 display: "inline-block",
                 left: "50%",
                 transform: "translateX(-50%)",
-                "&::after": { // Added underline decoration
+                "&::after": {
                   content: '""',
                   position: "absolute",
                   bottom: -10,
@@ -645,8 +553,8 @@ const HeroSection: FC = () => {
                         sx={{ 
                           fontWeight: 600, 
                           color: "#fff", 
-                          mb: 1.5, // Increased from 1
-                          fontSize: "1.125rem", // Increased from 1.05rem
+                          mb: 1.5,
+                          fontSize: "1.125rem",
                           lineHeight: 1.3 
                         }}
                       >
@@ -657,7 +565,7 @@ const HeroSection: FC = () => {
                           fontSize: "0.875rem", 
                           lineHeight: 1.6, 
                           color: "rgba(255,255,255,0.85)",
-                          flexGrow: 1 // Ensures text takes available space
+                          flexGrow: 1
                         }}
                       >
                         {b.subtext}
@@ -669,7 +577,7 @@ const HeroSection: FC = () => {
             </Grid>
           </Box>
 
-          {/* Improved Calculator Section */}
+          {/* Calculator Section */}
           <FadeInView once>
             <Box 
               sx={{
@@ -677,12 +585,12 @@ const HeroSection: FC = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.06))", // Slightly more visible
-                p: 4.5, // Increased padding
+                background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.06))",
+                p: 4.5,
                 borderRadius: 3,
-                border: "1px solid rgba(99, 102, 241, 0.25)", // More visible border
+                border: "1px solid rgba(99, 102, 241, 0.25)",
                 mb: 6,
-                boxShadow: "0 8px 32px rgba(99, 102, 241, 0.1)" // Subtle glow
+                boxShadow: "0 8px 32px rgba(99, 102, 241, 0.1)"
               }}
             >
               <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
@@ -698,7 +606,7 @@ const HeroSection: FC = () => {
                   mx: "auto", 
                   fontSize: "0.95rem", 
                   textAlign: "center", 
-                  mb: 3.5, // Increased spacing
+                  mb: 3.5,
                   lineHeight: 1.6
                 }}
               >
@@ -716,7 +624,7 @@ const HeroSection: FC = () => {
                   borderRadius: 2,
                   boxShadow: styles.shadows.primary,
                   px: 4,
-                  py: 1.25, // Taller button
+                  py: 1.25,
                   fontWeight: 600,
                   fontSize: "0.925rem",
                   transition: "all 0.2s ease"
@@ -728,7 +636,7 @@ const HeroSection: FC = () => {
             </Box>
           </FadeInView>
 
-          {/* Improved Final CTA */}
+          {/* Final CTA */}
           <Box 
             sx={{ 
               textAlign: "center", 
@@ -737,17 +645,17 @@ const HeroSection: FC = () => {
               mb: 2,
               p: 3,
               borderRadius: 4,
-              background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02))", // Very subtle background
+              background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02))",
             }}
           >
             <FadeInView once>
               <Typography 
                 sx={{ 
                   color: "#fff", 
-                  fontSize: "1.625rem", // Increased from 1.5rem
+                  fontSize: "1.625rem",
                   fontWeight: 700, 
-                  mb: 3.5, // Increased from 3
-                  maxWidth: 700, // Wider
+                  mb: 3.5,
+                  maxWidth: 700,
                   mx: "auto",
                   lineHeight: 1.3
                 }}
@@ -759,9 +667,9 @@ const HeroSection: FC = () => {
                 endIcon={<Calendar size={16} strokeWidth={2} />}
                 aria-label="Schedule your strategy session"
                 sx={{ 
-                  px: 4, // Wider button
-                  py: 1.5, // Taller button
-                  fontSize: "1rem" // Slightly larger text
+                  px: 4,
+                  py: 1.5,
+                  fontSize: "1rem"
                 }}
               >
                 Schedule Your Strategy Session
@@ -771,7 +679,7 @@ const HeroSection: FC = () => {
         </ContentArea>
       </Container>
 
-      {/* Calendly Widget (Lazy Loaded with Error Boundary) */}
+      {/* Calendly Widget */}
       <ErrorBoundary fallback={<div>Calendly could not be loaded. Please try again.</div>}>
         {isCalendlyOpen && (
           <Suspense fallback={calendlyLoadingFallback}>
