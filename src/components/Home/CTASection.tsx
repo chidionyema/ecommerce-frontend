@@ -1,50 +1,34 @@
+"use client";
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  useTheme,
-  alpha,
-  Grid,
-  Paper,
+  Box, Container, Typography, Button, useTheme, alpha, Grid, Paper, useMediaQuery
 } from '@mui/material';
 import { motion, useInView } from 'framer-motion';
-import { SPACING, getSharedStyles } from '../../utils/sharedStyles';
-import { ChevronRight } from 'lucide-react';
+import { SPACING } from '../../utils/sharedStyles';
+import { Mail, Briefcase } from 'lucide-react';
 
 const CTASection = () => {
   const theme = useTheme();
-  const styles = getSharedStyles(theme);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Refined animation variants with precise timing and subtle movements
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
       opacity: 1,
-      transition: { 
-        staggerChildren: 0.15,
-        delayChildren: 0.25
-      }
+      transition: { staggerChildren: 0.12, delayChildren: 0.15, duration: 0.8 }
     }
   };
   
   const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        duration: 0.65,
-        ease: [0.165, 0.015, 0.12, 0.995] // Apple-like cubic bezier
-      } 
-    }
+    hidden: { opacity: 0, y: 12 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.65 } }
   };
 
-  // Resource features with clear language and value proposition
+  // Resource features
   const resourceFeatures = [
     'Meticulously crafted technical guides',
     'Essential code patterns & templates',
@@ -57,22 +41,20 @@ const CTASection = () => {
       component="section"
       ref={ref}
       sx={{
-        py: SPACING.large * 1.6,
+        py: { xs: SPACING.large, md: SPACING.large * 1.5 },
         background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${alpha(theme.palette.primary.main, 0.85)} 100%)`,
         position: 'relative',
         overflow: 'hidden'
       }}
     >
-      {/* Refined background pattern with subtle opacity */}
+      {/* Background pattern */}
       <Box 
         sx={{
           position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          opacity: 0.04, // Reduced for subtlety
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
+          inset: 0,
+          opacity: 0.035,
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+          backgroundSize: '50px 50px'
         }}
       />
 
@@ -82,13 +64,8 @@ const CTASection = () => {
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
-          <Grid 
-            container 
-            spacing={4} 
-            alignItems="center" 
-            justifyContent="center"
-          >
-            {/* Left content - text with refined typography */}
+          <Grid container spacing={5} alignItems="center" justifyContent="center">
+            {/* Left content */}
             <Grid item xs={12} md={7}>
               <motion.div variants={itemVariants}>
                 <Typography
@@ -98,13 +75,23 @@ const CTASection = () => {
                     color: 'white',
                     fontWeight: 700,
                     mb: 2.5,
-                    textShadow: '0 2px 4px rgba(0,0,0,0.25)',
-                    fontSize: { xs: '2rem', sm: '2.5rem', md: '2.875rem' },
-                    letterSpacing: '-0.015em',
-                    lineHeight: 1.15
+                    fontSize: { xs: '2.25rem', md: '3rem' },
+                    lineHeight: 1.15,
+                    position: 'relative',
+                    display: 'inline-block',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: -8,
+                      left: 0,
+                      width: '75px',
+                      height: '3px',
+                      background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${alpha(theme.palette.secondary.main, 0.7)})`,
+                      borderRadius: '2px'
+                    }
                   }}
                 >
-                  Ready to Transform Your Enterprise Architecture?
+                  Enterprise Expertise On-Demand
                 </Typography>
               </motion.div>
 
@@ -114,40 +101,49 @@ const CTASection = () => {
                   sx={{
                     color: alpha(theme.palette.common.white, 0.92),
                     mb: 4,
-                    fontSize: '1.075rem',
-                    lineHeight: 1.55,
-                    maxWidth: '600px',
-                    letterSpacing: '0.01em',
-                    fontWeight: 400
+                    fontSize: '1.125rem',
+                    lineHeight: 1.6,
+                    maxWidth: '650px',
+                    '& strong': {
+                      fontWeight: 600,
+                      color: alpha(theme.palette.common.white, 0.98)
+                    }
                   }}
                 >
-                  Book a consultation with our senior engineers and discover how we can help you 
-                  implement enterprise-grade solutions based on our experience with ASOS, Tesco, and Philip Morris.
+                  Book a consultation with our <strong>senior engineers</strong> and discover how we can help you 
+                  implement enterprise-grade solutions based on our experience with <strong>ASOS</strong>, <strong>Tesco</strong>, and <strong>Philip Morris</strong>.
                 </Typography>
               </motion.div>
 
               <motion.div variants={itemVariants}>
-                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  gap: 2.5, 
+                  flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                  '& > a': {
+                    flexGrow: { xs: 1, sm: 0 },
+                    minWidth: { xs: '100%', sm: 'auto' }
+                  }
+                }}>
                   <Button
                     component={Link}
                     href="/contact"
                     variant="contained"
                     color="secondary"
                     size="large"
-                    endIcon={<ChevronRight size={18} />}
+                    endIcon={<Mail size={18} />}
                     sx={{
-                      px: 3.75,
+                      px: 3.5,
                       py: 1.4,
                       fontSize: '1rem',
                       fontWeight: 600,
-                      borderRadius: 1.5,
+                      borderRadius: 2,
                       textTransform: 'none',
-                      boxShadow: `0 4px 14px ${alpha(theme.palette.secondary.main, 0.45)}`,
-                      transition: 'all 0.38s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
+                      boxShadow: `0 5px 15px ${alpha(theme.palette.secondary.main, 0.45)}`,
                       '&:hover': {
                         transform: 'translateY(-2px)',
-                        boxShadow: `0 6px 18px ${alpha(theme.palette.secondary.main, 0.55)}`,
-                      },
+                        boxShadow: `0 8px 20px ${alpha(theme.palette.secondary.main, 0.55)}`,
+                      }
                     }}
                   >
                     Book Free Consultation
@@ -157,23 +153,23 @@ const CTASection = () => {
                     href="/solutions"
                     variant="outlined"
                     size="large"
+                    startIcon={<Briefcase size={18} />}
                     sx={{
-                      px: 3.75,
+                      px: 3.5,
                       py: 1.4,
                       fontSize: '1rem',
                       fontWeight: 600,
-                      borderRadius: 1.5,
+                      borderRadius: 2,
                       textTransform: 'none',
-                      borderWidth: 1.5,
+                      borderWidth: 2,
                       borderColor: alpha(theme.palette.common.white, 0.55),
                       color: theme.palette.common.white,
-                      transition: 'all 0.35s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
                       '&:hover': {
-                        borderWidth: 1.5,
+                        borderWidth: 2,
                         borderColor: theme.palette.common.white,
                         backgroundColor: alpha(theme.palette.common.white, 0.08),
-                        transform: 'translateY(-2px)',
-                      },
+                        transform: 'translateY(-2px)'
+                      }
                     }}
                   >
                     View Portfolio
@@ -182,22 +178,31 @@ const CTASection = () => {
               </motion.div>
             </Grid>
 
-            {/* Right content - subscription box with refined visuals */}
+            {/* Right content - subscription box */}
             <Grid item xs={12} md={5}>
               <motion.div variants={itemVariants}>
                 <Paper
-                  elevation={4}
+                  elevation={0}
                   sx={{
-                    p: 3.75,
-                    borderRadius: 2.5,
+                    p: { xs: 3, md: 3.75 },
+                    borderRadius: 3,
                     background: alpha(theme.palette.background.paper, 0.97),
-                    backdropFilter: 'blur(12px)',
-                    boxShadow: `0 8px 28px ${alpha(theme.palette.common.black, 0.16)}`,
+                    boxShadow: `0 10px 30px ${alpha(theme.palette.common.black, 0.15)}`,
                     border: `1px solid ${alpha(theme.palette.common.white, 0.12)}`,
-                    transition: 'transform 0.38s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
+                    position: 'relative',
+                    overflow: 'hidden',
                     '&:hover': {
-                      transform: 'translateY(-3px)',
-                      boxShadow: `0 12px 32px ${alpha(theme.palette.common.black, 0.18)}`,
+                      transform: 'translateY(-4px)',
+                      boxShadow: `0 14px 36px ${alpha(theme.palette.common.black, 0.18)}`,
+                    },
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '5px',
+                      background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                     }
                   }}
                 >
@@ -205,10 +210,23 @@ const CTASection = () => {
                     variant="h5" 
                     component="h3" 
                     fontWeight={700} 
-                    mb={1}
+                    mb={1.25}
                     color={theme.palette.primary.main}
-                    letterSpacing="-0.01em"
-                    fontSize="1.35rem"
+                    fontSize="1.4rem"
+                    sx={{
+                      position: 'relative',
+                      display: 'inline-block',
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: -5,
+                        left: 0,
+                        width: '35px',
+                        height: '2px',
+                        background: alpha(theme.palette.primary.main, 0.8),
+                        borderRadius: '1px'
+                      }
+                    }}
                   >
                     Subscribe to GLUStack Resources
                   </Typography>
@@ -216,16 +234,16 @@ const CTASection = () => {
                   <Typography 
                     variant="body1" 
                     color={theme.palette.text.secondary} 
-                    mb={3}
-                    fontSize="0.95rem"
+                    mb={3.5}
+                    fontSize="0.975rem"
                     lineHeight={1.6}
-                    letterSpacing="0.01em"
+                    sx={{ maxWidth: '94%', mt: 1.5 }}
                   >
                     Access our curated library of enterprise resources, detailed tutorials, and production-ready code samples.
                   </Typography>
                   
-                  {/* Subscription features with refined checkmarks */}
-                  <Box sx={{ mb: 3.5 }}>
+                  {/* Feature list */}
+                  <Box sx={{ mb: 4 }}>
                     {resourceFeatures.map((feature, index) => (
                       <Box 
                         key={index} 
@@ -233,31 +251,30 @@ const CTASection = () => {
                           display: 'flex', 
                           alignItems: 'center', 
                           gap: 1.4,
-                          mb: 1.5
+                          mb: index < resourceFeatures.length - 1 ? 2 : 0
                         }}
                       >
                         <Box 
                           sx={{ 
-                            width: 18, 
-                            height: 18, 
+                            width: 20, 
+                            height: 20, 
                             borderRadius: '50%', 
-                            backgroundColor: theme.palette.secondary.main,
+                            background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${alpha(theme.palette.secondary.light, 0.9)})`,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             color: 'white',
                             fontSize: '0.75rem',
-                            fontWeight: 600,
-                            boxShadow: `0 1px 3px ${alpha(theme.palette.secondary.main, 0.4)}`
+                            fontWeight: 600
                           }}
                         >
                           ✓
                         </Box>
                         <Typography 
-                          fontSize="0.925rem" 
+                          fontSize="0.95rem" 
                           color={theme.palette.text.primary}
-                          letterSpacing="0.01em"
                           fontWeight={500}
+                          lineHeight={1.4}
                         >
                           {feature}
                         </Typography>
@@ -277,17 +294,36 @@ const CTASection = () => {
                       textTransform: 'none',
                       fontWeight: 600,
                       fontSize: '0.95rem',
-                      borderRadius: 1.5,
-                      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
-                      transition: 'all 0.35s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
+                      borderRadius: 2,
+                      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}`,
                       '&:hover': {
-                        transform: 'translateY(-1px)',
-                        boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
-                      },
+                        transform: 'translateY(-2px)',
+                        boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.35)}`,
+                      }
                     }}
                   >
                     Subscribe for Free
                   </Button>
+                  
+                  {/* Badge */}
+                  <Box sx={{
+                    position: 'absolute',
+                    bottom: 16,
+                    right: 16,
+                    fontSize: '0.7rem',
+                    color: alpha(theme.palette.text.secondary, 0.7),
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5
+                  }}>
+                    <Box component="span" sx={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      backgroundColor: theme.palette.success.main
+                    }} />
+                    ENTERPRISE QUALITY
+                  </Box>
                 </Paper>
               </motion.div>
             </Grid>

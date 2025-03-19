@@ -152,24 +152,25 @@ const CategoryLabel = ({ category, theme }: { category: string; theme: Theme }) 
 );
 
 interface StyledTechCardProps {
-  importance?: 'primary' | 'secondary' | 'tertiary';
-  accentColor?: string;
+  $importance?: 'primary' | 'secondary' | 'tertiary';
+  $accentColor?: string;
 }
 
+// Fixed: Added $ prefix to prop names to prevent them from being passed to the DOM
 const StyledTechCard = styled(motion.div, {
-  shouldForwardProp: (prop) => !['importance', 'accentColor'].includes(prop as string)
-})<StyledTechCardProps>(({ theme, importance, accentColor }) => {
-  const primaryShadow = `0px 8px 24px ${alpha(accentColor || theme.palette.primary.main, 0.2)}`;
+  shouldForwardProp: (prop) => !['$importance', '$accentColor'].includes(prop as string)
+})<StyledTechCardProps>(({ theme, $importance, $accentColor }) => {
+  const primaryShadow = `0px 8px 24px ${alpha($accentColor || theme.palette.primary.main, 0.2)}`;
   const secondaryShadow = `0px 6px 16px ${alpha(theme.palette.grey[800], 0.15)}`;
   const tertiaryShadow = `0px 4px 12px ${alpha(theme.palette.grey[800], 0.1)}`;
-  const hoverShadow = `0px 12px 32px ${alpha(accentColor || theme.palette.primary.main, 0.25)}`;
+  const hoverShadow = `0px 12px 32px ${alpha($accentColor || theme.palette.primary.main, 0.25)}`;
 
   const getImportanceStyles = () => {
-    switch(importance) {
+    switch($importance) {
       case 'primary':
         return {
           borderWidth: 2,
-          borderColor: accentColor || theme.palette.primary.main,
+          borderColor: $accentColor || theme.palette.primary.main,
           boxShadow: primaryShadow,
           transform: 'scale(1.03)',
         };
@@ -210,7 +211,7 @@ const StyledTechCard = styled(motion.div, {
     boxShadow: importanceStyles.boxShadow,
     transform: importanceStyles.transform,
     '&:hover': {
-      transform: `translateY(-8px) ${importance === 'primary' ? 'scale(1.05)' : 'scale(1.02)'}`,
+      transform: `translateY(-8px) ${$importance === 'primary' ? 'scale(1.05)' : 'scale(1.02)'}`,
       boxShadow: hoverShadow,
       '& .card-content': {
         transform: 'translateY(-8px)',
@@ -222,13 +223,13 @@ const StyledTechCard = styled(motion.div, {
       top: 0,
       left: 0,
       width: '100%',
-      height: importance === 'primary' ? '4px' : '3px',
-      background: `linear-gradient(90deg, ${accentColor || theme.palette.primary.main}, ${accentColor ? alpha(accentColor, 0.7) : theme.palette.primary.light})`,
+      height: $importance === 'primary' ? '4px' : '3px',
+      background: `linear-gradient(90deg, ${$accentColor || theme.palette.primary.main}, ${$accentColor ? alpha($accentColor, 0.7) : theme.palette.primary.light})`,
       opacity: 0.8,
       transition: 'height 0.3s ease, opacity 0.3s ease',
     },
     '&:hover::after': {
-      height: importance === 'primary' ? '6px' : '4px',
+      height: $importance === 'primary' ? '6px' : '4px',
       opacity: 1,
     },
     '@media (max-width: 599.95px)': {
@@ -301,8 +302,9 @@ const TechCard: React.FC<TechCardProps> = ({
   return (
     <StyledTechCard
       ref={ref}
-      importance={importance}
-      accentColor={accentColor}
+      // Fixed: Added $ prefix to transient props
+      $importance={importance}
+      $accentColor={accentColor}
       variants={cardVariants}
       initial="hidden"
       animate={inView ? "visible" : "hidden"}

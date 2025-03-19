@@ -3,69 +3,100 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import NextLink from 'next/link';
-import { Box, Typography, Container, Grid, Tabs, Tab, Chip, useTheme, alpha, 
+import { Box, Typography, Container, Grid, Chip, useTheme, alpha, 
   Stack, Paper, Button, IconButton, Tooltip, Divider } from '@mui/material';
-import { ArrowForwardRounded, CheckCircleRounded, InfoOutlined, KeyboardArrowRightRounded,
-  StarRounded, ShieldRounded, SupportRounded, SpeedRounded } from '@mui/icons-material';
+import { ArrowForwardRounded, CheckCircleRounded, InfoOutlined, CompareArrowsRounded,
+  StarRounded, ShieldRounded, SupportRounded, SpeedRounded, CloseRounded } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import ConsistentPageLayout from '../../components/Shared/ConsistentPageLayout';
-import { pricingPageContent, plans } from '../../data/pricingPageData';
 import { theme as brandKit } from '../../theme/brandKit';
 import { Theme } from '@mui/material/styles';
 
 // Types
-type PlanType = string;
 type BillingCycle = 'monthly' | 'annual';
 
 interface Plan {
-  type: string; title: string; tagline: string; price: string;
-  annualPrice?: string; values?: string[]; recommended?: boolean; icon?: string;
+  type: string; 
+  title: string; 
+  tagline: string; 
+  price: string;
+  values?: string[]; 
+  recommended?: boolean; 
+  icon?: string;
 }
 
-interface Feature { name: string; values: Record<string, boolean | string>; }
+interface Feature { 
+  name: string; 
+  values: Record<string, boolean | string>; 
+}
 
-// Add guarantee
-pricingPageContent.faqSection.items.push({
-  question: "What is our guarantee?",
-  answer: "We offer a 30-day money-back guarantee to ensure complete satisfaction."
-});
-
-// Feature matrix
-const categories = [
-  { name: 'Core Features', id: 'core', icon: <SpeedRounded fontSize="small" /> },
-  { name: 'Support', id: 'support', icon: <SupportRounded fontSize="small" /> },
-  { name: 'Security', id: 'security', icon: <ShieldRounded fontSize="small" /> },
-  { name: 'Advanced', id: 'advanced', icon: <StarRounded fontSize="small" /> }
+// Define plans directly
+const plans: Plan[] = [
+  {
+    type: "strategy",
+    title: "Strategy Session",
+    tagline: "Diagnose your key challenges and get a clear roadmap.",
+    price: "£797", // GBP price
+    values: ["Problem Diagnosis", "High-Level Roadmap", "Expert Recommendations"],
+    icon: 'star',
+  },
+  {
+    type: "project",
+    title: "Project Implementation",
+    tagline: "Get hands-on support to achieve your specific goals.",
+    price: "Starting at £4,000", // GBP price
+    values: ["Customized Solution", "Dedicated Project Management", "Tangible Results"],
+    recommended: true,
+    icon: 'speed',
+  },
+  {
+    type: "custom",
+    title: "Custom Solutions",
+    tagline: "For complex projects and ongoing support.",
+    price: "Contact Us",
+    values: ["Tailored to Your Needs", "Long-Term Partnership", "Maximum Impact"],
+    icon: 'shield',
+  },
 ];
 
+// Define feature comparison matrix
 const allFeatures: Record<string, Feature[]> = {
   core: [
-    { name: 'Number of users', values: { consultation: '1 user', project: 'Up to 10 users', enterprise: 'Unlimited' } },
-    { name: 'Storage space', values: { consultation: '10 GB', project: '100 GB', enterprise: '1 TB' } },
-    { name: 'Projects', values: { consultation: '3', project: 'Unlimited', enterprise: 'Unlimited' } },
-    { name: 'API access', values: { consultation: false, project: true, enterprise: true } }
+    { name: 'Problem Assessment', values: { strategy: true, project: true, custom: true } },
+    { name: 'Solution Roadmap', values: { strategy: 'High-Level', project: 'Detailed', custom: 'Detailed' } },
+    { name: 'Project Management', values: { strategy: false, project: true, custom: true } },
   ],
   support: [
-    { name: 'Email support', values: { consultation: true, project: true, enterprise: true } },
-    { name: 'Phone support', values: { consultation: false, project: true, enterprise: true } },
-    { name: 'Dedicated manager', values: { consultation: false, project: false, enterprise: true } },
-    { name: 'Response time', values: { consultation: '24 hours', project: '12 hours', enterprise: '4 hours' } }
+    { name: 'Email Support', values: { strategy: true, project: true, custom: true } },
+    { name: 'Priority Support', values: { strategy: false, project: true, custom: true } },
   ],
   security: [
-    { name: 'Two-factor auth', values: { consultation: true, project: true, enterprise: true } },
-    { name: 'Advanced SSO', values: { consultation: false, project: true, enterprise: true } },
-    { name: 'Audit logs', values: { consultation: false, project: true, enterprise: true } },
-    { name: 'Custom security', values: { consultation: false, project: false, enterprise: true } }
+    { name: 'Data Security', values: { strategy: true, project: true, custom: true } },
+    { name: 'Confidentiality', values: { strategy: true, project: true, custom: true } },
   ],
-  advanced: [
-    { name: 'Custom integrations', values: { consultation: false, project: false, enterprise: true } },
-    { name: 'Workflow automation', values: { consultation: false, project: true, enterprise: true } },
-    { name: 'Analytics dashboard', values: { consultation: 'Basic', project: 'Advanced', enterprise: 'Enterprise' } },
-    { name: 'White labeling', values: { consultation: false, project: false, enterprise: true } }
-  ]
 };
 
-// Components with cleaner implementation
+// FAQ items
+const faqItems = [
+  {
+    question: "How does the Project Implementation pricing work?",
+    answer: "Project Implementation pricing starts at £4,000 but may vary based on the scope, complexity, and specific requirements of your project. We'll provide a detailed quote after understanding your needs during the initial consultation."
+  },
+  {
+    question: "Do you offer international payment options?",
+    answer: "Yes, we accept payments in major currencies including GBP, USD, and EUR. You can select your preferred currency using the currency switcher at the top of the page."
+  },
+  {
+    question: "What's included in the Strategy Session?",
+    answer: "The Strategy Session includes a comprehensive assessment of your business challenges, a high-level roadmap for addressing these challenges, and expert recommendations from our team of consultants."
+  },
+  {
+    question: "How long does a typical project take?",
+    answer: "Project timelines vary depending on complexity and scope. A typical implementation project ranges from 4-12 weeks, while custom solutions may extend further based on requirements."
+  }
+];
+
+// Component helpers
 const FeatureCheck = ({ color = 'primary', size = 'medium' }: { color?: 'primary' | 'success', size?: 'small' | 'medium' }) => {
   const theme = useTheme();
   const dims = size === 'small' ? 18 : 22;
@@ -113,13 +144,13 @@ const PlanIcon = ({ icon, isRecommended, theme }: { icon: string, isRecommended:
   );
 };
 
-const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, isHovered, onHover }: 
-  { plan: Plan, isRecommended: boolean, billingCycle: BillingCycle, onClick: (planType: string) => void, 
-    onViewFeatures: () => void, isHovered: boolean, onHover: (planType: string | null) => void }) => {
+const PlanCard = ({ plan, isRecommended, onClick, isHovered, onHover, currentCurrency }: 
+  { plan: Plan, isRecommended: boolean, onClick: (planType: string) => void, 
+    isHovered: boolean, onHover: (planType: string | null) => void, currentCurrency: string }) => {
   const theme = useTheme();
-  const monthlyCost = parseFloat(plan.price.replace(/[^0-9.]/g, ''));
-  const annualCost = parseFloat((plan.annualPrice || plan.price).replace(/[^0-9.]/g, ''));
-  const savingsPercent = monthlyCost > 0 ? Math.round(((monthlyCost * 12) - (annualCost * 12)) / (monthlyCost * 12) * 100) : 0;
+  
+  // Get displayed price based on current currency
+  const displayPrice = plan.price; // This would be updated with currency conversion logic
   
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
@@ -146,33 +177,22 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3.5, minHeight: 48 }}>{plan.tagline}</Typography>
 
         <Stack spacing={2.5} sx={{ mb: 4 }}>
-          {['Ideal for small teams', 'Quick setup', 'Basic support']
-            .map((val, i) => plan.values?.[i] || val)
-            .map((feature, i) => (
-              <Stack key={i} direction="row" spacing={1.5} alignItems="center">
-                <FeatureCheck color={isRecommended ? 'primary' : 'success'} />
-                <Typography variant="body2" sx={{ color: isRecommended ? theme.palette.text.primary 
-                  : theme.palette.text.secondary, fontWeight: 500 }}>{feature}</Typography>
-              </Stack>
-            ))}
+          {plan.values?.map((feature, i) => (
+            <Stack key={i} direction="row" spacing={1.5} alignItems="center">
+              <FeatureCheck color={isRecommended ? 'primary' : 'success'} />
+              <Typography variant="body2" sx={{ color: isRecommended ? theme.palette.text.primary 
+                : theme.palette.text.secondary, fontWeight: 500 }}>{feature}</Typography>
+            </Stack>
+          ))}
         </Stack>
 
         <Divider sx={{ borderColor: alpha(theme.palette.divider, 0.12), my: 3.5 }} />
 
         <Box sx={{ mb: 3.5 }}>
           <Typography variant="h4" sx={{ fontWeight: 800, color: isRecommended ? theme.palette.primary.main 
-            : theme.palette.text.primary, display: 'inline-flex', alignItems: 'baseline', gap: 1 }}>
-            {billingCycle === 'annual' && plan.annualPrice ? plan.annualPrice : plan.price}
-            
-            {billingCycle === 'annual' && plan.annualPrice && savingsPercent > 0 && (
-              <Typography component="span" variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem', 
-                bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main,
-                px: 1, py: 0.5, borderRadius: 1.5 }}>SAVE {savingsPercent}%</Typography>
-            )}
-          </Typography>
-          
-          <Typography variant="caption" sx={{ color: theme.palette.text.secondary, display: 'block', mt: 0.5 }}>
-            {billingCycle === 'annual' ? 'Billed annually' : 'Billed monthly'}
+            : theme.palette.text.primary, display: 'inline-flex', alignItems: 'baseline', gap: 1 }}
+            className="price-value" data-plan={plan.type}>
+            {displayPrice}
           </Typography>
         </Box>
 
@@ -182,13 +202,8 @@ const PlanCard = ({ plan, isRecommended, billingCycle, onClick, onViewFeatures, 
               boxShadow: '0 4px 14px rgba(51,102,255,0.35)',
               '&:hover': { boxShadow: '0 6px 20px rgba(51,102,255,0.5)', transform: 'translateY(-2px)' } }) }}
           endIcon={<ArrowForwardRounded />}>
-          {isRecommended ? 'Get started' : 'Choose plan'}
-        </Button>
-
-        <Button variant="text" size="small" color="inherit" onClick={onViewFeatures}
-          sx={{ fontSize: '0.8rem', mt: 2, justifyContent: 'center' }}
-          endIcon={<KeyboardArrowRightRounded fontSize="small" />}>
-          View all features
+          {plan.type === 'strategy' ? 'Get Started with Strategy' : 
+           plan.type === 'project' ? 'Start Your Project' : 'Request a Consultation'}
         </Button>
       </Paper>
     </motion.div>
@@ -211,55 +226,18 @@ const SectionHeading = ({ label, title, description }: { label?: string, title: 
   );
 };
 
-const StatsCard = ({ stats, theme }: { stats: Array<{ value: string, label: string, icon: React.ReactNode }>, theme: Theme }) => (
-  <Paper elevation={0} sx={{ backdropFilter: 'blur(10px)', bgcolor: alpha('#fff', 0.08),
-    borderRadius: 4, border: `1px solid ${alpha('#fff', 0.2)}`, p: 4, width: '100%',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
-    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3.5 }}>
-      <Box sx={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', 
-        justifyContent: 'center', bgcolor: alpha('#fff', 0.15) }}>
-        <StarRounded sx={{ fontSize: 20, color: '#fff' }} />
-      </Box>
-      <Typography variant="h6" sx={{ fontWeight: 700, color: '#fff' }}>Trusted globally</Typography>
-    </Stack>
-
-    <Grid container spacing={3}>
-      {stats.slice(0, 4).map((stat, i) => (
-        <Grid item xs={6} key={i}>
-          <motion.div whileHover={{ y: -5 }}>
-            <Box sx={{ p: 2, textAlign: 'center', bgcolor: alpha('#fff', 0.05), borderRadius: 3,
-              border: `1px solid ${alpha('#fff', 0.1)}`, height: '100%', display: 'flex', 
-              flexDirection: 'column', justifyContent: 'center' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1, opacity: 0.7 }}>{stat.icon}</Box>
-              <Typography variant="h5" sx={{ fontWeight: 800, color: '#fff', mb: 0.5 }}>{stat.value}</Typography>
-              <Typography variant="body2" sx={{ color: alpha('#fff', 0.8), fontSize: '0.75rem' }}>{stat.label}</Typography>
-            </Box>
-          </motion.div>
-        </Grid>
-      ))}
-    </Grid>
-  </Paper>
-);
-
-const CTAButtons = ({ primary, secondary, darkMode = false }: 
-  { primary: { text: string, href: string }, secondary: { text: string, href: string }, darkMode?: boolean }) => {
-  const theme = useTheme();
-  return (
-    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
-      <Button component={NextLink} href={primary.href} size="large" variant="contained" 
-        sx={{ bgcolor: darkMode ? '#fff' : undefined, color: darkMode ? theme.palette.primary.dark : undefined, 
-          textTransform: 'none', fontWeight: 700, py: 1.75, px: 4, borderRadius: 3,
-          boxShadow: '0 8px 20px rgba(0,0,0,0.15)' }}>
-        {primary.text}
-      </Button>
-      <Button variant="outlined" component={NextLink} href={secondary.href} size="large" 
-        sx={{ borderColor: darkMode ? alpha('#fff', 0.6) : undefined, color: darkMode ? '#fff' : undefined, 
-          textTransform: 'none', fontWeight: 600, py: 1.75, px: 4, borderRadius: 3,
-          bgcolor: darkMode ? alpha('#fff', 0.05) : undefined }}>
-        {secondary.text}
-      </Button>
-    </Stack>
-  );
+// Currency conversion function (conceptual)
+const getExchangeRate = async (fromCurrency: string, toCurrency: string) => {
+  // In a real implementation, you would fetch this from an API like Open Exchange Rates
+  // For now, we'll use a simple mapping
+  const rates = {
+    GBP: { USD: 1.27, EUR: 1.18 },
+    USD: { GBP: 0.79, EUR: 0.93 },
+    EUR: { GBP: 0.85, USD: 1.08 }
+  };
+  
+  if (fromCurrency === toCurrency) return 1;
+  return rates[fromCurrency as keyof typeof rates][toCurrency as keyof typeof rates[keyof typeof rates]] || 1;
 };
 
 // Main component
@@ -267,32 +245,45 @@ export default function PricingPage() {
   const theme = useTheme();
   const router = useRouter();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('annual');
-  const [activeTab, setActiveTab] = useState(0);
   const [compareMode, setCompareMode] = useState(false);
-  const [hoverCard, setHoverCard] = useState<PlanType | null>(null);
+  const [hoverCard, setHoverCard] = useState<string | null>(null);
   const [animateIn, setAnimateIn] = useState(false);
+  const [currentCurrency, setCurrentCurrency] = useState('GBP');
 
   useEffect(() => { 
     const timer = setTimeout(() => setAnimateIn(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
-  const handlePlanClick = (planType: string) => router.push(`/contact?plan=${planType}`);
-
-  // Stats for testimonials
-  const stats = [
-    { value: '97%', label: 'Customer satisfaction', icon: <StarRounded fontSize="small" /> },
-    { value: '5K+', label: 'Active customers', icon: <SpeedRounded fontSize="small" /> },
-    { value: '4.9', label: 'TrustPilot rating', icon: <ShieldRounded fontSize="small" /> },
-    { value: '24/7', label: 'Customer support', icon: <SupportRounded fontSize="small" /> }
-  ];
-
-  // Filter plans for current tab
-  const getTabPlans = () => {
-    if (activeTab === 0) return plans.filter(p => ['consultation', 'project'].includes(p.type));
-    if (activeTab === 1) return plans.filter(p => ['project', 'enterprise'].includes(p.type));
-    return plans.filter(p => p.type === 'enterprise' || p.recommended);
+  const handlePlanClick = (planType: string) => {
+    if (planType === 'strategy') {
+      router.push('/contact?plan=strategy');
+    } else if (planType === 'project') {
+      router.push('/contact?plan=project');
+    } else {
+      router.push('/contact');
+    }
   };
+
+  // This would update prices based on selected currency
+  const updatePrices = async (newCurrency: string) => {
+    if (newCurrency === currentCurrency) return;
+    
+    // In a real implementation, this would update the DOM with converted prices
+    // For demo purposes, we're just updating the state
+    setCurrentCurrency(newCurrency);
+  };
+
+  const handleCurrencyChange = async (currency: string) => {
+    await updatePrices(currency);
+  };
+
+  // Categories for feature comparison
+  const categories = [
+    { name: 'Core Features', id: 'core', icon: <SpeedRounded fontSize="small" /> },
+    { name: 'Support', id: 'support', icon: <SupportRounded fontSize="small" /> },
+    { name: 'Security', id: 'security', icon: <ShieldRounded fontSize="small" /> },
+  ];
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', overflow: 'hidden', pb: 10 }}>
@@ -305,95 +296,78 @@ export default function PricingPage() {
               <Typography variant="h1" sx={{ fontSize: { xs: '2.25rem', md: '3.25rem' }, fontWeight: 800, mb: 3,
                 backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Transparent pricing <br className="hidden md:block" />for every business
+                Simple Pricing, Powerful Results
               </Typography>
 
               <Typography variant="body1" sx={{ color: theme.palette.text.secondary, mb: 6, maxWidth: 600, 
                 mx: 'auto', fontSize: { xs: '1.1rem', md: '1.25rem' } }}>
-                Choose the perfect plan that fits your needs with no hidden fees or complicated tiers.
-                All plans include core platform features.
+                Choose the right plan to accelerate your business growth...
               </Typography>
             </motion.div>
 
-            {/* Billing toggle */}
+            {/* Currency Switcher */}
             <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 15 }}
               transition={{ duration: 0.5, delay: 0.1 }}>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2 }} 
-                justifyContent="center" alignItems="center" sx={{ mb: { xs: 6, md: 8 } }}>
+              <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ mb: 6 }}>
                 <Box sx={{ bgcolor: alpha(theme.palette.primary.main, 0.06),
                   border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
                   borderRadius: 10, p: 0.75, display: 'inline-flex' }}>
-                  <Button onClick={() => setBillingCycle('monthly')} 
-                    variant={billingCycle === 'monthly' ? 'contained' : 'text'} disableElevation
-                    sx={{ minWidth: 120, borderRadius: 8, textTransform: 'none', fontWeight: 600,
-                      color: billingCycle === 'monthly' ? '#fff' : theme.palette.text.primary }}>Monthly</Button>
-                  <Button onClick={() => setBillingCycle('annual')} 
-                    variant={billingCycle === 'annual' ? 'contained' : 'text'} disableElevation
-                    endIcon={billingCycle === 'annual' && (
-                      <Chip label="Save 10%" size="small" sx={{ height: 20, fontSize: '0.675rem',
-                        bgcolor: '#fff', color: theme.palette.primary.main }} />
-                    )}
-                    sx={{ minWidth: 120, borderRadius: 8, textTransform: 'none', fontWeight: 600,
-                      color: billingCycle === 'annual' ? '#fff' : theme.palette.text.primary }}>Annual</Button>
+                  <Button onClick={() => handleCurrencyChange('GBP')}
+                    variant={currentCurrency === 'GBP' ? 'contained' : 'text'} disableElevation
+                    sx={{ minWidth: 80, borderRadius: 8, textTransform: 'none', fontWeight: 600,
+                      color: currentCurrency === 'GBP' ? '#fff' : theme.palette.text.primary }}>GBP (£)</Button>
+                  <Button onClick={() => handleCurrencyChange('USD')}
+                    variant={currentCurrency === 'USD' ? 'contained' : 'text'} disableElevation
+                    sx={{ minWidth: 80, borderRadius: 8, textTransform: 'none', fontWeight: 600,
+                      color: currentCurrency === 'USD' ? '#fff' : theme.palette.text.primary }}>USD ($)</Button>
+                  <Button onClick={() => handleCurrencyChange('EUR')}
+                    variant={currentCurrency === 'EUR' ? 'contained' : 'text'} disableElevation
+                    sx={{ minWidth: 80, borderRadius: 8, textTransform: 'none', fontWeight: 600,
+                      color: currentCurrency === 'EUR' ? '#fff' : theme.palette.text.primary }}>EUR (€)</Button>
                 </Box>
-
-                <Button variant="text" color="inherit" onClick={() => setCompareMode(!compareMode)}
-                  sx={{ textTransform: 'none', fontWeight: 500,
-                    color: compareMode ? theme.palette.primary.main : theme.palette.text.secondary }}
-                  startIcon={<Box component="span" sx={{ width: 18, height: 18, borderRadius: '50%', 
-                    border: '1.5px solid', borderColor: compareMode ? theme.palette.primary.main : theme.palette.text.disabled,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
-                    '&::after': compareMode ? { content: '""', position: 'absolute', width: 10, height: 10,
-                      borderRadius: '50%', bgcolor: theme.palette.primary.main } : {} }} />}>
-                  {compareMode ? 'Hide comparison' : 'Compare all features'}
-                </Button>
               </Stack>
             </motion.div>
           </Box>
         </Container>
 
         {/* Pricing Cards */}
-        {!compareMode && (
-          <Container maxWidth="lg" sx={{ mb: { xs: 16, md: 20 } }}>
-            {/* Tab interface */}
-            <Box sx={{ mb: { xs: 6, md: 8 }, display: 'flex', justifyContent: 'center' }}>
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 10 }}
-                transition={{ duration: 0.4, delay: 0.2 }}>
-                <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}
-                  sx={{ '.MuiTabs-indicator': { height: 3, borderRadius: 1.5 } }}>
-                  {['For Startups', 'For Teams', 'For Enterprise'].map((label, index) => (
-                    <Tab key={index} label={label} sx={{ textTransform: 'none', fontWeight: 600 }} />
-                  ))}
-                </Tabs>
-              </motion.div>
-            </Box>
+        <Container maxWidth="lg" sx={{ mb: { xs: 8, md: 10 } }}>
+          {/* Plan cards */}
+          <Grid container spacing={4} justifyContent="center">
+            {plans.map((plan, index) => {
+              const isRecommended = plan.type === 'project' || !!plan.recommended;
+              
+              return (
+                <Grid item xs={12} sm={6} md={4} key={plan.type} sx={{ zIndex: isRecommended ? 2 : 1 }}>
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 20 }}
+                    transition={{ duration: 0.5, delay: 0.2 + (index * 0.1) }}>
+                    <PlanCard 
+                      plan={plan} 
+                      isRecommended={isRecommended}
+                      onClick={handlePlanClick}
+                      isHovered={hoverCard === plan.type} 
+                      onHover={setHoverCard}
+                      currentCurrency={currentCurrency}
+                    />
+                  </motion.div>
+                </Grid>
+              );
+            })}
+          </Grid>
 
-            {/* Plan cards */}
-            <Grid container spacing={4} justifyContent="center">
-              {getTabPlans().map((plan, index) => {
-                const isRecommended = (activeTab === 0 && plan.type === 'consultation') ||
-                                     (activeTab === 1 && plan.type === 'project') ||
-                                     (activeTab === 2 && plan.type === 'enterprise') ||
-                                     !!plan.recommended;
-                
-                // Add icon based on plan type
-                const enhancedPlan = { ...plan, icon: plan.type === 'consultation' ? 'star' 
-                  : plan.type === 'project' ? 'speed' : 'shield' };
-                
-                return (
-                  <Grid item xs={12} sm={6} md={4} key={plan.type} sx={{ zIndex: isRecommended ? 2 : 1 }}>
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: animateIn ? 1 : 0, y: animateIn ? 0 : 20 }}
-                      transition={{ duration: 0.5, delay: 0.2 + (index * 0.1) }}>
-                      <PlanCard plan={enhancedPlan} isRecommended={isRecommended} billingCycle={billingCycle}
-                        onClick={handlePlanClick} onViewFeatures={() => setCompareMode(true)}
-                        isHovered={hoverCard === plan.type} onHover={setHoverCard} />
-                    </motion.div>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Container>
-        )}
+          {/* Compare All Features Button */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Button
+              variant="outlined"
+              color="inherit"
+              onClick={() => setCompareMode(true)}
+              startIcon={<CompareArrowsRounded />}
+              sx={{ mt: 4 }}
+            >
+              Compare All Features
+            </Button>
+          </Box>
+        </Container>
 
         {/* Feature comparison table */}
         <AnimatePresence>
@@ -415,18 +389,17 @@ export default function PricingPage() {
                         </Grid>
                         
                         {plans.map((plan) => (
-                          <Grid item xs={plans.length > 3 ? 2 : 8 / Number(plans.length)} key={`header-${plan.type}`}>
+                          <Grid item xs={8 / plans.length} key={`header-${plan.type}`}>
                             <Box sx={{ height: 90, display: 'flex', flexDirection: 'column',
                               justifyContent: 'space-between', alignItems: 'center',
                               bgcolor: plan.recommended ? alpha(theme.palette.primary.main, 0.06) : 'transparent',
                               borderRadius: '12px 12px 0 0' }}>
                               <Stack direction="row" spacing={1} alignItems="center">
-                                <PlanIcon icon={plan.type === 'consultation' ? 'star' : plan.type === 'project' ? 'speed' : 'shield'} 
-                                  isRecommended={!!plan.recommended} theme={theme} />
+                                <PlanIcon icon={plan.icon || ''} isRecommended={!!plan.recommended} theme={theme} />
                                 <Typography variant="h6" sx={{ fontWeight: 700 }}>{plan.title}</Typography>
                               </Stack>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {billingCycle === 'annual' && plan.annualPrice ? plan.annualPrice : plan.price}
+                              <Typography variant="body2" sx={{ fontWeight: 600 }} className="price-value" data-plan={plan.type}>
+                                {plan.price}
                               </Typography>
                             </Box>
                           </Grid>
@@ -469,7 +442,7 @@ export default function PricingPage() {
 
                                 {/* Feature values by plan */}
                                 {plans.map((plan) => (
-                                  <Grid item xs={plans.length > 3 ? 2 : 8 / Number(plans.length)} key={`${category.id}-${feature.name}-${plan.type}`}>
+                                  <Grid item xs={8 / plans.length} key={`${category.id}-${feature.name}-${plan.type}`}>
                                     <Box sx={{ py: 2.5, borderTop: featureIndex === 0 ? 'none' : `1px solid ${alpha(theme.palette.divider, 0.08)}`,
                                       textAlign: 'center', bgcolor: featureIndex % 2 === 0 ? 
                                         alpha(theme.palette.background.default, 0.4) : 'transparent' }}>
@@ -484,11 +457,56 @@ export default function PricingPage() {
                       </Grid>
                     </Box>
                   </Box>
+
+                  {/* Hide Comparison Button */}
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                    <Button
+                      variant="outlined"
+                      color="inherit"
+                      onClick={() => setCompareMode(false)}
+                      startIcon={<CloseRounded />}
+                      sx={{ mt: 2 }}
+                    >
+                      Hide Comparison
+                    </Button>
+                  </Box>
                 </Paper>
               </Container>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Value Proposition Section (Optional) */}
+        <Box sx={{ py: 8, bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+          <Container maxWidth="lg">
+            <SectionHeading 
+              label="Why Choose Us" 
+              title="Delivering Real Value" 
+              description="Our services are designed to provide tangible results for your business"
+            />
+            
+            <Grid container spacing={4} justifyContent="center">
+              {[
+                { title: "Expert Guidance", description: "Work with industry specialists who understand your challenges", icon: "star" },
+                { title: "Proven Results", description: "Our methodologies have delivered success for hundreds of clients", icon: "speed" },
+                { title: "Ongoing Support", description: "We're with you every step of the way, from strategy to implementation", icon: "support" }
+              ].map((item, index) => (
+                <Grid item xs={12} md={4} key={index}>
+                  <Paper elevation={0} sx={{ p: 4, height: '100%', borderRadius: 4, 
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}` }}>
+                    <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
+                      <PlanIcon icon={item.icon} isRecommended={false} theme={theme} />
+                      <Typography variant="h6" sx={{ fontWeight: 700 }}>{item.title}</Typography>
+                    </Stack>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.description}
+                    </Typography>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        </Box>
 
         {/* FAQ section */}
         <Box sx={{ position: 'relative', py: { xs: 12, md: 16 },
@@ -502,7 +520,7 @@ export default function PricingPage() {
 
             {/* FAQ cards */}
             <Grid container spacing={4}>
-              {pricingPageContent.faqSection.items.slice(0, 6).map((faq, index) => (
+              {faqItems.map((faq, index) => (
                 <Grid item xs={12} md={6} key={index}>
                   <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }} 
@@ -523,7 +541,7 @@ export default function PricingPage() {
             </Grid>
           </Container>
         </Box>
-
+        
         {/* CTA section */}
         <Container maxWidth="lg" sx={{ mb: { xs: 10, md: 12 } }}>
           <Box sx={{ position: 'relative', py: { xs: 8, md: 10 }, 
@@ -544,23 +562,66 @@ export default function PricingPage() {
                   fontWeight: 800, color: '#fff', mb: 3 }}>Ready to transform your business?</Typography>
 
                 <Typography variant="body1" sx={{ color: alpha('#fff', 0.9), mb: 4 }}>
-                  Join thousands of growing businesses that trust our solutions to scale and succeed.
+                  Join hundreds of growing businesses that trust our solutions to scale and succeed.
                 </Typography>
 
-                <CTAButtons primary={{ text: "Get started now", href: "/contact" }}
-                  secondary={{ text: "Request demo", href: "/contact?demo=true" }} darkMode={true} />
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
+                  <Button component={NextLink} href="/contact" size="large" variant="contained" 
+                    sx={{ bgcolor: '#fff', color: theme.palette.primary.dark, 
+                      textTransform: 'none', fontWeight: 700, py: 1.75, px: 4, borderRadius: 3,
+                      boxShadow: '0 8px 20px rgba(0,0,0,0.15)' }}>
+                    Get started now
+                  </Button>
+                  <Button variant="outlined" component={NextLink} href="/contact?demo=true" size="large" 
+                    sx={{ borderColor: alpha('#fff', 0.6), color: '#fff', 
+                      textTransform: 'none', fontWeight: 600, py: 1.75, px: 4, borderRadius: 3,
+                      bgcolor: alpha('#fff', 0.05) }}>
+                    Request demo
+                  </Button>
+                </Stack>
               </motion.div>
 
               {/* Stats card */}
               <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.5, delay: 0.2 }}
                 style={{ width: '100%', maxWidth: 350 }}>
-                <StatsCard stats={stats} theme={theme} />
+                <Paper elevation={0} sx={{ backdropFilter: 'blur(10px)', bgcolor: alpha('#fff', 0.08),
+                  borderRadius: 4, border: `1px solid ${alpha('#fff', 0.2)}`, p: 4, width: '100%',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+                  <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3.5 }}>
+                    <Box sx={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', 
+                      justifyContent: 'center', bgcolor: alpha('#fff', 0.15) }}>
+                      <StarRounded sx={{ fontSize: 20, color: '#fff' }} />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#fff' }}>Trusted globally</Typography>
+                  </Stack>
+
+                  <Grid container spacing={3}>
+                    {[
+                      { value: '97%', label: 'Client satisfaction', icon: <StarRounded fontSize="small" /> },
+                      { value: '500+', label: 'Projects completed', icon: <SpeedRounded fontSize="small" /> },
+                      { value: '4.9', label: 'TrustPilot rating', icon: <ShieldRounded fontSize="small" /> },
+                      { value: '24/7', label: 'Customer support', icon: <SupportRounded fontSize="small" /> }
+                    ].map((stat, i) => (
+                      <Grid item xs={6} key={i}>
+                        <motion.div whileHover={{ y: -5 }}>
+                          <Box sx={{ p: 2, textAlign: 'center', bgcolor: alpha('#fff', 0.05), borderRadius: 3,
+                            border: `1px solid ${alpha('#fff', 0.1)}`, height: '100%', display: 'flex', 
+                            flexDirection: 'column', justifyContent: 'center' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1, opacity: 0.7 }}>{stat.icon}</Box>
+                            <Typography variant="h5" sx={{ fontWeight: 800, color: '#fff', mb: 0.5 }}>{stat.value}</Typography>
+                            <Typography variant="body2" sx={{ color: alpha('#fff', 0.8), fontSize: '0.75rem' }}>{stat.label}</Typography>
+                          </Box>
+                        </motion.div>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
               </motion.div>
             </Container>
           </Box>
         </Container>
-
+        
         {/* Support section */}
         <Container maxWidth="md" sx={{ mb: { xs: 12, md: 16 } }}>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}

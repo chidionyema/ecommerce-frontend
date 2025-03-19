@@ -1,50 +1,18 @@
 "use client";
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  Suspense,
-  lazy,
-  FC,
-  ReactNode
-} from "react";
+import React, { useState, useEffect, useMemo, Suspense, lazy, FC, ReactNode } from "react";
 import {
-  Box,
-  Typography,
-  Button,
-  Container,
-  alpha,
-  Grid,
-  Paper,
-  Slider,
-  Stack,
-  IconButton,
-  TextField,
-  Chip,
-  Tooltip
+  Box, Typography, Button, Container, alpha, Grid, Paper,
+  Stack, Chip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import {
-  ShieldCheck,
-  TrendingUp,
-  DollarSign,
-  Users,
-  ArrowRight,
-  Calendar,
-  Clock,
-  MessageCircle,
-  Info,
-  ChevronDown
+  ShieldCheck, TrendingUp, DollarSign, Users, Calendar,
+  Clock, ChevronRight
 } from "lucide-react";
 import {
-  SiAmazonaws,
-  SiMicrosoftazure,
-  SiDocker,
-  SiKubernetes,
-  SiTerraform,
-  SiGooglecloud
+  SiAmazonaws, SiMicrosoftazure, SiDocker, SiKubernetes, SiTerraform, SiGooglecloud
 } from "react-icons/si";
 
 // Lazy load external components
@@ -68,26 +36,102 @@ class ErrorBoundary extends React.Component<
     super(props);
     this.state = { hasError: false };
   }
+  
   static getDerivedStateFromError() {
     return { hasError: true };
   }
+  
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("Error caught by ErrorBoundary:", error, errorInfo);
   }
+  
   render() {
     if (this.state.hasError) {
-      return this.props.fallback || <div>Something went wrong.</div>;
+      return this.props.fallback || (
+        <Box sx={{ p: 3, textAlign: 'center', color: '#fff' }}>
+          <Typography>Something went wrong.</Typography>
+          <Button 
+            sx={{ mt: 2, color: '#fff', borderColor: 'rgba(255,255,255,0.5)' }}
+            variant="outlined" 
+            onClick={() => this.setState({ hasError: false })}
+          >
+            Try Again
+          </Button>
+        </Box>
+      );
     }
     return this.props.children;
   }
 }
 
-// -------------------- STYLED COMPONENTS --------------------
+// -------------------- STYLED COMPONENTS & COMMON STYLES --------------------
+// Common styles to reduce repetition
+const styles = {
+  gradients: {
+    primary: "linear-gradient(135deg, #6366F1, #8B5CF6)",
+    secondary: "linear-gradient(135deg, #A78BFA, #6366F1)",
+    accent1: "linear-gradient(135deg, #F97316, #EC4899)",
+    accent2: "linear-gradient(135deg, #14B8A6, #0EA5E9)",
+  },
+  colors: {
+    primary: "#6366F1",
+    primaryHover: "#5457EF",
+    text: "#fff",
+    textSecondary: "rgba(255,255,255,0.85)",
+  },
+  shadows: {
+    primary: "0 4px 14px rgba(99, 102, 241, 0.4)",
+    hover: "0 6px 20px rgba(99, 102, 241, 0.5)",
+    card: "0 4px 24px rgba(0, 0, 0, 0.1)",
+  },
+  animations: {
+    short: "all 0.2s ease",
+    medium: "all 0.25s ease",
+  },
+  spacing: {
+    section: 8,
+  }
+};
+
+// Motion animation variants
+const fadeVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.5,
+      ease: [0.22, 1, 0.36, 1]
+    } 
+  }
+};
+
+// Reusable fade-in motion component
+interface FadeInViewProps {
+  children: ReactNode;
+  delay?: number;
+  once?: boolean;
+}
+
+const FadeInView: FC<FadeInViewProps> = ({ children, delay = 0, once = false }) => (
+  <motion.div 
+    initial="hidden" 
+    animate={!once ? "visible" : undefined}
+    whileInView={once ? "visible" : undefined}
+    viewport={once ? { once: true } : undefined}
+    variants={fadeVariants}
+    transition={{ delay }}
+  >
+    {children}
+  </motion.div>
+);
+
+// Section components
 const Section = styled(Box)(({ theme }) => ({
   position: "relative",
   display: "flex",
   alignItems: "center",
-  padding: theme.spacing(8, 0),
+  padding: theme.spacing(styles.spacing.section, 0),
   overflow: "hidden",
   minHeight: 680,
   [theme.breakpoints.up("md")]: { minHeight: "95vh" }
@@ -98,75 +142,107 @@ const BgOverlay = styled(Box)({
   inset: 0,
   zIndex: 1,
   background: `radial-gradient(ellipse at center,
-    ${alpha("#263B66", 0.96)} 0%,
-    ${alpha("#263B66", 0.75)} 70%,
-    ${alpha("#263B66", 0.96)} 100%)`
+    ${alpha("#1a3674", 0.97)} 0%,
+    ${alpha("#1a3674", 0.85)} 70%,
+    ${alpha("#1a3674", 0.97)} 100%)`,
+  mixBlendMode: "multiply"
 });
 
 const ContentArea = styled(Box)({
   position: "relative",
   zIndex: 3,
-  marginTop: 32,
-  marginBottom: 32
+  width: "100%",
+  marginTop: 48,
+  marginBottom: 48
 });
 
-const Headline = styled(Typography)({
-  fontSize: "2.5rem",
-  lineHeight: 1.1,
-  fontWeight: 800,
-  color: "#fff",
+// Typography components
+const Headline = styled(Typography)(({ theme }) => ({
+  fontSize: "3rem",
+  lineHeight: 1.2,
+  fontWeight: 700,
+  color: styles.colors.text,
   textAlign: "center",
   margin: "0 auto 16px",
-  maxWidth: 900
-});
+  maxWidth: 900,
+  [theme.breakpoints.down("md")]: { fontSize: "2.5rem" },
+  [theme.breakpoints.down("sm")]: { fontSize: "2rem" }
+}));
 
-const Subheadline = styled(Typography)({
+const Subheadline = styled(Typography)(({ theme }) => ({
   fontSize: "1.125rem",
   fontWeight: 400,
-  color: "rgba(255, 255, 255, 0.95)",
+  color: styles.colors.textSecondary,
   textAlign: "center",
   margin: "0 auto 32px",
-  maxWidth: 760
-});
-
-const CTAButton = styled(Button)(({ theme }) => ({
-  color: "#fff",
-  fontWeight: 600,
-  borderRadius: 10,
-  textTransform: "none",
-  padding: theme.spacing(1.75, 4),
-  background: `linear-gradient(135deg,
-    ${alpha(theme.palette.secondary.main, 0.9)},
-    ${alpha(theme.palette.secondary.dark, 0.9)})`,
-  boxShadow: `0 8px 16px ${alpha(theme.palette.secondary.main, 0.3)}`,
-  transition: "all 0.28s cubic-bezier(0.165, 0.015, 0.12, 0.995)",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: `0 12px 24px ${alpha(theme.palette.secondary.main, 0.4)}`
+  maxWidth: 760,
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "1rem",
+    maxWidth: "85%"
   }
 }));
 
-const GlassPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  borderRadius: 12,
-  backdropFilter: "blur(10px)",
-  marginBottom: theme.spacing(4),
-  background: alpha(theme.palette.primary.main, 0.13),
-  border: `1px solid ${alpha(theme.palette.primary.light, 0.25)}`,
-  boxShadow: `0 8px 16px ${alpha("#000", 0.13)}`
-}));
+// Button and interactive components
+interface CTAButtonProps {
+  secondary?: boolean;
+}
 
-const OfferChip = styled(Chip)(({ theme }) => ({
-  height: 36,
-  backgroundColor: alpha(theme.palette.error.main, 0.13),
-  color: "#fff",
+const CTAButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'secondary'
+})<CTAButtonProps>(({ theme, secondary }) => ({
+  color: styles.colors.text,
   fontWeight: 600,
-  border: `1px solid ${alpha(theme.palette.error.light, 0.36)}`,
-  boxShadow: `0 4px 10px ${alpha(theme.palette.error.main, 0.16)}`,
-  "& .MuiChip-icon": { color: alpha("#fff", 0.97) }
+  borderRadius: 8,
+  textTransform: "none",
+  padding: theme.spacing(1.5, 3),
+  backgroundColor: secondary ? "transparent" : styles.colors.primary,
+  border: secondary ? "1.5px solid rgba(255, 255, 255, 0.85)" : "none",
+  boxShadow: secondary ? "none" : styles.shadows.primary,
+  transition: styles.animations.short,
+  "&:hover": {
+    backgroundColor: secondary ? "rgba(255, 255, 255, 0.12)" : styles.colors.primaryHover,
+    transform: "translateY(-2px)",
+    boxShadow: secondary ? "none" : styles.shadows.hover
+  }
 }));
 
-// Prevent "active" prop from reaching the DOM
+// CTA Button Group component
+interface CTAButtonGroupProps {
+  onSchedule: () => void;
+  onCaseStudies: () => void;
+}
+
+const CTAButtonGroup: FC<CTAButtonGroupProps> = ({ onSchedule, onCaseStudies }) => (
+  <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 3 }} justifyContent="center">
+    <CTAButton
+      onClick={onSchedule}
+      endIcon={<Calendar size={16} strokeWidth={2} />}
+      aria-label="Schedule your strategy session"
+    >
+      Schedule Your Strategy Session
+    </CTAButton>
+    <CTAButton
+      onClick={onCaseStudies}
+      endIcon={<ChevronRight size={16} strokeWidth={2} />}
+      secondary
+      aria-label="View case studies"
+    >
+      View Case Studies
+    </CTAButton>
+  </Stack>
+);
+
+const OfferChip = styled(Chip)({
+  height: 36,
+  backgroundColor: "rgba(99, 102, 241, 0.15)",
+  color: styles.colors.text,
+  fontWeight: 600,
+  border: "1px solid rgba(99, 102, 241, 0.3)",
+  boxShadow: "0 4px 10px rgba(99, 102, 241, 0.16)",
+  "& .MuiChip-icon": { color: alpha(styles.colors.text, 0.97) }
+});
+
+// Persona Button
 interface PersonaButtonProps {
   active?: boolean;
   onClick: () => void;
@@ -176,43 +252,59 @@ interface PersonaButtonProps {
 const PersonaButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== "active"
 })<PersonaButtonProps>(({ theme, active }) => ({
-  fontSize: "0.82rem",
+  fontSize: "0.875rem",
   fontWeight: 500,
-  borderRadius: 6,
-  transition: "all 0.28s",
-  padding: theme.spacing(0.85, 1.85),
+  borderRadius: 12,
+  transition: styles.animations.medium,
+  padding: theme.spacing(0.75, 2.25),
   ...(active
     ? {
-        background: alpha(theme.palette.secondary.main, 0.13),
-        border: `1px solid ${theme.palette.secondary.main}`,
-        color: theme.palette.secondary.main,
-        "&:hover": { background: alpha(theme.palette.secondary.main, 0.17) }
+        background: styles.colors.primary,
+        boxShadow: styles.shadows.primary,
+        color: styles.colors.text,
+        "&:hover": { background: styles.colors.primaryHover }
       }
     : {
-        border: `1px solid ${alpha("#fff", 0.17)}`,
-        color: alpha("#fff", 0.85),
-        "&:hover": { background: alpha("#fff", 0.04) }
+        background: "rgba(255, 255, 255, 0.08)",
+        border: "none",
+        color: alpha(styles.colors.text, 0.85),
+        "&:hover": { 
+          background: "rgba(255, 255, 255, 0.15)", 
+          transform: "translateY(-1px)" 
+        }
       })
 }));
 
+// Card components
+const BenefitCard = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  borderRadius: 16,
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+  transition: styles.animations.medium,
+  backdropFilter: "blur(10px)",
+  background: "rgba(255, 255, 255, 0.03)",
+  border: "1px solid rgba(255, 255, 255, 0.06)",
+  boxShadow: styles.shadows.card,
+  "&:hover": {
+    transform: "translateY(-4px)",
+    boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)"
+  }
+}));
+
 const IconCircle = styled(Box)({
+  width: 56,
+  height: 56,
   borderRadius: "50%",
-  padding: 12,
-  color: "#fff",
-  width: "fit-content",
-  marginBottom: 16,
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  boxShadow: "0 5px 10px rgba(0,0,0,0.17)"
+  marginBottom: 20,
+  boxShadow: "0 8px 16px rgba(0, 0, 0, 0.15)"
 });
 
-const fadeVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
-};
-
-// -------------------- DATA (Consider externalizing this constant) --------------------
+// -------------------- DATA --------------------
 interface Persona {
   headline: string;
   subheadline: string;
@@ -280,25 +372,25 @@ const DATA: DataStructure = {
       icon: <TrendingUp size={20} strokeWidth={1.5} />,
       text: "73% Faster Deployment",
       subtext: "From concept to production in weeks",
-      gradient: "linear-gradient(135deg, #00C6FB, #005BEA)"
+      gradient: styles.gradients.primary
     },
     {
       icon: <ShieldCheck size={20} strokeWidth={1.5} />,
       text: "Enterprise Security",
       subtext: "SOC 2, GDPR & ISO 27001 compliant",
-      gradient: "linear-gradient(135deg, #FF9966, #FF5E62)"
+      gradient: styles.gradients.accent1
     },
     {
       icon: <DollarSign size={20} strokeWidth={1.5} />,
       text: "47% Cost Reduction",
       subtext: "Optimized infrastructure & reduced overhead",
-      gradient: "linear-gradient(135deg, #38ef7d, #11998e)"
+      gradient: styles.gradients.accent2
     },
     {
       icon: <Users size={20} strokeWidth={1.5} />,
       text: "99.99% Uptime SLA",
       subtext: "Built for enterprise-grade reliability",
-      gradient: "linear-gradient(135deg, #6a11cb, #2575fc)"
+      gradient: "linear-gradient(135deg, #8B5CF6, #6366F1)"
     }
   ],
   techStack: [
@@ -322,14 +414,14 @@ interface CheckItemProps {
 }
 
 const CheckItem: FC<CheckItemProps> = React.memo(({ text }) => (
-  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
+  <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1.5 }}>
     <Box
       sx={{
-        width: 17,
-        height: 17,
+        width: 16,
+        height: 16,
         borderRadius: "50%",
-        bgcolor: "#4285f4",
-        color: "#fff",
+        bgcolor: styles.colors.primary,
+        color: styles.colors.text,
         fontSize: "0.7rem",
         fontWeight: 600,
         display: "flex",
@@ -342,7 +434,7 @@ const CheckItem: FC<CheckItemProps> = React.memo(({ text }) => (
     <Typography
       sx={{
         color: "rgba(255, 255, 255, 0.94)",
-        fontSize: "0.85rem",
+        fontSize: "0.875rem",
         fontWeight: 500
       }}
     >
@@ -355,13 +447,11 @@ CheckItem.displayName = "CheckItem";
 // -------------------- MAIN COMPONENT --------------------
 const HeroSection: FC = () => {
   const [isCalendlyOpen, setIsCalendlyOpen] = useState<boolean>(false);
-  const [isChatbotOpen, setIsChatbotOpen] = useState<boolean>(false);
-  const [selectedPersona, setSelectedPersona] = useState<keyof DataStructure["personas"]>("developer");
-  const [showCalculator, setShowCalculator] = useState<boolean>(false);
+  const [selectedPersona, setSelectedPersona] = useState<keyof DataStructure["personas"]>("executive");
   const [teamSize, setTeamSize] = useState<number>(5);
   const [roi, setRoi] = useState<number>(30);
 
-  // Validate URL parameter and local storage value
+  // Track persona in URL and localStorage
   useEffect(() => {
     const p = new URLSearchParams(window.location.search).get("persona");
     if (p && ["developer", "executive", "security"].includes(p)) {
@@ -374,6 +464,11 @@ const HeroSection: FC = () => {
     }
   }, []);
 
+  // Update localStorage when persona changes - Fixed TypeScript error with type assertion
+  useEffect(() => {
+    localStorage.setItem("userPersona", selectedPersona as string);
+  }, [selectedPersona]);
+
   const personaData = DATA.personas[selectedPersona];
   const annualSavings = useMemo(() => {
     const monthlyCost = teamSize * 10000;
@@ -381,35 +476,58 @@ const HeroSection: FC = () => {
     return Math.round(monthlyCost * 12 * (rate / 100));
   }, [teamSize, roi, selectedPersona]);
 
+  // Handle actions
+  const handleOpenCalendly = () => setIsCalendlyOpen(true);
+  const handleCloseCalendly = () => setIsCalendlyOpen(false);
+  const handleViewCaseStudies = () => window.open("/case-studies", "_self");
+  const handleOpenCalculator = () => window.open("/calculator", "_self");
+
+  // Loading state for Calendly
+  const calendlyLoadingFallback = (
+    <Box sx={{ 
+      position: "fixed", 
+      inset: 0, 
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "center", 
+      backgroundColor: "rgba(0,0,0,0.75)", 
+      zIndex: 9999 
+    }}>
+      <Typography color="white">Loading booking system...</Typography>
+    </Box>
+  );
+
   return (
     <Section>
       {/* Background */}
       <Box sx={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden" }}>
         <Image
           src="/images/istockphoto-realhero.jpg"
-          alt="Enterprise background hero"
+          alt="Enterprise technology background"
           layout="fill"
           objectFit="cover"
           priority
-          style={{ filter: "saturate(1.01) brightness(0.9)", opacity: 0.9 }}
+          style={{ filter: "saturate(1.05) brightness(0.8)", opacity: 0.95 }}
+          quality={90}
         />
       </Box>
       <BgOverlay />
 
       <Container maxWidth="lg">
         <ContentArea>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeVariants}>
+          <FadeInView>
             <Headline>
-              {personaData.headline.split(" ").slice(0, -1).join(" ")}{" "}
+              Enterprise Solutions with{" "}
               <Box
                 component="span"
-                sx={(theme) => ({
-                  background: `linear-gradient(135deg, ${theme.palette.secondary.light}, ${theme.palette.secondary.main})`,
+                sx={{
+                  background: styles.gradients.secondary,
                   WebkitBackgroundClip: "text",
-                  color: "transparent"
-                })}
+                  WebkitTextFillColor: "transparent",
+                  color: styles.colors.primary
+                }}
               >
-                {personaData.headline.split(" ").slice(-1)}
+                47% Cost Reduction
               </Box>
             </Headline>
             <Subheadline>{personaData.subheadline}</Subheadline>
@@ -422,48 +540,17 @@ const HeroSection: FC = () => {
                   label="Limited Time: 2 Free Strategy Sessions"
                 />
               </Box>
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 3 }} justifyContent="center">
-                <CTAButton
-                  onClick={() => setIsCalendlyOpen(true)}
-                  endIcon={<Calendar size={16} strokeWidth={2} />}
-                  aria-label="Schedule your strategy session"
-                >
-                  Schedule Your Strategy Session
-                </CTAButton>
-                <CTAButton
-                  onClick={() => window.open("/solutions", "_self")}
-                  endIcon={<ArrowRight size={16} strokeWidth={2} />}
-                  sx={{
-                    backgroundColor: alpha("#000", 0.1),
-                    background: "none",
-                    border: `1.5px solid ${alpha("#fff", 0.85)}`
-                  }}
-                  aria-label="View case studies"
-                >
-                  View Case Studies
-                </CTAButton>
-              </Stack>
+              <CTAButtonGroup 
+                onSchedule={handleOpenCalendly} 
+                onCaseStudies={handleViewCaseStudies} 
+              />
             </Box>
-          </motion.div>
+          </FadeInView>
 
           {/* Persona Selector */}
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeVariants}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                mb: 5,
-                borderRadius: 2,
-                mx: "auto",
-                maxWidth: "fit-content",
-                backgroundColor: "rgba(0,0,0,0.1)",
-                p: 1,
-                backdropFilter: "blur(8px)"
-              }}
-              role="radiogroup"
-              aria-label="Select your persona"
-            >
-              <Typography sx={{ color: "rgba(255,255,255,0.7)", mr: 2, alignSelf: "center", fontSize: "0.85rem" }}>
+          <FadeInView delay={0.1}>
+            <Stack direction="row" alignItems="center" sx={{ mb: 5, justifyContent: "center" }}>
+              <Typography sx={{ color: "rgba(255,255,255,0.8)", mr: 2, fontSize: "0.875rem" }}>
                 I am a:
               </Typography>
               <Stack direction="row" spacing={1}>
@@ -479,347 +566,109 @@ const HeroSection: FC = () => {
                   </PersonaButton>
                 ))}
               </Stack>
-            </Box>
-          </motion.div>
+            </Stack>
+          </FadeInView>
 
           {/* Benefits Grid */}
-  {/* Benefits Grid */}
-<Box sx={{ mb: 6 }}>
-  <Typography
-    variant="h3"
-    sx={{ fontSize: "1.5rem", textAlign: "center", color: "white", mb: 3, fontWeight: 600 }}
-  >
-    Why Organizations Choose Our Solutions
-  </Typography>
-  <Grid container spacing={2.5} sx={{ alignItems: "stretch" }}>
-    {DATA.benefits.map((b, i) => (
-      <Grid item xs={12} sm={6} md={3} key={i} sx={{ display: "flex" }}>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeVariants}
-          style={{ width: "100%" }}
-        >
-          <GlassPaper
-            sx={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              "&:hover": { transform: "translateY(-3px)", background: alpha("#263B66", 0.17) }
-            }}
-          >
-            <IconCircle sx={{ background: b.gradient }}>{b.icon}</IconCircle>
-            <Typography sx={{ fontWeight: 600, color: "#fff", mb: 1, fontSize: "1.05rem" }}>
-              {b.text}
+          <Box sx={{ mb: 6 }}>
+            <Typography
+              variant="h3"
+              sx={{ 
+                fontSize: "1.5rem", 
+                textAlign: "center", 
+                color: "white", 
+                mb: 4, 
+                fontWeight: 600 
+              }}
+            >
+              Why Organizations Choose Our Solutions
             </Typography>
-            <Typography sx={{ fontSize: "0.85rem", lineHeight: 1.5, color: "rgba(255,255,255,0.94)" }}>
-              {b.subtext}
-            </Typography>
-          </GlassPaper>
-        </motion.div>
-      </Grid>
-    ))}
-  </Grid>
-</Box>
-
-
-          {/* ROI Calculator */}
-          <Box sx={{ mb: 6 }}>
-            {!showCalculator ? (
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeVariants}>
-                <GlassPaper
-                  onClick={() => setShowCalculator(true)}
-                  sx={{
-                    cursor: "pointer",
-                    textAlign: "center",
-                    transition: "all 0.2s ease",
-                    "&:hover": { transform: "translateY(-2px)", boxShadow: "0 8px 16px rgba(0,0,0,0.1)" }
-                  }}
-                  role="button"
-                  aria-label="Open cost savings calculator"
-                >
-                  <Stack direction="row" justifyContent="center" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                    <DollarSign size={20} color="#4285f4" strokeWidth={2} />
-                    <Typography variant="h6" color="#4285f4" fontWeight={600}>
-                      Calculate Your Potential Savings
-                    </Typography>
-                  </Stack>
-                  <Typography sx={{ color: "rgba(255,255,255,0.9)", maxWidth: 600, mx: "auto", fontSize: "0.95rem" }}>
-                    Our solutions typically reduce development costs by 30-50%. See how much your organization could save.
-                  </Typography>
-                </GlassPaper>
-              </motion.div>
-            ) : (
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeVariants}>
-                <GlassPaper>
-                  <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <DollarSign size={20} color="#4285f4" strokeWidth={2} />
-                      <Typography sx={{ color: "#4285f4", fontWeight: 600, fontSize: "1.05rem" }}>
-                        Enterprise Cost Savings Calculator
+            <Grid container spacing={3} sx={{ alignItems: "stretch" }}>
+              {DATA.benefits.map((b, i) => (
+                <Grid item xs={12} sm={6} md={3} key={i} sx={{ display: "flex" }}>
+                  <FadeInView delay={i * 0.1} once>
+                    <BenefitCard>
+                      <IconCircle sx={{ background: b.gradient }}>{b.icon}</IconCircle>
+                      <Typography sx={{ fontWeight: 600, color: "#fff", mb: 1, fontSize: "1.05rem" }}>
+                        {b.text}
                       </Typography>
-                    </Stack>
-                    <Tooltip title="See methodology">
-                      <IconButton size="small" color="primary" aria-label="Methodology info">
-                        <Info size={16} />
-                      </IconButton>
-                    </Tooltip>
-                  </Stack>
-                  <Grid container spacing={3} sx={{ mb: 3 }}>
-                    <Grid item xs={12} sm={6}>
-                      <Typography sx={{ color: "#fff", fontSize: "0.9rem", mb: 1, fontWeight: 500 }}>
-                        Development Team Size: {teamSize}
+                      <Typography sx={{ fontSize: "0.875rem", lineHeight: 1.6, color: "rgba(255,255,255,0.85)" }}>
+                        {b.subtext}
                       </Typography>
-                      <Typography sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.8rem", mb: 1 }}>
-                        Est. monthly cost: ${(teamSize * 10000).toLocaleString()}
-                      </Typography>
-                      <Slider
-                        value={teamSize}
-                        onChange={(e, val) => setTeamSize(val as number)}
-                        min={1}
-                        max={50}
-                        step={1}
-                        valueLabelDisplay="auto"
-                        aria-label="Team size slider"
-                        sx={{ color: "#4285f4" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Typography sx={{ color: "#fff", fontSize: "0.9rem", mb: 1, fontWeight: 500 }}>
-                        Efficiency Improvement: {roi}%
-                      </Typography>
-                      <Typography sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.8rem", mb: 1 }}>
-                        Industry average: 30-45%
-                      </Typography>
-                      <Slider
-                        value={roi}
-                        onChange={(e, val) => setRoi(val as number)}
-                        min={10}
-                        max={60}
-                        step={5}
-                        valueLabelDisplay="auto"
-                        aria-label="Efficiency improvement slider"
-                        sx={{ color: "#4285f4" }}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      backgroundColor: "rgba(66,133,244,0.1)",
-                      p: 2,
-                      borderRadius: 1
-                    }}
-                  >
-                    <Typography sx={{ color: "#fff", fontSize: "0.95rem", fontWeight: 500 }}>
-                      Potential annual savings:
-                    </Typography>
-                    <Typography variant="h6" sx={{ color: "#4285f4", fontWeight: 700 }}>
-                      ${annualSavings.toLocaleString()}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ textAlign: "center", mt: 3 }}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => setIsCalendlyOpen(true)}
-                      sx={{ borderRadius: 2 }}
-                      aria-label="Get detailed analysis"
-                    >
-                      Get Detailed Analysis
-                    </Button>
-                  </Box>
-                </GlassPaper>
-              </motion.div>
-            )}
-          </Box>
-
-          {/* Persona Features */}
-          <Box sx={{ mb: 6 }}>
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeVariants}>
-              <GlassPaper sx={{ maxWidth: 720, mx: "auto" }}>
-                <Typography sx={{ color: "#4285f4", fontWeight: 600, textAlign: "center", mb: 3, fontSize: "1.15rem" }}>
-                  {selectedPersona === "developer"
-                    ? "Developer-Focused Features"
-                    : selectedPersona === "executive"
-                    ? "Business Value Accelerators"
-                    : "Security & Compliance Features"}
-                </Typography>
-                <Grid container spacing={2}>
-                  {personaData.benefits.map((feature, i) => (
-                    <Grid item xs={12} sm={6} key={i}>
-                      <CheckItem text={feature} />
-                    </Grid>
-                  ))}
+                    </BenefitCard>
+                  </FadeInView>
                 </Grid>
-              </GlassPaper>
-            </motion.div>
+              ))}
+            </Grid>
           </Box>
 
-          {/* Social Proof */}
-          <Box sx={{ mb: 6 }}>
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeVariants}>
-              <GlassPaper sx={{ maxWidth: "sm", mx: "auto", py: 3, px: { xs: 2, sm: 4 } }}>
-                <Typography sx={{ textAlign: "center", color: "#fff", fontWeight: 600, mb: 3, fontSize: "1rem" }}>
-                  Trusted by industry leaders
+          {/* Calculator Section */}
+          <FadeInView once>
+            <Box 
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05))",
+                p: 4,
+                borderRadius: 3,
+                border: "1px solid rgba(99, 102, 241, 0.2)",
+                mb: 6
+              }}
+            >
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                <DollarSign size={20} color={styles.colors.primary} strokeWidth={2} />
+                <Typography variant="h6" color={styles.colors.primary} fontWeight={600}>
+                  Calculate Your Potential Savings
                 </Typography>
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 1.5, sm: 3 }} justifyContent="center">
-                  {DATA.successIndicators.map((item, i) => (
-                    <CheckItem key={i} text={item} />
-                  ))}
-                </Stack>
-              </GlassPaper>
-            </motion.div>
-          </Box>
-
-          {/* Tech Stack */}
-          <Box sx={{ mb: 6 }}>
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeVariants}>
-              <GlassPaper>
-                <Typography sx={{ color: "#fff", textAlign: "center", mb: 3, fontWeight: 600, fontSize: "1rem" }}>
-                  Pre-built architectures for leading enterprise technologies
-                </Typography>
-                <Grid container spacing={3} justifyContent="center" sx={{ mb: 3 }}>
-                  {DATA.techStack.map((tech, i) => (
-                    <Grid item key={i} xs={4} sm={2}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: 1.5,
-                          transition: "transform 0.3s ease",
-                          "&:hover": { transform: "translateY(-5px)" }
-                        }}
-                      >
-                        <tech.icon color={tech.color} size={36} />
-                        <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.85rem" }}>
-                          {tech.name}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  ))}
-                </Grid>
-              </GlassPaper>
-            </motion.div>
-          </Box>
+              </Stack>
+              <Typography sx={{ color: "rgba(255,255,255,0.9)", maxWidth: 600, mx: "auto", fontSize: "0.95rem", textAlign: "center", mb: 3 }}>
+                Our solutions typically reduce development costs by 30-50%. See how much your organization could save.
+              </Typography>
+              <Button 
+                variant="contained"
+                color="primary" 
+                sx={{ 
+                  bgcolor: styles.colors.primary, 
+                  "&:hover": { bgcolor: styles.colors.primaryHover },
+                  borderRadius: 2,
+                  boxShadow: styles.shadows.primary,
+                  px: 4
+                }}
+                onClick={handleOpenCalculator}
+              >
+                Open Savings Calculator
+              </Button>
+            </Box>
+          </FadeInView>
 
           {/* Final CTA */}
-          <Box sx={{ textAlign: "center", mb: 4 }}>
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeVariants}>
+          <Box sx={{ textAlign: "center", pt: 4, mb: 4 }}>
+            <FadeInView once>
               <Typography sx={{ color: "#fff", fontSize: "1.5rem", fontWeight: 700, mb: 3, maxWidth: 600, mx: "auto" }}>
                 Ready to transform your enterprise technology?
               </Typography>
               <CTAButton
-                onClick={() => setIsCalendlyOpen(true)}
+                onClick={handleOpenCalendly}
                 endIcon={<Calendar size={16} strokeWidth={2} />}
                 aria-label="Schedule your strategy session"
               >
                 Schedule Your Strategy Session
               </CTAButton>
-            </motion.div>
+            </FadeInView>
           </Box>
         </ContentArea>
       </Container>
 
-      {/* Chatbot Button */}
-      <IconButton
-        onClick={() => setIsChatbotOpen(!isChatbotOpen)}
-        sx={{
-          position: "fixed",
-          bottom: 24,
-          right: 24,
-          width: 52,
-          height: 52,
-          borderRadius: "50%",
-          zIndex: 1000,
-          background: (theme) => theme.palette.secondary.main,
-          color: "#fff",
-          boxShadow: "0 4px 18px rgba(0,0,0,0.3)",
-          "&:hover": { background: (theme) => theme.palette.secondary.dark, transform: "scale(1.05)" }
-        }}
-        aria-label="Open chat assistant"
-      >
-        <MessageCircle size={24} />
-      </IconButton>
-
-      <AnimatePresence>
-        {isChatbotOpen && (
-          <Suspense fallback={<div>Loading Chat...</div>}>
-            <motion.div
-              initial={{ opacity: 0, y: 16, scale: 0.92 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 8, scale: 0.95 }}
-              transition={{ duration: 0.24, ease: "easeOut" }}
-            >
-              <Box
-                sx={{
-                  position: "fixed",
-                  bottom: 90,
-                  right: 24,
-                  width: 340,
-                  maxHeight: 480,
-                  borderRadius: 12,
-                  p: 2,
-                  background: "rgba(30,41,59,0.95)",
-                  backdropFilter: "blur(10px)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  zIndex: 1000,
-                  boxShadow: "0 10px 36px rgba(0,0,0,0.3)",
-                  overflow: "hidden"
-                }}
-                role="dialog"
-                aria-modal="true"
-                aria-label="Enterprise AI Assistant Chat"
-              >
-                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                  <Typography sx={{ color: "#4285f4", fontWeight: 700 }}>
-                    Enterprise AI Assistant
-                  </Typography>
-                  <IconButton size="small" onClick={() => setIsChatbotOpen(false)} sx={{ color: "rgba(255,255,255,0.7)" }} aria-label="Close chat">
-                    <ChevronDown size={18} />
-                  </IconButton>
-                </Stack>
-                <Typography sx={{ color: "#fff", fontSize: "0.9rem", mb: 2 }}>
-                  How can I help with your enterprise solution needs today?
-                </Typography>
-                <TextField
-                  fullWidth
-                  placeholder="Ask me anything..."
-                  variant="outlined"
-                  size="small"
-                  sx={{
-                    mb: 2,
-                    "& .MuiOutlinedInput-root": {
-                      color: "white",
-                      "& fieldset": { borderColor: "rgba(255,255,255,0.2)" },
-                      "&:hover fieldset": { borderColor: "rgba(255,255,255,0.3)" },
-                      "&.Mui-focused fieldset": { borderColor: "#4285f4" }
-                    }
-                  }}
-                  inputProps={{ "aria-label": "Chat input" }}
-                />
-                <Button fullWidth variant="contained" color="primary" size="small" aria-label="Send message">
-                  Send
-                </Button>
-              </Box>
-            </motion.div>
-          </Suspense>
-        )}
-      </AnimatePresence>
-
       {/* Calendly Widget (Lazy Loaded with Error Boundary) */}
-      <ErrorBoundary fallback={<div>Calendly could not be loaded.</div>}>
+      <ErrorBoundary fallback={<div>Calendly could not be loaded. Please try again.</div>}>
         {isCalendlyOpen && (
-          <Suspense fallback={<div>Loading Calendly...</div>}>
+          <Suspense fallback={calendlyLoadingFallback}>
             <CalendlyBooking
               isOpen={isCalendlyOpen}
-              onClose={() => setIsCalendlyOpen(false)}
-              eventTypeUrl={process.env.NEXT_PUBLIC_CALENDLY_URL || "https://calendly.com/glustack/strategy-session"}
+              onClose={handleCloseCalendly}
+              eventTypeUrl="https://calendly.com/glustack/strategy-session"
               prefill={{ name: "", email: "" }}
             />
           </Suspense>
