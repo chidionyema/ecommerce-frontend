@@ -242,7 +242,7 @@ const OfferChip = styled(Chip)({
   "& .MuiChip-icon": { color: alpha(styles.colors.text, 0.97) }
 });
 
-// Persona Button
+// Refined Persona Button with improved styling
 interface PersonaButtonProps {
   active?: boolean;
   onClick: () => void;
@@ -253,33 +253,40 @@ const PersonaButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== "active"
 })<PersonaButtonProps>(({ theme, active }) => ({
   fontSize: "0.875rem",
-  fontWeight: 500,
+  fontWeight: 600, // Increased from 500 for better visibility
+  letterSpacing: "0.02em", // Slightly improved letter spacing
   borderRadius: 12,
   transition: styles.animations.medium,
-  padding: theme.spacing(0.75, 2.25),
+  padding: theme.spacing(0.9, 2.5), // Increased padding for better clickable area
+  minWidth: 110, // Ensure consistent width across tabs
   ...(active
     ? {
-        background: styles.colors.primary,
+        background: styles.gradients.primary, // Use gradient for active state
         boxShadow: styles.shadows.primary,
         color: styles.colors.text,
-        "&:hover": { background: styles.colors.primaryHover }
+        "&:hover": { 
+          background: styles.gradients.primary,
+          filter: "brightness(1.05)"
+        }
       }
     : {
         background: "rgba(255, 255, 255, 0.08)",
-        border: "none",
-        color: alpha(styles.colors.text, 0.85),
+        border: "1px solid rgba(255, 255, 255, 0.15)", // Added subtle border
+        color: alpha(styles.colors.text, 0.9), // Increased opacity for better visibility
         "&:hover": { 
           background: "rgba(255, 255, 255, 0.15)", 
-          transform: "translateY(-1px)" 
+          transform: "translateY(-1px)",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"
         }
       })
 }));
 
-// Card components
+// Consistent and improved benefit card
 const BenefitCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
+  padding: theme.spacing(3.5), // Increased padding
   borderRadius: 16,
-  height: "100%",
+  height: "100%", // This ensures the height is always 100% of the parent container
+  minHeight: 180, // Set a minimum height for consistency
   display: "flex",
   flexDirection: "column",
   transition: styles.animations.medium,
@@ -289,19 +296,22 @@ const BenefitCard = styled(Paper)(({ theme }) => ({
   boxShadow: styles.shadows.card,
   "&:hover": {
     transform: "translateY(-4px)",
-    boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)"
+    boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)",
+    border: "1px solid rgba(255, 255, 255, 0.1)" // Subtle border enhancement on hover
   }
 }));
 
+// Improved icon circle with consistent size and better appearance
 const IconCircle = styled(Box)({
-  width: 56,
-  height: 56,
+  width: 60, // Slightly increased from 56
+  height: 60, // Slightly increased from 56
   borderRadius: "50%",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   marginBottom: 20,
-  boxShadow: "0 8px 16px rgba(0, 0, 0, 0.15)"
+  boxShadow: "0 8px 16px rgba(0, 0, 0, 0.15)",
+  border: "1px solid rgba(255, 255, 255, 0.15)" // Added subtle border
 });
 
 // -------------------- DATA --------------------
@@ -369,25 +379,25 @@ const DATA: DataStructure = {
   },
   benefits: [
     {
-      icon: <TrendingUp size={20} strokeWidth={1.5} />,
+      icon: <TrendingUp size={22} strokeWidth={1.5} />, // Slightly larger icon
       text: "73% Faster Deployment",
       subtext: "From concept to production in weeks",
       gradient: styles.gradients.primary
     },
     {
-      icon: <ShieldCheck size={20} strokeWidth={1.5} />,
+      icon: <ShieldCheck size={22} strokeWidth={1.5} />, // Slightly larger icon
       text: "Enterprise Security",
       subtext: "SOC 2, GDPR & ISO 27001 compliant",
       gradient: styles.gradients.accent1
     },
     {
-      icon: <DollarSign size={20} strokeWidth={1.5} />,
+      icon: <DollarSign size={22} strokeWidth={1.5} />, // Slightly larger icon
       text: "47% Cost Reduction",
       subtext: "Optimized infrastructure & reduced overhead",
       gradient: styles.gradients.accent2
     },
     {
-      icon: <Users size={20} strokeWidth={1.5} />,
+      icon: <Users size={22} strokeWidth={1.5} />, // Slightly larger icon
       text: "99.99% Uptime SLA",
       subtext: "Built for enterprise-grade reliability",
       gradient: "linear-gradient(135deg, #8B5CF6, #6366F1)"
@@ -499,7 +509,7 @@ const HeroSection: FC = () => {
 
   return (
     <Section>
-      {/* Background */}
+      {/* Background with improved quality */}
       <Box sx={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden" }}>
         <Image
           src="/images/istockphoto-realhero.jpg"
@@ -507,8 +517,8 @@ const HeroSection: FC = () => {
           layout="fill"
           objectFit="cover"
           priority
-          style={{ filter: "saturate(1.05) brightness(0.8)", opacity: 0.95 }}
-          quality={90}
+          style={{ filter: "saturate(1.1) brightness(0.75)", opacity: 0.95 }} // Slightly enhanced saturation
+          quality={95} // Increased from 90
         />
       </Box>
       <BgOverlay />
@@ -524,7 +534,8 @@ const HeroSection: FC = () => {
                   background: styles.gradients.secondary,
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
-                  color: styles.colors.primary
+                  color: styles.colors.primary,
+                  textShadow: "0 2px 10px rgba(139, 92, 246, 0.3)" // Subtle text glow
                 }}
               >
                 47% Cost Reduction
@@ -532,7 +543,7 @@ const HeroSection: FC = () => {
             </Headline>
             <Subheadline>{personaData.subheadline}</Subheadline>
 
-            {/* CTA */}
+            {/* CTA with improved spacing */}
             <Box sx={{ textAlign: "center", mb: 5 }}>
               <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
                 <OfferChip
@@ -547,13 +558,40 @@ const HeroSection: FC = () => {
             </Box>
           </FadeInView>
 
-          {/* Persona Selector */}
+          {/* Improved Persona Selector Tab Section */}
           <FadeInView delay={0.1}>
-            <Stack direction="row" alignItems="center" sx={{ mb: 5, justifyContent: "center" }}>
-              <Typography sx={{ color: "rgba(255,255,255,0.8)", mr: 2, fontSize: "0.875rem" }}>
+            <Box
+              sx={{
+                mb: 5,
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: "center",
+                justifyContent: "center",
+                p: 1.5, // Added padding around the entire section
+                borderRadius: 3,
+                background: "rgba(255,255,255,0.03)", // Very subtle background
+                border: "1px solid rgba(255,255,255,0.06)" // Subtle border
+              }}
+            >
+              <Typography 
+                sx={{ 
+                  color: "rgba(255,255,255,0.9)", 
+                  fontSize: "0.925rem", 
+                  fontWeight: 500,
+                  mr: { xs: 0, sm: 3 }, 
+                  mb: { xs: 2, sm: 0 }
+                }}
+              >
                 I am a:
               </Typography>
-              <Stack direction="row" spacing={1}>
+              <Stack 
+                direction="row" 
+                spacing={1.5} // Increased spacing between buttons
+                sx={{
+                  flexWrap: { xs: "wrap", sm: "nowrap" },
+                  justifyContent: "center"
+                }}
+              >
                 {Object.keys(DATA.personas).map((p) => (
                   <PersonaButton
                     key={p}
@@ -566,19 +604,33 @@ const HeroSection: FC = () => {
                   </PersonaButton>
                 ))}
               </Stack>
-            </Stack>
+            </Box>
           </FadeInView>
 
-          {/* Benefits Grid */}
+          {/* Improved Benefits Grid with consistent sizing */}
           <Box sx={{ mb: 6 }}>
             <Typography
               variant="h3"
               sx={{ 
-                fontSize: "1.5rem", 
+                fontSize: "1.625rem", // Slightly larger 
                 textAlign: "center", 
                 color: "white", 
                 mb: 4, 
-                fontWeight: 600 
+                fontWeight: 600,
+                position: "relative",
+                display: "inline-block",
+                left: "50%",
+                transform: "translateX(-50%)",
+                "&::after": { // Added underline decoration
+                  content: '""',
+                  position: "absolute",
+                  bottom: -10,
+                  left: "25%",
+                  width: "50%",
+                  height: 3,
+                  borderRadius: 2,
+                  background: styles.gradients.primary,
+                }
               }}
             >
               Why Organizations Choose Our Solutions
@@ -589,10 +641,25 @@ const HeroSection: FC = () => {
                   <FadeInView delay={i * 0.1} once>
                     <BenefitCard>
                       <IconCircle sx={{ background: b.gradient }}>{b.icon}</IconCircle>
-                      <Typography sx={{ fontWeight: 600, color: "#fff", mb: 1, fontSize: "1.05rem" }}>
+                      <Typography 
+                        sx={{ 
+                          fontWeight: 600, 
+                          color: "#fff", 
+                          mb: 1.5, // Increased from 1
+                          fontSize: "1.125rem", // Increased from 1.05rem
+                          lineHeight: 1.3 
+                        }}
+                      >
                         {b.text}
                       </Typography>
-                      <Typography sx={{ fontSize: "0.875rem", lineHeight: 1.6, color: "rgba(255,255,255,0.85)" }}>
+                      <Typography 
+                        sx={{ 
+                          fontSize: "0.875rem", 
+                          lineHeight: 1.6, 
+                          color: "rgba(255,255,255,0.85)",
+                          flexGrow: 1 // Ensures text takes available space
+                        }}
+                      >
                         {b.subtext}
                       </Typography>
                     </BenefitCard>
@@ -602,7 +669,7 @@ const HeroSection: FC = () => {
             </Grid>
           </Box>
 
-          {/* Calculator Section */}
+          {/* Improved Calculator Section */}
           <FadeInView once>
             <Box 
               sx={{
@@ -610,20 +677,31 @@ const HeroSection: FC = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05))",
-                p: 4,
+                background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.06))", // Slightly more visible
+                p: 4.5, // Increased padding
                 borderRadius: 3,
-                border: "1px solid rgba(99, 102, 241, 0.2)",
-                mb: 6
+                border: "1px solid rgba(99, 102, 241, 0.25)", // More visible border
+                mb: 6,
+                boxShadow: "0 8px 32px rgba(99, 102, 241, 0.1)" // Subtle glow
               }}
             >
-              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                <DollarSign size={20} color={styles.colors.primary} strokeWidth={2} />
+              <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
+                <DollarSign size={22} color={styles.colors.primary} strokeWidth={2} />
                 <Typography variant="h6" color={styles.colors.primary} fontWeight={600}>
                   Calculate Your Potential Savings
                 </Typography>
               </Stack>
-              <Typography sx={{ color: "rgba(255,255,255,0.9)", maxWidth: 600, mx: "auto", fontSize: "0.95rem", textAlign: "center", mb: 3 }}>
+              <Typography 
+                sx={{ 
+                  color: "rgba(255,255,255,0.9)", 
+                  maxWidth: 600, 
+                  mx: "auto", 
+                  fontSize: "0.95rem", 
+                  textAlign: "center", 
+                  mb: 3.5, // Increased spacing
+                  lineHeight: 1.6
+                }}
+              >
                 Our solutions typically reduce development costs by 30-50%. See how much your organization could save.
               </Typography>
               <Button 
@@ -631,10 +709,17 @@ const HeroSection: FC = () => {
                 color="primary" 
                 sx={{ 
                   bgcolor: styles.colors.primary, 
-                  "&:hover": { bgcolor: styles.colors.primaryHover },
+                  "&:hover": { 
+                    bgcolor: styles.colors.primaryHover,
+                    transform: "translateY(-2px)"
+                  },
                   borderRadius: 2,
                   boxShadow: styles.shadows.primary,
-                  px: 4
+                  px: 4,
+                  py: 1.25, // Taller button
+                  fontWeight: 600,
+                  fontSize: "0.925rem",
+                  transition: "all 0.2s ease"
                 }}
                 onClick={handleOpenCalculator}
               >
@@ -643,16 +728,41 @@ const HeroSection: FC = () => {
             </Box>
           </FadeInView>
 
-          {/* Final CTA */}
-          <Box sx={{ textAlign: "center", pt: 4, mb: 4 }}>
+          {/* Improved Final CTA */}
+          <Box 
+            sx={{ 
+              textAlign: "center", 
+              pt: 4, 
+              pb: 2,
+              mb: 2,
+              p: 3,
+              borderRadius: 4,
+              background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02))", // Very subtle background
+            }}
+          >
             <FadeInView once>
-              <Typography sx={{ color: "#fff", fontSize: "1.5rem", fontWeight: 700, mb: 3, maxWidth: 600, mx: "auto" }}>
+              <Typography 
+                sx={{ 
+                  color: "#fff", 
+                  fontSize: "1.625rem", // Increased from 1.5rem
+                  fontWeight: 700, 
+                  mb: 3.5, // Increased from 3
+                  maxWidth: 700, // Wider
+                  mx: "auto",
+                  lineHeight: 1.3
+                }}
+              >
                 Ready to transform your enterprise technology?
               </Typography>
               <CTAButton
                 onClick={handleOpenCalendly}
                 endIcon={<Calendar size={16} strokeWidth={2} />}
                 aria-label="Schedule your strategy session"
+                sx={{ 
+                  px: 4, // Wider button
+                  py: 1.5, // Taller button
+                  fontSize: "1rem" // Slightly larger text
+                }}
               >
                 Schedule Your Strategy Session
               </CTAButton>
