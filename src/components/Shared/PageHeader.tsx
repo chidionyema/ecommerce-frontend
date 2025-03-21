@@ -221,21 +221,24 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       ref={headerRef}
       sx={{
         position: 'relative',
+        // REDUCED HEIGHTS here
         minHeight: { 
-          xs: `${380 * densityFactor.spacing}px`, 
-          sm: `${420 * densityFactor.spacing}px`, 
-          md: `${480 * densityFactor.spacing}px` 
+          xs: `${300 * densityFactor.spacing}px`, 
+          sm: `${320 * densityFactor.spacing}px`, 
+          md: `${360 * densityFactor.spacing}px` 
         },
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        pt: { xs: 8 * densityFactor.spacing, md: 10 * densityFactor.spacing },
-        pb: { xs: 8 * densityFactor.spacing, md: 10 * densityFactor.spacing },
+        // REDUCED PADDING
+        pt: { xs: 6 * densityFactor.spacing, md: 7 * densityFactor.spacing },
+        pb: { xs: 6 * densityFactor.spacing, md: 7 * densityFactor.spacing },
         overflow: 'hidden',
         backgroundColor: theme.palette.primary.dark,
         borderRadius: { xs: 0, sm: appearance === 'minimal' ? 0 : theme.shape.borderRadius * 1.5 },
         boxShadow: getBoxShadow(),
-        mt: 0,
+        // ADDED TOP MARGIN
+        mt: { xs: 4, sm: 5, md: 6 },
         mb: { xs: 4, sm: 5, md: 6 },
         mx: { xs: 0, sm: appearance === 'minimal' ? 0 : 3, md: appearance === 'minimal' ? 0 : 4 },
         isolation: 'isolate',
@@ -354,7 +357,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       }} />
 
       {/* Content container */}
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 3, my: 4 * densityFactor.spacing, width: '100%' }}>
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 3, my: 3 * densityFactor.spacing, width: '100%' }}>
         <Box component={motion.div} style={{ y: contentY, opacity: contentOpacity }}>
           {/* Headline */}
           <Box component={motion.div} variants={ANIMATIONS.fadeIn(0.05)} initial="initial" animate="animate">
@@ -363,10 +366,11 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               component="h1"
               id={`${id}-title`}
               sx={{
+                // REDUCED FONT SIZES
                 fontSize: { 
-                  xs: `${2.5 * densityFactor.typography}rem`, 
-                  sm: `${3 * densityFactor.typography}rem`, 
-                  md: `${3.75 * densityFactor.typography}rem` 
+                  xs: `${2.2 * densityFactor.typography}rem`, 
+                  sm: `${2.5 * densityFactor.typography}rem`, 
+                  md: `${3 * densityFactor.typography}rem` 
                 },
                 lineHeight: 1.08,
                 fontWeight: 800,
@@ -374,7 +378,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 position: 'relative',
                 color: alpha('#fff', 0.98),
                 textAlign: 'center',
-                mb: 3,
+                mb: 2.5, // REDUCED MARGIN
                 overflowWrap: 'break-word',
                 hyphens: 'auto',
                 maxWidth: '96%',
@@ -406,10 +410,11 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               <Typography
                 variant="subtitle1"
                 sx={{
+                  // REDUCED FONT SIZES
                   fontSize: { 
-                    xs: `${1.1 * densityFactor.typography}rem`, 
-                    sm: `${1.2 * densityFactor.typography}rem`, 
-                    md: `${1.3 * densityFactor.typography}rem` 
+                    xs: `${1 * densityFactor.typography}rem`, 
+                    sm: `${1.1 * densityFactor.typography}rem`, 
+                    md: `${1.2 * densityFactor.typography}rem` 
                   },
                   fontWeight: 400,
                   lineHeight: 1.55,
@@ -418,8 +423,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                   color: alpha('#ffffff', 0.9),
                   maxWidth: '800px',
                   mx: 'auto',
-                  mt: 3 * densityFactor.spacing,
-                  mb: 4 * densityFactor.spacing,
+                  mt: 2.5 * densityFactor.spacing, // REDUCED MARGIN
+                  mb: 3 * densityFactor.spacing, // REDUCED MARGIN
                   textShadow: appearance === 'glass' ? '0 1px 5px rgba(0,0,0,0.15)' : 'none',
                   '& strong': {
                     fontWeight: 600,
@@ -442,16 +447,16 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               initial="initial"
               animate={isInView ? "animate" : "initial"}
               variants={ANIMATIONS.stagger.container}
-              sx={{ width: '100%', mb: 5 * densityFactor.spacing }}
+              sx={{ width: '100%', mb: 4 * densityFactor.spacing }} // REDUCED MARGIN
             >
-              <Box sx={{ maxWidth: '900px', mx: 'auto', mb: 4 }}>
+              <Box sx={{ maxWidth: '900px', mx: 'auto', mb: 3 }}> {/* REDUCED MARGIN */}
                 <Box
                   sx={{
                     display: 'flex',
                     flexDirection: { xs: 'column', sm: highlights.length > 2 ? 'column' : 'row', md: 'row' },
-                    gap: 2 * densityFactor.spacing,
+                    gap: 1.5 * densityFactor.spacing, // REDUCED GAP
                     justifyContent: 'center',
-                    mt: 4 * densityFactor.spacing,
+                    mt: 3 * densityFactor.spacing, // REDUCED MARGIN
                   }}
                 >
                   {highlights.map((highlight, index) => (
@@ -459,7 +464,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                       <Paper 
                         elevation={0} 
                         sx={{
-                          p: 2.5 * densityFactor.spacing,
+                          p: 2 * densityFactor.spacing, // REDUCED PADDING
                           height: '100%',
                           display: 'flex',
                           flexDirection: 'column',
@@ -483,7 +488,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                           color="white"
                           sx={{
                             fontWeight: 600,
-                            fontSize: `${1 * densityFactor.typography}rem`,
+                            fontSize: `${0.9 * densityFactor.typography}rem`, // REDUCED FONT SIZE
                             textAlign: 'center',
                             textShadow: appearance === 'glass' ? '0 1px 3px rgba(0,0,0,0.2)' : 'none',
                           }}
@@ -504,9 +509,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               sx={{
                 display: 'flex',
                 flexDirection: { xs: 'column', sm: 'row' },
-                gap: { xs: 2 * densityFactor.spacing, sm: 3 * densityFactor.spacing },
+                gap: { xs: 1.5 * densityFactor.spacing, sm: 2.5 * densityFactor.spacing }, // REDUCED GAP
                 justifyContent: 'center',
-                mt: 2 * densityFactor.spacing,
+                mt: 1.5 * densityFactor.spacing, // REDUCED MARGIN
                 alignItems: 'center',
               }}
             >
@@ -519,11 +524,11 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 sx={{
                   borderRadius: 9,
                   fontWeight: 600,
-                  fontSize: '0.95rem',
+                  fontSize: '0.9rem', // REDUCED FONT SIZE
                   textTransform: 'none',
                   transition: 'all 0.32s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
-                  px: 4.5 * densityFactor.spacing,
-                  py: 1.75 * densityFactor.spacing,
+                  px: 4 * densityFactor.spacing, // REDUCED PADDING
+                  py: 1.5 * densityFactor.spacing, // REDUCED PADDING
                   background: `linear-gradient(135deg, 
                     ${theme.palette.secondary.main}, 
                     ${alpha(theme.palette.secondary.dark, 0.92)})`,
@@ -548,11 +553,11 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                   sx={{
                     borderRadius: 9,
                     fontWeight: 600,
-                    fontSize: '0.95rem',
+                    fontSize: '0.9rem', // REDUCED FONT SIZE
                     textTransform: 'none',
                     transition: 'all 0.32s cubic-bezier(0.165, 0.015, 0.12, 0.995)',
-                    px: 3.5 * densityFactor.spacing,
-                    py: 1.65 * densityFactor.spacing,
+                    px: 3 * densityFactor.spacing, // REDUCED PADDING
+                    py: 1.5 * densityFactor.spacing, // REDUCED PADDING
                     borderWidth: 1.5,
                     borderColor: alpha('#fff', 0.85),
                     color: '#fff',

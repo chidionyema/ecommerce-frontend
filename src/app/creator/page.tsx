@@ -1,13 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import { Box, Typography, Container, Grid, Button, Tabs, Tab, Paper, Card, CardContent, List, ListItem, 
-  ListItemIcon, ListItemText } from "@mui/material";
-import { VerifiedUser, AttachMoney, Stars, CheckCircle, Code, Web, Storage, DeviceHub, ShoppingCart, 
+import { Box, Typography, Container, Grid, Button, Card, CardContent, List, ListItem, 
+  ListItemIcon, ListItemText, Paper } from "@mui/material";
+import { VerifiedUser, AttachMoney, Stars, CheckCircle, Web, Storage, DeviceHub, ShoppingCart, 
   HealthAndSafety, AccountBalance, School } from "@mui/icons-material";
 import NextLink from "next/link";
 import ConsistentPageLayout from "../../components/Shared/ConsistentPageLayout";
 
-// Enhanced high-contrast color palette
+// Optimized high-contrast color palette
 const cp = {
   primary: { main: "#1a56db", light: "#3b82f6", dark: "#1e40af" },
   secondary: { main: "#0369a1", light: "#0ea5e9", dark: "#075985" },
@@ -18,33 +18,33 @@ const cp = {
   text: "#111827", 
   lightText: "#ffffff",
   background: "#ffffff",
-  cardDark: "#0c2461", // Darker blue for card backgrounds
-  cardText: "#ffffff", // White text for dark cards
-  cardLightBg: "#1e3799", // Slightly lighter blue for better contrast
+  cardDark: "#0c2461",        // Darker blue for card backgrounds
+  cardText: "#ffffff",        // White text for dark cards
+  cardLightBg: "#1e3799",     // Slightly lighter blue for better contrast
   cardListItem: "rgba(255, 255, 255, 0.9)" // Off-white for list items
 };
 
-// Combined standards data
+// Optimized standards data
 const standardsData = [
-  { id: "frontend", category: "Technology", title: "Frontend", icon: <Web fontSize="large" sx={{ color: "#ffffff" }} />,
+  { id: "frontend", category: "Technology", title: "Frontend", icon: <Web fontSize="large" sx={{ color: cp.primary.main }} />,
     standards: ["Mobile-First Responsive Design", "Accessible UI Components (WCAG AA)", 
       "Modern CSS Architecture", "Progressive Web App Support", "Cross-Browser Compatibility"] },
-  { id: "backend", category: "Technology", title: "Backend", icon: <Storage fontSize="large" sx={{ color: "#ffffff" }} />,
+  { id: "backend", category: "Technology", title: "Backend", icon: <Storage fontSize="large" sx={{ color: cp.primary.main }} />,
     standards: ["API Security & Authentication", "Database Optimization", "Scalable Architecture", 
       "Comprehensive Documentation", "Error Handling & Logging"] },
-  { id: "fullstack", category: "Technology", title: "Full Stack", icon: <DeviceHub fontSize="large" sx={{ color: "#ffffff" }} />,
+  { id: "fullstack", category: "Technology", title: "Full Stack", icon: <DeviceHub fontSize="large" sx={{ color: cp.primary.main }} />,
     standards: ["End-to-End Testing", "Infrastructure as Code", "Continuous Integration/Deployment", 
       "Microservices Architecture", "Event-Driven Development"] },
-  { id: "ecommerce", category: "Industry", title: "E-commerce", icon: <ShoppingCart fontSize="large" sx={{ color: "#ffffff" }} />,
+  { id: "ecommerce", category: "Industry", title: "E-commerce", icon: <ShoppingCart fontSize="large" sx={{ color: cp.secondary.main }} />,
     standards: ["Secure Payment Processing", "Inventory Management", "User Account Security", 
       "Order Processing Workflow", "Product Catalog Optimization"] },
-  { id: "healthcare", category: "Industry", title: "Healthcare", icon: <HealthAndSafety fontSize="large" sx={{ color: "#ffffff" }} />,
+  { id: "healthcare", category: "Industry", title: "Healthcare", icon: <HealthAndSafety fontSize="large" sx={{ color: cp.secondary.main }} />,
     standards: ["HIPAA Compliance", "Patient Data Security", "Medical Records Integration", 
       "Appointment Scheduling", "Telehealth Capabilities"] },
-  { id: "finance", category: "Industry", title: "Finance", icon: <AccountBalance fontSize="large" sx={{ color: "#ffffff" }} />,
+  { id: "finance", category: "Industry", title: "Finance", icon: <AccountBalance fontSize="large" sx={{ color: cp.secondary.main }} />,
     standards: ["Financial Data Security", "Transaction Processing", "Regulatory Compliance", 
       "Real-Time Analytics", "Risk Assessment Tools"] },
-  { id: "education", category: "Industry", title: "Education", icon: <School fontSize="large" sx={{ color: "#ffffff" }} />,
+  { id: "education", category: "Industry", title: "Education", icon: <School fontSize="large" sx={{ color: cp.secondary.main }} />,
     standards: ["Learning Management Systems", "Student Progress Tracking", "Interactive Learning Tools", 
       "Classroom Management", "Assignment Submission"] }
 ];
@@ -57,32 +57,59 @@ const BecomeACreatorPage = () => {
     <ConsistentPageLayout>
       <Container maxWidth="lg" sx={{ py: 6 }}>
         {/* Hero Section */}
-        <Paper elevation={0} sx={{ bgcolor: cp.primary.main, color: "white", p: 6, borderRadius: 2, mb: 6,
-          backgroundImage: "linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(29, 78, 216, 0.9) 100%)" }}>
+        <Paper elevation={0} sx={{ 
+          bgcolor: cp.primary.main, 
+          color: "white", 
+          p: 6, 
+          borderRadius: 2, 
+          mb: 6,
+          backgroundImage: "linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(29, 78, 216, 0.9) 100%)" 
+        }}>
           <Box sx={{ textAlign: "center", maxWidth: "800px", mx: "auto" }}>
-            <Typography variant="h2" sx={{ fontWeight: 700, fontSize: { xs: "2.25rem", md: "3rem" }, mb: 3,
-              textShadow: "0 1px 2px rgba(0,0,0,0.1)" }}>
+            <Typography variant="h2" sx={{ 
+              fontWeight: 700, 
+              fontSize: { xs: "2.25rem", md: "3rem" }, 
+              mb: 3,
+              textShadow: "0 1px 2px rgba(0,0,0,0.1)" 
+            }}>
               Share Your Expertise. Empower the Community. Earn.
             </Typography>
-            <Typography variant="h6" sx={{ fontSize: "1.25rem", lineHeight: 1.6, mb: 4, fontWeight: 400 }}>
+            <Typography variant="h6" sx={{ 
+              fontSize: "1.25rem", 
+              lineHeight: 1.6, 
+              mb: 4, 
+              fontWeight: 400 
+            }}>
               Become a GluStack Creator and help developers build amazing things, faster. 
               Earn a share of every sale while establishing yourself in the community.
             </Typography>
             <NextLink href="/creator-application" passHref>
-              <Button variant="contained" size="large" sx={{ px: 5, py: 1.5, borderRadius: "8px", fontWeight: 600,
-                textTransform: "none", backgroundColor: "white", color: cp.primary.dark,
-                "&:hover": { backgroundColor: cp.neutral[100] }, fontSize: "1.125rem",
-                boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}>
+              <Button variant="contained" size="large" sx={{ 
+                px: 5, 
+                py: 1.5, 
+                borderRadius: "8px", 
+                fontWeight: 600,
+                textTransform: "none", 
+                backgroundColor: "white", 
+                color: cp.primary.dark,
+                "&:hover": { backgroundColor: cp.neutral[100] }, 
+                fontSize: "1.125rem",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.1)" 
+              }}>
                 Apply Now
               </Button>
             </NextLink>
           </Box>
         </Paper>
 
-        {/* Benefits Section */}
+        {/* Benefits Section — UPDATED ONLY HERE */}
         <Box sx={{ mb: 8 }}>
-          <Typography variant="h3" align="center" sx={{ fontWeight: 700, mb: 5, color: cp.text,
-            fontSize: { xs: "1.875rem", md: "2.25rem" } }}>
+          <Typography variant="h3" align="center" sx={{ 
+            fontWeight: 700, 
+            mb: 5, 
+            color: cp.text,
+            fontSize: { xs: "1.875rem", md: "2.25rem" } 
+          }}>
             Why Become a GluStack Creator?
           </Typography>
           <Grid container spacing={4}>
@@ -102,12 +129,24 @@ const BecomeACreatorPage = () => {
                   height: "100%", 
                   borderRadius: 2,
                   backgroundColor: cp.cardDark,
-                  color: cp.cardText
+                  color: cp.cardText,
+                  "&:hover": { transform: "translateY(-4px)", transition: "transform 0.2s" }
                 }}>
                   <CardContent sx={{ p: 4, textAlign: "center" }}>
                     {benefit.icon}
-                    <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: cp.lightText }}>{benefit.title}</Typography>
-                    <Typography variant="body1" sx={{ color: "rgba(255, 255, 255, 0.85)", fontSize: "1rem" }}>{benefit.desc}</Typography>
+                    <Typography variant="h5" sx={{ 
+                      mb: 2, 
+                      fontWeight: 600, 
+                      color: cp.lightText 
+                    }}>
+                      {benefit.title}
+                    </Typography>
+                    <Typography variant="body1" sx={{ 
+                      color: "rgba(255, 255, 255, 0.85)", 
+                      fontSize: "1rem" 
+                    }}>
+                      {benefit.desc}
+                    </Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -117,8 +156,12 @@ const BecomeACreatorPage = () => {
 
         {/* Merged Standards Section */}
         <Box sx={{ mb: 8 }}>
-          <Typography variant="h3" align="center" sx={{ fontWeight: 700, mb: 4, color: cp.text,
-            fontSize: { xs: "1.875rem", md: "2.25rem" } }}>
+          <Typography variant="h3" align="center" sx={{ 
+            fontWeight: 700, 
+            mb: 4, 
+            color: cp.text,
+            fontSize: { xs: "1.875rem", md: "2.25rem" } 
+          }}>
             Our Standards
           </Typography>
           <Paper elevation={2} sx={{ 
@@ -143,8 +186,16 @@ const BecomeACreatorPage = () => {
           <Grid container spacing={3}>
             {/* Navigation Cards */}
             <Grid item xs={12} md={4}>
-              <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: cp.text, px: 1 }}>Choose Your Focus</Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: { md: "400px" }, overflowY: { md: "auto" } }}>
+              <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: cp.text, px: 1 }}>
+                Choose Your Focus
+              </Typography>
+              <Box sx={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                gap: 2, 
+                height: { md: "400px" }, 
+                overflowY: { md: "auto" } 
+              }}>
                 {standardsData.map(item => (
                   <Card key={item.id} elevation={activeTab === item.id ? 3 : 1} 
                     sx={{ 
@@ -165,7 +216,9 @@ const BecomeACreatorPage = () => {
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <Box sx={{ mr: 2 }}>{item.icon}</Box>
                         <Box>
-                          <Typography sx={{ fontWeight: 600, color: cp.lightText }}>{item.title}</Typography>
+                          <Typography sx={{ fontWeight: 600, color: cp.lightText }}>
+                            {item.title}
+                          </Typography>
                           <Typography variant="caption" sx={{ color: "rgba(255, 255, 255, 0.85)" }}>
                             {item.category}
                           </Typography>
@@ -198,12 +251,15 @@ const BecomeACreatorPage = () => {
                         {activeStandard.icon}
                       </Box>
                       <Box>
-                        <Typography variant="h4" sx={{ fontWeight: 600, color: cp.lightText }}>{activeStandard.title}</Typography>
+                        <Typography variant="h4" sx={{ fontWeight: 600, color: cp.lightText }}>
+                          {activeStandard.title}
+                        </Typography>
                         <Typography sx={{ color: "rgba(255, 255, 255, 0.85)", fontWeight: 500 }}>
                           {activeStandard.category} Standards
                         </Typography>
                       </Box>
                     </Box>
+                    
                     <List>
                       {activeStandard.standards.map((standard, index) => (
                         <ListItem key={index} sx={{ py: 1, px: 0 }}>
@@ -223,6 +279,7 @@ const BecomeACreatorPage = () => {
                         </ListItem>
                       ))}
                     </List>
+                    
                     <Typography sx={{ mt: 2, fontStyle: "italic", color: "rgba(255, 255, 255, 0.7)" }}>
                       All {activeStandard.title} GluStacks must meet these standards to ensure quality and consistency.
                     </Typography>
@@ -235,8 +292,12 @@ const BecomeACreatorPage = () => {
 
         {/* Process Section */}
         <Box sx={{ mb: 8 }}>
-          <Typography variant="h3" align="center" sx={{ fontWeight: 700, mb: 5, color: cp.text,
-            fontSize: { xs: "1.875rem", md: "2.25rem" } }}>
+          <Typography variant="h3" align="center" sx={{ 
+            fontWeight: 700, 
+            mb: 5, 
+            color: cp.text,
+            fontSize: { xs: "1.875rem", md: "2.25rem" } 
+          }}>
             The GluStack Creator Process
           </Typography>
           <Grid container spacing={3}>
@@ -278,8 +339,12 @@ const BecomeACreatorPage = () => {
                     {i + 1}
                   </Box>
                   <CardContent sx={{ pt: 4, pb: 3, px: 3, textAlign: "center" }}>
-                    <Typography variant="h5" sx={{ mt: 2, mb: 2, fontWeight: 600, color: cp.lightText }}>{step.step}</Typography>
-                    <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.85)", fontSize: "0.95rem" }}>{step.desc}</Typography>
+                    <Typography variant="h5" sx={{ mt: 2, mb: 2, fontWeight: 600, color: cp.lightText }}>
+                      {step.step}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.85)", fontSize: "0.95rem" }}>
+                      {step.desc}
+                    </Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -288,28 +353,59 @@ const BecomeACreatorPage = () => {
         </Box>
 
         {/* CTA Section */}
-        <Box sx={{ textAlign: "center", py: 6, px: 4, 
+        <Box sx={{ 
+          textAlign: "center", 
+          py: 6, 
+          px: 4, 
           background: `linear-gradient(135deg, ${cp.premium.main}, ${cp.premium.dark})`, 
-          color: "white", borderRadius: 2, mb: 4,
-          boxShadow: "0 8px 32px rgba(0,0,0,0.15)", position: "relative", overflow: "hidden" }}>
-          <Box sx={{ position: "absolute", inset: 0, 
-            backgroundImage: "radial-gradient(circle at 20% 150%, rgba(255,255,255,0.18) 0%, transparent 45%)" }} />
+          color: "white", 
+          borderRadius: 2, 
+          mb: 4, 
+          boxShadow: "0 8px 32px rgba(0,0,0,0.15)", 
+          position: "relative", 
+          overflow: "hidden" 
+        }}>
+          <Box sx={{ 
+            position: "absolute", 
+            inset: 0, 
+            backgroundImage: "radial-gradient(circle at 20% 150%, rgba(255,255,255,0.18) 0%, transparent 45%)" 
+          }} />
           <Box sx={{ position: "relative", zIndex: 1 }}>
             <Stars sx={{ fontSize: 48, color: "white", mb: 2, opacity: 0.9 }} />
-            <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, fontSize: { xs: "1.5rem", md: "2rem" },
-              textShadow: "0 2px 4px rgba(0,0,0,0.2)" }}>
+            <Typography variant="h4" sx={{ 
+              fontWeight: 700, 
+              mb: 3, 
+              fontSize: { xs: "1.5rem", md: "2rem" },
+              textShadow: "0 2px 4px rgba(0,0,0,0.2)" 
+            }}>
               Ready to Join Our Creator Community?
             </Typography>
-            <Typography variant="body1" sx={{ fontSize: "1.125rem", maxWidth: "600px", mx: "auto", mb: 4, 
-              color: "rgba(255,255,255,0.9)" }}>
+            <Typography variant="body1" sx={{ 
+              fontSize: "1.125rem", 
+              maxWidth: "600px", 
+              mx: "auto", 
+              mb: 4, 
+              color: "rgba(255,255,255,0.9)" 
+            }}>
               Apply today and start sharing your expertise with developers worldwide 
               while earning passive income from your creations.
             </Typography>
             <NextLink href="/creator-application" passHref>
-              <Button variant="contained" size="large" sx={{ px: 6, py: 1.75, borderRadius: "8px", fontWeight: 600,
-                textTransform: "none", backgroundColor: "white", color: cp.premium.dark,
-                "&:hover": { backgroundColor: "rgba(255,255,255,0.9)", transform: "translateY(-3px) scale(1.05)" }, 
-                fontSize: "1.125rem", boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }}>
+              <Button variant="contained" size="large" sx={{ 
+                px: 6, 
+                py: 1.75, 
+                borderRadius: "8px", 
+                fontWeight: 600,
+                textTransform: "none", 
+                backgroundColor: "white", 
+                color: cp.premium.dark,
+                "&:hover": { 
+                  backgroundColor: "rgba(255,255,255,0.9)", 
+                  transform: "translateY(-3px) scale(1.05)" 
+                }, 
+                fontSize: "1.125rem", 
+                boxShadow: "0 4px 12px rgba(0,0,0,0.25)" 
+              }}>
                 Apply Now
               </Button>
             </NextLink>

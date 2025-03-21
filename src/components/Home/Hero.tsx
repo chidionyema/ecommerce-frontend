@@ -1,15 +1,14 @@
 "use client";
-import React, { useState, useEffect, useMemo, Suspense, lazy, FC, ReactNode } from "react";
+import React, { useState, useEffect, useMemo, Suspense, lazy } from "react";
 import {
   Box, Typography, Button, Container, alpha, Grid, Paper,
-  Stack, Chip,
+  Stack, Chip
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import {
-  ShieldCheck, TrendingUp, DollarSign, Users, Calendar,
-  Clock, ChevronRight
+  ShieldCheck, TrendingUp, DollarSign, Users, Calendar, ChevronRight, Clock
 } from "lucide-react";
 import {
   SiAmazonaws, SiMicrosoftazure, SiDocker, SiKubernetes, SiTerraform, SiGooglecloud
@@ -18,22 +17,31 @@ import {
 // Lazy load external component
 const CalendlyBooking = lazy(() => import('../CalendlyBooking'));
 
-// ErrorBoundary Component
-class ErrorBoundary extends React.Component {
-  constructor(props) {
+// ErrorBoundary Component with TypeScript types
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
   
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(): ErrorBoundaryState {
     return { hasError: true };
   }
   
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     console.error("Error caught:", error, errorInfo);
   }
   
-  render() {
+  render(): React.ReactNode {
     if (this.state.hasError) {
       return this.props.fallback || (
         <Box sx={{ p: 3, textAlign: 'center', color: '#fff' }}>
@@ -52,7 +60,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-// Styles object
+// Styles and theme constants
 const styles = {
   gradients: {
     primary: "linear-gradient(135deg, #6366F1, #8B5CF6)",
@@ -75,12 +83,10 @@ const styles = {
     short: "all 0.2s ease",
     medium: "all 0.25s ease",
   },
-  spacing: {
-    section: 8,
-  }
+  spacing: { section: 8 }
 };
 
-// Animation variants
+// Animation and styled components
 const fadeVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { 
@@ -90,8 +96,13 @@ const fadeVariants = {
   }
 };
 
-// FadeInView component
-const FadeInView = ({ children, delay = 0, once = false }) => (
+interface FadeInViewProps {
+  children: React.ReactNode;
+  delay?: number;
+  once?: boolean;
+}
+
+const FadeInView: React.FC<FadeInViewProps> = ({ children, delay = 0, once = false }) => (
   <motion.div 
     initial="hidden" 
     animate={!once ? "visible" : undefined}
@@ -159,9 +170,13 @@ const Subheadline = styled(Typography)(({ theme }) => ({
   }
 }));
 
+interface CTAButtonProps {
+  secondary?: boolean;
+}
+
 const CTAButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== 'secondary'
-})(({ theme, secondary }) => ({
+})<CTAButtonProps>(({ theme, secondary }) => ({
   color: styles.colors.text,
   fontWeight: 600,
   borderRadius: 8,
@@ -178,27 +193,6 @@ const CTAButton = styled(Button, {
   }
 }));
 
-// CTA Button Group component
-const CTAButtonGroup = ({ onSchedule, onCaseStudies }) => (
-  <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 3 }} justifyContent="center">
-    <CTAButton
-      onClick={onSchedule}
-      endIcon={<Calendar size={16} strokeWidth={2} />}
-      aria-label="Schedule your strategy session"
-    >
-      Schedule Your Strategy Session
-    </CTAButton>
-    <CTAButton
-      onClick={onCaseStudies}
-      endIcon={<ChevronRight size={16} strokeWidth={2} />}
-      secondary
-      aria-label="View case studies"
-    >
-      View Case Studies
-    </CTAButton>
-  </Stack>
-);
-
 const OfferChip = styled(Chip)({
   height: 36,
   backgroundColor: "rgba(99, 102, 241, 0.15)",
@@ -209,9 +203,13 @@ const OfferChip = styled(Chip)({
   "& .MuiChip-icon": { color: alpha(styles.colors.text, 0.97) }
 });
 
+interface PersonaButtonProps {
+  active?: boolean;
+}
+
 const PersonaButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== "active"
-})(({ theme, active }) => ({
+})<PersonaButtonProps>(({ theme, active }) => ({
   fontSize: "0.875rem",
   fontWeight: 600,
   letterSpacing: "0.02em",
@@ -245,7 +243,7 @@ const BenefitCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3.5),
   borderRadius: 16,
   height: "100%",
-  minHeight: 220, // Increased for consistent height
+  minHeight: 220,
   display: "flex",
   flexDirection: "column",
   transition: styles.animations.medium,
@@ -272,8 +270,36 @@ const IconCircle = styled(Box)({
   border: "1px solid rgba(255, 255, 255, 0.15)"
 });
 
-// Data structure
-const DATA = {
+// Data structure with TypeScript types
+interface PersonaData {
+  headline: string;
+  subheadline: string;
+  benefits: string[];
+}
+
+interface Benefit {
+  icon: React.ReactNode;
+  text: string;
+  subtext: string;
+  gradient: string;
+}
+
+interface TechStack {
+  icon: React.ComponentType;
+  name: string;
+  color: string;
+}
+
+interface DataStructure {
+  personas: {
+    [key: string]: PersonaData;
+  };
+  benefits: Benefit[];
+  techStack: TechStack[];
+  successIndicators: string[];
+}
+
+const DATA: DataStructure = {
   personas: {
     developer: {
       headline: "Enterprise Solutions Delivered 10× Faster",
@@ -332,43 +358,18 @@ const DATA = {
   ]
 };
 
-// CheckItem component
-const CheckItem = React.memo(({ text }) => (
-  <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1.5 }}>
-    <Box
-      sx={{
-        width: 16,
-        height: 16,
-        borderRadius: "50%",
-        bgcolor: styles.colors.primary,
-        color: styles.colors.text,
-        fontSize: "0.7rem",
-        fontWeight: 600,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
-      ✓
-    </Box>
-    <Typography
-      sx={{
-        color: "rgba(255, 255, 255, 0.94)",
-        fontSize: "0.875rem",
-        fontWeight: 500
-      }}
-    >
-      {text}
-    </Typography>
-  </Stack>
-));
+// Props for the CTAButtonGroup component
+interface CTAButtonGroupProps {
+  onSchedule: () => void;
+  onCaseStudies: () => void;
+}
 
 // Main Component
-const HeroSection = () => {
-  const [isCalendlyOpen, setIsCalendlyOpen] = useState(false);
-  const [selectedPersona, setSelectedPersona] = useState("executive");
-  const [teamSize, setTeamSize] = useState(5);
-  const [roi, setRoi] = useState(30);
+const HeroSection: React.FC = () => {
+  const [isCalendlyOpen, setIsCalendlyOpen] = useState<boolean>(false);
+  const [selectedPersona, setSelectedPersona] = useState<string>("executive");
+  const [teamSize, setTeamSize] = useState<number>(5);
+  const [roi, setRoi] = useState<number>(30);
 
   // Load persona from URL or localStorage
   useEffect(() => {
@@ -381,10 +382,8 @@ const HeroSection = () => {
         setSelectedPersona(stored);
       }
     }
-  }, []);
-
-  // Save persona to localStorage
-  useEffect(() => {
+    
+    // Save persona to localStorage
     localStorage.setItem("userPersona", selectedPersona);
   }, [selectedPersona]);
 
@@ -403,19 +402,25 @@ const HeroSection = () => {
   const handleViewCaseStudies = () => window.open("/case-studies", "_self");
   const handleOpenCalculator = () => window.open("/calculator", "_self");
 
-  // Loading state for Calendly
-  const calendlyLoadingFallback = (
-    <Box sx={{ 
-      position: "fixed", 
-      inset: 0, 
-      display: "flex", 
-      alignItems: "center", 
-      justifyContent: "center", 
-      backgroundColor: "rgba(0,0,0,0.75)", 
-      zIndex: 9999 
-    }}>
-      <Typography color="white">Loading booking system...</Typography>
-    </Box>
+  // Combined Button Group component
+  const CTAButtonGroup: React.FC<CTAButtonGroupProps> = ({ onSchedule, onCaseStudies }) => (
+    <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 3 }} justifyContent="center">
+      <CTAButton
+        onClick={onSchedule}
+        endIcon={<Calendar size={16} strokeWidth={2} />}
+        aria-label="Schedule your strategy session"
+      >
+        Schedule Your Strategy Session
+      </CTAButton>
+      <CTAButton
+        onClick={onCaseStudies}
+        endIcon={<ChevronRight size={16} strokeWidth={2} />}
+        secondary
+        aria-label="View case studies"
+      >
+        View Case Studies
+      </CTAButton>
+    </Stack>
   );
 
   return (
@@ -549,25 +554,10 @@ const HeroSection = () => {
                   <FadeInView delay={i * 0.1} once>
                     <BenefitCard>
                       <IconCircle sx={{ background: b.gradient }}>{b.icon}</IconCircle>
-                      <Typography 
-                        sx={{ 
-                          fontWeight: 600, 
-                          color: "#fff", 
-                          mb: 1.5,
-                          fontSize: "1.125rem",
-                          lineHeight: 1.3 
-                        }}
-                      >
+                      <Typography sx={{ fontWeight: 600, color: "#fff", mb: 1.5, fontSize: "1.125rem", lineHeight: 1.3 }}>
                         {b.text}
                       </Typography>
-                      <Typography 
-                        sx={{ 
-                          fontSize: "0.875rem", 
-                          lineHeight: 1.6, 
-                          color: "rgba(255,255,255,0.85)",
-                          flexGrow: 1
-                        }}
-                      >
+                      <Typography sx={{ fontSize: "0.875rem", lineHeight: 1.6, color: "rgba(255,255,255,0.85)", flexGrow: 1 }}>
                         {b.subtext}
                       </Typography>
                     </BenefitCard>
@@ -599,17 +589,7 @@ const HeroSection = () => {
                   Calculate Your Potential Savings
                 </Typography>
               </Stack>
-              <Typography 
-                sx={{ 
-                  color: "rgba(255,255,255,0.9)", 
-                  maxWidth: 600, 
-                  mx: "auto", 
-                  fontSize: "0.95rem", 
-                  textAlign: "center", 
-                  mb: 3.5,
-                  lineHeight: 1.6
-                }}
-              >
+              <Typography sx={{ color: "rgba(255,255,255,0.9)", maxWidth: 600, mx: "auto", fontSize: "0.95rem", textAlign: "center", mb: 3.5, lineHeight: 1.6 }}>
                 Our solutions typically reduce development costs by 30-50%. See how much your organization could save.
               </Typography>
               <Button 
@@ -617,10 +597,7 @@ const HeroSection = () => {
                 color="primary" 
                 sx={{ 
                   bgcolor: styles.colors.primary, 
-                  "&:hover": { 
-                    bgcolor: styles.colors.primaryHover,
-                    transform: "translateY(-2px)"
-                  },
+                  "&:hover": { bgcolor: styles.colors.primaryHover, transform: "translateY(-2px)" },
                   borderRadius: 2,
                   boxShadow: styles.shadows.primary,
                   px: 4,
@@ -637,40 +614,16 @@ const HeroSection = () => {
           </FadeInView>
 
           {/* Final CTA */}
-          <Box 
-            sx={{ 
-              textAlign: "center", 
-              pt: 4, 
-              pb: 2,
-              mb: 2,
-              p: 3,
-              borderRadius: 4,
-              background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02))",
-            }}
-          >
+          <Box sx={{ textAlign: "center", pt: 4, pb: 2, mb: 2, p: 3, borderRadius: 4, background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02))" }}>
             <FadeInView once>
-              <Typography 
-                sx={{ 
-                  color: "#fff", 
-                  fontSize: "1.625rem",
-                  fontWeight: 700, 
-                  mb: 3.5,
-                  maxWidth: 700,
-                  mx: "auto",
-                  lineHeight: 1.3
-                }}
-              >
+              <Typography sx={{ color: "#fff", fontSize: "1.625rem", fontWeight: 700, mb: 3.5, maxWidth: 700, mx: "auto", lineHeight: 1.3 }}>
                 Ready to transform your enterprise technology?
               </Typography>
               <CTAButton
                 onClick={handleOpenCalendly}
                 endIcon={<Calendar size={16} strokeWidth={2} />}
                 aria-label="Schedule your strategy session"
-                sx={{ 
-                  px: 4,
-                  py: 1.5,
-                  fontSize: "1rem"
-                }}
+                sx={{ px: 4, py: 1.5, fontSize: "1rem" }}
               >
                 Schedule Your Strategy Session
               </CTAButton>
@@ -682,7 +635,11 @@ const HeroSection = () => {
       {/* Calendly Widget */}
       <ErrorBoundary fallback={<div>Calendly could not be loaded. Please try again.</div>}>
         {isCalendlyOpen && (
-          <Suspense fallback={calendlyLoadingFallback}>
+          <Suspense fallback={
+            <Box sx={{ position: "fixed", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.75)", zIndex: 9999 }}>
+              <Typography color="white">Loading booking system...</Typography>
+            </Box>
+          }>
             <CalendlyBooking
               isOpen={isCalendlyOpen}
               onClose={handleCloseCalendly}
