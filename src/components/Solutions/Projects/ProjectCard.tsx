@@ -140,7 +140,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
     onSelect?.(project?.id || '');
   };
 
-  if (!inView) return <Box ref={ref} sx={{ ...sx, my: 4, width: 380, height: 680 }} />;
+  // Changed height from 680 to 612 (10% reduction)
+  if (!inView) return <Box ref={ref} sx={{ ...sx, my: 4, width: 380, height: 612 }} />;
 
   const technologyIcons = project?.technologyIcons || [];
   const metrics = project?.metrics || [];
@@ -176,13 +177,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
         <Card
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
-          onClick={() => !expanded && onSelect?.(project?.id || '')}
           component="article"
-          role="button"
+          role="region"
           tabIndex={0}
           sx={{
             width: 380,
-            height: expanded ? 'auto' : 680,
+            // Changed height from 680 to 612 (10% reduction)
+            height: expanded ? 'auto' : 612,
             display: 'flex',
             flexDirection: 'column',
             borderRadius: '16px',
@@ -199,27 +200,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
             position: 'relative',
             zIndex: expanded ? 10 : 1
           }}>
-          {/* Technology Icons */}
-          {!expanded && design.hasTechnologyIcons && (
-            <Box sx={{ display: 'flex', gap: 1.25, position: 'absolute', top: 12, left: 12, zIndex: 5 }}>
-              {technologyIcons.slice(0, 4).map((Icon, index) => {
-                const techName = technologies[index] || '';
-                const iconInfo = TECH_ICONS[techName];
-                return (
-                  <Box key={index} sx={{
-                    width: 32, height: 32, borderRadius: '8px', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                    bgcolor: alpha(iconInfo?.color || '#ffffff', 0.85), backdropFilter: 'blur(4px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                    '&:hover': { transform: 'translateY(-2px)' }
-                  }}>
-                    {React.createElement(Icon, { size: 16, color: '#ffffff', strokeWidth: 1.75 })}
-                  </Box>
-                );
-              })}
-            </Box>
-          )}
+          {/* Technology Icons in header removed as requested */}
           {/* Featured badge */}
           {project?.featured && (
             <Box sx={{
@@ -238,7 +219,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
           )}
 
           {/* Banner Image Section */}
-          <Box sx={{ position: 'relative', width: '100%', height: '200px', overflow: 'hidden' }}>
+          <Box sx={{ position: 'relative', width: '100%', height: '180px', overflow: 'hidden' }}>
             {!imageLoaded ? (
               <Box
                 component={motion.div}
@@ -303,7 +284,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
 
           {/* Content Area */}
           <Box sx={{
-            height: expanded ? 'auto' : '416px',
+            // Changed height from 416px to 374px (10% reduction)
+            height: expanded ? 'auto' : '374px',
             display: 'flex', flexDirection: 'column',
             px: 3, pt: 3, position: 'relative', background: 'transparent'
           }}>
@@ -325,7 +307,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
             {design.hasMetrics && (
               <Box sx={{
                 display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderRadius: '10px',
-                background: design.background, overflow: 'visible', mb: 3, mt: 1, height: '85px',
+                background: design.background, overflow: 'visible', mb: 3, mt: 1, height: '80px',
                 border: '1px solid rgba(255, 255, 255, 0.2)', boxShadow: '0 4px 12px rgba(0, 20, 50, 0.15)'
               }}>
                 {metrics.map((metric, index) => (
@@ -378,8 +360,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
               </Box>
               <Box sx={{
                 display: 'flex', flexWrap: 'wrap', gap: '8px',
-                maxHeight: !expanded && design.shouldCollapseTechs ? '100px' : 'none',
-                height: !expanded ? '100px' : 'auto',
+                maxHeight: !expanded && design.shouldCollapseTechs ? '90px' : 'none',
+                height: !expanded ? '90px' : 'auto',
                 overflowY: !expanded && design.shouldCollapseTechs ? 'hidden' : 'visible',
                 position: 'relative', pb: !expanded && design.shouldCollapseTechs ? 2 : 0,
                 mx: -0.5, px: 0.5,
@@ -431,7 +413,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
                   fullWidth
                   sx={{
                     background: 'rgba(255, 255, 255, 0.75)', borderRadius: '12px',
-                    height: '48px', fontWeight: 600, fontSize: '15px', color: 'rgba(10, 30, 60, 0.9)',
+                    height: '44px', fontWeight: 600, fontSize: '15px', color: 'rgba(10, 30, 60, 0.9)',
                     textTransform: 'none', border: '1px solid rgba(255, 255, 255, 0.8)',
                     boxShadow: expanded ? '0 6px 20px rgba(0, 20, 50, 0.1)' : '0 4px 16px rgba(0, 20, 50, 0.08)',
                     backdropFilter: 'blur(4px)',

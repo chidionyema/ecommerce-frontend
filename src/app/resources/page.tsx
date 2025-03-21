@@ -36,51 +36,121 @@ interface Resource {
   premium: boolean;
 }
 
-// Card Component with proper typing
+// Card Component with proper typing and fixed heights
 const ResourceCard = ({ resource }: { resource: Resource }) => {
   const isPremium = resource.premium;
   const typeColor = isPremium ? colors.premium : colors.primary;
   
   return (
-    <Card sx={{ ...sx.card, "&:hover": { transform: "translateY(-4px)", boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
-      borderColor: isPremium ? colors.premium : colors.primary } }}>
+    <Card sx={{ 
+      ...sx.card, 
+      "&:hover": { 
+        transform: "translateY(-4px)", 
+        boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+        borderColor: isPremium ? colors.premium : colors.primary 
+      },
+      height: 420 // Fixed height for all cards
+    }}>
       {isPremium && (
-        <Box sx={{ position: "absolute", top: 0, right: 0, bgcolor: colors.premium, color: colors.white, py: 0.5, px: 1.5,
-          fontWeight: 700, fontSize: "0.75rem", borderBottomLeftRadius: 8, display: "flex", alignItems: "center", zIndex: 2 }}>
+        <Box sx={{ 
+          position: "absolute", 
+          top: 0, 
+          right: 0, 
+          bgcolor: colors.premium, 
+          color: colors.white, 
+          py: 0.5, 
+          px: 1.5,
+          fontWeight: 700, 
+          fontSize: "0.75rem", 
+          borderBottomLeftRadius: 8, 
+          display: "flex", 
+          alignItems: "center", 
+          zIndex: 2 
+        }}>
           <Stars sx={{ fontSize: 16, mr: 0.5 }} />PREMIUM
         </Box>
       )}
       
-      <Box sx={{ p: 2.5, pb: 1.5, display: "flex", alignItems: "center", justifyContent: "space-between",
-        borderBottom: `1px solid ${colors.gray[200]}`, bgcolor: colors.gray[50] }}>
+      <Box sx={{ 
+        p: 2.5, 
+        pb: 1.5, 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "space-between",
+        borderBottom: `1px solid ${colors.gray[200]}`, 
+        bgcolor: colors.gray[50] 
+      }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Box sx={{ color: typeColor }}>{getTypeIcon(resource.type)}</Box>
-          <Typography sx={{ color: colors.gray[700], fontWeight: 600, fontSize: "0.75rem", 
-            textTransform: "uppercase", letterSpacing: "0.03em" }}>{resource.type}</Typography>
+          <Typography sx={{ 
+            color: colors.gray[700], 
+            fontWeight: 600, 
+            fontSize: "0.75rem", 
+            textTransform: "uppercase", 
+            letterSpacing: "0.03em" 
+          }}>{resource.type}</Typography>
         </Box>
         
         {isPremium && (
-          <Chip icon={<Stars sx={{ fontSize: 16, color: colors.premium }} />} label="Premium" size="small"
-            sx={{ bgcolor: alpha(colors.premium, 0.1), color: colors.premium, fontWeight: 600, 
-              fontSize: "0.75rem", height: 24 }} />
+          <Chip 
+            icon={<Stars sx={{ fontSize: 16, color: colors.premium }} />} 
+            label="Premium" 
+            size="small"
+            sx={{ 
+              bgcolor: alpha(colors.premium, 0.1), 
+              color: colors.premium, 
+              fontWeight: 600, 
+              fontSize: "0.75rem", 
+              height: 24 
+            }} 
+          />
         )}
       </Box>
       
-      <Box sx={{ p: 2.5, flexGrow: 1, display: "flex", flexDirection: "column" }}>
+      <Box sx={{ 
+        p: 2.5, 
+        display: "flex", 
+        flexDirection: "column",
+        height: "calc(100% - 56px)" // Subtracting the header height
+      }}>
         <Box sx={{ display: "flex", alignItems: "flex-start", mb: 2 }}>
           <Box sx={{ color: typeColor, mr: 1.5, mt: 0.5 }}>{getTypeIcon(resource.type)}</Box>
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 800, fontSize: "1.2rem", color: colors.black, 
-              lineHeight: 1.2, mb: 0.5 }}>{resource.title}</Typography>
-            <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: typeColor, 
-              textTransform: "uppercase" }}>{resource.type}</Typography>
+            <Typography variant="h6" sx={{ 
+              fontWeight: 800, 
+              fontSize: "1.2rem", 
+              color: colors.black, 
+              lineHeight: 1.2, 
+              mb: 0.5,
+              display: '-webkit-box',
+              overflow: 'hidden',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              height: '2.4rem' // Fixed height for title (2 lines max)
+            }}>{resource.title}</Typography>
+            <Typography sx={{ 
+              fontSize: "0.8rem", 
+              fontWeight: 600, 
+              color: typeColor, 
+              textTransform: "uppercase" 
+            }}>{resource.type}</Typography>
           </Box>
         </Box>
         
-        <Typography sx={{ fontSize: "0.95rem", color: colors.black, mb: 2, fontWeight: 500, 
-          lineHeight: 1.5 }}>{resource.description}</Typography>
+        <Typography sx={{ 
+          fontSize: "0.95rem", 
+          color: colors.black, 
+          mb: 2, 
+          fontWeight: 500, 
+          lineHeight: 1.5,
+          display: '-webkit-box',
+          overflow: 'hidden',
+          WebkitBoxOrient: 'vertical',
+          WebkitLineClamp: 3,
+          height: '4.275rem' // Fixed height for description (3 lines max)
+        }}>{resource.description}</Typography>
         
-        <Box sx={{ mb: 'auto' }}>
+        <Box sx={{ height: '96px' }}> {/* Fixed height for the feature points */}
           {["Speeds up development by 50%", "Production-ready code", "Regularly maintained"].map((point, index) => (
             <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 1 }}>
               <CheckCircle sx={{ fontSize: 16, mr: 1, color: isPremium ? colors.premium : colors.success }} />
@@ -89,17 +159,42 @@ const ResourceCard = ({ resource }: { resource: Resource }) => {
           ))}
         </Box>
         
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 2, mb: 2 }}>
+        <Box sx={{ 
+          display: "flex", 
+          flexWrap: "wrap", 
+          gap: 1, 
+          mt: 2, 
+          mb: 2,
+          height: '24px', // Fixed height for tags
+          overflow: 'hidden'
+        }}>
           {resource.tags.slice(0, 3).map(tag => (
-            <Chip key={tag} label={tag} size="small" sx={{ bgcolor: colors.gray[100], color: colors.gray[700],
-              fontWeight: 600, fontSize: "0.7rem", height: 24, border: `1px solid ${colors.gray[300]}` }} />
+            <Chip 
+              key={tag} 
+              label={tag} 
+              size="small" 
+              sx={{ 
+                bgcolor: colors.gray[100], 
+                color: colors.gray[700],
+                fontWeight: 600, 
+                fontSize: "0.7rem", 
+                height: 24, 
+                border: `1px solid ${colors.gray[300]}` 
+              }} 
+            />
           ))}
         </Box>
         
-        <Button variant="contained" fullWidth endIcon={<ArrowForward />}
-          sx={{ ...sx.btn(typeColor), py: 1.2, mt: 1 }}>
-          {isPremium ? "Get Premium Access" : "View Details"}
-        </Button>
+        <Box sx={{ mt: 'auto' }}> {/* Push button to bottom */}
+          <Button 
+            variant="contained" 
+            fullWidth 
+            endIcon={<ArrowForward />}
+            sx={{ ...sx.btn(typeColor), py: 1.2 }}
+          >
+            {isPremium ? "Get Premium Access" : "View Details"}
+          </Button>
+        </Box>
       </Box>
     </Card>
   );

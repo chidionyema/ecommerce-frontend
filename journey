@@ -1,0 +1,164 @@
+I. Combined User Journeys: Overview
+
+We'll structure this by outlining the stages that are common to both user types, and then branch out to creator-specific and subscriber-specific stages.
+
+Stage	Creator Journey	Subscriber Journey	Shared Pages	Creator-Specific Pages	Subscriber-Specific Pages
+1. Awareness/Discovery	Becomes aware of GluStak as a platform	Discovers GluStaks as potential solutions	Homepage, About Us, Blog (optional), Contact Us	Become a Creator (Landing Page)	GluStak Marketplace (Browse Page)
+2. Consideration	Evaluates benefits of becoming a creator	Evaluates GluStaks for purchase	Terms of Service, Privacy Policy	Creator Terms of Service, GluStak Guidelines	GluStak Detail Page
+3. Action (Signup/Login)	Registers and logs in	Registers and logs in	Sign Up / Login, Forgot Password	Creator Application Form	-
+4. Onboarding	Completes profile, learns platform rules	Sets up profile		Creator Dashboard (initial setup)	User Account / Dashboard (initial setup)
+5. Core Activity	Creates, submits, manages GluStaks	Purchases, integrates, uses GluStaks	-	Create GluStak Page, Creator Dashboard (ongoing)	Checkout Page, Thank You/Confirmation, User Account/Dashboard
+6. Support/Maintenance	Updates GluStaks, interacts with community	Receives support, provides feedback	Documentation, FAQ, Contact us	Creator Dashboard (support features)	User Account/Dashboard (support, feedback)
+7. Growth/Advocacy	Earns revenue, builds reputation, new GluStaks	(Potentially) Leaves reviews, refers others	Community Forum (optional), Blog (optional)	-	-
+
+Export to Sheets
+II. Detailed Page Breakdown
+
+Now, let's break down each stage and its associated pages in detail:
+
+1. Awareness/Discovery Stage:
+
+Shared Pages:
+
+Homepage:
+Purpose: First impression, communicate value proposition to both creators and subscribers.
+Content:
+Hero section with clear headlines and calls to action (e.g., "Build and Sell Reusable Code" / "Find Pre-Built Solutions").
+Brief overview of GluStaks and their benefits.
+Sections highlighting featured GluStaks, creator success stories, and subscriber testimonials.
+Navigation to key pages (Become a Creator, Marketplace, About Us).
+About Us:
+Purpose: Build trust, share the company's mission.
+Content: Company story, team, values, contact information.
+Blog (Optional):
+Purpose: Content marketing, attract organic traffic, establish expertise.
+Content: Tutorials, case studies, industry news, creator spotlights.
+Contact Us:
+Purpose: Provide a way for users to ask questions.
+Content: Contact form, email address, FAQ.
+Creator-Specific:
+
+Become a Creator (Landing Page):
+Purpose: Attract potential creators, explain benefits.
+Content: (As detailed in previous responses) - Focus on earning potential, community, and ease of creation.
+Subscriber-Specific:
+
+GluStak Marketplace (Browse Page):
+Purpose: Main page for discovering GluStaks.
+Content: (As detailed in previous responses) - Search, filters, featured GluStaks, listing cards.
+2. Consideration Stage:
+
+Shared pages
+
+Terms of service
+Purpose: Outling the terms of agreement and conditions.
+Content: General terms and conditions.
+Privacy Policy
+Purpose: to outline how personal data is used.
+Content: Data collection, usage and protection.
+Creator-Specific:
+
+Creator Terms of Service:
+Purpose: Legal agreement specific to creators.
+Content: Intellectual property, royalties, payments, termination.
+GluStak Guidelines Page (Documentation):
+Purpose: Explain requirements for creating GluStaks.
+Content: Technical specs, coding standards, documentation requirements.
+Subscriber-Specific:
+
+GluStak Detail Page:
+Purpose: Provide in-depth information about a single GluStak.
+Content: (As detailed in previous responses) - Features, documentation, pricing, reviews, creator info.
+3. Action (Sign Up/Login) Stage:
+
+Shared Pages:
+
+Sign Up / Login Page:
+Purpose: User registration and authentication.
+Content: Separate forms/options for creators and subscribers, social login, forgot password link.
+Forgot Password Page:
+Purpose: Password recovery.
+Content: Email input, reset instructions, security measures.
+Creator-Specific:
+
+Creator Application Form:
+Purpose: Gather information to assess creator suitability.
+Content: Personal info, skills, portfolio, GluStak ideas, agreement to terms.
+4. Onboarding Stage:
+
+Creator-Specific:
+
+Creator Dashboard (Initial Setup):
+Purpose: Guide new creators through initial setup.
+Content: Welcome message, profile completion steps, links to documentation, initial GluStak creation prompts.
+Subscriber-Specific:
+
+User Account / Dashboard (Initial Setup):
+Purpose: Guide new subscribers through profile setup.
+Content: Welcome message, profile completion steps, links to browse GluStaks, payment method setup (optional).
+5. Core Activity Stage:
+
+Creator-Specific:
+
+Create GluStak Page (Editor/Submission Form):
+Purpose: Interface for building and submitting GluStaks.
+Content: (As detailed in previous responses) - Details form, file upload, documentation editor, preview, submission.
+Creator Dashboard (Ongoing):
+Purpose: Central hub for managing GluStaks.
+Content: (As detailed in previous responses) - Overview, GluStak management, sales, analytics, reviews, communication, settings, support.
+Creator Payout / Payment Settings Page:
+Purpose: Where a creator sets up how they will be paid.
+Subscriber-Specific:
+
+Checkout Page:
+Purpose: Handle payment for GluStaks.
+Content: Order summary, payment method selection, billing address, secure gateway integration.
+Thank You / Order Confirmation Page:
+Purpose: Confirm purchase, provide next steps.
+Content: Order confirmation, download links, access instructions, account links.
+User Account / Dashboard (Ongoing):
+Purpose: Manage profile, purchases, and settings.
+Content: Profile management, purchase history, download links, settings, support.
+6. Support/Maintenance Stage:
+
+Shared Pages:
+
+Documentation:
+Purpose: Provide comprehensive information on using the platform and GluStaks.
+Content: FAQs, tutorials, troubleshooting guides, API documentation (if applicable).
+FAQ:
+Purpose: To answer common user questions.
+Contact Us: (As described above)
+Creator-Specific:
+
+Creator Dashboard (Support Features):
+Purpose: Access support resources, manage updates.
+Content: Links to documentation, FAQs, contact options, version control tools.
+Subscriber-Specific:
+
+User Account / Dashboard (Support, Feedback):
+Purpose: Access support, provide feedback.
+Content: Links to documentation, FAQs, contact options, review/rating system.
+7. Growth/Advocacy Stage:
+
+Shared Pages:
+
+Community Forum (Optional):
+Purpose: Foster interaction and collaboration.
+Content: Discussion threads, Q&A, announcements.
+Blog (Optional):
+Purpose: Content marketing, thought leadership.
+Content: Tutorials, case studies, creator spotlights.
+Affiliate program page (optional):
+Purpose For user to sign up and help promote the platform Key Considerations Throughout All Stages:
+User Experience (UX): All pages should be intuitive, easy to navigate, and mobile-responsive.
+
+Accessibility: Adhere to accessibility guidelines (WCAG) to ensure the platform is usable by everyone.
+
+Security: Implement robust security measures to protect user data and transactions.
+
+Performance: Optimize pages for fast loading times.
+
+Branding: Maintain a consistent visual identity and tone of voice.
+
+This detailed map provides a comprehensive framework for building your GluStak marketplace. Remember to prioritize the core functionality and user experience first, and then iterate and add features based on user feedback and market demands. This is a living document, so revisit and update it regularly.
