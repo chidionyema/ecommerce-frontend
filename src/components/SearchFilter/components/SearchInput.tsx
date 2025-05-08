@@ -16,9 +16,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import { ColorConfig, SearchHistoryItem } from '../types';
 
-// Import fuzzy-search library (you'll need to install it with npm/yarn)
-// npm install fzf
-import { Fzf } from 'fzf';
+
 
 interface SearchInputProps {
   value: string;
