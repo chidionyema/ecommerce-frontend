@@ -74,22 +74,22 @@ const Footer: React.FC = () => {
             </Typography>
             <Box sx={{ mt: 1 }}>
               {/* Wrap IconButton with NextLink and use href on IconButton */}
-              <NextLink href="https://facebook.com" passHref legacyBehavior>
+              <NextLink href="https://facebook.com" passHref>
                 <SocialIconLink aria-label="Facebook">
                   <FacebookIcon />
                 </SocialIconLink>
               </NextLink>
-              <NextLink href="https://twitter.com" passHref legacyBehavior>
+              <NextLink href="https://twitter.com" passHref>
                 <SocialIconLink aria-label="Twitter">
                   <TwitterIcon />
                 </SocialIconLink>
               </NextLink>
-              <NextLink href="https://linkedin.com" passHref legacyBehavior>
+              <NextLink href="https://linkedin.com" passHref>
                 <SocialIconLink aria-label="LinkedIn">
                   <LinkedInIcon />
                 </SocialIconLink>
               </NextLink>
-              <NextLink href="https://instagram.com" passHref legacyBehavior>
+              <NextLink href="https://instagram.com" passHref>
                 <SocialIconLink aria-label="Instagram">
                   <InstagramIcon />
                 </SocialIconLink>

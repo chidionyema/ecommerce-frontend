@@ -1,4 +1,3 @@
-// components/navigation/BrandLogo.tsx
 import React, { memo, useState } from 'react';
 import Link from 'next/link';
 import { Box, Paper, Stack, Typography, useTheme, alpha } from '@mui/material';
@@ -10,17 +9,23 @@ const BrandLogo = memo(() => {
   const [textHovered, setTextHovered] = useState(false);
 
   return (
-    <Link href="/" passHref legacyBehavior>
+    // Link now renders an <a>, so we remove Box as an <a> to avoid nested anchors
+    <Link href="/" style={{ textDecoration: 'none', cursor: 'pointer' }}>
       <Box
-        component="a"
+        onMouseEnter={() => {
+          setIsHovered(true);
+          setTextHovered(true);
+        }}
+        onMouseLeave={() => {
+          setIsHovered(false);
+          setTextHovered(false);
+        }}
         sx={{
+          display: 'inline-flex',
           transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
           transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
-          cursor: 'pointer', // Added for better UX
           textDecoration: 'none',
         }}
-        onMouseEnter={() => { setIsHovered(true); setTextHovered(true); }}
-        onMouseLeave={() => { setIsHovered(false); setTextHovered(false); }}
       >
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <Paper
@@ -52,42 +57,43 @@ const BrandLogo = memo(() => {
               }}
             />
           </Paper>
-          <Box>
-            <Typography
-              variant="h4"
-              component="div"
+
+          <Typography
+            variant="h4"
+            component="div"
+            sx={{
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: 800,
+              letterSpacing: '0.5px',
+              fontSize: { xs: '1.8rem', md: '2.2rem' },
+              lineHeight: 1,
+              display: 'flex',
+              alignItems: 'baseline',
+              '& > span': {
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                transform: textHovered ? 'translateY(-2px)' : 'none',
+              },
+            }}
+          >
+            <Box component="span" sx={{ fontWeight: 900, color: theme.palette.text.primary }}>
+              GLU
+            </Box>
+            <Box
+              component="span"
               sx={{
-                fontFamily: "'Poppins', sans-serif",
-                fontWeight: 800,
-                letterSpacing: '0.5px',
-                fontSize: { xs: '1.8rem', md: '2.2rem' },
-                lineHeight: 1,
-                '& > span': {
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  transform: textHovered ? 'translateY(-2px)' : 'none',
-                },
+                position: 'relative',
+                background: `linear-gradient(90deg, ${theme.palette.primary.dark} 20%, ${theme.palette.primary.main} 100%)`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                color: 'transparent',
+                fontWeight: 900,
+                ml: 0.5,
               }}
             >
-              <Box component="span" sx={{ display: 'inline-block', color: theme.palette.text.primary, fontWeight: 900 }}>
-                GLU
-              </Box>
-              <Box
-                component="span"
-                sx={{
-                  position: 'relative',
-                  background: `linear-gradient(90deg, ${theme.palette.primary.dark} 20%, ${theme.palette.primary.main} 100%)`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  color: 'transparent',
-                  fontWeight: 900,
-                  ml: 0.5,
-                }}
-              >
-                Stack
-              </Box>
-            </Typography>
-          </Box>
+              Stack
+            </Box>
+          </Typography>
         </Stack>
       </Box>
     </Link>

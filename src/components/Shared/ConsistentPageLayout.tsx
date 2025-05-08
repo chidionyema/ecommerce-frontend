@@ -103,7 +103,7 @@ const ConsistentPageLayout: React.FC<ConsistentPageLayoutProps> = ({
                 padding: '2px',
               }}
             />
-            <NextLink href="/contact" passHref legacyBehavior>
+            <NextLink href="/contact" passHref>
               <MotionCTAButton
                 animate={{ scale: [1, 1.02, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
