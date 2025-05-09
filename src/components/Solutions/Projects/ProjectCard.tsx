@@ -90,7 +90,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   const design = useMemo(() => ({
-    bannerImage: project?.bannerImage ? `/images/${project.bannerImage}` : '/images/placeholder.jpg',
+    bannerImage: project?.bannerImage ? `/images/${project.bannerImage}` : undefined,
     brandColor: project?.brandColor || theme.palette.primary.main,
     background: (project?.id && BACKGROUNDS[project.id]) || project?.background || 'linear-gradient(135deg, #1565c0, #0d47a1)',
     hasDetailedContent: Boolean(project?.challenges || project?.impact || (project?.description && project.description.length > 120)),
@@ -100,18 +100,26 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, sx = {}, delay = 0, 
     hasMetrics: Array.isArray(project?.metrics) && project.metrics.length > 0
   }), [project, theme.palette.primary.main]);
 
-  useEffect(() => {
-    if ((!priority && !inView) || (project?.background && !project?.bannerImage)) {
-      setImageLoaded(true);
-      return;
-    }
-    const img = new Image();
-    img.src = design.bannerImage;
-    const timeoutId = setTimeout(() => setImageLoaded(true), 800);
-    img.onload = () => { clearTimeout(timeoutId); setImageLoaded(true); };
-    img.onerror = () => { clearTimeout(timeoutId); setImageLoaded(true); };
-    return () => clearTimeout(timeoutId);
-  }, [priority, inView, design.bannerImage, project?.background]);
+  // In the useEffect for image loading
+useEffect(() => {
+  if ((!priority && !inView) || (project?.background && !project?.bannerImage)) {
+    setImageLoaded(true);
+    return;
+  }
+  
+  // Add null check for bannerImage
+  if (!design.bannerImage) {
+    setImageLoaded(true);
+    return;
+  }
+
+  const img = new Image();
+  img.src = design.bannerImage; // Now guaranteed to be string
+  const timeoutId = setTimeout(() => setImageLoaded(true), 800);
+  img.onload = () => { clearTimeout(timeoutId); setImageLoaded(true); };
+  img.onerror = () => { clearTimeout(timeoutId); setImageLoaded(true); };
+  return () => clearTimeout(timeoutId);
+}, [priority, inView, design.bannerImage, project?.background]);
 
   useEffect(() => { setExpanded(false); }, [project?.id]);
 

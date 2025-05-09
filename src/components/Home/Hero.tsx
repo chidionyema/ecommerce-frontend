@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo, Suspense, lazy } from "react";
+import React, { useState, useEffect, useMemo, useCallback, Suspense, lazy } from "react";
 import {
   Box, Typography, Button, Container, alpha, Grid, Paper,
   Stack, Chip
@@ -142,7 +142,11 @@ const ContentArea = styled(Box)({
   zIndex: 3,
   width: "100%",
   marginTop: 48,
-  marginBottom: 48
+  marginBottom: 48,
+  '@media (max-width: 599px)': {
+    paddingLeft: '16px !important',
+    paddingRight: '16px !important'
+  }
 });
 
 const Headline = styled(Typography)(({ theme }) => ({
@@ -358,69 +362,69 @@ const DATA: DataStructure = {
   ]
 };
 
-// Props for the CTAButtonGroup component
-interface CTAButtonGroupProps {
-  onSchedule: () => void;
-  onCaseStudies: () => void;
-}
-
 // Main Component
 const HeroSection: React.FC = () => {
-  const [isCalendlyOpen, setIsCalendlyOpen] = useState<boolean>(false);
-  const [selectedPersona, setSelectedPersona] = useState<string>("executive");
-  const [teamSize, setTeamSize] = useState<number>(5);
-  const [roi, setRoi] = useState<number>(30);
+  const [isCalendlyOpen, setIsCalendlyOpen] = useState(false);
+  const [selectedPersona, setSelectedPersona] = useState("executive");
 
-  // Load persona from URL or localStorage
+  // Persona initialization effect (runs once)
   useEffect(() => {
-    const p = new URLSearchParams(window.location.search).get("persona");
-    if (p && ["developer", "executive", "security"].includes(p)) {
-      setSelectedPersona(p);
-    } else {
-      const stored = localStorage.getItem("userPersona");
-      if (stored && ["developer", "executive", "security"].includes(stored)) {
-        setSelectedPersona(stored);
-      }
-    }
+    const params = new URLSearchParams(window.location.search);
+    const urlPersona = params.get("persona");
+    const validPersonas = new Set(["developer", "executive", "security"]);
     
-    // Save persona to localStorage
+    const storedPersona = localStorage.getItem("userPersona");
+    const initialPersona = validPersonas.has(urlPersona) ? urlPersona :
+      validPersonas.has(storedPersona) ? storedPersona : "executive";
+    
+    if (initialPersona) setSelectedPersona(initialPersona);
+  }, []);
+
+  // Persona persistence effect
+  useEffect(() => {
     localStorage.setItem("userPersona", selectedPersona);
   }, [selectedPersona]);
 
-  const personaData = DATA.personas[selectedPersona];
-  
-  // Calculate annual savings
-  const annualSavings = useMemo(() => {
-    const monthlyCost = teamSize * 10000;
-    const rate = selectedPersona === "executive" ? 47 : roi;
-    return Math.round(monthlyCost * 12 * (rate / 100));
-  }, [teamSize, roi, selectedPersona]);
+  // Memoized persona data
+  const personaData = useMemo(
+    () => DATA.personas[selectedPersona],
+    [selectedPersona]
+  );
 
-  // Event handlers
-  const handleOpenCalendly = () => setIsCalendlyOpen(true);
-  const handleCloseCalendly = () => setIsCalendlyOpen(false);
-  const handleViewCaseStudies = () => window.open("/case-studies", "_self");
-  const handleOpenCalculator = () => window.open("/calculator", "_self");
+  // Event handlers with useCallback
+  const handleOpenCalendly = useCallback(() => setIsCalendlyOpen(true), []);
+  const handleCloseCalendly = useCallback(() => setIsCalendlyOpen(false), []);
+  const handleViewCaseStudies = useCallback(
+    () => window.open("/case-studies", "_self"),
+    []
+  );
+  const handleOpenCalculator = useCallback(
+    () => window.open("/calculator", "_self"),
+    []
+  );
 
-  // Combined Button Group component
-  const CTAButtonGroup: React.FC<CTAButtonGroupProps> = ({ onSchedule, onCaseStudies }) => (
-    <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 3 }} justifyContent="center">
-      <CTAButton
-        onClick={onSchedule}
-        endIcon={<Calendar size={16} strokeWidth={2} />}
-        aria-label="Schedule your strategy session"
-      >
-        Schedule Your Strategy Session
-      </CTAButton>
-      <CTAButton
-        onClick={onCaseStudies}
-        endIcon={<ChevronRight size={16} strokeWidth={2} />}
-        secondary
-        aria-label="View case studies"
-      >
-        View Case Studies
-      </CTAButton>
-    </Stack>
+  // Memoized CTA Button Group
+  const CTAButtonGroup = useMemo(
+    () => (
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 3 }} justifyContent="center">
+        <CTAButton
+          onClick={handleOpenCalendly}
+          endIcon={<Calendar size={16} strokeWidth={2} />}
+          aria-label="Schedule your strategy session"
+        >
+          Schedule Your Strategy Session
+        </CTAButton>
+        <CTAButton
+          onClick={handleViewCaseStudies}
+          endIcon={<ChevronRight size={16} strokeWidth={2} />}
+          secondary
+          aria-label="View case studies"
+        >
+          View Case Studies
+        </CTAButton>
+      </Stack>
+    ),
+    [handleOpenCalendly, handleViewCaseStudies]
   );
 
   return (
@@ -467,7 +471,7 @@ const HeroSection: React.FC = () => {
                   label="Limited Time: 2 Free Strategy Sessions"
                 />
               </Box>
-              <CTAButtonGroup onSchedule={handleOpenCalendly} onCaseStudies={handleViewCaseStudies} />
+              {CTAButtonGroup}
             </Box>
           </FadeInView>
 
@@ -632,7 +636,7 @@ const HeroSection: React.FC = () => {
         </ContentArea>
       </Container>
 
-      {/* Calendly Widget */}
+      {/* Calendly Widget with Proper Cleanup */}
       <ErrorBoundary fallback={<div>Calendly could not be loaded. Please try again.</div>}>
         {isCalendlyOpen && (
           <Suspense fallback={
@@ -641,6 +645,7 @@ const HeroSection: React.FC = () => {
             </Box>
           }>
             <CalendlyBooking
+              key={`calendly-${Date.now()}`}
               isOpen={isCalendlyOpen}
               onClose={handleCloseCalendly}
               eventTypeUrl="https://calendly.com/glustack/strategy-session"

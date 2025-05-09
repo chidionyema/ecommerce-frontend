@@ -98,6 +98,7 @@ const ConsistentPageLayout: React.FC<ConsistentPageLayoutProps> = ({
                 '&.MuiTypography-root': {
                   fontSize: { xs: '0.875rem', sm: '1rem' },
                   marginBottom: '0',
+                  marginTop: '20',
                   lineHeight: 1.2,
                 },
                 padding: '2px',
