@@ -8,7 +8,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { Fzf } from 'fzf';
+import Fzf from 'fzf';
+
 
 
 import { FilterOption, FilterGroup, ColorConfig, FilterType } from '../types';
@@ -69,23 +70,20 @@ export function FilterPanel({
       return filterGroups;
     }
   
-    // T must be the array type, not the element type:
-    const engine = new Fzf<FilterGroup[]>(
-      // if TS still grumbles about readonly,
-      // you can cast:
-      filterGroups as readonly FilterGroup[],
-      {
-        selector: group =>
-          `${group.label} ${group.options?.map(o => o.label).join(' ')}`,
-        fuzzy: "v2",
-        limit: filterGroups.length,
-      }
-    );
+    // TS will infer T = FilterGroup[] 
+    // (so the list type is ReadonlyArray<FilterGroup>)
+    const engine = new Fzf(filterGroups, {
+      selector: group =>
+        `${group.label} ${group.options?.map(o => o.label).join(' ')}`,
+      fuzzy: "v2",
+      limit: filterGroups.length,
+    });
   
     return engine
       .find(searchTerm)
       .map(result => result.item);
   }, [filterGroups, searchTerm, enableFilterSearch]);
+  
   
   
   // Handle checkbox and radio changes
