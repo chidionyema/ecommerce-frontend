@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { 
   Box, Typography, Container, Grid, Button, Card, CardContent, TextField, 
   Stepper, Step, StepLabel, FormControlLabel, Checkbox, Divider, List, 
-  ListItem, ListItemIcon, ListItemText, Paper, Chip, alpha, useTheme 
+  ListItem, ListItemIcon, ListItemText, Paper, Chip, alpha 
 } from "@mui/material";
 import { 
   CheckCircle, Close, Code, Stars, ArrowForward, ArrowBack,
@@ -12,6 +12,39 @@ import {
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import ConsistentPageLayout from "../../../components/Shared/ConsistentPageLayout";
+
+// Type definitions
+interface FormState {
+  firstName: string;
+  lastName: string;
+  email: string;
+  bio: string;
+  skills: string[];
+  experience: string;
+  primaryExpertise: string;
+  portfolioLinks: {
+    github: string;
+    website: string;
+    linkedin: string;
+    other: string;
+  };
+  sampleComponents: string[];
+  termsAgreed: boolean;
+  guidelinesRead: boolean;
+}
+
+interface FormErrors {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  bio?: string;
+  skills?: string;
+  experience?: string;
+  primaryExpertise?: string;
+  portfolioLinks?: string;
+  termsAgreed?: string;
+  guidelinesRead?: string;
+}
 
 // Refined colors and styles
 const colors = {
@@ -32,41 +65,50 @@ const sx = {
 const steps = ['Basic Info', 'Skills & Experience', 'Portfolio', 'Submit'];
 
 // Initial form state
-const initialState = {
-  firstName: "", lastName: "", email: "", bio: "", skills: [], experience: "",
-  primaryExpertise: "", portfolioLinks: { github: "", website: "", linkedin: "", other: "" }, 
-  sampleComponents: [], termsAgreed: false, guidelinesRead: false
+const initialState: FormState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  bio: "",
+  skills: [],
+  experience: "",
+  primaryExpertise: "",
+  portfolioLinks: { github: "", website: "", linkedin: "", other: "" },
+  sampleComponents: [],
+  termsAgreed: false,
+  guidelinesRead: false
 };
 
 const CreatorApplicationPage = () => {
   const router = useRouter();
-  const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
-  const [formState, setFormState] = useState(initialState);
-  const [errors, setErrors] = useState({});
+  const [formState, setFormState] = useState<FormState>(initialState);
+  const [errors, setErrors] = useState<FormErrors>({});
   
-  // Form handling
-  const handleChange = (e) => {
+  // Form handling with proper event types
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
   
-  const handleNestedChange = (parent, field, value) => {
-    if (parent === 'portfolioLinks') {
-      setFormState((prev) => ({ 
-        ...prev, portfolioLinks: { ...prev.portfolioLinks, [field]: value } 
-      }));
-    }
+  const handleNestedChange = (
+    field: keyof FormState['portfolioLinks'],
+    value: string
+  ) => {
+    setFormState(prev => ({
+      ...prev,
+      portfolioLinks: { ...prev.portfolioLinks, [field]: value }
+    }));
   };
   
-  const handleCheckboxChange = (e) => {
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
     setFormState(prev => ({ ...prev, [name]: checked }));
   };
-  
+
   // Validation
-  const validateStep = (step) => {
-    const newErrors = {};
+  const validateStep = (step: number) => {
+    const newErrors: FormErrors = {};
     
     if (step === 0) {
       if (!formState.firstName.trim()) newErrors.firstName = "Required";
@@ -107,7 +149,6 @@ const CreatorApplicationPage = () => {
   
   const handleSubmit = () => {
     if (validateStep(activeStep)) {
-      // Would connect to API in production
       router.push("/creator/pending-approval");
     }
   };
@@ -145,7 +186,6 @@ const CreatorApplicationPage = () => {
             </Grid>
           </Grid>
           
-          {/* Why Become a Creator Section */}
           <Box sx={{ mt: 4, p: 3, bgcolor: alpha(colors.premium, 0.05), borderRadius: 2 }}>
             <Typography variant="h6" sx={{ color: colors.premium, fontWeight: 700, mb: 2 }}>
               Why Become a GluStack Creator?
@@ -212,7 +252,6 @@ const CreatorApplicationPage = () => {
             </Grid>
           </Grid>
           
-          {/* Quality Guidelines */}
           <Box sx={{ mt: 4 }}>
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>What Makes a Great GluStack?</Typography>
             <Grid container spacing={3}>
@@ -272,25 +311,25 @@ const CreatorApplicationPage = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField label="GitHub Profile" value={formState.portfolioLinks.github}
-                onChange={(e) => handleNestedChange('portfolioLinks', 'github', e.target.value)} fullWidth
+                onChange={(e) => handleNestedChange('github', e.target.value)} fullWidth
                 placeholder="https://github.com/yourusername" 
                 InputProps={{ startAdornment: (<GitHub sx={{ color: colors.gray[500], mr: 1 }} />) }} />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField label="LinkedIn Profile" value={formState.portfolioLinks.linkedin}
-                onChange={(e) => handleNestedChange('portfolioLinks', 'linkedin', e.target.value)} fullWidth
+                onChange={(e) => handleNestedChange('linkedin', e.target.value)} fullWidth
                 placeholder="https://linkedin.com/in/yourusername" 
                 InputProps={{ startAdornment: (<LinkedIn sx={{ color: colors.gray[500], mr: 1 }} />) }} />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField label="Personal Website" value={formState.portfolioLinks.website}
-                onChange={(e) => handleNestedChange('portfolioLinks', 'website', e.target.value)} fullWidth
+                onChange={(e) => handleNestedChange('website', e.target.value)} fullWidth
                 placeholder="https://yourwebsite.com" 
                 InputProps={{ startAdornment: (<Language sx={{ color: colors.gray[500], mr: 1 }} />) }} />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField label="Other Portfolio Link" value={formState.portfolioLinks.other}
-                onChange={(e) => handleNestedChange('portfolioLinks', 'other', e.target.value)} fullWidth
+                onChange={(e) => handleNestedChange('other', e.target.value)} fullWidth
                 placeholder="https://codepen.io/yourusername" />
             </Grid>
             
@@ -309,7 +348,6 @@ const CreatorApplicationPage = () => {
             </Grid>
           </Grid>
           
-          {/* Why Quality Matters */}
           <Paper sx={{ mt: 4, p: 3, bgcolor: alpha(colors.primary, 0.05) }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center' }}>
               <HelpOutline sx={{ color: colors.primary, mr: 1 }} />
@@ -421,7 +459,6 @@ const CreatorApplicationPage = () => {
   return (
     <ConsistentPageLayout>
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Header */}
         <Box sx={{ mb: 4, textAlign: "center" }}>
           <Typography variant="h3" sx={{ fontWeight: 800, mb: 2 }}>Become a GluStack Creator</Typography>
           <Typography variant="h6" sx={{ color: colors.gray[700], fontWeight: 500, maxWidth: 800, mx: "auto" }}>
@@ -429,17 +466,14 @@ const CreatorApplicationPage = () => {
           </Typography>
         </Box>
         
-        {/* Stepper */}
         <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
           {steps.map((label) => (<Step key={label}><StepLabel>{label}</StepLabel></Step>))}
         </Stepper>
         
-        {/* Content */}
         <Card sx={{ ...sx.card, mb: 3 }}>
           <CardContent sx={{ p: 4 }}><StepContent /></CardContent>
         </Card>
         
-        {/* Navigation */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
           <Button onClick={handleBack} disabled={activeStep === 0} startIcon={<ArrowBack />}
             sx={{ borderColor: colors.primary, color: colors.primary, fontWeight: 600 }} variant="outlined">
