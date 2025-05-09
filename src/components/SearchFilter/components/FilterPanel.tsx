@@ -8,6 +8,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { Fzf } from 'fzf';
+
 
 import { FilterOption, FilterGroup, ColorConfig, FilterType } from '../types';
 
@@ -65,7 +67,7 @@ export function FilterPanel({
   const filteredGroups = React.useMemo(() => {
     if (!searchTerm.trim() || !enableFilterSearch) return filterGroups;
     
-    const fzf = new Fzf(filterGroups, {
+    const fzf = new fzf(filterGroups, {
       selector: item => `${item.label} ${item.options?.map(o => o.label).join(' ')}`,
       fuzzy: "v2",
       limit: filterGroups.length
