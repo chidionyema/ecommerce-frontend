@@ -65,16 +65,22 @@ export function FilterPanel({
   
   // Filter visible groups based on search
   const filteredGroups = React.useMemo(() => {
-    if (!searchTerm.trim() || !enableFilterSearch) return filterGroups;
-    
-    const fzf = new fzf(filterGroups, {
-      selector: item => `${item.label} ${item.options?.map(o => o.label).join(' ')}`,
+    if (!searchTerm.trim() || !enableFilterSearch) {
+      return filterGroups;
+    }
+  
+    // use the imported Fzf class; don’t name your variable `fzf`
+    const engine = new Fzf<FilterGroup>(filterGroups, {
+      selector: group =>
+        `${group.label} ${group.options?.map(o => o.label).join(' ')}`,
       fuzzy: "v2",
-      limit: filterGroups.length
+      limit: filterGroups.length,
     });
-    
-    return fzf.find(searchTerm).map(result => result.item);
-  }, [searchTerm, filterGroups, enableFilterSearch]);
+  
+    // `.find` returns { item, score }[]
+    return engine.find(searchTerm).map(result => result.item);
+  }, [filterGroups, searchTerm, enableFilterSearch]);
+  
   
   // Handle checkbox and radio changes
   const handleCheckboxChange = (group: FilterGroup, option: FilterOption) => {
