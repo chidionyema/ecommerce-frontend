@@ -6,6 +6,7 @@ export interface Project {
     icon: React.ComponentType<any>; // For MUI Icon component
     // Add other project properties you need
     teamSize: number;
+    bannerImage: string;
     timeline: string;
     technologies: string[];
     technologyIcons?: Record<string, string>;

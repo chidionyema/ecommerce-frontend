@@ -31,7 +31,7 @@ const validateEnv = () => {
 };
 validateEnv();
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.local.ritualworks.com';
+const API_URL = 'https://api.local.ritualworks.com';
 
 // =====================================================================
 // Type Definitions

@@ -176,8 +176,8 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({ projects = [], spacing: gridS
           <Box sx={{ mt: 3 }}>
             <Grid
               container
-              columnSpacing={22} // Keep horizontal spacing at 15 units
-              rowSpacing={0} // Set vertical spacing between rows to 10 units (80px)
+              columnSpacing={22}
+              rowSpacing={0}
               justifyContent="center"
               sx={{ mb: 6 }}
             >
@@ -255,7 +255,19 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({ projects = [], spacing: gridS
               backgroundColor: colorSystem.alpha(theme.palette.primary.main, 'faint'),
               display: 'flex', alignItems: 'center', justifyContent: 'center', mb: spacing[3]
             }}>
-              <Box component="img" src="/images/empty-folder.svg" alt="No projects found" sx={{ width: 36, height: 36, opacity: 0.7 }} />
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  py: 4,
+                  color: 'text.secondary',
+                }}
+              >
+                <Typography variant="body2" sx={{ opacity: 0.7 }}>
+                  No projects found
+                </Typography>
+              </Box>
             </Box>
             <Typography variant="h6" color="text.primary" gutterBottom sx={{
               fontWeight: typography.fontWeights.semibold,

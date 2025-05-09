@@ -83,7 +83,7 @@ const BecomeACreatorPage = () => {
               Become a GluStack Creator and help developers build amazing things, faster. 
               Earn a share of every sale while establishing yourself in the community.
             </Typography>
-            <NextLink href="/creator-application" passHref>
+            <NextLink href="/creator/apply" passHref>
               <Button variant="contained" size="large" sx={{ 
                 px: 5, 
                 py: 1.5, 
@@ -390,7 +390,7 @@ const BecomeACreatorPage = () => {
               Apply today and start sharing your expertise with developers worldwide 
               while earning passive income from your creations.
             </Typography>
-            <NextLink href="/creator-application" passHref>
+            <NextLink href="/creator/apply" passHref>
               <Button variant="contained" size="large" sx={{ 
                 px: 6, 
                 py: 1.75, 
