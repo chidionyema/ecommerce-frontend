@@ -59,7 +59,7 @@ async function handleEdgeRequest(req: NextRequest) {
   const path = url.pathname.replace(/^\/api/, '');
   
   // Configure the backend URL
-  const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://api.yourbackend.com';
+  const BACKEND_API_URL = 'https://api.local.ritualworks.com'
   const apiUrl = `${BACKEND_API_URL}${path}`;
   
   // Get client IP
