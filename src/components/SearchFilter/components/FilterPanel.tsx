@@ -70,12 +70,16 @@ export function FilterPanel({
     }
   
     // use the imported Fzf class; don’t name your variable `fzf`
-    const engine = new Fzf<FilterGroup>(filterGroups, {
-      selector: group =>
-        `${group.label} ${group.options?.map(o => o.label).join(' ')}`,
-      fuzzy: "v2",
-      limit: filterGroups.length,
-    });
+    const engine = new Fzf(
+      filterGroups as unknown as readonly any[],
+      {
+        selector: group =>
+          `${group.label} ${group.options?.map(o => o.label).join(' ')}`,
+        fuzzy: "v2",
+        limit: filterGroups.length,
+      }
+    );
+    
   
     // `.find` returns { item, score }[]
     return engine.find(searchTerm).map(result => result.item);
