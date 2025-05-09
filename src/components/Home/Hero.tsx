@@ -370,15 +370,21 @@ const HeroSection: React.FC = () => {
   // Persona initialization effect (runs once)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const urlPersona = params.get("persona");
+    const urlPersona = params.get("persona");     // string | null
     const validPersonas = new Set(["developer", "executive", "security"]);
-    
-    const storedPersona = localStorage.getItem("userPersona");
-    const initialPersona = validPersonas.has(urlPersona) ? urlPersona :
-      validPersonas.has(storedPersona) ? storedPersona : "executive";
-    
-    if (initialPersona) setSelectedPersona(initialPersona);
+  
+    // Only call .has if urlPersona is a string
+    const initialPersona = 
+      typeof urlPersona === "string" && validPersonas.has(urlPersona)
+        ? urlPersona
+        : (() => {
+            const stored = localStorage.getItem("userPersona");
+            return (stored && validPersonas.has(stored)) ? stored : "executive";
+          })();
+  
+    setSelectedPersona(initialPersona);
   }, []);
+  
 
   // Persona persistence effect
   useEffect(() => {
