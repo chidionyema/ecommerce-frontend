@@ -15,7 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import { ColorConfig, SearchHistoryItem } from '../types';
-
+import { Fzf } from 'fzf';
 
 
 interface SearchInputProps {
