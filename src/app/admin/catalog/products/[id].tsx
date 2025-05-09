@@ -12,7 +12,7 @@ import ErrorBoundary from '../../../../components/Common/ErrorBoundary';
 import ProductSkeleton from '../../../../components/catalog/ProductSkeleton';
 
 // Client-side API fetching for fallback
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://ritualworks.com';
+const API_BASE_URL =   'https://api.local.ritualworks.com'
 
 const fetchProduct = async (id: string): Promise<ProductDto> => {
   const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
