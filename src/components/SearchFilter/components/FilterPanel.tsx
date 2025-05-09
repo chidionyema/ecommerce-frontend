@@ -69,9 +69,11 @@ export function FilterPanel({
       return filterGroups;
     }
   
-    // use the imported Fzf class; don’t name your variable `fzf`
-    const engine = new Fzf(
-      filterGroups as unknown as readonly any[],
+    // T must be the array type, not the element type:
+    const engine = new Fzf<FilterGroup[]>(
+      // if TS still grumbles about readonly,
+      // you can cast:
+      filterGroups as readonly FilterGroup[],
       {
         selector: group =>
           `${group.label} ${group.options?.map(o => o.label).join(' ')}`,
@@ -79,10 +81,10 @@ export function FilterPanel({
         limit: filterGroups.length,
       }
     );
-    
   
-    // `.find` returns { item, score }[]
-    return engine.find(searchTerm).map(result => result.item);
+    return engine
+      .find(searchTerm)
+      .map(result => result.item);
   }, [filterGroups, searchTerm, enableFilterSearch]);
   
   
