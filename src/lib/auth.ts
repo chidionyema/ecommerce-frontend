@@ -24,10 +24,10 @@ const validateEnv = () => {
     }
     
     // For runtime in production, enforce the environment variable
-    if (!process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === 'production') {
-      console.error('Missing required environment variable: NEXT_PUBLIC_API_URL');
-      throw new Error('Configuration error');
-    }
+   // if (!process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === 'production') {
+    //  console.error('Missing required environment variable: NEXT_PUBLIC_API_URL');
+      //throw new Error('Configuration error');
+   // }
 };
 validateEnv();
 
