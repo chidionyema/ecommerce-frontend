@@ -21,7 +21,7 @@ export default async function handler(
     console.error('API Handler Error:', error);
     
     if (!res) {
-      // Edge runtime
+      // Edge runtime 
       return new Response(
         JSON.stringify({ 
           error: 'Server Error', 
