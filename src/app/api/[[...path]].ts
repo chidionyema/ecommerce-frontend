@@ -10,7 +10,7 @@ export default async function handler(
 ) {
   try {
     // Check if we're using Node.js API routes (with req/res) or Edge API routes
-    const isEdgeRuntime = !res;
+    const isEdgeRuntime = !res; 
     
     if (isEdgeRuntime) {
       return handleEdgeRequest(req as NextRequest);
