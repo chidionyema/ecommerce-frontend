@@ -1,13 +1,19 @@
+// src/components/Home/Hero.tsx
 "use client";
 import React, { useState, useEffect, useMemo, useCallback, Suspense, lazy } from "react";
-import { Box, Typography, Button, Container, alpha, Grid, Paper, Stack, Chip, Theme } from "@mui/material"; // Import Theme
+import { Box, Typography, Button, Container, alpha, Grid, Paper, Stack, Chip, Theme } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ShieldCheck, TrendingUp, DollarSign, Users, Calendar, ChevronRight, Clock } from "lucide-react";
 import { SiAmazonaws, SiMicrosoftazure, SiDocker, SiKubernetes, SiTerraform, SiGooglecloud } from "react-icons/si";
 
-const CalendlyBooking = lazy(() => import('../CalendlyBooking'));
+// REMOVE CalendlyBooking import
+// const CalendlyBooking = lazy(() => import('../CalendlyBooking'));
+
+// IMPORT the new Scheduler (adjust path as needed)
+const StrategySessionScheduler = lazy(() => import('../Booking/StrategySessionScheduler'));
+
 
 // ErrorBoundary (remains the same)
 interface ErrorBoundaryProps { children: React.ReactNode; fallback?: React.ReactNode; }
@@ -49,8 +55,8 @@ const FadeInView: React.FC<FadeInViewProps> = ({ children, delay = 0, once = fal
   </motion.div>
 );
 
-// Styled components
-const Section = styled(Box)(({ theme }) => ({ /* ... (no changes needed here based on error) ... */
+// Styled components (CTAButton was corrected in previous step - ensure that version is used)
+const Section = styled(Box)(({ theme }) => ({
   position: "relative", display: "flex", alignItems: "center",
   paddingTop: theme.spacing(styles.spacing.section), 
   paddingBottom: theme.spacing(styles.spacing.section), 
@@ -58,11 +64,11 @@ const Section = styled(Box)(({ theme }) => ({ /* ... (no changes needed here bas
   minHeight: "80vh", 
   [theme.breakpoints.up("md")]: { minHeight: "95vh" }
 }));
-const BgOverlay = styled(Box)({ /* ... (no changes needed here based on error) ... */
+const BgOverlay = styled(Box)({
   position: "absolute", inset: 0, zIndex: 1, mixBlendMode: "multiply",
   background: `radial-gradient(ellipse at center, ${alpha("#1a3674", 0.97)} 0%, ${alpha("#1a3674", 0.85)} 70%, ${alpha("#1a3674", 0.97)} 100%)`,
 });
-const ContentArea = styled(Box)(({theme}) => ({ /* ... (no changes needed here based on error) ... */
+const ContentArea = styled(Box)(({theme}) => ({ 
   position: "relative", zIndex: 3, width: "100%",
   paddingTop: theme.spacing(6), 
   paddingBottom: theme.spacing(6), 
@@ -73,76 +79,51 @@ const ContentArea = styled(Box)(({theme}) => ({ /* ... (no changes needed here b
     paddingBottom: theme.spacing(4),
   }
 }));
-const Headline = styled(Typography)(({ theme }) => ({ /* ... (no changes needed here based on error) ... */
+const Headline = styled(Typography)(({ theme }) => ({
   fontSize: "clamp(2rem, 6vw, 3rem)", 
   lineHeight: 1.2, fontWeight: 700, color: styles.colors.text, textAlign: "center",
   margin: "0 auto", 
   marginBottom: theme.spacing(2), 
   maxWidth: 900,
 }));
-const Subheadline = styled(Typography)(({ theme }) => ({ /* ... (no changes needed here based on error) ... */
+const Subheadline = styled(Typography)(({ theme }) => ({
   fontSize: "clamp(1rem, 3.5vw, 1.125rem)", 
   fontWeight: 400, color: styles.colors.textSecondary, textAlign: "center",
   margin: "0 auto", 
 }));
 
-// ***** CORRECTED CTAButton *****
 const CTAButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== 'secondary'
 })<{ secondary?: boolean }>(({ theme, secondary }: { theme: Theme, secondary?: boolean }) => ({
-  // Common styles (applied to all sizes unless overridden)
-  color: styles.colors.text,
-  fontWeight: 600,
-  borderRadius: 8,
-  textTransform: "none",
+  color: styles.colors.text, fontWeight: 600, borderRadius: 8, textTransform: "none",
   transition: styles.animations.short, 
   backgroundColor: secondary ? "transparent" : styles.colors.primary,
   border: secondary ? `1.5px solid ${alpha(styles.colors.text, 0.75)}` : "none",
   boxShadow: secondary ? "none" : styles.shadows.primary,
-
-  // Mobile-first styles (base styles for xs)
-  width: '100%',
-  maxWidth: '320px', // Constrained max-width for mobile (parent Stack will center this)
-  padding: theme.spacing(1.25, 2), // Mobile-specific padding
-  fontSize: "0.9rem",               // Mobile-specific font size
-
-  // Styles for sm breakpoint and up (overrides mobile-first for all responsive properties)
+  width: '100%', maxWidth: '320px', 
+  padding: theme.spacing(1.25, 2), fontSize: "0.9rem",
   [theme.breakpoints.up('sm')]: {
-    width: 'auto',      // Revert to auto width
-    maxWidth: 'none',   // Remove the mobile-specific maxWidth constraint
-    padding: theme.spacing(1.5, 3), // Restore/set desktop padding
-    fontSize: "1rem",   // Restore/set desktop font size
+    width: 'auto', maxWidth: 'none',   
+    padding: theme.spacing(1.5, 3), fontSize: "1rem",  
   },
-
   "&:hover": {
     backgroundColor: secondary ? alpha(styles.colors.text, 0.12) : styles.colors.primaryHover,
-    transform: "translateY(-2px)",
-    boxShadow: secondary ? "none" : styles.shadows.hover,
+    transform: "translateY(-2px)", boxShadow: secondary ? "none" : styles.shadows.hover,
     borderColor: secondary ? styles.colors.text : 'none',
   }
 }));
-// ***** END OF CORRECTION *****
 
-const OfferChip = styled(Chip)(({theme}) => ({ /* ... (no changes needed here based on error) ... */
-  height: 'auto', 
-  padding: theme.spacing(0.75, 1.5),
+const OfferChip = styled(Chip)(({theme}) => ({ 
+  height: 'auto', padding: theme.spacing(0.75, 1.5),
   backgroundColor: alpha(styles.colors.primary, 0.18), 
-  color: styles.colors.text,
-  fontWeight: 600,
-  fontSize: '0.875rem', 
+  color: styles.colors.text, fontWeight: 600, fontSize: '0.875rem', 
   border: `1px solid ${alpha(styles.colors.primary, 0.4)}`, 
   boxShadow: "0 4px 10px rgba(99, 102, 241, 0.16)",
   '& .MuiChip-icon': { color: alpha(styles.colors.text, 0.97), fontSize: '1.1rem' },
-  '& .MuiChip-label': {
-    whiteSpace: 'normal', 
-    paddingLeft: theme.spacing(0.5),
-    paddingRight: theme.spacing(0.5),
-  },
-  [theme.breakpoints.up('sm')]: {
-    fontSize: '0.9rem',
-  }
+  '& .MuiChip-label': { whiteSpace: 'normal', paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5), },
+  [theme.breakpoints.up('sm')]: { fontSize: '0.9rem', }
 }));
-const PersonaButton = styled(Button, { /* ... (no changes needed here based on error) ... */
+const PersonaButton = styled(Button, { 
   shouldForwardProp: (prop) => prop !== "active"
 })<{ active?: boolean }>(({ theme, active }) => ({
   fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.02em", borderRadius: 12, transition: styles.animations.medium, padding: theme.spacing(0.9, 2.5), minWidth: 110,
@@ -150,26 +131,14 @@ const PersonaButton = styled(Button, { /* ... (no changes needed here based on e
     ? { background: styles.gradients.primary, boxShadow: styles.shadows.primary, color: styles.colors.text, "&:hover": { background: styles.gradients.primary, filter: "brightness(1.05)" } }
     : { background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.15)", color: alpha(styles.colors.text, 0.9), "&:hover": { background: "rgba(255, 255, 255, 0.15)", transform: "translateY(-1px)", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)" } })
 }));
-const BenefitCard = styled(Paper)(({ theme }) => ({ /* ... (no changes needed here based on error) ... */
-  padding: theme.spacing(3.5),
-  borderRadius: 16,
-  width: "100%",
-  height: "100%",
-  minHeight: 220,
-  display: "flex",
-  flexDirection: "column",
-  transition: styles.animations.medium,
-  backdropFilter: "blur(10px)",
-  background: "rgba(255, 255, 255, 0.03)",
-  border: "1px solid rgba(255, 255, 255, 0.06)",
-  boxShadow: styles.shadows.card,
-  "&:hover": {
-    transform: "translateY(-4px)",
-    boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)",
-    border: "1px solid rgba(255, 255, 255, 0.1)"
-  }
+const BenefitCard = styled(Paper)(({ theme }) => ({ 
+  padding: theme.spacing(3.5), borderRadius: 16, width: "100%", height: "100%", minHeight: 220,
+  display: "flex", flexDirection: "column", transition: styles.animations.medium,
+  backdropFilter: "blur(10px)", background: "rgba(255, 255, 255, 0.03)",
+  border: "1px solid rgba(255, 255, 255, 0.06)", boxShadow: styles.shadows.card,
+  "&:hover": { transform: "translateY(-4px)", boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)", border: "1px solid rgba(255, 255, 255, 0.1)" }
 }));
-const IconCircle = styled(Box)({ /* ... (no changes needed here based on error) ... */
+const IconCircle = styled(Box)({
   width: 60, height: 60, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", marginBottom: 20,
   boxShadow: "0 8px 16px rgba(0, 0, 0, 0.15)", border: "1px solid rgba(255, 255, 255, 0.15)"
 });
@@ -179,7 +148,7 @@ interface PersonaData { headline: string; subheadline: string; benefits: string[
 interface Benefit { icon: React.ReactNode; text: string; subtext: string; gradient: string; }
 interface TechStack { icon: React.ComponentType; name: string; color: string; }
 interface DataStructure { personas: { [key: string]: PersonaData; }; benefits: Benefit[]; techStack: TechStack[]; successIndicators: string[]; }
-const DATA: DataStructure = { /* ... (data remains the same) ... */
+const DATA: DataStructure = { /* ... (data) ... */
   personas: { developer: { headline: "Enterprise Solutions Delivered 10× Faster", subheadline: "Accelerate development with meticulously crafted enterprise-grade architectures", benefits: ["CI/CD Pipeline Integration", "Microservices Architecture", "Containerization", "Infrastructure as Code"] }, executive: { headline: "Enterprise Solutions with 47% Cost Reduction", subheadline: "Optimize technology investments with precision-engineered enterprise solutions", benefits: ["TCO Optimization", "Automated Workflows", "Resource Optimization", "Reduced Maintenance"] }, security: { headline: "Enterprise Solutions with Enterprise-Grade Security", subheadline: "Deploy secure enterprise solutions with comprehensive protection built from first principles", benefits: ["SOC 2 Type II Compliance", "Data Encryption", "Security Scanning", "Role-Based Access"] } },
   benefits: [ { icon: <TrendingUp size={22} strokeWidth={1.5} />, text: "73% Faster Deployment", subtext: "From concept to production in weeks", gradient: styles.gradients.primary }, { icon: <ShieldCheck size={22} strokeWidth={1.5} />, text: "Enterprise Security", subtext: "SOC 2, GDPR & ISO 27001 compliant", gradient: styles.gradients.accent1 }, { icon: <DollarSign size={22} strokeWidth={1.5} />, text: "47% Cost Reduction", subtext: "Optimized infrastructure & reduced overhead", gradient: styles.gradients.accent2 }, { icon: <Users size={22} strokeWidth={1.5} />, text: "99.99% Uptime SLA", subtext: "Built for enterprise-grade reliability", gradient: "linear-gradient(135deg, #8B5CF6, #6366F1)" } ],
   techStack: [ { icon: SiAmazonaws, name: "AWS", color: "#FF9900" }, { icon: SiMicrosoftazure, name: "Azure", color: "#0078D4" }, { icon: SiGooglecloud, name: "GCP", color: "#4285F4" }, { icon: SiDocker, name: "Docker", color: "#2496ED" }, { icon: SiKubernetes, name: "K8s", color: "#326CE5" }, { icon: SiTerraform, name: "Terraform", color: "#7B42BC" } ],
@@ -187,10 +156,11 @@ const DATA: DataStructure = { /* ... (data remains the same) ... */
 };
 
 
-// Main Component (HeroSection - structure remains as per your previous correct version)
+// Main Component (HeroSection)
 const HeroSection: React.FC = () => {
   const theme = useTheme(); 
-  const [isCalendlyOpen, setIsCalendlyOpen] = useState(false);
+  // MODIFIED: State for custom booking system
+  const [isBookingSystemOpen, setIsBookingSystemOpen] = useState(false);
   const [selectedPersona, setSelectedPersona] = useState<string>("executive");
 
   const validPersonas = useMemo(() => new Set(Object.keys(DATA.personas)), []);
@@ -199,13 +169,10 @@ const HeroSection: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     const urlPersona = params.get("persona");
     let initialPersona = "executive";
-    if (urlPersona && validPersonas.has(urlPersona)) {
-      initialPersona = urlPersona;
-    } else {
+    if (urlPersona && validPersonas.has(urlPersona)) { initialPersona = urlPersona; }
+    else {
       const storedPersona = localStorage.getItem("userPersona");
-      if (storedPersona && validPersonas.has(storedPersona)) {
-        initialPersona = storedPersona;
-      }
+      if (storedPersona && validPersonas.has(storedPersona)) { initialPersona = storedPersona; }
     }
     setSelectedPersona(initialPersona);
   }, [validPersonas]);
@@ -214,26 +181,23 @@ const HeroSection: React.FC = () => {
 
   const personaData = useMemo(() => DATA.personas[selectedPersona] || DATA.personas.executive, [selectedPersona]);
 
-  const handleOpenCalendly = useCallback(() => setIsCalendlyOpen(true), []);
-  const handleCloseCalendly = useCallback(() => setIsCalendlyOpen(false), []);
-  const handleViewCaseStudies = useCallback(() => window.open("/solutions", "_self"), []);
+  // MODIFIED: Handlers for custom booking system
+  const handleOpenBookingSystem = useCallback(() => setIsBookingSystemOpen(true), []);
+  const handleCloseBookingSystem = useCallback(() => setIsBookingSystemOpen(false), []);
+
+  const handleViewCaseStudies = useCallback(() => window.open("/solutions", "_self"), []); // Assuming "/solutions" for case studies now
   const handleOpenCalculator = useCallback(() => window.open("/calculator", "_self"), []);
   
   const CTAButtonGroup = useMemo(() => (
-    <Stack
-      direction={{ xs: "column", sm: "row" }}
-      spacing={{ xs: 1.5, sm: 2.5 }} 
-      alignItems="center" 
-      sx={{ width: "100%" }} 
-    >
-      <CTAButton onClick={handleOpenCalendly} endIcon={<Calendar size={16} strokeWidth={2} />} aria-label="Schedule your strategy session">
+    <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 1.5, sm: 2.5 }} alignItems="center" sx={{ width: "100%" }}>
+      <CTAButton onClick={handleOpenBookingSystem} endIcon={<Calendar size={16} strokeWidth={2} />} aria-label="Schedule your strategy session">
         Schedule Strategy Session
       </CTAButton>
       <CTAButton onClick={handleViewCaseStudies} endIcon={<ChevronRight size={16} strokeWidth={2} />} secondary aria-label="View case studies">
         View Case Studies
       </CTAButton>
     </Stack>
-  ), [handleOpenCalendly, handleViewCaseStudies]);
+  ), [handleOpenBookingSystem, handleViewCaseStudies]); // MODIFIED dependency
 
   return (
     <Section>
@@ -247,11 +211,7 @@ const HeroSection: React.FC = () => {
             <Headline>
               Enterprise Solutions with <Box component="span" sx={{ background: styles.gradients.secondary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", color: styles.colors.primary, textShadow: "0 2px 10px rgba(139, 92, 246, 0.3)" }}>47% Cost Reduction</Box>
             </Headline>
-            <Stack
-              spacing={{ xs: 2.5, sm: 3.5 }} 
-              alignItems="center" 
-              sx={{ width: '100%', mt: {xs: 1, sm: 0}, mb: { xs: 4, sm: 5 } }}
-            >
+            <Stack spacing={{ xs: 2.5, sm: 3.5 }} alignItems="center" sx={{ width: '100%', mt: {xs: 1, sm: 0}, mb: { xs: 4, sm: 5 } }}>
               <Subheadline sx={{ maxWidth: { xs: '100%', sm: '90%', md: 760 } }}>
                 {personaData.subheadline}
               </Subheadline>
@@ -260,12 +220,34 @@ const HeroSection: React.FC = () => {
             </Stack>
           </FadeInView>
 
-          <FadeInView delay={0.1} componentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-            <Box sx={{ width: '100%', maxWidth: {xs: '100%', sm: 'max-content'}, mb: { xs: 4, sm: 5 }, display: "flex", flexDirection: { xs: "column", sm: "row" }, alignItems: "center", justifyContent: "center", p: {xs: 1.5, sm: 2}, borderRadius: 3, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-              <Typography sx={{ color: "rgba(255,255,255,0.9)", fontSize: "0.925rem", fontWeight: 500, mr: { xs: 0, sm: 2.5 }, mb: { xs: 1.5, sm: 0 }, textAlign: {xs: 'center', sm: 'left'} }}>
+          {/* ... (Persona Selector, Benefits Grid, Calculator Section, Final CTA remain largely the same, but CTAs that opened Calendly now open custom scheduler) ... */}
+          {/* Example: Modifying the Final CTA */}
+           <FadeInView delay={0.1} componentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+            <Box sx={{ 
+                width: '100%',
+                maxWidth: {xs: '100%', sm: 'max-content'}, 
+                mb: { xs: 4, sm: 5 },
+                display: "flex", flexDirection: { xs: "column", sm: "row" },
+                alignItems: "center", justifyContent: "center",
+                p: {xs: 1.5, sm: 2},
+                borderRadius: 3,
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.06)" 
+            }}>
+              <Typography 
+                sx={{ 
+                  color: "rgba(255,255,255,0.9)", fontSize: "0.925rem", fontWeight: 500, 
+                  mr: { xs: 0, sm: 2.5 }, mb: { xs: 1.5, sm: 0 },
+                  textAlign: {xs: 'center', sm: 'left'}
+                }}
+              >
                 I am a:
               </Typography>
-              <Stack direction="row" spacing={{xs: 1, sm: 1.5}} sx={{ flexWrap: "wrap", justifyContent: "center" }} >
+              <Stack 
+                direction="row" 
+                spacing={{xs: 1, sm: 1.5}}
+                sx={{ flexWrap: "wrap", justifyContent: "center" }} 
+              >
                 {Object.keys(DATA.personas).map((p) => (
                   <PersonaButton key={p} active={selectedPersona === p} onClick={() => setSelectedPersona(p)} aria-checked={selectedPersona === p} role="radio">
                     {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -316,7 +298,8 @@ const HeroSection: React.FC = () => {
               <Typography sx={{ color: "#fff", fontSize: "clamp(1.25rem, 5vw, 1.625rem)", fontWeight: 700, mb: 3, maxWidth: 700, mx: "auto", lineHeight: 1.3 }}>
                 Ready to transform your enterprise technology?
               </Typography>
-              <CTAButton onClick={handleOpenCalendly} endIcon={<Calendar size={16} strokeWidth={2} />} aria-label="Schedule your strategy session" sx={{ px: {xs:3, sm:4}, py: 1.5, fontSize: "clamp(0.9rem, 3.5vw, 1rem)" }}>
+              {/* MODIFIED: This CTAButton now opens the custom scheduler */}
+              <CTAButton onClick={handleOpenBookingSystem} endIcon={<Calendar size={16} strokeWidth={2} />} aria-label="Schedule your strategy session" sx={{ px: {xs:3, sm:4}, py: 1.5, fontSize: "clamp(0.9rem, 3.5vw, 1rem)" }}>
                 Schedule Strategy Session
               </CTAButton>
             </Box>
@@ -324,12 +307,23 @@ const HeroSection: React.FC = () => {
         </ContentArea>
       </Container>
 
-      <ErrorBoundary fallback={<div>Calendly could not be loaded. Please try again.</div>}>
-        {isCalendlyOpen && (
-          <Suspense fallback={ <Box sx={{ position: "fixed", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.75)", zIndex: 9999 }}> <Typography color="white">Loading booking system...</Typography> </Box> }>
-            <CalendlyBooking key={`calendly-${Date.now()}`} isOpen={isCalendlyOpen} onClose={handleCloseCalendly} eventTypeUrl="https://calendly.com/glustack/strategy-session" prefill={{ name: "", email: "" }} />
-          </Suspense>
-        )}
+      {/* MODIFIED: Render custom booking system */}
+      <ErrorBoundary fallback={<div>Booking system could not be loaded. Please try again later.</div>}>
+        <Suspense fallback={ 
+            <Box sx={{ position: "fixed", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.75)", zIndex: 9999 }}>
+                 <Typography color="white">Loading Scheduler...</Typography> {/* More generic loading message */}
+            </Box> 
+        }>
+          {isBookingSystemOpen && (
+            <StrategySessionScheduler
+              isOpen={isBookingSystemOpen}
+              onClose={handleCloseBookingSystem}
+              // Pass recipient email and session name if you want them configurable from HeroSection
+              // recipientEmail="your-company-bookings@example.com" 
+              // sessionName="Discovery Call"
+            />
+          )}
+        </Suspense>
       </ErrorBoundary>
     </Section>
   );
