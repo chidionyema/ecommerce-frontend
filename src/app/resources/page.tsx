@@ -391,26 +391,3 @@ const ResourcesPage = () => {
 
 export default ResourcesPage;
 
-// --- NOTES on getTypeIcon and resourcesData ---
-// interface Resource {
-//   id: string | number;
-//   type: string; // e.g., 'component', 'guide', 'pattern'
-//   title: string;
-//   description: string;
-//   premium: boolean;
-//   tags: string[];
-//   // ... other properties like URL, author, etc.
-// }
-
-// const resourcesData: Resource[] = [
-//   // ... your data items
-// ];
-
-// const getTypeIcon = (type: string, props?: any) => {
-//   // Example:
-//   // if (type === 'component') return <ViewQuilt {...props} aria-label="Component Icon" />;
-//   // if (type === 'guide') return <MenuBook {...props} aria-label="Guide Icon" />;
-//   // Ensure these icons are accessible (e.g., SVGs with <title> or proper aria-label if purely iconic)
-//   // For now, returning a placeholder
-//   return <span {...props} >{type.slice(0,1).toUpperCase()}</span>;
-// };
