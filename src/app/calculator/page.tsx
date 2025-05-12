@@ -1,4 +1,3 @@
-// SavingsCalculatorPage.tsx
 "use client"; // If using Next.js App Router
 
 import React, { useState, useMemo, useCallback } from "react";
@@ -14,10 +13,13 @@ import {
   Button,
   alpha,
   useTheme,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { motion, AnimatePresence } from "framer-motion";
-import { DollarSign, TrendingUp, ChevronRight, Info } from "lucide-react"; // Or other suitable icons
+import { DollarSign, TrendingUp, ChevronRight, Info, ChevronDown } from "lucide-react";
 
 // Assuming your styles object is accessible or you define a new one
 // For now, let's define some specific to this page, inspired by the Hero's styles
@@ -33,12 +35,15 @@ const calculatorStyles = {
     sliderTrack: alpha("#6366F1", 0.25),
     sliderThumb: "#6366F1",
     borderColor: alpha("#000000", 0.12),
+    accordionBorder: alpha("#6366F1", 0.2),
   },
   shadows: {
     card: "0 10px 30px rgba(0, 0, 0, 0.07)",
     focus: `0 0 0 3px ${alpha("#6366F1", 0.5)}`,
+    accordion: "0 4px 12px rgba(0,0,0,0.05)",
   },
   borderRadius: "16px",
+  borderRadiusSmall: "12px",
 };
 
 // Styled Components
@@ -48,8 +53,9 @@ const PageWrapper = styled(Box)({
   paddingTop: "var(--header-height, 64px)", // Account for a potential fixed header
   paddingBottom: "48px",
   display: "flex",
-  alignItems: "center", // Vertically center if content is not too tall
-  justifyContent: "center",
+  flexDirection: "column", // Allow content to flow downwards
+  alignItems: "center",
+  // justifyContent: "center", // Removed to allow scrolling for more content
 });
 
 const CalculatorPaper = styled(Paper)({
@@ -59,7 +65,7 @@ const CalculatorPaper = styled(Paper)({
   backgroundColor: calculatorStyles.colors.paperBackground,
   maxWidth: "700px",
   width: "100%",
-  margin: "32px", // Margin for smaller screens
+  margin: "32px auto", // Centered with auto margins
 });
 
 const SectionTitle = styled(Typography)({
@@ -73,8 +79,8 @@ const SectionTitle = styled(Typography)({
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
-    borderRadius: "12px",
-    backgroundColor: alpha(calculatorStyles.colors.primaryLight, 0.2), // Very subtle background
+    borderRadius: calculatorStyles.borderRadiusSmall,
+    backgroundColor: alpha(calculatorStyles.colors.primaryLight, 0.2),
     "& fieldset": {
       borderColor: calculatorStyles.colors.borderColor,
     },
@@ -112,7 +118,7 @@ const StyledSlider = styled(Slider)({
       boxShadow: `0 0 0 6px ${alpha(calculatorStyles.colors.sliderThumb, 0.16)}`,
     },
     "&:before": {
-      display: "none", // Remove default ripple
+      display: "none",
     },
   },
   "& .MuiSlider-valueLabel": {
@@ -146,7 +152,7 @@ const ResultBox = styled(Box)(({ theme }) => ({
 }));
 
 const SavingsAmount = styled(Typography)({
-  fontSize: "clamp(2.5rem, 6vw, 4rem)", // Responsive font size
+  fontSize: "clamp(2.5rem, 6vw, 4rem)",
   fontWeight: 700,
   color: calculatorStyles.colors.primary,
   lineHeight: 1.2,
@@ -165,16 +171,92 @@ const CalculationBreakdownText = styled(Typography)({
   marginTop: "8px",
 });
 
+// --- NEW STYLED COMPONENTS FOR DISCOVERY/FAQ SECTION ---
+const DiscoverySectionWrapper = styled(Box)({
+  maxWidth: "700px",
+  width: "100%",
+  margin: "48px auto", // Spacing from calculator or button
+  padding: "0 16px", // Padding for content within this wrapper
+});
+
+const StyledAccordion = styled(Accordion)({
+  backgroundColor: calculatorStyles.colors.paperBackground,
+  color: calculatorStyles.colors.text,
+  borderRadius: `${calculatorStyles.borderRadiusSmall} !important`, // Override default MUI squaring
+  boxShadow: calculatorStyles.shadows.accordion,
+  border: `1px solid ${calculatorStyles.colors.accordionBorder}`,
+  "&:before": {
+    display: "none", // Remove default MUI top border
+  },
+  "&.Mui-expanded": {
+    margin: "16px 0", // More pronounced margin when expanded
+  },
+  "&:first-of-type": {
+    borderTopLeftRadius: `${calculatorStyles.borderRadiusSmall} !important`,
+    borderTopRightRadius: `${calculatorStyles.borderRadiusSmall} !important`,
+  },
+  "&:last-of-type": {
+    borderBottomLeftRadius: `${calculatorStyles.borderRadiusSmall} !important`,
+    borderBottomRightRadius: `${calculatorStyles.borderRadiusSmall} !important`,
+  },
+});
+
+const StyledAccordionSummary = styled(AccordionSummary)({
+  "& .MuiAccordionSummary-content": {
+    fontWeight: 500,
+    fontSize: "1.1rem",
+    color: calculatorStyles.colors.text,
+  },
+  "& .MuiAccordionSummary-expandIconWrapper .MuiSvgIcon-root": { // For MUI default icon
+     color: calculatorStyles.colors.primary,
+  },
+   "& .MuiAccordionSummary-expandIconWrapper": { // For Lucide icon
+     color: calculatorStyles.colors.primary,
+  }
+});
+
+const StyledAccordionDetails = styled(AccordionDetails)({
+  padding: "8px 24px 24px", // Adjust padding
+  fontSize: "1rem",
+  color: calculatorStyles.colors.textLight,
+  lineHeight: 1.7,
+});
+
+
+// --- FAQ Data ---
+const faqData = [
+  {
+    id: "faq1",
+    question: "How do your solutions generate savings?",
+    answer: "Our innovative platform streamlines your existing workflows, identifies inefficiencies, and automates key processes. This directly translates to reduced operational costs, optimized resource allocation, and minimized waste, leading to significant annual savings."
+  },
+  {
+    id: "faq2",
+    question: "What kind of organizations are these savings typical for?",
+    answer: "While results can vary, organizations across various sectors, from SMEs to large enterprises, experience substantial savings. The calculator provides an estimate based on common efficiency gains we observe in areas like procurement, resource management, and operational overhead."
+  },
+  {
+    id: "faq3",
+    question: "Is this a one-time saving or ongoing?",
+    answer: "The savings are typically ongoing. Initial implementation yields immediate benefits, and our continuous improvement model ensures that your operations become progressively more efficient, sustaining and often increasing these savings over time."
+  },
+  {
+    id: "faq4",
+    question: "How accurate is this calculator?",
+    answer: "This calculator provides an estimate based on typical client results and the data you input. For a personalized assessment and a detailed breakdown of how we can achieve these savings for your specific organization, we recommend scheduling a consultation with our experts."
+  }
+];
+
 // --- Component ---
 const SavingsCalculatorPage: React.FC = () => {
-  const theme = useTheme(); // For any direct theme access if needed
+  const theme = useTheme();
 
-  const [currentExpenditure, setCurrentExpenditure] = useState<number | "">(100000); // Default to a realistic number
-  const [savingsRate, setSavingsRate] = useState<number>(30); // Default to 30%
+  const [currentExpenditure, setCurrentExpenditure] = useState<number | "">(100000);
+  const [savingsRate, setSavingsRate] = useState<number>(30);
+  const [isDiscoveryVisible, setIsDiscoveryVisible] = useState<boolean>(false); // State for FAQ visibility
 
   const handleExpenditureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    // Allow empty string for clearing input, otherwise parse as float
     setCurrentExpenditure(value === "" ? "" : parseFloat(value));
   };
 
@@ -191,11 +273,15 @@ const SavingsCalculatorPage: React.FC = () => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD", // Make this configurable if needed
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);
   };
+
+  const handleDiscoverToggle = useCallback(() => {
+    setIsDiscoveryVisible(prev => !prev);
+  }, []);
 
   return (
     <PageWrapper>
@@ -228,7 +314,6 @@ const SavingsCalculatorPage: React.FC = () => {
           </Typography>
 
           <Grid container spacing={4}>
-            {/* Input 1: Current Expenditure */}
             <Grid item xs={12}>
               <SectionTitle variant="h6">
                 <DollarSign size={20} />
@@ -248,14 +333,13 @@ const SavingsCalculatorPage: React.FC = () => {
                   ),
                   inputProps: {
                     min: 0,
-                    step: 1000, // Adjust step as needed
+                    step: 1000,
                   }
                 }}
                 aria-label="Current Annual Expenditure in USD"
               />
             </Grid>
 
-            {/* Input 2: Savings Rate */}
             <Grid item xs={12}>
               <SectionTitle variant="h6">
                 <TrendingUp size={20} />
@@ -267,12 +351,12 @@ const SavingsCalculatorPage: React.FC = () => {
                   onChange={handleSavingsRateChange}
                   aria-labelledby="savings-rate-slider"
                   valueLabelDisplay="auto"
-                  min={5} // Sensible min
-                  max={75} // Sensible max, e.g. if "up to 47%" is the headline, allow a bit more
+                  min={5}
+                  max={75}
                   marks={[
                     { value: 10, label: "10%" },
                     { value: 30, label: "30%" },
-                    { value: 47, label: "47%" },
+                    { value: 47, label: "47%" }, // A specific interesting mark
                     { value: 60, label: "60%" },
                   ]}
                 />
@@ -286,16 +370,15 @@ const SavingsCalculatorPage: React.FC = () => {
             </Grid>
           </Grid>
 
-          {/* Results */}
           <ResultBox>
             <SavingsLabel>Estimated Annual Savings</SavingsLabel>
             <AnimatePresence mode="wait">
               <motion.div
-                key={estimatedSavings} // Key change triggers animation
+                key={estimatedSavings}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }} // Ive-like easing
+                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
               >
                 <SavingsAmount>
                   {formatCurrency(estimatedSavings)}
@@ -307,16 +390,15 @@ const SavingsCalculatorPage: React.FC = () => {
             </CalculationBreakdownText>
           </ResultBox>
 
-          {/* Optional CTA */}
           <Box sx={{ mt: 5, textAlign: "center" }}>
             <Button
               variant="contained"
               size="large"
-              endIcon={<ChevronRight />}
+              endIcon={isDiscoveryVisible ? <ChevronDown style={{ transform: 'rotate(180deg)'}} /> : <ChevronRight />}
               sx={{
                 backgroundColor: calculatorStyles.colors.primary,
                 color: "#fff",
-                borderRadius: "12px",
+                borderRadius: calculatorStyles.borderRadiusSmall,
                 padding: "12px 28px",
                 textTransform: "none",
                 fontWeight: 600,
@@ -329,12 +411,45 @@ const SavingsCalculatorPage: React.FC = () => {
                 },
                 transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
               }}
-            // onClick={() => { /* Navigate to contact or demo page */ }}
+              onClick={handleDiscoverToggle} // Updated onClick handler
             >
-              Discover How We Achieve This
+              {isDiscoveryVisible ? "Hide Details" : "Discover How We Achieve This"}
             </Button>
           </Box>
         </CalculatorPaper>
+
+        {/* --- NEW DISCOVERY/FAQ SECTION --- */}
+        <AnimatePresence>
+          {isDiscoveryVisible && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              style={{ overflow: 'hidden' }} // Prevents content spill during animation
+            >
+              <DiscoverySectionWrapper>
+                <Typography variant="h4" component="h2" sx={{textAlign: "center", fontWeight: 600, color: calculatorStyles.colors.text, mb: 4, mt:3, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1}}>
+                  <Info size={28} strokeWidth={2.5} style={{color: calculatorStyles.colors.primary}}/> How Savings Are Calculated
+                </Typography>
+                {faqData.map((faqItem) => (
+                  <StyledAccordion key={faqItem.id} TransitionProps={{ timeout: 400 }}>
+                    <StyledAccordionSummary
+                      expandIcon={<ChevronDown size={20} />} // Using Lucide icon
+                      aria-controls={`${faqItem.id}-content`}
+                      id={`${faqItem.id}-header`}
+                    >
+                      {faqItem.question}
+                    </StyledAccordionSummary>
+                    <StyledAccordionDetails>
+                      {faqItem.answer}
+                    </StyledAccordionDetails>
+                  </StyledAccordion>
+                ))}
+              </DiscoverySectionWrapper>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Container>
     </PageWrapper>
   );
