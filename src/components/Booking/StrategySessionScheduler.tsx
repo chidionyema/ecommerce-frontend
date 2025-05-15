@@ -148,7 +148,7 @@ type BookingStep = "date" | "time" | "details" | "confirmation";
 const StrategySessionScheduler: React.FC<StrategySessionSchedulerProps> = ({
   isOpen,
   onClose,
-  recipientEmail = "strategy@example.com",
+  recipientEmail = "strategy@glustack.com",
   sessionName = "Strategy Session"
 }) => {
   const theme = useTheme();

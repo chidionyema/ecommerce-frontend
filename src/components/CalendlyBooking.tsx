@@ -1,91 +1,75 @@
-"use client";
-import { useState, useEffect, useCallback } from 'react';
-import { Box, Dialog, IconButton, CircularProgress } from '@mui/material';
-import Close from '@mui/icons-material/Close';
-import Script from 'next/script';
-import { useRouter } from 'next/navigation';
+// src/components/CalendlyBooking.tsx
+"use client"; // If using Next.js App Router
 
-export interface CalendlyProps {
-  eventTypeUrl: string;
+import React from 'react';
+import { PopupModal } from 'react-calendly';
+
+interface CalendlyBookingProps {
+  isOpen: boolean;
+  onClose: () => void;
+  calendlyEventLink: string; // Your specific Calendly event link part, e.g., "your-username/30min"
   prefill?: {
     name?: string;
     email?: string;
+    customAnswers?: { [key: string]: string };
   };
-  isOpen?: boolean;
-  onClose?: () => void;
+  pageSettings?: {
+    backgroundColor?: string;
+    hideEventTypeDetails?: boolean;
+    hideLandingPageDetails?: boolean;
+    primaryColor?: string;
+    textColor?: string;
+  };
+  utm?: {
+    utmCampaign?: string;
+    utmSource?: string;
+    utmMedium?: string;
+    utmContent?: string;
+    utmTerm?: string;
+  };
 }
 
-declare global {
-  interface Window {
-    Calendly: {
-      initPopupWidget: (options: { url: string }) => void;
-      closePopupWidget: () => void;
-      showPopupWidget: (url: string) => void;
-    };
-  }
-}
-
-// Named export for regular imports
-export const CalendlyBooking = ({
-  eventTypeUrl,
+const CalendlyBooking: React.FC<CalendlyBookingProps> = ({
+  isOpen,
+  onClose,
+  calendlyEventLink,
   prefill,
-  isOpen = false,
-  onClose
-}: CalendlyProps) => {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  pageSettings,
+  utm,
+}) => {
+  if (!isOpen) {
+    return null;
+  }
 
-  const initCalendly = useCallback(() => {
-    if (typeof window.Calendly !== 'undefined') {
-      window.Calendly.initPopupWidget({
-        url: `${eventTypeUrl}?${new URLSearchParams(prefill || {}).toString()}`
-      });
-      setIsLoading(false);
-    }
-  }, [eventTypeUrl, prefill]);
+  // Construct the full Calendly URL
+  const fullCalendlyUrl = `https://calendly.com/${calendlyEventLink}`;
 
-  useEffect(() => {
-    if (isOpen) {
-      // Minimal change: redirect to the contact page instead of opening Calendly
-      router.push('/contact');
-      setIsLoading(false);
-    } else if (typeof window.Calendly !== 'undefined') {
-      window.Calendly.closePopupWidget();
-    }
-  }, [isOpen, router]);
+  // Ensure rootElement is correctly identified. For Next.js, it's often '__next'.
+  // For other React apps, it might be 'root' or another ID.
+  const [rootElement, setRootElement] = React.useState<HTMLElement | null>(null);
 
-  const handleClose = () => {
-    if (typeof window.Calendly !== 'undefined') {
-      window.Calendly.closePopupWidget();
-    }
-    if (onClose) {
-      onClose();
-    }
-  };
+  React.useEffect(() => {
+    // Ensure this runs client-side only
+    const element = document.getElementById("__next") || document.getElementById("root") || document.body;
+    setRootElement(element);
+  }, []);
+
+  if (!rootElement) {
+      // You might want a loader here or handle the case where rootElement is not found
+      return null;
+  }
 
   return (
-    <>
-      <Script
-        strategy="lazyOnload"
-        src="https://assets.calendly.com/assets/external/widget.js"
-        onLoad={isOpen ? initCalendly : undefined}
-      />
-      
-      {isOpen && isLoading && (
-        <Dialog
-          open={true}
-          onClose={handleClose}
-          fullWidth
-          maxWidth="sm"
-        >
-          <Box display="flex" justifyContent="center" alignItems="center" p={4}>
-            <CircularProgress />
-          </Box>
-        </Dialog>
-      )}
-    </>
+    <PopupModal
+      url={fullCalendlyUrl}
+      onModalClose={onClose}
+      open={isOpen}
+      rootElement={rootElement}
+      prefill={prefill}
+      pageSettings={pageSettings}
+      utm={utm}
+    />
   );
 };
 
-// Default export for React.lazy compatibility
 export default CalendlyBooking;

@@ -55,7 +55,6 @@ const PageWrapper = styled(Box)({
   display: "flex",
   flexDirection: "column", // Allow content to flow downwards
   alignItems: "center",
-  // justifyContent: "center", // Removed to allow scrolling for more content
 });
 
 const CalculatorPaper = styled(Paper)({
@@ -65,7 +64,7 @@ const CalculatorPaper = styled(Paper)({
   backgroundColor: calculatorStyles.colors.paperBackground,
   maxWidth: "700px",
   width: "100%",
-  margin: "32px auto", // Centered with auto margins
+  margin: "32px auto", 
 });
 
 const SectionTitle = styled(Typography)({
@@ -171,25 +170,24 @@ const CalculationBreakdownText = styled(Typography)({
   marginTop: "8px",
 });
 
-// --- NEW STYLED COMPONENTS FOR DISCOVERY/FAQ SECTION ---
 const DiscoverySectionWrapper = styled(Box)({
   maxWidth: "700px",
   width: "100%",
-  margin: "48px auto", // Spacing from calculator or button
-  padding: "0 16px", // Padding for content within this wrapper
+  margin: "48px auto", 
+  padding: "0 16px", 
 });
 
 const StyledAccordion = styled(Accordion)({
   backgroundColor: calculatorStyles.colors.paperBackground,
   color: calculatorStyles.colors.text,
-  borderRadius: `${calculatorStyles.borderRadiusSmall} !important`, // Override default MUI squaring
+  borderRadius: `${calculatorStyles.borderRadiusSmall} !important`, 
   boxShadow: calculatorStyles.shadows.accordion,
   border: `1px solid ${calculatorStyles.colors.accordionBorder}`,
   "&:before": {
-    display: "none", // Remove default MUI top border
+    display: "none", 
   },
   "&.Mui-expanded": {
-    margin: "16px 0", // More pronounced margin when expanded
+    margin: "16px 0", 
   },
   "&:first-of-type": {
     borderTopLeftRadius: `${calculatorStyles.borderRadiusSmall} !important`,
@@ -207,23 +205,21 @@ const StyledAccordionSummary = styled(AccordionSummary)({
     fontSize: "1.1rem",
     color: calculatorStyles.colors.text,
   },
-  "& .MuiAccordionSummary-expandIconWrapper .MuiSvgIcon-root": { // For MUI default icon
+  "& .MuiAccordionSummary-expandIconWrapper .MuiSvgIcon-root": { 
      color: calculatorStyles.colors.primary,
   },
-   "& .MuiAccordionSummary-expandIconWrapper": { // For Lucide icon
+   "& .MuiAccordionSummary-expandIconWrapper": { 
      color: calculatorStyles.colors.primary,
   }
 });
 
 const StyledAccordionDetails = styled(AccordionDetails)({
-  padding: "8px 24px 24px", // Adjust padding
+  padding: "8px 24px 24px", 
   fontSize: "1rem",
   color: calculatorStyles.colors.textLight,
   lineHeight: 1.7,
 });
 
-
-// --- FAQ Data ---
 const faqData = [
   {
     id: "faq1",
@@ -247,13 +243,12 @@ const faqData = [
   }
 ];
 
-// --- Component ---
 const SavingsCalculatorPage: React.FC = () => {
   const theme = useTheme();
 
   const [currentExpenditure, setCurrentExpenditure] = useState<number | "">(100000);
   const [savingsRate, setSavingsRate] = useState<number>(30);
-  const [isDiscoveryVisible, setIsDiscoveryVisible] = useState<boolean>(false); // State for FAQ visibility
+  const [isDiscoveryVisible, setIsDiscoveryVisible] = useState<boolean>(false); 
 
   const handleExpenditureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -356,7 +351,7 @@ const SavingsCalculatorPage: React.FC = () => {
                   marks={[
                     { value: 10, label: "10%" },
                     { value: 30, label: "30%" },
-                    { value: 47, label: "47%" }, // A specific interesting mark
+                    { value: 33, label: "33%" }, // Changed 47% to 33%
                     { value: 60, label: "60%" },
                   ]}
                 />
@@ -411,14 +406,13 @@ const SavingsCalculatorPage: React.FC = () => {
                 },
                 transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
               }}
-              onClick={handleDiscoverToggle} // Updated onClick handler
+              onClick={handleDiscoverToggle} 
             >
               {isDiscoveryVisible ? "Hide Details" : "Discover How We Achieve This"}
             </Button>
           </Box>
         </CalculatorPaper>
 
-        {/* --- NEW DISCOVERY/FAQ SECTION --- */}
         <AnimatePresence>
           {isDiscoveryVisible && (
             <motion.div
@@ -426,7 +420,7 @@ const SavingsCalculatorPage: React.FC = () => {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              style={{ overflow: 'hidden' }} // Prevents content spill during animation
+              style={{ overflow: 'hidden' }} 
             >
               <DiscoverySectionWrapper>
                 <Typography variant="h4" component="h2" sx={{textAlign: "center", fontWeight: 600, color: calculatorStyles.colors.text, mb: 4, mt:3, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1}}>
@@ -435,7 +429,7 @@ const SavingsCalculatorPage: React.FC = () => {
                 {faqData.map((faqItem) => (
                   <StyledAccordion key={faqItem.id} TransitionProps={{ timeout: 400 }}>
                     <StyledAccordionSummary
-                      expandIcon={<ChevronDown size={20} />} // Using Lucide icon
+                      expandIcon={<ChevronDown size={20} />} 
                       aria-controls={`${faqItem.id}-content`}
                       id={`${faqItem.id}-header`}
                     >
