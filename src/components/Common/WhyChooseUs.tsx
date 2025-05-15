@@ -17,20 +17,20 @@ import {
   TrendingUp,
   FileText,
   Video,
-  Calendar,
+  Calendar, // Keep if used elsewhere, otherwise can be removed if only for Calendly button icon
   Download,
   ChevronRight
 } from "lucide-react";
-import { getSharedStyles, ANIMATIONS } from "../../utils/designSystem";
-import TechCard from "../Common/TechCard";
+import { getSharedStyles, ANIMATIONS } from "../../utils/designSystem"; // Assuming this path is correct
+import TechCard from "../Common/TechCard"; // Assuming this path is correct
 import { motion, useInView } from "framer-motion";
 import dynamic from "next/dynamic";
 
 // Dynamically import Calendly to improve initial load time
-const CalendlyBooking = dynamic(() => import("../CalendlyBooking"), {
+const CalendlyBooking = dynamic(() => import("../CalendlyBooking"), { // Assuming this path is correct
   ssr: false,
   loading: () => (
-    <Box sx={{ 
+    <Box sx={{
       position: "fixed",
       top: 0,
       left: 0,
@@ -121,9 +121,9 @@ const ResourceItem: React.FC<ResourceItemProps> = ({ title, Icon, color }) => {
       </Box>
       <Typography
         color={theme.palette.text.primary}
-        sx={{ 
-          fontSize: "0.85rem", 
-          letterSpacing: "0.01em", 
+        sx={{
+          fontSize: "0.85rem",
+          letterSpacing: "0.01em",
           lineHeight: 1.4,
           fontWeight: 500
         }}
@@ -136,21 +136,21 @@ const ResourceItem: React.FC<ResourceItemProps> = ({ title, Icon, color }) => {
 
 const WhyChooseUs: React.FC = () => {
   const theme = useTheme();
-  const styles = getSharedStyles(theme);
+  const styles = getSharedStyles(theme); // Assuming getSharedStyles is correctly defined
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
   const [isCalendlyOpen, setIsCalendlyOpen] = useState(false);
 
   // Purple color for the consultation button
   const purpleColor = "#673AB7";
-  
+
   // Custom animations with refined physics
   const refinedAnimations = useMemo(() => ({
     container: {
       hidden: { opacity: 0 },
       visible: {
         opacity: 1,
-        transition: { 
+        transition: {
           staggerChildren: 0.1,
           delayChildren: 0.05,
           duration: 0.6,
@@ -163,7 +163,7 @@ const WhyChooseUs: React.FC = () => {
       visible: {
         opacity: 1,
         y: 0,
-        transition: { 
+        transition: {
           duration: 0.5,
           ease: [0.22, 1, 0.36, 1]
         }
@@ -174,7 +174,7 @@ const WhyChooseUs: React.FC = () => {
       visible: {
         opacity: 1,
         y: 0,
-        transition: { 
+        transition: {
           duration: 0.5,
           ease: [0.22, 1, 0.36, 1]
         }
@@ -190,6 +190,9 @@ const WhyChooseUs: React.FC = () => {
       }
     }
   }), []);
+
+  // Define your Calendly event link part
+  const calendlyEventLinkPart = "glustack/consultation";
 
   return (
     <Box
@@ -211,16 +214,16 @@ const WhyChooseUs: React.FC = () => {
           right: 0,
           bottom: 0,
           opacity: 0.035,
-          backgroundImage: "url('/images/grid-pattern.svg')",
+          backgroundImage: "url('/images/grid-pattern.svg')", // Ensure this path is correct
           backgroundSize: "cover",
           zIndex: 0,
         }}
       />
-      
-      <Container maxWidth="lg" sx={{ 
+
+      <Container maxWidth="lg" sx={{
         ...styles.contentContainer,
-        position: "relative", 
-        zIndex: 1 
+        position: "relative",
+        zIndex: 1
       }}>
         <motion.div
           variants={refinedAnimations.container}
@@ -245,7 +248,7 @@ const WhyChooseUs: React.FC = () => {
                   background: "linear-gradient(135deg, #673AB7, #3F51B5)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
-                  color: "#673AB7",
+                  color: "#673AB7", // Fallback color
                 }}>
                   GLUStack
                 </Box>
@@ -276,13 +279,15 @@ const WhyChooseUs: React.FC = () => {
                   variants={refinedAnimations.card}
                   whileHover="hover"
                   style={{ width: "100%", height: "100%" }}
-                  transition={{ delay: index * 0.08 }}
+                  // initial="hidden" // Already handled by parent container stagger
+                  // animate="visible"
+                  transition={{ delay: index * 0.08 }} // This is fine for item-specific delays if parent staggers
                 >
                   <TechCard
                     icon={reason.icon}
                     title={reason.text}
                     accentColor={reason.color}
-                    importance="primary"
+                    importance="primary" // Ensure TechCard handles this prop
                     sx={{
                       height: "100%",
                       display: "flex",
@@ -323,12 +328,12 @@ const WhyChooseUs: React.FC = () => {
             <Paper
               elevation={0}
               sx={{
-                ...styles.ctaCard,
+                ...styles.ctaCard, // Ensure this style is defined in getSharedStyles
                 mt: { xs: 2, md: 4 },
                 mb: 2,
                 borderRadius: "16px",
                 background: `linear-gradient(145deg, ${alpha(
-                  theme.palette.background.paper,
+                  theme.palette.background.paper, // Ensure theme.palette.background.paper is appropriate
                   0.97
                 )}, ${alpha(theme.palette.background.paper, 0.87)})`,
                 backdropFilter: "blur(10px)",
@@ -358,15 +363,15 @@ const WhyChooseUs: React.FC = () => {
                 >
                   Take the Next Step
                 </Typography>
-                
+
                 <Typography
                   variant="body2"
                   color={theme.palette.text.secondary}
                   align="center"
-                  sx={{ 
-                    letterSpacing: "0.01em", 
-                    maxWidth: "75%", 
-                    mx: "auto", 
+                  sx={{
+                    letterSpacing: "0.01em",
+                    maxWidth: "75%",
+                    mx: "auto",
                     fontSize: "0.85rem",
                     lineHeight: 1.6
                   }}
@@ -404,10 +409,10 @@ const WhyChooseUs: React.FC = () => {
                   <Grid container spacing={1.5}>
                     {resources.map((resource, i) => (
                       <Grid item xs={12} sm={6} key={i}>
-                        <ResourceItem 
-                          title={resource.title} 
-                          Icon={resource.icon} 
-                          color={resource.color} 
+                        <ResourceItem
+                          title={resource.title}
+                          Icon={resource.icon}
+                          color={resource.color}
                         />
                       </Grid>
                     ))}
@@ -417,7 +422,7 @@ const WhyChooseUs: React.FC = () => {
                     variant="contained"
                     color="primary"
                     startIcon={<Download size={14} />}
-                    href="/resources"
+                    href="/resources" // Assuming this is the correct link
                     sx={{
                       mt: 2.5,
                       px: 2.5,
@@ -514,13 +519,30 @@ const WhyChooseUs: React.FC = () => {
         </motion.div>
       </Container>
 
-      {/* Calendly integration */}
+      {/* Calendly integration - FIXED */}
       {isCalendlyOpen && (
         <CalendlyBooking
-          eventTypeUrl="https://calendly.com/glustack/consultation"
-          prefill={{ name: "", email: "" }}
+          // Use the correct prop 'calendlyEventLink'
+          calendlyEventLink={calendlyEventLinkPart}
+          // Provide the event link part, not the full URL
+          prefill={{
+            name: "", // Consider populating with actual user data if available
+            email: "" // Consider populating with actual user data if available
+          }}
           isOpen={isCalendlyOpen}
           onClose={() => setIsCalendlyOpen(false)}
+          // You can also add 'pageSettings' and 'utm' props here if needed,
+          // similar to the HeroSection example:
+          // pageSettings={{
+          //   backgroundColor: 'ffffff', // Example
+          //   primaryColor: '00a2ff',    // Example
+          //   textColor: '4d5055'       // Example
+          // }}
+          // utm={{
+          //   utmCampaign: 'WhyChooseUs_ConsultationCTA', // Example
+          //   utmSource: 'Website',                         // Example
+          //   utmMedium: 'CalendlyModalCTA'                 // Example
+          // }}
         />
       )}
     </Box>
