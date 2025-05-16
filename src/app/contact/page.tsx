@@ -1,13 +1,14 @@
 // ./src/app/contact/page.tsx
 'use client';
 
-import React, { useState, useEffect, useRef, FormEvent } from 'react'; // Added FormEvent
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react'; // Removed FormEvent
 import { useRouter, useSearchParams } from 'next/navigation';
-import * as yup from 'yup';
+// import * as yup from 'yup'; // Removed yup
+import dynamic from 'next/dynamic'; // Added for dynamic import
 import {
   Box, Container, Typography, Divider, Grid, Stack, Paper, Avatar,
-  List, ListItem, ListItemIcon, ListItemText, TextField, Button,
-  InputAdornment, CircularProgress, Fab, Slide, Fade, Zoom,
+  List, ListItem, ListItemIcon, ListItemText, Button, // Removed TextField, InputAdornment
+  CircularProgress, Fab, Slide, Fade, Zoom,
   useTheme, alpha
 } from '@mui/material';
 import SEO from '../../components/SEO';
@@ -16,38 +17,29 @@ import GoldCard from '../../components/GoldCard';
 import FAQ from '../../components/Common/FAQ';
 import {
   faqItems, testimonials, contactInfoItems, heroSection,
-  testimonialSection, successPageData, icons, formCTA,
-  formAdditionalText, seoData, validationConfig
-} from '../../data/contactPageData';
+  testimonialSection, /*successPageData,*/ icons, formCTA, // Removed successPageData
+  /*formAdditionalText,*/ seoData, /*validationConfig*/ // Removed formAdditionalText, validationConfig
+} from '../../data/contactPageData'; // Assuming this path is correct
 import styles from '@/styles/contact.module.css';
-
-// Define form data interface
-interface FormData {
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-}
-
-// Validation schema
-const validationSchema = yup.object().shape({
-  name: yup.string()
-    .required(validationConfig.name.requiredMessage)
-    .min(validationConfig.name.minLength, validationConfig.name.minLengthMessage)
-    .max(validationConfig.name.maxLength, validationConfig.name.maxLengthMessage),
-  email: yup.string()
-    .required(validationConfig.email.requiredMessage)
-    .email(validationConfig.email.invalidMessage),
-  phone: yup.string()
-    .optional()
-    .matches(validationConfig.phone.pattern, validationConfig.phone.patternMessage)
-    .max(validationConfig.phone.maxLength, validationConfig.phone.maxLengthMessage),
-  message: yup.string()
-    .optional()
-    .max(validationConfig.message.maxLength, validationConfig.message.maxLengthMessage),
+// Assuming CalendlyBooking component is in this path
+// and its styles/loading state defined as per previous discussions
+const CalendlyBooking = dynamic(() => import('../../components/CalendlyBooking'), {
+  ssr: false,
+  loading: () => (
+    <Box sx={{ position: "fixed", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: 'column', gap: 2, backgroundColor: "rgba(10, 10, 25, 0.85)", backdropFilter: "blur(8px)", zIndex: 10000 }}>
+      <CircularProgress sx={{ color: "#6366F1" /* Example primary color */ }} />
+      <Typography sx={{ fontFamily: "'SF Pro Display', 'Roboto', sans-serif", color: "#FFFFFF", fontSize: '1.1rem', fontWeight: 500 }}>
+        Loading Scheduler...
+      </Typography>
+    </Box>
+  )
 });
 
-// Ive-inspired styles
+
+// Removed FormData interface
+// Removed validationSchema
+
+// Ive-inspired styles (keeping as is from your provided code)
 const iveStyles = {
   transition: 'all 0.28s cubic-bezier(0.22, 0.01, 0.21, 1)',
   letterSpacing: { heading: '-0.01em', body: '0.01em' },
@@ -67,7 +59,7 @@ const iveStyles = {
   }
 };
 
-// Back to Top Button
+// Back to Top Button (keeping as is)
 const BackToTopButton = () => {
   const theme = useTheme();
   const [isVisible, setIsVisible] = useState(false);
@@ -109,28 +101,39 @@ export default function Contact() {
   const searchParams = useSearchParams();
   const theme = useTheme();
 
-  const [formData, setFormData] = useState<FormData>({ name: '', email: '', phone: '', message: '' });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  // const [loading, setLoading] = useState(false); // This was commented out, submitStatus is used instead
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  // State for Calendly modal
+  const [isCalendlyModalOpen, setIsCalendlyModalOpen] = useState(false);
+  const [calendlyPrefillMessage, setCalendlyPrefillMessage] = useState<string | undefined>(undefined);
+  const [isLoadingCalendly, setIsLoadingCalendly] = useState(false); // For button loading state
+
+  // Removed formData, errors, submitStatus states related to the old form
+
   const [animateIn, setAnimateIn] = useState(false);
 
-  const successTitleRef = useRef<HTMLHeadingElement>(null);
+  // User details for prefill (example, you might get this from auth state)
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | undefined>(undefined);
+  const [currentUserName, setCurrentUserName] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     setAnimateIn(true);
     const plan = searchParams.get('plan');
     const custom = searchParams.get('custom');
 
-    if (plan) setFormData(prev => ({ ...prev, message: `I'm interested in the ${plan} plan.` }));
-    else if (custom) setFormData(prev => ({ ...prev, message: "I'm interested in discussing a custom solution for my business." }));
+    if (plan) {
+      setCalendlyPrefillMessage(`Interested in the ${plan} plan.`);
+    } else if (custom) {
+      setCalendlyPrefillMessage("Interested in discussing a custom solution for my business.");
+    }
+
+    // Example: simulate fetching logged-in user data
+    // Replace with your actual auth logic if available
+    setTimeout(() => {
+      // setCurrentUserEmail("testuser@example.com");
+      // setCurrentUserName("Test User");
+    }, 500);
+
   }, [searchParams]);
 
-  useEffect(() => {
-    if (submitStatus === 'success' && successTitleRef.current) {
-      successTitleRef.current.focus();
-    }
-  }, [submitStatus]);
 
   const renderStars = (rating: number) => (
     <Box sx={{ display: 'flex' }} aria-label={`${rating} out of 5 stars`}>
@@ -143,160 +146,27 @@ export default function Contact() {
     </Box>
   );
 
-  // --- MODIFIED handleSubmit function for full integration ---
-  const handleSubmit = async (e: React.FormEvent<HTMLDivElement>) => { // Changed HTMLFormElement to HTMLDivElement/ Added type for `e`
-    e.preventDefault();
-    setErrors({}); // Clear previous errors
+  const handleOpenCalendlyModal = useCallback(() => {
+    setIsLoadingCalendly(true); // Show loading state on button
+    // The dynamic import of CalendlyBooking will start loading its chunk.
+    // The actual modal opening is controlled by isCalendlyModalOpen.
+    // A short delay can make the loading state on button feel more responsive if chunk is small.
+    setTimeout(() => {
+        setIsCalendlyModalOpen(true);
+        setIsLoadingCalendly(false); // Hide loading state on button once modal is ready to open
+    }, 300); // Adjust delay as needed, or remove if dynamic loading is very fast
+  }, []);
 
-    try {
-      // Client-side validation
-      await validationSchema.validate(formData, { abortEarly: false });
-      setSubmitStatus('loading');
+  const handleCloseCalendlyModal = useCallback(() => {
+    setIsCalendlyModalOpen(false);
+  }, []);
 
-      // Actual API Call
-      const response = await fetch('/api/submit-contact', { // Your API endpoint
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+  // Define your Calendly event link (replace with your actual link)
+  const YOUR_CALENDLY_EVENT_LINK = "https://calendly.com/glustack000/30min";
 
-      if (response.ok) {
-        // const result = await response.json(); // Optional: if your backend sends data back
-        // console.log('Form submission successful (from API):', result);
-        setSubmitStatus('success');
-        // Clear the form on successful submission
-        setFormData({ name: '', email: '', phone: '', message: '' });
-      } else {
-        // Handle errors from the backend
-        const errorData = await response.json();
-        setErrors({ form: errorData.message || 'Submission failed. Please try again.' });
-        setSubmitStatus('idle'); // Reset status on backend error
-        console.error('Backend submission error:', errorData);
-      }
-    } catch (err) { // Catches client-side yup.ValidationError or network errors for fetch
-      setSubmitStatus('idle'); // Reset status on any error
-      if (err instanceof yup.ValidationError) {
-        const validationErrors: Record<string, string> = {};
-        err.inner.forEach(error => {
-          if (error.path) {
-            validationErrors[error.path] = error.message;
-          }
-        });
-        setErrors(validationErrors);
-        // Optional: Focus on the first field with an error
-        if (err.inner.length > 0 && err.inner[0].path) {
-           const firstErrorField = document.querySelector(`[name="${err.inner[0].path}"]`) as HTMLElement;
-           firstErrorField?.focus();
-        }
-      } else {
-        // Handle unexpected errors (e.g., network issues if fetch itself fails)
-        setErrors({ form: 'An unexpected error occurred. Please check your connection and try again.' });
-        console.error('Frontend submission error:', err);
-      }
-    }
-  };
-  // --- End of MODIFIED handleSubmit function ---
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => {
-        const updated = { ...prev };
-        delete updated[name];
-        return updated;
-      });
-    }
-  };
-
-  if (submitStatus === 'success') {
-    return (
-      <ConsistentPageLayout
-        seoTitle={successPageData.seoTitle}
-        seoDescription={successPageData.seoDescription}
-        title={successPageData.title}
-        subtitle={successPageData.subtitle}
-        scrollOptions={{ showSectionMenu: false, showProgressIndicator: false }}
-      >
-        <Zoom in={true} timeout={800}>
-          <Box className={styles.successContainer} sx={{ textAlign: 'center', py: { xs: 4, md: 8 }}}>
-            <Box
-              className={styles.successIconCircle}
-              sx={{
-                backgroundColor: alpha(theme.palette.success.main, 0.15),
-                transition: iveStyles.transition,
-                '&:hover': { transform: iveStyles.hover.scale },
-                width: { xs: 80, md: 100 },
-                height: { xs: 80, md: 100 },
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mx: 'auto',
-                mb: 3,
-              }}
-            >
-              <icons.checkCircle style={{ fontSize: '3rem', color: theme.palette.success.main, width: '1.5em', height: '1.5em' }} />
-            </Box>
-            <Typography
-              ref={successTitleRef}
-              tabIndex={-1}
-              variant="h2"
-              component="h2"
-              className={styles.successTitle}
-              sx={{
-                letterSpacing: iveStyles.letterSpacing.heading,
-                mb: 2,
-                fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' }
-              }}
-            >
-              {successPageData.title}
-            </Typography>
-            <Typography
-              variant="body1"
-              className={styles.successMessage}
-              sx={{
-                color: theme.palette.text.secondary,
-                letterSpacing: iveStyles.letterSpacing.body,
-                lineHeight: 1.6,
-                mb: 4,
-                maxWidth: '600px',
-                mx: 'auto',
-                fontSize: { xs: '0.9rem', sm: '1rem'}
-              }}
-            >
-              {successPageData.message}
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => router.push('/')}
-              className={styles.successButton}
-              sx={{
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                boxShadow: iveStyles.shadows.medium(theme.palette.primary.main),
-                borderRadius: iveStyles.borderRadius.button,
-                textTransform: 'none',
-                fontWeight: 600,
-                px: {xs: 3, sm: 4},
-                py: {xs: 1, sm: 1.5},
-                transition: iveStyles.transition,
-                '&:hover': {
-                  boxShadow: iveStyles.shadows.prominent(theme.palette.primary.main),
-                  transform: iveStyles.hover.transform
-                }
-              }}
-            >
-              {successPageData.buttonText}
-            </Button>
-          </Box>
-        </Zoom>
-        <BackToTopButton />
-      </ConsistentPageLayout>
-    );
-  }
+  // Removed handleSubmit and handleInputChange functions
+  // Removed success state rendering for the form
 
   return (
     <>
@@ -341,6 +211,7 @@ export default function Contact() {
           </Fade>
 
           <Box className={styles.contactGrid} sx={{ mb: { xs: 6, md: 8 }, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: { xs: 3, md: 4 } }}>
+            {/* Contact Info Box (Left Side) - Kept as is */}
             <Slide direction="right" in={animateIn} timeout={800}>
               <Box className={styles.contactInfoBox} sx={{
                 backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.8 : 0.98),
@@ -357,8 +228,7 @@ export default function Contact() {
                 <Box className={styles.contactInfoHeader} sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
                   <Box className={styles.iconCircle} sx={{
                     backgroundColor: alpha(theme.palette.primary.main, 0.15),
-                    width: { xs: 50, md: 60 },
-                    height: { xs: 50, md: 60 },
+                    width: { xs: 50, md: 60 }, height: { xs: 50, md: 60 },
                     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: {xs: 2, md: 3},
                     transition: iveStyles.transition, '&:hover': { transform: iveStyles.hover.scale }
                   }}>
@@ -402,14 +272,13 @@ export default function Contact() {
               </Box>
             </Slide>
 
+            {/* Calendly CTA Box (Right Side) - Replaces the form */}
             <Slide direction="left" in={animateIn} timeout={800}>
               <Box sx={{ height: '100%' }}>
-                {/* Updated the onSubmit to directly use the typed handleSubmit */}
                 <GoldCard
-                  component="form"
-                  onSubmit={handleSubmit} 
-                  aria-busy={submitStatus === 'loading'}
-                  className={styles.formCard}
+                  // component="form" // No longer a form
+                  // onSubmit={handleSubmit} // Removed onSubmit
+                  className={styles.formCard} // Can keep class name if styles are still relevant for GoldCard
                   sx={{
                     p: {xs: 2.5, sm:3, md: 4}, height: '100%', display: 'flex', flexDirection: 'column',
                     backgroundColor: alpha(theme.palette.background.paper, 0.98),
@@ -421,6 +290,7 @@ export default function Contact() {
                       boxShadow: iveStyles.shadows.prominent(theme.palette.common.black),
                       transform: 'translateY(-3px)'
                     },
+                    justifyContent: 'center', // Center content vertically
                   }}
                 >
                   <Box className={styles.formHeader} sx={{ mb: {xs:3, md:4}, textAlign: 'center' }}>
@@ -428,78 +298,31 @@ export default function Contact() {
                       background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                       width: {xs: 56, md: 64}, height: {xs:56, md:64}, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', mb: 2,
                     }}>
-                      {React.createElement(heroSection.formIcon, { sx: { fontSize: {xs:28, md:32}, color: 'white' } })}
+                      {/* Changed icon to Calendar or similar */}
+                      <icons.starIcon sx={{ fontSize: {xs:28, md:32}, color: 'white' }} /> 
+                      {/* Replace heroSection.formIcon with a Calendar icon if desired:
+                       <CalendarToday sx={{ fontSize: {xs:28, md:32}, color: 'white' }} />
+                      */}
                     </Box>
                     <Typography variant="h3" component="h2" className={styles.formTitle} sx={{ mb: 1, letterSpacing: iveStyles.letterSpacing.heading, fontWeight: 600, fontSize: { xs: '1.7rem', sm: '2rem', md: '2.2rem' } }}>
-                      {heroSection.formTitle}
+                      {heroSection.formTitle} {/* e.g., "Get a Custom Tech Roadmap" */}
                     </Typography>
                     <Typography variant="body1" className={styles.formSubtitle} sx={{ color: theme.palette.text.secondary, letterSpacing: iveStyles.letterSpacing.body, lineHeight: 1.6, maxWidth: '90%', mx: 'auto', fontSize: {xs: '0.9rem', md: '1rem'} }}>
-                      {heroSection.formSubtitle}
+                      {/* Modified subtitle for Calendly */}
+                      Schedule a session to discuss your personalized technology roadmap.
                     </Typography>
                   </Box>
 
-                  <Stack spacing={{xs: 2, md: 3}} className={styles.formFieldsContainer} sx={{ mb: 'auto' }}>
-                    {[
-                      { name: 'name', label: formAdditionalText.nameLabel, icon: icons.person, required: true },
-                      { name: 'email', label: formAdditionalText.emailLabel, icon: icons.email, required: true },
-                      { name: 'phone', label: formAdditionalText.phoneLabel, icon: icons.phone }
-                    ].map(field => (
-                      <TextField
-                        key={field.name}
-                        fullWidth
-                        label={field.label}
-                        name={field.name}
-                        value={formData[field.name as keyof FormData]}
-                        onChange={handleInputChange}
-                        error={!!errors[field.name]}
-                        helperText={errors[field.name]}
-                        className={styles.textField}
-                        required={field.required}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              {React.createElement(field.icon, { "aria-hidden": "true" })}
-                            </InputAdornment>
-                          ),
-                          className: styles.textFieldInput,
-                          sx: { borderRadius: iveStyles.borderRadius.input, transition: iveStyles.transition, '&.Mui-focused': { boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}` } }
-                        }}
-                        variant="outlined"
-                      />
-                    ))}
-                    <TextField
-                      fullWidth
-                      label={formAdditionalText.messageLabel}
-                      name="message"
-                      multiline
-                      rows={4}
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      error={!!errors.message}
-                      helperText={errors.message || `${formData.message?.length || 0}/${validationConfig.message.maxLength} characters`}
-                      className={styles.messageField}
-                      InputProps={{
-                        className: styles.messageFieldInput,
-                        sx: { borderRadius: iveStyles.borderRadius.input, transition: iveStyles.transition, '&.Mui-focused': { boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}` } }
-                      }}
-                      variant="outlined"
-                    />
-                    <Box component="div" aria-live="polite" sx={{
-                        position: 'absolute', width: '1px', height: '1px',
-                        margin: '-1px', padding: '0', overflow: 'hidden',
-                        clip: 'rect(0, 0, 0, 0)', border: '0'
-                    }}>
-                        {submitStatus === 'loading' && "Submitting your message, please wait."}
-                    </Box>
+                  <Stack spacing={{xs: 2, md: 3}} sx={{ mt: 3, alignItems: 'center' }}>
                     <Button
-                      type="submit"
+                      onClick={handleOpenCalendlyModal}
                       fullWidth
                       size="large"
                       variant="contained"
-                      disabled={submitStatus === 'loading'}
-                      className={styles.submitButton}
+                      disabled={isLoadingCalendly}
+                      className={styles.submitButton} // Can reuse submit button styles
                       sx={{
-                        mt: 2, height: 56, borderRadius: iveStyles.borderRadius.button,
+                        height: 56, borderRadius: iveStyles.borderRadius.button,
                         background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                         boxShadow: iveStyles.shadows.medium(theme.palette.primary.main),
                         textTransform: 'none', fontWeight: 600, fontSize: '1.05rem', letterSpacing: iveStyles.letterSpacing.body,
@@ -513,15 +336,15 @@ export default function Contact() {
                         }
                       }}
                     >
-                      {submitStatus === 'loading' ? <CircularProgress size={24} color="inherit" /> : formCTA}
+                      {isLoadingCalendly ? <CircularProgress size={24} color="inherit" /> : formCTA /* e.g., "Request Your Tech Roadmap" */}
                     </Button>
-                    {errors.form && <Typography color="error" variant="body2" sx={{mt:1, textAlign:'center'}}>{errors.form}</Typography>}
                   </Stack>
                 </GoldCard>
               </Box>
             </Slide>
           </Box>
 
+          {/* Testimonials and FAQ sections remain the same */}
           <Box className={styles.testimonialsSection} sx={{ py: {xs:4, md:6}, mb: {xs:4, md:6} }}>
             <Typography variant="h2" component="h2" className={styles.testimonialsSectionTitle} sx={{
               mb: 1, letterSpacing: iveStyles.letterSpacing.heading, fontWeight: 600, textAlign: 'center',
@@ -600,6 +423,37 @@ export default function Contact() {
           <BackToTopButton />
         </Container>
       </ConsistentPageLayout>
+
+      {/* Calendly Booking Modal */}
+      {/* Check for window to ensure client-side rendering for dynamic import and modal */}
+      {typeof window !== 'undefined' && isCalendlyModalOpen && (
+         <Suspense fallback={<Box sx={{ position: "fixed", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.5)" }}><CircularProgress /></Box>}>
+            <CalendlyBooking
+              isOpen={isCalendlyModalOpen}
+              onClose={handleCloseCalendlyModal}
+              calendlyEventLink={YOUR_CALENDLY_EVENT_LINK} // Ensure this is correctly set
+              prefill={{
+                email: currentUserEmail, // Example: pass fetched/authed user email
+                name: currentUserName,   // Example: pass fetched/authed user name
+                customAnswers: calendlyPrefillMessage
+                  ? { a1: calendlyPrefillMessage } // 'a1' is an example, map to your Calendly custom question field
+                  : undefined,
+              }}
+              pageSettings={{
+                backgroundColor: theme.palette.mode === 'dark' ? '1a1a1a' : 'ffffff',
+                hideEventTypeDetails: false,
+                hideLandingPageDetails: false,
+                primaryColor: theme.palette.primary.main.substring(1), // Remove #
+                textColor: theme.palette.text.primary.substring(1), // Remove #
+              }}
+              utm={{
+                utmCampaign: 'ContactPageCTA',
+                utmSource: 'Website',
+                utmMedium: 'CalendlyModal',
+              }}
+            />
+        </Suspense>
+      )}
     </>
   );
 }
