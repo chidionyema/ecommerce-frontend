@@ -1,13 +1,12 @@
-// src/components/CalendlyBooking.tsx
-"use client"; // If using Next.js App Router
+"use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PopupModal } from 'react-calendly';
 
 interface CalendlyBookingProps {
   isOpen: boolean;
   onClose: () => void;
-  calendlyEventLink: string; // Your specific Calendly event link part, e.g., "your-username/30min"
+  calendlyEventLink: string;
   prefill?: {
     name?: string;
     email?: string;
@@ -37,39 +36,47 @@ const CalendlyBooking: React.FC<CalendlyBookingProps> = ({
   pageSettings,
   utm,
 }) => {
-  if (!isOpen) {
-    return null;
+  const [rootElement, setRootElement] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    // This effect runs once after the component mounts on the client-side
+    if (typeof window !== 'undefined') {
+      // Try to find common root elements, falling back to document.body
+      const element = document.getElementById("__next") || document.getElementById("root") || document.body;
+      if (element) {
+        setRootElement(element);
+      } else {
+        // This should be a very rare case as document.body should always exist
+        console.error("CalendlyBooking: Critical - Could not find a root element for the modal, including document.body. Modal may not function correctly.");
+      }
+    }
+  }, []); // Empty dependency array ensures this runs only once on mount
+
+  // If the modal is not supposed to be open, or if the rootElement hasn't been determined yet,
+  // don't render the PopupModal.
+  if (!isOpen || !rootElement) {
+    if (isOpen && typeof window !== 'undefined' && !rootElement) {
+      // Log only if we are on the client and expecting to show the modal but rootElement isn't ready.
+      // This state is expected briefly on initial load.
+      console.log("CalendlyBooking: Modal is set to open, but rootElement is not yet available. Waiting for DOM to be ready.");
+    }
+    return null; // Or return a loader/placeholder if preferred
   }
 
-  // Construct the full Calendly URL
-  const fullCalendlyUrl = `https://calendly.com/${calendlyEventLink}`;
+  // At this point, isOpen is true AND rootElement is guaranteed to be an HTMLElement.
+  console.log("CalendlyBooking: Rendering PopupModal. URL:", calendlyEventLink);
 
-  // Ensure rootElement is correctly identified. For Next.js, it's often '__next'.
-  // For other React apps, it might be 'root' or another ID.
-  const [rootElement, setRootElement] = React.useState<HTMLElement | null>(null);
+  const modalProps = {
+    url: calendlyEventLink,
+    onModalClose: onClose,
+    open: isOpen, // Will be true here
+    prefill: prefill,
+    pageSettings: pageSettings,
+    utm: utm,
+    rootElement: rootElement, // rootElement is now guaranteed to be non-null
+  };
 
-  React.useEffect(() => {
-    // Ensure this runs client-side only
-    const element = document.getElementById("__next") || document.getElementById("root") || document.body;
-    setRootElement(element);
-  }, []);
-
-  if (!rootElement) {
-      // You might want a loader here or handle the case where rootElement is not found
-      return null;
-  }
-
-  return (
-    <PopupModal
-      url={fullCalendlyUrl}
-      onModalClose={onClose}
-      open={isOpen}
-      rootElement={rootElement}
-      prefill={prefill}
-      pageSettings={pageSettings}
-      utm={utm}
-    />
-  );
+  return <PopupModal {...modalProps} />;
 };
 
 export default CalendlyBooking;
