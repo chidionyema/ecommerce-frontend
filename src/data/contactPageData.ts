@@ -101,27 +101,43 @@ export const faqItems: FaqItem[] = [
 export const testimonials: Testimonial[] = [
   {
     id: 1,
-    name: 'John Doe',
-    role: 'CEO, TechCorp',
-    content: 'Their strategic approach completely transformed our digital infrastructure, resulting in a 40% increase in operational efficiency within just three months.',
-    avatar: '/avatar1.jpg',
+    name: 'Darren Hall',
+    role: 'ASOS, Korokoro Research',
+    content: "Working with Chidi has been an absolute pleasure. Their intelligence and remarkable resourcefulness are consistently on display, enabling them to not only complete all assigned tasks with diligence and precision but also to proactively seek out and master new skills. Chidi's ability to adapt and learn quickly makes them an invaluable asset to any project or team. They don't just meet expectations; they thoughtfully exceed them.",
+    avatar: '/avatar1.jpg', // Replace with actual path if available
     rating: 5,
   },
   {
     id: 2,
-    name: 'Jane Smith',
-    role: 'CTO, InnovateX',
-    content: 'The precision execution and attention to detail elevated our tech stack far beyond our expectations. Worth every penny of the investment.',
-    avatar: '/avatar2.jpg',
+    name: 'Adebola Oke',
+    role: 'BBC, Tesco',
+    content: "Chidi possesses a rare blend of keen intelligence and practical skill that is truly impressive. In our project, their insightful contributions were pivotal in helping to steer the overall direction, ensuring we stayed on track and focused on the most impactful outcomes. Adebola is a strategic thinker and a proactive problem-solver, consistently demonstrating a deep understanding of complex challenges and the ability to drive towards effective solutions.",
+    avatar: '/avatar2.jpg', // Replace with actual path if available
     rating: 5,
   },
   {
     id: 3,
-    name: 'Michael Johnson',
-    role: 'VP of Technology, FutureTech',
-    content: 'From initial consultation to implementation, their team delivered exactly what we needed with remarkable professionalism and technical expertise.',
-    avatar: '/avatar3.jpg',
-    rating: 4,
+    name: 'Sandeep Dagar',
+    role: 'easyJet, ASOS',
+    content: "I've had the opportunity to collaborate with Chidi on various initiatives, and their sharp intellect and dedication are consistently evident. Chidi has a knack for understanding intricate systems and contributing meaningfully to project goals. Their commitment to quality and ability to grasp new concepts make them a highly reliable and effective team member.",
+    avatar: '/avatar3.jpg', // Replace with actual path if available
+    rating: 5,
+  },
+  {
+    id: 4,
+    name: 'Jayakumar',
+    role: 'StepStone',
+    content: "Chidi is a standout professional whose contributions have been significant. They approach tasks with a clear understanding and execute with precision. Their ability to quickly learn and apply new information, coupled with a strong work ethic, makes them a valuable and dependable colleague. I've been consistently impressed by their dedication and the quality of their work.",
+    avatar: '/avatar4.jpg', // Replace with actual path if available
+    rating: 5,
+  },
+  {
+    id: 5,
+    name: 'Rudolphe Cabral',
+    role: 'Manager, Phillip Morris',
+    content: "Chidi's capability to conceptualise and execute is exceptional. I had the privilege of seeing them build an entire platform from the ground up, demonstrating not only profound technical expertise but also a clear vision and an unwavering commitment to seeing a complex project through to successful completion. Their drive and ability to turn an idea into a functional reality are truly commendable.",
+    avatar: '/avatar5.jpg', // Replace with actual path if available
+    rating: 5,
   },
 ];
 
@@ -130,12 +146,12 @@ export const contactInfoItems: ContactInfoItem[] = [
   {
     icon: Phone,
     primaryText: "Call Us",
-    secondaryText: "+1 (555) 123-4567",
+    secondaryText: "+44 7904026978",
   },
   {
     icon: Email,
     primaryText: "Email Us",
-    secondaryText: "contact@techsolutions.com",
+    secondaryText: "contact@glustack.com",
   },
   {
     icon: LocationOn,
@@ -145,7 +161,7 @@ export const contactInfoItems: ContactInfoItem[] = [
   {
     icon: AccessTime,
     primaryText: "Business Hours",
-    secondaryText: "Monday - Friday: 9AM - 6PM EST",
+    secondaryText: "Monday - Saturday: 9AM - 6PM EST",
   },
 ];
 

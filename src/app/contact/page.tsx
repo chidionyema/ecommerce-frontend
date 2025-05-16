@@ -1,6 +1,7 @@
+// ./src/app/contact/page.tsx
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, FormEvent } from 'react'; // Added FormEvent
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as yup from 'yup';
 import {
@@ -9,7 +10,7 @@ import {
   InputAdornment, CircularProgress, Fab, Slide, Fade, Zoom,
   useTheme, alpha
 } from '@mui/material';
-import SEO from '../../components/SEO'; // Assuming SEO component handles meta tags including viewport
+import SEO from '../../components/SEO';
 import ConsistentPageLayout from '../../components/Shared/ConsistentPageLayout';
 import GoldCard from '../../components/GoldCard';
 import FAQ from '../../components/Common/FAQ';
@@ -17,7 +18,7 @@ import {
   faqItems, testimonials, contactInfoItems, heroSection,
   testimonialSection, successPageData, icons, formCTA,
   formAdditionalText, seoData, validationConfig
-} from '../../data/contactPageData'; // Ensure icons in this data are accessible (e.g. MUI icons or SVGs with titles/aria-hidden)
+} from '../../data/contactPageData';
 import styles from '@/styles/contact.module.css';
 
 // Define form data interface
@@ -28,7 +29,7 @@ interface FormData {
   message: string;
 }
 
-// Validation schema (remains the same)
+// Validation schema
 const validationSchema = yup.object().shape({
   name: yup.string()
     .required(validationConfig.name.requiredMessage)
@@ -46,7 +47,7 @@ const validationSchema = yup.object().shape({
     .max(validationConfig.message.maxLength, validationConfig.message.maxLengthMessage),
 });
 
-// Ive-inspired styles (remains the same)
+// Ive-inspired styles
 const iveStyles = {
   transition: 'all 0.28s cubic-bezier(0.22, 0.01, 0.21, 1)',
   letterSpacing: { heading: '-0.01em', body: '0.01em' },
@@ -66,7 +67,7 @@ const iveStyles = {
   }
 };
 
-// Back to Top Button (remains largely the same, ensure icons.backToTop is accessible)
+// Back to Top Button
 const BackToTopButton = () => {
   const theme = useTheme();
   const [isVisible, setIsVisible] = useState(false);
@@ -81,11 +82,11 @@ const BackToTopButton = () => {
     <Zoom in={isVisible}>
       <Fab
         color="primary"
-        aria-label="Back to Top" // Good for accessibility
+        aria-label="Back to Top"
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className={styles.backToTopButton}
         sx={{
-          position: 'fixed', // From styles.backToTopButton usually
+          position: 'fixed',
           bottom: { xs: theme.spacing(2), md: theme.spacing(4) },
           right: { xs: theme.spacing(2), md: theme.spacing(4) },
           background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
@@ -97,7 +98,6 @@ const BackToTopButton = () => {
           }
         }}
       >
-        {/* Ensure icons.backToTop is an accessible SVG (e.g., with <title>) or MUI Icon */}
         <icons.backToTop />
       </Fab>
     </Zoom>
@@ -111,11 +111,11 @@ export default function Contact() {
 
   const [formData, setFormData] = useState<FormData>({ name: '', email: '', phone: '', message: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success'>('idle'); // More descriptive
+  // const [loading, setLoading] = useState(false); // This was commented out, submitStatus is used instead
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success'>('idle');
   const [animateIn, setAnimateIn] = useState(false);
 
-  const successTitleRef = useRef<HTMLHeadingElement>(null); // For focusing on success title
+  const successTitleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     setAnimateIn(true);
@@ -128,38 +128,76 @@ export default function Contact() {
 
   useEffect(() => {
     if (submitStatus === 'success' && successTitleRef.current) {
-      successTitleRef.current.focus(); // Focus on success title for A11y
+      successTitleRef.current.focus();
     }
   }, [submitStatus]);
 
+  const renderStars = (rating: number) => (
+    <Box sx={{ display: 'flex' }} aria-label={`${rating} out of 5 stars`}>
+      {Array(5).fill(0).map((_, i) => (
+        <icons.starIcon key={i} sx={{
+          color: i < rating ? theme.palette.primary.main : alpha(theme.palette.divider, 0.5),
+          fontSize: { xs: '1rem', sm: '1.2rem' }, mr: 0.5
+        }} />
+      ))}
+    </Box>
+  );
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // --- MODIFIED handleSubmit function for full integration ---
+  const handleSubmit = async (e: React.FormEvent<HTMLDivElement>) => { // Changed HTMLFormElement to HTMLDivElement/ Added type for `e`
     e.preventDefault();
-    setErrors({});
+    setErrors({}); // Clear previous errors
 
     try {
+      // Client-side validation
       await validationSchema.validate(formData, { abortEarly: false });
       setSubmitStatus('loading');
-      // Simulate API call
-      setTimeout(() => {
+
+      // Actual API Call
+      const response = await fetch('/api/submit-contact', { // Your API endpoint
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        // const result = await response.json(); // Optional: if your backend sends data back
+        // console.log('Form submission successful (from API):', result);
         setSubmitStatus('success');
-      }, 1500);
-    } catch (err) {
-      setSubmitStatus('idle');
+        // Clear the form on successful submission
+        setFormData({ name: '', email: '', phone: '', message: '' });
+      } else {
+        // Handle errors from the backend
+        const errorData = await response.json();
+        setErrors({ form: errorData.message || 'Submission failed. Please try again.' });
+        setSubmitStatus('idle'); // Reset status on backend error
+        console.error('Backend submission error:', errorData);
+      }
+    } catch (err) { // Catches client-side yup.ValidationError or network errors for fetch
+      setSubmitStatus('idle'); // Reset status on any error
       if (err instanceof yup.ValidationError) {
         const validationErrors: Record<string, string> = {};
-        err.inner.forEach(error => { if (error.path) validationErrors[error.path] = error.message; });
+        err.inner.forEach(error => {
+          if (error.path) {
+            validationErrors[error.path] = error.message;
+          }
+        });
         setErrors(validationErrors);
         // Optional: Focus on the first field with an error
-        // if (err.inner.length > 0 && err.inner[0].path) {
-        //   const firstErrorField = document.querySelector(`[name="${err.inner[0].path}"]`) as HTMLElement;
-        //   firstErrorField?.focus();
-        // }
+        if (err.inner.length > 0 && err.inner[0].path) {
+           const firstErrorField = document.querySelector(`[name="${err.inner[0].path}"]`) as HTMLElement;
+           firstErrorField?.focus();
+        }
       } else {
-        setErrors({ form: 'An unexpected error occurred. Please try again.' });
+        // Handle unexpected errors (e.g., network issues if fetch itself fails)
+        setErrors({ form: 'An unexpected error occurred. Please check your connection and try again.' });
+        console.error('Frontend submission error:', err);
       }
     }
   };
+  // --- End of MODIFIED handleSubmit function ---
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -173,24 +211,12 @@ export default function Contact() {
     }
   };
 
-  const renderStars = (rating: number) => (
-    <Box sx={{ display: 'flex' }} aria-label={`${rating} out of 5 stars`}> {/* A11y for star rating */}
-      {Array(5).fill(0).map((_, i) => (
-        // Ensure icons.starIcon is accessible or aria-hidden if decorative
-        <icons.starIcon key={i} sx={{
-          color: i < rating ? theme.palette.primary.main : alpha(theme.palette.divider, 0.5),
-          fontSize: { xs: '1rem', sm: '1.2rem' }, mr: 0.5
-        }} />
-      ))}
-    </Box>
-  );
-
   if (submitStatus === 'success') {
     return (
       <ConsistentPageLayout
         seoTitle={successPageData.seoTitle}
         seoDescription={successPageData.seoDescription}
-        title={successPageData.title} // This title might be redundant if the h2 below is focused
+        title={successPageData.title}
         subtitle={successPageData.subtitle}
         scrollOptions={{ showSectionMenu: false, showProgressIndicator: false }}
       >
@@ -202,7 +228,7 @@ export default function Contact() {
                 backgroundColor: alpha(theme.palette.success.main, 0.15),
                 transition: iveStyles.transition,
                 '&:hover': { transform: iveStyles.hover.scale },
-                width: { xs: 80, md: 100 }, // Responsive icon circle
+                width: { xs: 80, md: 100 },
                 height: { xs: 80, md: 100 },
                 borderRadius: '50%',
                 display: 'flex',
@@ -212,13 +238,12 @@ export default function Contact() {
                 mb: 3,
               }}
             >
-              {/* Ensure icons.checkCircle is accessible (e.g. MUI Icon) */}
               <icons.checkCircle style={{ fontSize: '3rem', color: theme.palette.success.main, width: '1.5em', height: '1.5em' }} />
             </Box>
             <Typography
-              ref={successTitleRef} // Ref for focusing
-              tabIndex={-1} // Make it focusable
-              variant="h2" // More appropriate than h3 if this is the main message
+              ref={successTitleRef}
+              tabIndex={-1}
+              variant="h2"
               component="h2"
               className={styles.successTitle}
               sx={{
@@ -277,7 +302,7 @@ export default function Contact() {
     <>
       <SEO title={seoData.title} description={seoData.description} keywords={seoData.keywords} />
       <ConsistentPageLayout scrollOptions={{ showSectionMenu: false, showProgressIndicator: false }}>
-        <Container maxWidth="lg" sx={{ py: { xs: 4, sm: 6, md: 10 }, px: { xs: 2, sm: 3, md: 4 } }}> {/* Adjusted padding */}
+        <Container maxWidth="lg" sx={{ py: { xs: 4, sm: 6, md: 10 }, px: { xs: 2, sm: 3, md: 4 } }}>
           <Fade in={animateIn} timeout={1000}>
             <Box className={styles.heroContainer} sx={{ mb: { xs: 5, md: 8 }, textAlign: 'center' }}>
               <Typography
@@ -292,7 +317,7 @@ export default function Contact() {
                   letterSpacing: '-0.015em',
                   fontWeight: 700,
                   lineHeight: 1.2,
-                  fontSize: { xs: '2.2rem', sm: '2.8rem', md: '3.5rem' } // Responsive font size
+                  fontSize: { xs: '2.2rem', sm: '2.8rem', md: '3.5rem' }
                 }}
               >
                 {heroSection.title}
@@ -307,7 +332,7 @@ export default function Contact() {
                   lineHeight: 1.6,
                   maxWidth: '800px',
                   mx: 'auto',
-                  fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' } // Responsive font size
+                  fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
                 }}
               >
                 {heroSection.subtitle}
@@ -322,7 +347,7 @@ export default function Contact() {
                 backdropFilter: 'blur(10px)',
                 boxShadow: iveStyles.shadows.subtle(theme.palette.common.black),
                 borderRadius: iveStyles.borderRadius.card,
-                p: {xs: 2.5, sm:3, md: 4}, // Responsive padding
+                p: {xs: 2.5, sm:3, md: 4},
                 position: 'relative',
                 overflow: 'hidden',
                 transition: iveStyles.transition,
@@ -332,18 +357,17 @@ export default function Contact() {
                 <Box className={styles.contactInfoHeader} sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
                   <Box className={styles.iconCircle} sx={{
                     backgroundColor: alpha(theme.palette.primary.main, 0.15),
-                    width: { xs: 50, md: 60 }, // Consider responsive size
-                    height: { xs: 50, md: 60 }, // Consider responsive size
+                    width: { xs: 50, md: 60 },
+                    height: { xs: 50, md: 60 },
                     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: {xs: 2, md: 3},
                     transition: iveStyles.transition, '&:hover': { transform: iveStyles.hover.scale }
                   }}>
-                    {/* Ensure heroSection.contactInfoIcon is accessible or aria-hidden */}
                     {React.createElement(heroSection.contactInfoIcon, { sx: { fontSize: {xs: 24, md: 28}, color: theme.palette.primary.main } })}
                   </Box>
                   <Box>
                     <Typography variant="h4" component="h2" className={styles.contactInfoTitle} sx={{
                       mb: 0.5, letterSpacing: iveStyles.letterSpacing.heading, fontWeight: 600,
-                      fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' } // Responsive
+                      fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' }
                     }}>
                       {heroSection.contactInfoTitle}
                     </Typography>
@@ -363,7 +387,6 @@ export default function Contact() {
                         <Box className={styles.contactItemCircle} sx={{
                            backgroundColor: alpha(theme.palette.primary.main, 0.15), width: {xs:36, md:40}, height: {xs:36, md:40}, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: iveStyles.transition, '&:hover': { transform: iveStyles.hover.scale }
                         }}>
-                          {/* Ensure item.icon is accessible (MUI Icon) or aria-hidden if purely decorative */}
                           {React.createElement(item.icon, { sx: { fontSize: {xs:18, md:20}, color: theme.palette.primary.main }, "aria-hidden": "true" })}
                         </Box>
                       </ListItemIcon>
@@ -381,14 +404,14 @@ export default function Contact() {
 
             <Slide direction="left" in={animateIn} timeout={800}>
               <Box sx={{ height: '100%' }}>
+                {/* Updated the onSubmit to directly use the typed handleSubmit */}
                 <GoldCard
                   component="form"
-                  onSubmit={handleSubmit as React.FormEventHandler<HTMLDivElement>}
-                  aria-busy={submitStatus === 'loading'} // A11y: indicate loading state
+                  onSubmit={handleSubmit} 
+                  aria-busy={submitStatus === 'loading'}
                   className={styles.formCard}
                   sx={{
                     p: {xs: 2.5, sm:3, md: 4}, height: '100%', display: 'flex', flexDirection: 'column',
-                    /* ... other GoldCard styles ... */
                     backgroundColor: alpha(theme.palette.background.paper, 0.98),
                     backdropFilter: 'blur(10px)',
                     boxShadow: iveStyles.shadows.medium(theme.palette.common.black),
@@ -404,9 +427,7 @@ export default function Contact() {
                     <Box className={styles.formIconCircle} sx={{
                       background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                       width: {xs: 56, md: 64}, height: {xs:56, md:64}, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', mb: 2,
-                      /* ... */
                     }}>
-                       {/* Ensure heroSection.formIcon is accessible or aria-hidden */}
                       {React.createElement(heroSection.formIcon, { sx: { fontSize: {xs:28, md:32}, color: 'white' } })}
                     </Box>
                     <Typography variant="h3" component="h2" className={styles.formTitle} sx={{ mb: 1, letterSpacing: iveStyles.letterSpacing.heading, fontWeight: 600, fontSize: { xs: '1.7rem', sm: '2rem', md: '2.2rem' } }}>
@@ -437,14 +458,13 @@ export default function Contact() {
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
-                              {/* Assuming these icons are decorative due to labels; otherwise, provide aria-label */}
                               {React.createElement(field.icon, { "aria-hidden": "true" })}
                             </InputAdornment>
                           ),
                           className: styles.textFieldInput,
                           sx: { borderRadius: iveStyles.borderRadius.input, transition: iveStyles.transition, '&.Mui-focused': { boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}` } }
                         }}
-                        variant="outlined" // Or "filled", "standard" as per your design
+                        variant="outlined"
                       />
                     ))}
                     <TextField
@@ -464,7 +484,6 @@ export default function Contact() {
                       }}
                       variant="outlined"
                     />
-                    {/* Visually hidden polite live region for form submission status */}
                     <Box component="div" aria-live="polite" sx={{
                         position: 'absolute', width: '1px', height: '1px',
                         margin: '-1px', padding: '0', overflow: 'hidden',
@@ -487,7 +506,7 @@ export default function Contact() {
                         transition: iveStyles.transition,
                         '&:hover': { boxShadow: iveStyles.shadows.prominent(theme.palette.primary.main), transform: iveStyles.hover.transform },
                         '&:active': { transform: 'translateY(0)' },
-                        '&.Mui-disabled': { // Style for disabled state if needed
+                        '&.Mui-disabled': {
                             background: alpha(theme.palette.action.disabledBackground, 0.5),
                             color: theme.palette.action.disabled,
                             boxShadow: 'none',
@@ -506,7 +525,7 @@ export default function Contact() {
           <Box className={styles.testimonialsSection} sx={{ py: {xs:4, md:6}, mb: {xs:4, md:6} }}>
             <Typography variant="h2" component="h2" className={styles.testimonialsSectionTitle} sx={{
               mb: 1, letterSpacing: iveStyles.letterSpacing.heading, fontWeight: 600, textAlign: 'center',
-              fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' } // Responsive
+              fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' }
             }}>
               {testimonialSection.title}
             </Typography>
@@ -545,11 +564,11 @@ export default function Contact() {
                       <Box className={styles.testimonialAuthor} sx={{ display: 'flex', alignItems: 'center' }}>
                         <Avatar
                           src={testimonial.avatar}
-                          alt={testimonial.name} // Good for A11y
+                          alt={testimonial.name}
                           className={styles.testimonialAvatar}
                           sx={{
                             border: `2px solid ${theme.palette.primary.main}`, mr: 2,
-                            width: {xs: 40, md: 48}, height: {xs:40, md:48}, // Responsive avatar
+                            width: {xs: 40, md: 48}, height: {xs:40, md:48},
                             boxShadow: iveStyles.shadows.subtle(theme.palette.common.black)
                           }}
                         />
@@ -577,23 +596,10 @@ export default function Contact() {
             title="Frequently Asked Questions"
             subtitle="Find answers to common questions about our services and solutions"
             sx={{ mb: { xs: 6, md: 8 } }}
-            // Ensure FAQ component itself is accessible (e.g. proper ARIA for accordions)
           />
           <BackToTopButton />
         </Container>
       </ConsistentPageLayout>
-      {/*
-        Consider global CSS for prefers-reduced-motion if not handled by MUI defaults for custom transitions:
-        @media (prefers-reduced-motion: reduce) {
-          * {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-            scroll-behavior: auto !important;
-          }
-        }
-        Thoroughly test color contrast with browser dev tools or online checkers.
-      */}
     </>
   );
 }

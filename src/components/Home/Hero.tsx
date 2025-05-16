@@ -9,19 +9,31 @@ import Head from "next/head";
 import { ShieldCheck, TrendingUp, DollarSign, Users, Calendar, ChevronRight, Clock } from "lucide-react";
 import { SiAmazonaws, SiMicrosoftazure, SiDocker, SiKubernetes, SiTerraform, SiGooglecloud } from "react-icons/si";
 
-// IMPORT the CalendlyBooking component using next/dynamic for client-side only rendering
-// Ensure this path is correct: ../Calendly/CalendlyBooking.tsx
-const CalendlyBooking = dynamic(() => import('../CalendlyBooking'), {
+// --- JONY IVE POLISH: Refined Loading State for Calendly ---
+const CalendlyBooking = dynamic(() => import('../CalendlyBooking'), { // Ensure this path is correct
   ssr: false,
   loading: () => (
-    <Box sx={{ position: "fixed", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: 'column', gap: 2, backgroundColor: "rgba(0,0,0,0.85)", zIndex: 10000 }}>
-      <CircularProgress sx={{color: styles.colors.primary}} />
-      <Typography color="white" variant="h6">Loading Scheduler...</Typography>
+    <Box sx={{
+      position: "fixed", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
+      flexDirection: 'column', gap: 2.5,
+      backgroundColor: "rgba(10, 10, 25, 0.85)", // Slightly more refined dark overlay
+      backdropFilter: "blur(8px)", // Subtle blur for depth
+      zIndex: 10000
+    }}>
+      <CircularProgress sx={{ color: styles.colors.primary }} />
+      <Typography sx={{
+        fontFamily: styles.typography.fontFamily, // Consistent font
+        color: styles.colors.text,
+        fontSize: '1.1rem',
+        fontWeight: 500,
+      }}>
+        Loading Scheduler...
+      </Typography>
     </Box>
   )
 });
 
-// ErrorBoundary
+// --- JONY IVE POLISH: Refined ErrorBoundary Fallback UI ---
 interface ErrorBoundaryProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
@@ -43,13 +55,34 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   render(): React.ReactNode {
     if (this.state.hasError) {
       return this.props.fallback || (
-        <Box sx={{ p: 3, textAlign: 'center', color: '#fff', background: 'rgba(0,0,0,0.7)', borderRadius: 2, m: 2 }}>
-          <Typography variant="h6">Oops! Something went wrong.</Typography>
-          <Typography>The booking module could not be loaded.</Typography>
+        <Box sx={{
+          p: 4, textAlign: 'center', color: styles.colors.text,
+          background: 'rgba(20, 20, 40, 0.7)', borderRadius: 3, m: 2,
+          fontFamily: styles.typography.fontFamily, // Consistent font
+          border: `1px solid ${alpha(styles.colors.primary, 0.2)}`
+        }}>
+          <Typography variant="h6" component="h2" sx={{ mb: 1.5, fontWeight: 600 }}>
+            Scheduler Unavailable
+          </Typography>
+          <Typography sx={{ mb: 3, color: styles.colors.textSecondary, fontSize: '0.95rem' }}>
+            The booking module could not be loaded at this moment. Please try again shortly.
+          </Typography>
           <Button
-            sx={{ mt: 2, color: '#fff', borderColor: 'rgba(255,255,255,0.5)' }}
             variant="outlined"
             onClick={() => this.setState({ hasError: false })}
+            sx={{
+              color: styles.colors.text,
+              borderColor: alpha(styles.colors.text, 0.5),
+              textTransform: 'none',
+              borderRadius: '8px',
+              padding: '8px 20px',
+              fontWeight: 500,
+              transition: styles.animations.short,
+              '&:hover': {
+                borderColor: styles.colors.text,
+                backgroundColor: alpha(styles.colors.text, 0.08)
+              }
+            }}
           >
             Try Again
           </Button>
@@ -60,38 +93,54 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 }
 
-// Styles and theme constants
+
+// --- JONY IVE POLISH: Refined Styles and Theme Constants ---
 const styles = {
-  gradients: {
-    primary: "linear-gradient(135deg, #6366F1, #8B5CF6)",
-    secondary: "linear-gradient(135deg, #A78BFA, #6366F1)",
-    accent1: "linear-gradient(135deg, #F97316, #EC4899)",
-    accent2: "linear-gradient(135deg, #14B8A6, #0EA5E9)"
+  gradients: { // Using fewer, more impactful gradients
+    primary: "linear-gradient(135deg, #6366F1, #8B5CF6)", // Main brand gradient
+    secondaryHighlight: "linear-gradient(135deg, #A78BFA, #6366F1)", // For text highlights
+    subtleGlow: "linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.1))", // For subtle backgrounds
+    benefitCard1: "linear-gradient(135deg, #6366F1, #8B5CF6)",
+    benefitCard2: "linear-gradient(135deg, #F97316, #EC4899)", // Accent
+    benefitCard3: "linear-gradient(135deg, #14B8A6, #0EA5E9)", // Another Accent
+    benefitCard4: "linear-gradient(135deg, #8B5CF6, #A78BFA)" // Variation of primary
   },
   colors: {
-    primary: "#6366F1",
-    primaryHover: "#5457EF",
-    text: "#fff",
-    textSecondary: "rgba(255,255,255,0.85)"
+    primary: "#6366F1", // Main interactive color
+    primaryHover: "#5457EF", // Darker for hover
+    text: "#FFFFFF", // Pure white for clarity
+    textSecondary: "rgba(255, 255, 255, 0.8)", // Slightly reduced opacity for secondary text
+    backgroundDark: "#0A0A19", // Very dark blue/purple, for base background if image isn't full bleed
+    subtleBorder: "rgba(255, 255, 255, 0.1)", // For faint borders on dark UI elements
   },
-  shadows: {
-    primary: "0 4px 14px rgba(99, 102, 241, 0.4)",
-    hover: "0 6px 20px rgba(99, 102, 241, 0.5)",
-    card: "0 4px 24px rgba(0, 0, 0, 0.1)"
+  shadows: { // Softer, more layered shadows
+    primary: "0 4px 12px rgba(99, 102, 241, 0.3), 0 1px 3px rgba(99, 102, 241, 0.2)",
+    hover: "0 6px 18px rgba(99, 102, 241, 0.35), 0 2px 6px rgba(99, 102, 241, 0.25)",
+    card: "0 3px 8px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0,0,0,0.05)", // Subtle default card shadow
+    cardHover: "0 8px 16px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0,0,0,0.08)", // Lifted card shadow
   },
-  animations: {
-    short: "all 0.2s ease",
-    medium: "all 0.25s ease"
+  animations: { // Slightly more graceful timings
+    short: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)", // MUI's standard easing
+    medium: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
   },
-  spacing: {
-    section: 8
+  spacing: { // Define a base unit, e.g. 8px. Sections are multiples of this.
+    baseUnit: 1, // Corresponds to theme.spacing(1) = 8px by default in MUI
+    sectionVertical: 10, // theme.spacing(10) = 80px
+    contentPadding: 3, // theme.spacing(3) = 24px
+  },
+  typography: { // Centralize font family
+    fontFamily: "'SF Pro Display', 'Roboto', 'Helvetica Neue', Arial, sans-serif", // Added Arial as a generic fallback
+    letterSpacings: {
+      heading: '-0.01em', // Slight tightening for larger headings
+      body: '0.005em',   // Normal to slightly open for body
+    }
   }
 };
 
 // Animation
 const fadeVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+  hidden: { opacity: 0, y: 25 }, // Slightly increased y for a more noticeable entrance
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } } // Slightly longer duration
 };
 
 interface FadeInViewProps {
@@ -101,12 +150,11 @@ interface FadeInViewProps {
   componentStyle?: React.CSSProperties;
 }
 
-const FadeInView: React.FC<FadeInViewProps> = ({ children, delay = 0, once = false, componentStyle }) => (
+const FadeInView: React.FC<FadeInViewProps> = ({ children, delay = 0, once = true, componentStyle }) => ( // Default once to true
   <motion.div
     initial="hidden"
-    animate={!once ? "visible" : undefined}
-    whileInView={once ? "visible" : undefined}
-    viewport={once ? { once: true } : undefined}
+    whileInView="visible" // Simplified: always use whileInView if once=true
+    viewport={{ once: true, amount: 0.2 }} // Trigger when 20% is visible
     variants={fadeVariants}
     transition={{ delay }}
     style={{ width: "100%", ...componentStyle }}
@@ -120,101 +168,109 @@ const Section = styled(Box)(({ theme }) => ({
   position: "relative",
   display: "flex",
   alignItems: "center",
-  paddingTop: theme.spacing(styles.spacing.section),
-  paddingBottom: theme.spacing(styles.spacing.section),
+  paddingTop: theme.spacing(styles.spacing.sectionVertical),
+  paddingBottom: theme.spacing(styles.spacing.sectionVertical),
   overflow: "hidden",
-  minHeight: "80vh",
+  minHeight: "90vh", // Slightly less aggressive minHeight if content is dense
+  fontFamily: styles.typography.fontFamily,
   [theme.breakpoints.up("md")]: {
     minHeight: "95vh"
   }
 }));
 
+// --- JONY IVE POLISH: Subtler Background Overlay ---
 const BgOverlay = styled(Box)({
   position: "absolute",
   inset: 0,
   zIndex: 1,
-  mixBlendMode: "multiply",
-  background: `radial-gradient(ellipse at center, ${alpha("#1a3674", 0.97)} 0%, ${alpha("#1a3674", 0.85)} 70%, ${alpha("#1a3674", 0.97)} 100%)`,
+  // Simpler gradient, less color, more focus on creating depth for text
+  background: `linear-gradient(180deg, ${alpha(styles.colors.backgroundDark, 0.6)} 0%, ${alpha(styles.colors.backgroundDark, 0.85)} 60%, ${alpha(styles.colors.backgroundDark, 0.95)} 100%)`,
 });
 
 const ContentArea = styled(Box)(({ theme }) => ({
   position: "relative",
   zIndex: 3,
   width: "100%",
-  paddingTop: theme.spacing(6),
-  paddingBottom: theme.spacing(6),
+  paddingTop: theme.spacing(styles.spacing.contentPadding + 3), // More top padding
+  paddingBottom: theme.spacing(styles.spacing.contentPadding + 3),
   [theme.breakpoints.down("sm")]: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
+    paddingLeft: theme.spacing(styles.spacing.contentPadding -1),
+    paddingRight: theme.spacing(styles.spacing.contentPadding -1),
+    paddingTop: theme.spacing(styles.spacing.contentPadding),
+    paddingBottom: theme.spacing(styles.spacing.contentPadding),
   }
 }));
 
 const Headline = styled(Typography)<TypographyProps>(({ theme }) => ({
-  fontSize: "clamp(2rem, 6vw, 3rem)",
-  lineHeight: 1.2,
+  fontSize: "clamp(2.2rem, 6vw, 3.2rem)",
+  lineHeight: 1.25,
   fontWeight: 700,
   color: styles.colors.text,
   textAlign: "center",
   margin: "0 auto",
-  marginBottom: theme.spacing(2),
+  marginBottom: theme.spacing(2.5),
   maxWidth: 900,
+  letterSpacing: styles.typography.letterSpacings.heading,
 }));
 
 const Subheadline = styled(Typography)<TypographyProps>(({ theme }) => ({
-  fontSize: "clamp(1rem, 3.5vw, 1.125rem)",
+  fontSize: "clamp(1rem, 3.5vw, 1.15rem)",
   fontWeight: 400,
   color: styles.colors.textSecondary,
   textAlign: "center",
   margin: "0 auto",
+  maxWidth: 700,
+  lineHeight: 1.6,
+  letterSpacing: styles.typography.letterSpacings.body,
 }));
 
 const CTAButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== 'secondary' && prop !== 'theme'
 })<{ secondary?: boolean; theme?: Theme }>(({ theme, secondary }) => ({
   color: styles.colors.text,
-  fontWeight: 600,
-  borderRadius: 8,
+  fontFamily: styles.typography.fontFamily,
+  fontWeight: 500,
+  borderRadius: 10,
   textTransform: "none",
   transition: styles.animations.short,
   backgroundColor: secondary ? "transparent" : styles.colors.primary,
-  border: secondary ? `1.5px solid ${alpha(styles.colors.text, 0.75)}` : "none",
+  border: secondary ? `1.5px solid ${styles.colors.subtleBorder}` : `1.5px solid ${styles.colors.primary}`,
   boxShadow: secondary ? "none" : styles.shadows.primary,
   width: '100%',
-  maxWidth: '320px',
-  padding: theme.spacing(1.25, 2),
+  padding: theme.spacing(1.35, 2.5),
   fontSize: "0.9rem",
+  letterSpacing: '0.015em',
   [theme.breakpoints.up('sm')]: {
     width: 'auto',
-    maxWidth: 'none',
-    padding: theme.spacing(1.5, 3),
+    padding: theme.spacing(1.6, 3.5),
     fontSize: "1rem",
   },
   "&:hover": {
-    backgroundColor: secondary ? alpha(styles.colors.text, 0.12) : styles.colors.primaryHover,
-    transform: "translateY(-2px)",
-    boxShadow: secondary ? "none" : styles.shadows.hover,
-    borderColor: secondary ? styles.colors.text : 'none',
+    backgroundColor: secondary ? alpha(styles.colors.text, 0.08) : styles.colors.primaryHover,
+    transform: "translateY(-3px) scale(1.02)",
+    boxShadow: secondary ? `0 0 0 1.5px ${styles.colors.text}` : styles.shadows.hover,
+    borderColor: secondary ? styles.colors.text : styles.colors.primaryHover,
   }
 }));
 
 const OfferChip = styled(Chip)(({ theme }) => ({
   height: 'auto',
-  padding: theme.spacing(0.75, 1.5),
-  backgroundColor: alpha(styles.colors.primary, 0.18),
+  padding: theme.spacing(1, 1.75),
+  fontFamily: styles.typography.fontFamily,
+  backgroundColor: alpha(styles.colors.primary, 0.1),
   color: styles.colors.text,
-  fontWeight: 600,
-  fontSize: '0.875rem',
-  border: `1px solid ${alpha(styles.colors.primary, 0.4)}`,
-  boxShadow: "0 4px 10px rgba(99, 102, 241, 0.16)",
+  fontWeight: 500,
+  fontSize: '0.85rem',
+  border: `1px solid ${alpha(styles.colors.primary, 0.25)}`,
+  boxShadow: `0 2px 8px ${alpha(styles.colors.primary, 0.1)}`,
   '& .MuiChip-icon': {
-    color: alpha(styles.colors.text, 0.97),
-    fontSize: '1.1rem'
+    color: alpha(styles.colors.text, 0.85),
+    fontSize: '1rem',
+    marginLeft: theme.spacing(0.5)
   },
   '& .MuiChip-label': {
     whiteSpace: 'normal',
-    paddingLeft: theme.spacing(0.5),
+    paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(0.5),
   },
   [theme.breakpoints.up('sm')]: {
@@ -225,13 +281,14 @@ const OfferChip = styled(Chip)(({ theme }) => ({
 const PersonaButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== "active" && prop !== 'theme'
 })<{ active?: boolean; theme?: Theme }>(({ theme, active }) => ({
-  fontSize: "0.875rem",
-  fontWeight: 600,
-  letterSpacing: "0.02em",
-  borderRadius: 12,
+  fontSize: "0.85rem",
+  fontFamily: styles.typography.fontFamily,
+  fontWeight: 500,
+  letterSpacing: "0.015em",
+  borderRadius: 10,
   transition: styles.animations.medium,
-  padding: theme.spacing(0.9, 2.5),
-  minWidth: 110,
+  padding: theme.spacing(1, 2.25),
+  minWidth: 100,
   ...(active
     ? {
         background: styles.gradients.primary,
@@ -239,67 +296,77 @@ const PersonaButton = styled(Button, {
         color: styles.colors.text,
         "&:hover": {
           background: styles.gradients.primary,
-          filter: "brightness(1.05)"
+          filter: "brightness(1.1)",
         }
       }
     : {
-        background: "rgba(255, 255, 255, 0.08)",
-        border: "1px solid rgba(255, 255, 255, 0.15)",
-        color: alpha(styles.colors.text, 0.9),
+        background: alpha(styles.colors.text, 0.05),
+        border: `1px solid ${styles.colors.subtleBorder}`,
+        color: styles.colors.textSecondary,
         "&:hover": {
-          background: "rgba(255, 255, 255, 0.15)",
-          transform: "translateY(-1px)",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"
+          background: alpha(styles.colors.text, 0.1),
+          borderColor: alpha(styles.colors.text, 0.3),
+          transform: "translateY(-2px)",
+          boxShadow: "0 3px 10px rgba(0, 0, 0, 0.1)"
         }
       })
 }));
 
 const BenefitCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3.5),
-  borderRadius: 16,
+  padding: theme.spacing(3),
+  borderRadius: 14,
   width: "100%",
   height: "100%",
-  minHeight: 220,
+  minHeight: 230,
   display: "flex",
   flexDirection: "column",
+  fontFamily: styles.typography.fontFamily,
   transition: styles.animations.medium,
-  backdropFilter: "blur(10px)",
-  background: "rgba(255, 255, 255, 0.03)",
-  border: "1px solid rgba(255, 255, 255, 0.06)",
+  backdropFilter: "blur(12px) saturate(150%)",
+  background: alpha(styles.colors.backgroundDark, 0.5),
+  border: `1px solid ${alpha(styles.colors.text, 0.08)}`,
   boxShadow: styles.shadows.card,
   "&:hover": {
-    transform: "translateY(-4px)",
-    boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)",
-    border: "1px solid rgba(255, 255, 255, 0.1)"
+    transform: "translateY(-6px) scale(1.01)",
+    boxShadow: styles.shadows.cardHover,
+    borderColor: alpha(styles.colors.text, 0.15),
+    background: alpha(styles.colors.backgroundDark, 0.65),
   }
 }));
 
 const IconCircle = styled(Box)({
-  width: 60,
-  height: 60,
+  width: 56,
+  height: 56,
   borderRadius: "50%",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   marginBottom: 20,
-  boxShadow: "0 8px 16px rgba(0, 0, 0, 0.15)",
-  border: "1px solid rgba(255, 255, 255, 0.15)"
+  boxShadow: `inset 0 1px 2px ${alpha("#000000", 0.1)}, 0 2px 4px ${alpha("#000000", 0.05)}`,
+  color: styles.colors.text,
+  '& svg': {
+    filter: `drop-shadow(0 1px 1px ${alpha(styles.colors.backgroundDark, 0.3)})`
+  }
 });
 
-// Data structure
+// --- JONY IVE POLISH: Updated Data Structure for Headline & Icons ---
 interface PersonaData {
-  headline: string;
+  headlineMain: string;
+  highlightedPhrase?: string;
   subheadline: string;
   benefits: string[];
   metaTitle: string;
   metaDescription: string;
 }
+
+// **MODIFIED HERE: Benefit interface uses renderIcon**
 interface Benefit {
-  icon: React.ReactNode;
+  renderIcon: (props?: { color?: string; [key: string]: any }) => React.ReactNode; // Function that returns a ReactNode
   text: string;
   subtext: string;
   gradient: string;
 }
+
 interface TechStackItem {
   icon: React.ComponentType<any>;
   name: string;
@@ -307,40 +374,64 @@ interface TechStackItem {
 }
 interface DataStructure {
   personas: { [key: string]: PersonaData; };
-  benefits: Benefit[];
+  benefitsDisplay: Benefit[];
   techStack: TechStackItem[];
   successIndicators: string[];
 }
 
+// **MODIFIED HERE: DATA.benefitsDisplay uses renderIcon functions**
 const DATA: DataStructure = {
   personas: {
     developer: {
-      headline: "Enterprise Solutions Delivered 10× Faster",
+      headlineMain: "Enterprise Solutions Delivered",
+      highlightedPhrase: "10× Faster",
       subheadline: "Accelerate development with meticulously crafted enterprise-grade architectures and pre-built modules for peak performance.",
-      benefits: ["CI/CD Pipeline Integration", "Microservices Architecture", "Containerization & Orchestration", "Infrastructure as Code (IaC)"],
+      benefits: ["CI/CD Pipeline Integration", "Microservices Architecture"],
       metaTitle: "Faster Enterprise Solutions for Developers | GluStack",
-      metaDescription: "Discover how GluStack helps developers deliver enterprise solutions 10x faster with advanced architectures and tools. Schedule a demo!"
+      metaDescription: "Discover how GluStack helps developers deliver enterprise solutions 10x faster. Schedule a demo!"
     },
     executive: {
-      headline: "Enterprise Solutions with 33% Cost Reduction",
+      headlineMain: "Enterprise Solutions with 33%",
+      highlightedPhrase: "Cost Reduction",
       subheadline: "Optimize technology investments and drive operational efficiency with our precision-engineered enterprise solutions for executives.",
-      benefits: ["Total Cost of Ownership (TCO) Optimization", "Automated Business Workflows", "Cloud Resource Optimization", "Reduced Long-term Maintenance"],
+      benefits: ["Total Cost of Ownership (TCO) Optimization", "Automated Business Workflows"],
       metaTitle: "Reduce Costs with Enterprise Solutions for Executives | GluStack",
-      metaDescription: "Achieve significant cost reduction (avg. 33%) and boost efficiency with GluStack's enterprise solutions tailored for executives. Book a strategy call."
+      metaDescription: "Achieve significant cost reduction (avg. 33%) with GluStack's enterprise solutions. Book a strategy call."
     },
     security: {
-      headline: "Enterprise Solutions with Fortified Security",
+      headlineMain: "Enterprise Solutions with",
+      highlightedPhrase: "Fortified Security",
       subheadline: "Deploy highly secure enterprise solutions with comprehensive protection, ensuring compliance and data integrity for security professionals.",
-      benefits: ["SOC 2 Type II & ISO 27001 Ready", "End-to-End Data Encryption", "Automated Security Scanning & Pen Testing", "Granular Role-Based Access Control (RBAC)"],
+      benefits: ["SOC 2 Type II & ISO 27001 Ready", "End-to-End Data Encryption"],
       metaTitle: "Fortified Security in Enterprise Solutions | GluStack",
-      metaDescription: "Secure your enterprise with GluStack's solutions, featuring SOC 2 readiness, data encryption, and robust access controls. Learn more."
+      metaDescription: "Secure your enterprise with GluStack's solutions, featuring SOC 2 readiness. Learn more."
     }
   },
-  benefits: [
-    { icon: <TrendingUp size={22} strokeWidth={1.5} />, text: "73% Faster Deployment", subtext: "From concept to production in weeks, not months.", gradient: styles.gradients.primary },
-    { icon: <ShieldCheck size={22} strokeWidth={1.5} />, text: "Enterprise-Grade Security", subtext: "SOC 2, GDPR & ISO 27001 compliant solutions.", gradient: styles.gradients.accent1 },
-    { icon: <DollarSign size={22} strokeWidth={1.5} />, text: "47% Average Cost Reduction", subtext: "Optimized infrastructure and reduced operational overhead.", gradient: styles.gradients.accent2 },
-    { icon: <Users size={22} strokeWidth={1.5} />, text: "99.99% Uptime SLA", subtext: "Built for mission-critical enterprise reliability.", gradient: "linear-gradient(135deg, #8B5CF6, #6366F1)" }
+  benefitsDisplay: [
+    {
+      renderIcon: (props) => <TrendingUp size={24} strokeWidth={1.5} {...props} />,
+      text: "73% Faster Deployment",
+      subtext: "From concept to production in weeks, not months.",
+      gradient: styles.gradients.benefitCard1
+    },
+    {
+      renderIcon: (props) => <ShieldCheck size={24} strokeWidth={1.5} {...props} />,
+      text: "Enterprise-Grade Security",
+      subtext: "SOC 2, GDPR & ISO 27001 compliant solutions.",
+      gradient: styles.gradients.benefitCard2
+    },
+    {
+      renderIcon: (props) => <DollarSign size={24} strokeWidth={1.5} {...props} />,
+      text: "33% Average Cost Reduction",
+      subtext: "Optimized infrastructure and reduced operational overhead.",
+      gradient: styles.gradients.benefitCard3
+    },
+    {
+      renderIcon: (props) => <Users size={24} strokeWidth={1.5} {...props} />,
+      text: "99.99% Uptime SLA",
+      subtext: "Built for mission-critical enterprise reliability.",
+      gradient: styles.gradients.benefitCard4
+    }
   ],
   techStack: [
     { icon: SiAmazonaws, name: "AWS", color: "#FF9900" },
@@ -354,81 +445,75 @@ const DATA: DataStructure = {
     "Used by leading FinTech companies globally",
     "Trusted by major Healthcare providers for critical systems",
     "Chosen by innovative E-commerce platforms for scalability"
-  ]
+  ],
 };
 
-// Main Component (HeroSection)
+
 const HeroSection: React.FC = () => {
   const theme = useTheme();
-  // Consistent state variable name for modal visibility
   const [isCalendlyModalOpen, setIsCalendlyModalOpen] = useState(false);
   const [selectedPersona, setSelectedPersona] = useState<string>("executive");
   const [currentUserEmail, setCurrentUserEmail] = useState<string | undefined>(undefined);
   const [currentUserName, setCurrentUserName] = useState<string | undefined>(undefined);
 
-  // Use the event link part from your error message for this example
-  const YOUR_CALENDLY_EVENT_LINK_PART = "glustack/consultation";
+  const YOUR_CALENDLY_EVENT_LINK_PART = "https://calendly.com/glustack000/30min";
   const YOUR_COMPANY_NAME_FOR_SEO = "GluStack";
+  const YOUR_WEBSITE_URL_BASE = "https://yourglustackwebsite.com"; // Replace with actual
 
   const validPersonas = useMemo(() => new Set(Object.keys(DATA.personas)), []);
 
   useEffect(() => {
-    setTimeout(() => {
-        setCurrentUserEmail("testuser@example.com"); // Replace with actual user data logic
-        setCurrentUserName("Test User"); // Replace with actual user data logic
-    }, 1000);
+    const timer = setTimeout(() => {
+        setCurrentUserEmail("testuser@example.com");
+        setCurrentUserName("Test User");
+    }, 1200);
 
     const params = new URLSearchParams(window.location.search);
-    const urlPersona = params.get("persona");
+    const urlPersona = params.get("persona")?.toLowerCase();
     let initialPersona = "executive";
 
     if (urlPersona && validPersonas.has(urlPersona)) {
       initialPersona = urlPersona;
     } else {
-      const storedPersona = localStorage.getItem("userPersona");
+      const storedPersona = localStorage.getItem("glustackUserPersona")?.toLowerCase();
       if (storedPersona && validPersonas.has(storedPersona)) {
         initialPersona = storedPersona;
       }
     }
     setSelectedPersona(initialPersona);
+    return () => clearTimeout(timer);
   }, [validPersonas]);
 
   useEffect(() => {
-    localStorage.setItem("userPersona", selectedPersona);
+    localStorage.setItem("glustackUserPersona", selectedPersona);
   }, [selectedPersona]);
 
   const personaData = useMemo(() => DATA.personas[selectedPersona] || DATA.personas.executive, [selectedPersona]);
 
-  // Consistent handler names
   const handleOpenCalendlyModal = useCallback(() => setIsCalendlyModalOpen(true), []);
   const handleCloseCalendlyModal = useCallback(() => setIsCalendlyModalOpen(false), []);
 
   const handleViewCaseStudies = useCallback(() => window.open("/solutions", "_self"), []);
   const handleOpenCalculator = useCallback(() => window.open("/calculator", "_self"), []);
 
+
   const CTAButtonGroup = useMemo(() => (
     <Stack
       direction={{ xs: "column", sm: "row" }}
-      spacing={{ xs: 1.5, sm: 2.5 }}
+      spacing={{ xs: 1.5, sm: 2 }}
       alignItems="center"
       justifyContent="center"
-      sx={{ width: "100%" }}
+      sx={{ width: "100%", mt: 0.5 }}
     >
-      <CTAButton onClick={handleOpenCalendlyModal} endIcon={<Calendar size={16} strokeWidth={2} />} aria-label="Schedule your strategy session">
+      <CTAButton onClick={handleOpenCalendlyModal} endIcon={<Calendar size={18} strokeWidth={2.5} />} aria-label="Schedule your strategy session">
         Schedule Strategy Session
       </CTAButton>
-      <CTAButton onClick={handleViewCaseStudies} endIcon={<ChevronRight size={16} strokeWidth={2} />} secondary aria-label="View case studies">
+      <CTAButton onClick={handleViewCaseStudies} endIcon={<ChevronRight size={18} strokeWidth={2.5} />} secondary aria-label="View case studies">
         View Case Studies
       </CTAButton>
     </Stack>
   ), [handleOpenCalendlyModal, handleViewCaseStudies]);
 
-  const headlineParts = personaData.headline.split(" with ");
-  const headlinePrefix = headlineParts[0];
-  const headlineSuffix = headlineParts.length > 1 ? ` with ${headlineParts.slice(1).join(" with ")}` : "";
-  const suffixWords = headlineSuffix.split(" ");
-  const headlineHighlight = suffixWords.length > 1 ? suffixWords.slice(-2).join(" ") : (suffixWords[0] || "");
-  const headlineSuffixMain = headlineSuffix.replace(headlineHighlight, "").trim();
 
   return (
     <Section>
@@ -437,62 +522,69 @@ const HeroSection: React.FC = () => {
         <meta name="description" content={personaData.metaDescription.replace("YourCompanyName", YOUR_COMPANY_NAME_FOR_SEO)} />
         <meta property="og:title" content={personaData.metaTitle.replace("YourCompanyName", YOUR_COMPANY_NAME_FOR_SEO)} />
         <meta property="og:description" content={personaData.metaDescription.replace("YourCompanyName", YOUR_COMPANY_NAME_FOR_SEO)} />
-        <meta property="og:image" content="/images/og-hero-image.jpg" />
-        <meta property="og:url" content={`https://yourwebsite.com/hero?persona=${selectedPersona}`} />
+        <meta property="og:image" content={`${YOUR_WEBSITE_URL_BASE}/images/og-hero-image.jpg`} />
+        <meta property="og:url" content={`${YOUR_WEBSITE_URL_BASE}/hero?persona=${selectedPersona}`} />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href={`https://yourwebsite.com/hero?persona=${selectedPersona}`} />
+        <link rel="canonical" href={`${YOUR_WEBSITE_URL_BASE}/hero?persona=${selectedPersona}`} />
       </Head>
 
       <Box sx={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden" }}>
         <Image
             src="/images/istockphoto-realhero.jpg"
-            alt={`Abstract background for ${personaData.headline} - ${YOUR_COMPANY_NAME_FOR_SEO}`}
-            layout="fill"
-            objectFit="cover"
+            alt={`Abstract background for ${personaData.headlineMain} - ${YOUR_COMPANY_NAME_FOR_SEO}`}
+            fill
+            style={{ objectFit: "cover" }}
             priority
-            style={{ filter: "saturate(1.1) brightness(0.75)", opacity: 0.95 }}
-            quality={95}
+            quality={90}
             unoptimized={process.env.NODE_ENV === 'development'}
         />
       </Box>
       <BgOverlay />
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
         <ContentArea>
           <FadeInView componentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
             <Headline component="h1">
-              {headlinePrefix}
-              {headlineSuffixMain && (
-                <>{headlineSuffixMain} </>
+              {personaData.headlineMain}
+              {personaData.highlightedPhrase && (
+                <>
+                  {' '}
+                  <Box component="span" sx={{
+                    background: styles.gradients.secondaryHighlight,
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    color: styles.colors.primary,
+                  }}>
+                    {personaData.highlightedPhrase}
+                  </Box>
+                </>
               )}
-              <Box component="span" sx={{ background: styles.gradients.secondary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", color: styles.colors.primary, textShadow: "0 2px 10px rgba(139, 92, 246, 0.3)" }}>
-                {headlineHighlight || "Key Benefits"}
-              </Box>
             </Headline>
-            <Stack spacing={{ xs: 2.5, sm: 3.5 }} alignItems="center" sx={{ width: '100%', mt: {xs: 1, sm: 0}, mb: { xs: 4, sm: 5 } }}>
-              <Subheadline component="h2">
+            <Stack spacing={{ xs: 3, sm: 4 }} alignItems="center" sx={{ width: '100%', mt: {xs: 0.5, sm: 0.5}, mb: { xs: 4.5, sm: 5.5 } }}>
+              <Subheadline component="h2" sx={{maxWidth: 720}}>
                 {personaData.subheadline}
               </Subheadline>
-              <OfferChip icon={<Clock size={18} strokeWidth={2} />} label="Limited Time: Free Strategy Sessions Available" />
+              <OfferChip icon={<Clock size={18} strokeWidth={2.5} />} label="Limited Time: Free Strategy Sessions Available" />
               {CTAButtonGroup}
             </Stack>
           </FadeInView>
 
-           <FadeInView delay={0.1} once componentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+          <FadeInView delay={0.15} componentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
             <Box sx={{
                 width: '100%',
                 maxWidth: {xs: '100%', sm: 'max-content'},
-                mb: { xs: 4, sm: 5 },
+                mb: { xs: 5, sm: 6 },
                 display: "flex", flexDirection: { xs: "column", sm: "row" },
                 alignItems: "center", justifyContent: "center",
-                p: {xs: 1.5, sm: 2},
-                borderRadius: 3,
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.06)"
+                p: {xs: 1.25, sm: 1.5},
+                borderRadius: '14px',
+                background: alpha(styles.colors.text, 0.03),
+                border: `1px solid ${alpha(styles.colors.text, 0.06)}`,
             }}>
               <Typography
                 sx={{
-                  color: "rgba(255,255,255,0.9)", fontSize: "0.925rem", fontWeight: 500,
-                  mr: { xs: 0, sm: 2.5 }, mb: { xs: 1.5, sm: 0 },
+                  color: styles.colors.textSecondary, fontSize: "0.9rem", fontWeight: 500,
+                  fontFamily: styles.typography.fontFamily,
+                  mr: { xs: 0, sm: 2 }, mb: { xs: 1.5, sm: 0 },
                   textAlign: {xs: 'center', sm: 'left'}
                 }}
               >
@@ -500,7 +592,7 @@ const HeroSection: React.FC = () => {
               </Typography>
               <Stack
                 direction="row"
-                spacing={{xs: 1, sm: 1.5}}
+                spacing={{xs: 1, sm: 1.25}}
                 sx={{ flexWrap: "wrap", justifyContent: "center" }}
               >
                 {Object.keys(DATA.personas).map((p) => (
@@ -512,18 +604,43 @@ const HeroSection: React.FC = () => {
             </Box>
           </FadeInView>
 
-          <Box sx={{ mb: { xs: 4, sm: 6 } }}>
-            <Typography variant="h2" component="h2" sx={{ fontSize: "clamp(1.25rem, 5vw, 1.625rem)", textAlign: "center", color: "white", mb: {xs: 3, sm: 4}, fontWeight: 600, position: "relative", display: "inline-block", left: "50%", transform: "translateX(-50%)", "&::after": { content: '""', position: "absolute", bottom: -10, left: "25%", width: "50%", height: 3, borderRadius: 2, background: styles.gradients.primary } }}>
+          <Box sx={{ mb: { xs: 5, sm: 7 } }}>
+            <Typography variant="h2" component="h3" sx={{
+                fontSize: "clamp(1.3rem, 5vw, 1.75rem)",
+                textAlign: "center", color: styles.colors.text, mb: {xs: 3.5, sm: 4.5},
+                fontWeight: 600, position: "relative", display: "inline-block",
+                fontFamily: styles.typography.fontFamily, letterSpacing: styles.typography.letterSpacings.heading,
+                left: "50%", transform: "translateX(-50%)",
+                "&::after": {
+                    content: '""', position: "absolute", bottom: -12, left: "30%",
+                    width: "40%", height: "3px", borderRadius: "2px",
+                    background: styles.gradients.primary,
+                    transition: 'width 0.5s ease-out',
+                }
+            }}>
               Why Organizations Choose Our Solutions
             </Typography>
-            <Grid container spacing={{xs: 2, sm: 3}} sx={{ alignItems: "stretch" }}>
-              {DATA.benefits.map((b, i) => (
+            <Grid container spacing={{xs: 2.5, sm: 3.5}} sx={{ alignItems: "stretch" }}>
+              {DATA.benefitsDisplay.map((b, i) => (
                 <Grid item xs={12} sm={6} md={3} key={i} sx={{ display: "flex" }}>
-                  <FadeInView delay={i * 0.1} once componentStyle={{ display: 'flex', width: '100%', height: '100%' }}>
+                  <FadeInView delay={i * 0.12} componentStyle={{ display: 'flex', width: '100%', height: '100%' }}>
                     <BenefitCard>
-                      <IconCircle sx={{ background: b.gradient }}>{b.icon}</IconCircle>
-                      <Typography variant="h3" component="h3" sx={{ fontWeight: 600, color: "#fff", mb: 1.5, fontSize: "1.125rem", lineHeight: 1.3 }}>{b.text}</Typography>
-                      <Typography sx={{ fontSize: "0.875rem", lineHeight: 1.6, color: "rgba(255,255,255,0.85)", flexGrow: 1 }}>{b.subtext}</Typography>
+                      {/* **MODIFIED HERE: Rendering icon via function call** */}
+                      <IconCircle sx={{ background: b.gradient }}>
+                        {b.renderIcon({ color: styles.colors.text })}
+                      </IconCircle>
+                      <Typography variant="h4" component="h4" sx={{
+                          fontWeight: 600, color: styles.colors.text, mb: 1.25,
+                          fontSize: "1.05rem", lineHeight: 1.35, fontFamily: styles.typography.fontFamily,
+                       }}>
+                        {b.text}
+                       </Typography>
+                      <Typography sx={{
+                          fontSize: "0.85rem", lineHeight: 1.65, color: styles.colors.textSecondary,
+                          flexGrow: 1, fontFamily: styles.typography.fontFamily,
+                      }}>
+                        {b.subtext}
+                      </Typography>
                     </BenefitCard>
                   </FadeInView>
                 </Grid>
@@ -531,29 +648,53 @@ const HeroSection: React.FC = () => {
             </Grid>
           </Box>
 
-          <FadeInView once delay={0.2} componentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-            <Box sx={{ width: '100%', display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.06))", p: {xs: 3, sm: 4.5}, borderRadius: 3, border: "1px solid rgba(99, 102, 241, 0.25)", mb: { xs: 4, sm: 6 }, boxShadow: "0 8px 32px rgba(99, 102, 241, 0.1)" }}>
-              <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
-                <DollarSign size={22} color={styles.colors.primary} strokeWidth={2} />
-                <Typography variant="h3" component="h3" color={styles.colors.primary} fontWeight={600} sx={{fontSize: "clamp(1.1rem, 4vw, 1.25rem)"}}>
+          <FadeInView once delay={0.25} componentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+            <Box sx={{
+                width: '100%', display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                background: styles.gradients.subtleGlow,
+                p: {xs: 3.5, sm: 5}, borderRadius: '16px',
+                border: `1px solid ${alpha(styles.colors.primary, 0.15)}`,
+                mb: { xs: 5, sm: 7 }, boxShadow: `0 8px 32px ${alpha(styles.colors.primary, 0.08)}`,
+            }}>
+              <Stack direction="row" alignItems="center" spacing={1.25} sx={{ mb: 2.5 }}>
+                <DollarSign size={24} color={styles.colors.primary} strokeWidth={2} />
+                <Typography variant="h3" component="h3" color={styles.colors.primary} fontWeight={600} sx={{fontSize: "clamp(1.15rem, 4vw, 1.3rem)", fontFamily: styles.typography.fontFamily}}>
                     Calculate Potential Savings
                 </Typography>
               </Stack>
-              <Typography sx={{ color: "rgba(255,255,255,0.9)", maxWidth: 600, mx: "auto", fontSize: "clamp(0.875rem, 3vw, 0.95rem)", textAlign: "center", mb: 3.5, lineHeight: 1.6 }}>
+              <Typography sx={{
+                  color: styles.colors.textSecondary, maxWidth: 600, mx: "auto",
+                  fontSize: "clamp(0.9rem, 3vw, 1rem)", textAlign: "center", mb: 3.5, lineHeight: 1.65,
+                  fontFamily: styles.typography.fontFamily
+              }}>
                 Our solutions typically reduce development costs by 30-50% and accelerate time-to-market. See how much your organization could save.
               </Typography>
-              <Button variant="contained" color="primary" sx={{ bgcolor: styles.colors.primary, "&:hover": { bgcolor: styles.colors.primaryHover, transform: "translateY(-2px)" }, borderRadius: 2, boxShadow: styles.shadows.primary, px: {xs:3, sm:4}, py: 1.25, fontWeight: 600, fontSize: "clamp(0.875rem, 3vw, 0.925rem)", transition: "all 0.2s ease" }} onClick={handleOpenCalculator}>
+              <CTAButton
+                sx={{
+                    px: {xs:3.5, sm:4.5}, py: 1.35,
+                    fontSize: "clamp(0.9rem, 3vw, 0.95rem)",
+                }}
+                onClick={handleOpenCalculator}
+              >
                 Open Savings Calculator
-              </Button>
+              </CTAButton>
             </Box>
           </FadeInView>
 
-          <FadeInView once delay={0.3} componentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-            <Box sx={{ width: '100%', textAlign: "center", pt: {xs: 3, sm: 4}, pb: {xs: 1, sm: 2}, mb: 2, p: {xs: 2, sm:3}, borderRadius: 4, background: "linear-gradient(to bottom, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02))" }}>
-              <Typography variant="h2" component="h2" sx={{ color: "#fff", fontSize: "clamp(1.25rem, 5vw, 1.625rem)", fontWeight: 700, mb: 3, maxWidth: 700, mx: "auto", lineHeight: 1.3 }}>
+          <FadeInView once delay={0.35} componentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+            <Box sx={{
+                width: '100%', textAlign: "center",
+                pt: {xs: 3.5, sm: 4.5}, pb: {xs: 3.5, sm: 4.5},
+                borderRadius: '16px', background: alpha(styles.colors.backgroundDark, 0.3)
+            }}>
+              <Typography variant="h2" component="h3" sx={{
+                  color: styles.colors.text, fontSize: "clamp(1.3rem, 5vw, 1.75rem)", fontWeight: 600,
+                  mb: 3.5, maxWidth: 700, mx: "auto", lineHeight: 1.35,
+                  fontFamily: styles.typography.fontFamily, letterSpacing: styles.typography.letterSpacings.heading,
+              }}>
                 Ready to Transform Your Enterprise Technology?
               </Typography>
-              <CTAButton onClick={handleOpenCalendlyModal} endIcon={<Calendar size={16} strokeWidth={2} />} aria-label="Schedule your free strategy session" sx={{ px: {xs:3, sm:4}, py: 1.5, fontSize: "clamp(0.9rem, 3.5vw, 1rem)" }}>
+              <CTAButton onClick={handleOpenCalendlyModal} endIcon={<Calendar size={18} strokeWidth={2.5} />} aria-label="Schedule your free strategy session" sx={{ px: {xs:3.5, sm:5}, py: 1.6, fontSize: "clamp(0.95rem, 3.5vw, 1.05rem)" }}>
                 Schedule Free Strategy Session
               </CTAButton>
             </Box>
@@ -561,18 +702,13 @@ const HeroSection: React.FC = () => {
         </ContentArea>
       </Container>
 
-      <ErrorBoundary fallback={
-        <Box sx={{ p:3, textAlign: 'center', color: '#fff', position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography variant="h6">Booking Unavailable</Typography>
-          <Typography>The scheduling module could not be loaded. Please try again later or contact support.</Typography>
-        </Box>
-      }>
+      <ErrorBoundary>
         <Suspense fallback={null}>
           {isCalendlyModalOpen && (
             <CalendlyBooking
               isOpen={isCalendlyModalOpen}
               onClose={handleCloseCalendlyModal}
-              calendlyEventLink={YOUR_CALENDLY_EVENT_LINK_PART} // Correct prop name
+              calendlyEventLink={YOUR_CALENDLY_EVENT_LINK_PART}
               prefill={{
                 email: currentUserEmail,
                 name: currentUserName,
@@ -582,11 +718,11 @@ const HeroSection: React.FC = () => {
                 }
               }}
               pageSettings={{
-                backgroundColor: '1a1a1a',
+                backgroundColor: styles.colors.backgroundDark.substring(1),
                 hideEventTypeDetails: false,
                 hideLandingPageDetails: false,
                 primaryColor: styles.colors.primary.substring(1),
-                textColor: 'ffffff'
+                textColor: styles.colors.text.substring(1)
               }}
               utm={{
                 utmCampaign: `HeroSection_${selectedPersona}`,
