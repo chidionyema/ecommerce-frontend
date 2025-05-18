@@ -13,17 +13,22 @@ import {
   SiReact,
   SiNextdotjs,
   SiDotnet,
+  SiGo,        // New
+  SiPython,    // New
+  SiJava,      // New
+  SiAngular,   // New
+  SiVuedotjs   // New
 } from "react-icons/si";
 import { ChevronRight, FileText, Download } from "lucide-react";
 import { ANIMATIONS, getSharedStyles } from "../../utils/designSystem";
 
 // Dynamic import with reduced SSR concerns and better loading experience
-const TechCard = dynamic(() => import("../Common/TechCard"), { 
+const TechCard = dynamic(() => import("../Common/TechCard"), {
   ssr: false,
   loading: () => (
-    <Box sx={{ 
-      height: 240, 
-      borderRadius: 3, 
+    <Box sx={{
+      height: 240,
+      borderRadius: 3,
       background: "rgba(255,255,255,0.05)",
       display: "flex",
       alignItems: "center",
@@ -93,11 +98,46 @@ const TECH_ITEMS = [
     category: "Frontend",
   },
   {
+    icon: <SiAngular size={42} />, // New Frontend
+    title: "Angular",
+    description: "Comprehensive framework for building feature-rich SPAs. Strong opinions and robust tooling for large enterprise projects.",
+    color: "#DD0031",
+    category: "Frontend",
+  },
+  {
+    icon: <SiVuedotjs size={42} />, // New Frontend
+    title: "Vue.js",
+    description: "Progressive framework for intuitive UIs. Known for its gentle learning curve, flexibility, and excellent performance.",
+    color: "#4FC08D",
+    category: "Frontend",
+  },
+  {
     icon: <SiDotnet size={42} />,
     title: ".NET Core",
     description:
       "Scalable, cross-platform backend systems with C# and ASP.NET. Clean architecture patterns developed at enterprise scale.",
     color: "#512BD4",
+    category: "Backend",
+  },
+  {
+    icon: <SiGo size={42} />, // New Backend
+    title: "Golang",
+    description: "High-performance concurrent backends and microservices. Known for simplicity, efficiency, and strong networking capabilities.",
+    color: "#00ADD8",
+    category: "Backend",
+  },
+  {
+    icon: <SiPython size={42} />, // New Backend
+    title: "Python",
+    description: "Versatile backend development with Django & Flask. Widely used for web apps, data science, and AI/ML integration.",
+    color: "#3776AB",
+    category: "Backend",
+  },
+  {
+    icon: <SiJava size={42} />, // New Backend
+    title: "Java & Spring",
+    description: "Robust, scalable enterprise applications with Spring Boot. Battle-tested for large-scale systems and microservices.",
+    color: "#f89820",
     category: "Backend",
   },
 ];
@@ -189,7 +229,7 @@ ElegantCheckmarkItem.displayName = "ElegantCheckmarkItem";
 
 // Tech card item component with refined hover effects
 const TechCardItem = memo(
-  ({ tech, isHovered, onMouseEnter, onMouseLeave }: { 
+  ({ tech, isHovered, onMouseEnter, onMouseLeave }: {
     tech: { icon: JSX.Element; title: string; description: string; color: string; category: string };
     isHovered: boolean;
     onMouseEnter: () => void;
@@ -210,7 +250,7 @@ const TechCardItem = memo(
         <motion.div
           variants={ANIMATIONS.item}
           style={{ width: "100%", height: "100%" }}
-          whileHover={{ 
+          whileHover={{
             y: -5,
             transition: { duration: 0.2, ease: [0.26, 0.54, 0.32, 1] }
           }}
@@ -268,9 +308,9 @@ const ResourceItem = memo(({ text }: { text: string }) => {
       </Box>
       <Typography
         color={theme.palette.text.primary}
-        sx={{ 
-          fontSize: "0.85rem", 
-          letterSpacing: "0.01em", 
+        sx={{
+          fontSize: "0.85rem",
+          letterSpacing: "0.01em",
           lineHeight: 1.4,
           fontWeight: 500
         }}
@@ -296,10 +336,11 @@ const TechnologyShowcase = () => {
     () => (filter === "All" ? TECH_ITEMS : TECH_ITEMS.filter((tech) => tech.category === filter)),
     [filter]
   );
-  
+
   const categories = useMemo(
-    () => ["All", ...Array.from(new Set(TECH_ITEMS.map((tech) => tech.category)))], 
-    []
+    () => ["All", ...Array.from(new Set(TECH_ITEMS.map((tech) => tech.category)))],
+    [] // TECH_ITEMS is stable, so empty dependency array is fine if TECH_ITEMS itself doesn't change reference.
+       // If TECH_ITEMS could change reference, add [TECH_ITEMS] here. For a const, it's okay.
   );
 
   // Custom purple accent color
@@ -311,7 +352,7 @@ const TechnologyShowcase = () => {
       hidden: { opacity: 0 },
       visible: {
         opacity: 1,
-        transition: { 
+        transition: {
           staggerChildren: 0.1,
           delayChildren: 0.1,
           duration: 0.5,
@@ -324,7 +365,7 @@ const TechnologyShowcase = () => {
       visible: {
         opacity: 1,
         y: 0,
-        transition: { 
+        transition: {
           duration: 0.5,
           ease: [0.22, 1, 0.36, 1]
         }
@@ -368,9 +409,9 @@ const TechnologyShowcase = () => {
           <motion.div variants={refinedAnimations.item}>
             <Typography
               variant="h2"
-              sx={{ 
-                ...styles.sectionTitle, 
-                letterSpacing: "-0.02em", 
+              sx={{
+                ...styles.sectionTitle,
+                letterSpacing: "-0.02em",
                 fontWeight: 700,
                 fontSize: { xs: "2rem", sm: "2.25rem", md: "2.5rem" },
                 mb: 1.5,
@@ -387,11 +428,11 @@ const TechnologyShowcase = () => {
                 Technology Stack
               </Box>
             </Typography>
-            <Typography 
-              variant="subtitle1" 
-              sx={{ 
-                ...styles.sectionSubtitle, 
-                letterSpacing: "0.01em", 
+            <Typography
+              variant="subtitle1"
+              sx={{
+                ...styles.sectionSubtitle,
+                letterSpacing: "0.01em",
                 fontWeight: 400,
                 fontSize: { xs: "0.95rem", sm: "1rem", md: "1.1rem" },
                 mb: 4,
@@ -408,11 +449,11 @@ const TechnologyShowcase = () => {
           {/* Category filters with refined styling */}
           <motion.div variants={refinedAnimations.item}>
             <Box
-              sx={{ 
-                display: "flex", 
-                justifyContent: "center", 
-                gap: 1, 
-                flexWrap: "wrap", 
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 1,
+                flexWrap: "wrap",
                 mb: 4,
                 px: 2
               }}
@@ -429,9 +470,9 @@ const TechnologyShowcase = () => {
           </motion.div>
 
           {/* Tech cards grid with improved spacing */}
-          <Grid 
-            container 
-            spacing={3} 
+          <Grid
+            container
+            spacing={3}
             justifyContent="center"
             sx={{ mb: 5 }}
           >
@@ -490,10 +531,10 @@ const TechnologyShowcase = () => {
                   variant="body2"
                   color={theme.palette.text.secondary}
                   align="center"
-                  sx={{ 
-                    letterSpacing: "0.01em", 
-                    maxWidth: "75%", 
-                    mx: "auto", 
+                  sx={{
+                    letterSpacing: "0.01em",
+                    maxWidth: "75%",
+                    mx: "auto",
                     fontSize: "0.85rem",
                     lineHeight: 1.6
                   }}
