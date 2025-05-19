@@ -25,7 +25,7 @@ const DATA = {
   testimonials: [
     {
       id: 1,
-      name: "John Doe",
+      name: "Stefan Feissli",
       role: "CTO, TechCorp",
       content: "GLUStack's strategic approach transformed our entire development pipeline. Their enterprise expertise helped us resolve complex scaling issues that had plagued us for months.",
       avatar: "/avatar1.jpg",
@@ -34,8 +34,8 @@ const DATA = {
     },
     {
       id: 2,
-      name: "Jane Smith",
-      role: "VP Engineering, InnovateX",
+      name: "Rudolphe Cabral",
+      role: "Manager, Philip Morris",
       content: "The precision and expertise they brought to our Azure migration delivered exceptional ROI. We've seen a 40% decrease in infrastructure costs and significantly improved reliability.",
       avatar: "/avatar2.jpg",
       rating: 5,
@@ -44,16 +44,16 @@ const DATA = {
     {
       id: 3,
       name: "Michael Johnson",
-      role: "Founder, StartupHub",
-      content: "As a startup, we needed enterprise-level architecture but with a sustainable approach. GLUStack delivered exactly that, setting us up for sustainable growth without technical debt.",
+      role: "Manager, BBC Worldwide",
+      content: "We needed enterprise-level architecture but with a sustainable approach. GLUStack delivered exactly that, setting us up for sustainable growth without technical debt.",
       avatar: "/avatar3.jpg",
       rating: 5,
       projectType: "Architecture"
     },
     {
       id: 4,
-      name: "Emily Davis",
-      role: "Product Director, GlobalReach",
+      name: "Saudamini Bhadange",
+      role: "Product Director, Asos",
       content: "Their team's ability to seamlessly integrate microservices into our legacy system exceeded our expectations. The migration was smooth and the performance gains were immediate.",
       avatar: "/avatar4.jpg",
       rating: 5,
@@ -61,8 +61,8 @@ const DATA = {
     },
     {
       id: 5,
-      name: "David Lee",
-      role: "Product Manager, AgileSolutions",
+      name: "Colin Page",
+      role: "Product Manager, CognitionFoundry",
       content: "GLUStack's security implementation was remarkable. They identified vulnerabilities we weren't even aware of and implemented OAuth 2.0 with zero disruption to our customers.",
       avatar: "/avatar5.jpg",
       rating: 5,
@@ -70,8 +70,8 @@ const DATA = {
     },
     {
       id: 6,
-      name: "Sarah Chen",
-      role: "Lead Developer, CodeCrafters",
+      name: "Simeon Langford",
+      role: "CEO, MoodyCow",
       content: "The knowledge transfer and documentation during our Kubernetes migration was exemplary. Our team is now fully self-sufficient thanks to their systematic approach to training.",
       avatar: "/avatar6.jpg",
       rating: 4,
