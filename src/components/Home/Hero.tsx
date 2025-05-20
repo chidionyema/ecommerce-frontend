@@ -349,7 +349,6 @@ const IconCircle = styled(Box)({
   }
 });
 
-// --- JONY IVE POLISH: Updated Data Structure for Headline & Icons ---
 interface PersonaData {
   headlineMain: string;
   highlightedPhrase?: string;
@@ -359,9 +358,8 @@ interface PersonaData {
   metaDescription: string;
 }
 
-// **MODIFIED HERE: Benefit interface uses renderIcon**
 interface Benefit {
-  renderIcon: (props?: { color?: string; [key: string]: any }) => React.ReactNode; // Function that returns a ReactNode
+  renderIcon: (props?: { color?: string; [key: string]: any }) => React.ReactNode;
   text: string;
   subtext: string;
   gradient: string;
@@ -379,7 +377,6 @@ interface DataStructure {
   successIndicators: string[];
 }
 
-// **MODIFIED HERE: DATA.benefitsDisplay uses renderIcon functions**
 const DATA: DataStructure = {
   personas: {
     developer: {
@@ -452,7 +449,8 @@ const DATA: DataStructure = {
 const HeroSection: React.FC = () => {
   const theme = useTheme();
   const [isCalendlyModalOpen, setIsCalendlyModalOpen] = useState(false);
-  const [selectedPersona, setSelectedPersona] = useState<string>("executive");
+  // MODIFICATION 1: Set initial state to "developer"
+  const [selectedPersona, setSelectedPersona] = useState<string>("developer");
   const [currentUserEmail, setCurrentUserEmail] = useState<string | undefined>(undefined);
   const [currentUserName, setCurrentUserName] = useState<string | undefined>(undefined);
 
@@ -470,7 +468,8 @@ const HeroSection: React.FC = () => {
 
     const params = new URLSearchParams(window.location.search);
     const urlPersona = params.get("persona")?.toLowerCase();
-    let initialPersona = "executive";
+    // MODIFICATION 2: Set fallback initialPersona to "developer"
+    let initialPersona = "developer"; 
 
     if (urlPersona && validPersonas.has(urlPersona)) {
       initialPersona = urlPersona;
@@ -479,16 +478,22 @@ const HeroSection: React.FC = () => {
       if (storedPersona && validPersonas.has(storedPersona)) {
         initialPersona = storedPersona;
       }
+      // If neither URL param nor localStorage has a valid persona, 
+      // initialPersona ("developer") will be used.
     }
     setSelectedPersona(initialPersona);
     return () => clearTimeout(timer);
   }, [validPersonas]);
 
   useEffect(() => {
-    localStorage.setItem("glustackUserPersona", selectedPersona);
+    // Only set item if selectedPersona is a valid key to avoid storing undefined/null
+    if (selectedPersona && DATA.personas[selectedPersona]) {
+      localStorage.setItem("glustackUserPersona", selectedPersona);
+    }
   }, [selectedPersona]);
 
-  const personaData = useMemo(() => DATA.personas[selectedPersona] || DATA.personas.executive, [selectedPersona]);
+  // MODIFICATION 3: Ensure personaData defaults to developer if selectedPersona is somehow invalid
+  const personaData = useMemo(() => DATA.personas[selectedPersona] || DATA.personas.developer, [selectedPersona]);
 
   const handleOpenCalendlyModal = useCallback(() => setIsCalendlyModalOpen(true), []);
   const handleCloseCalendlyModal = useCallback(() => setIsCalendlyModalOpen(false), []);
@@ -625,7 +630,6 @@ const HeroSection: React.FC = () => {
                 <Grid item xs={12} sm={6} md={3} key={i} sx={{ display: "flex" }}>
                   <FadeInView delay={i * 0.12} componentStyle={{ display: 'flex', width: '100%', height: '100%' }}>
                     <BenefitCard>
-                      {/* **MODIFIED HERE: Rendering icon via function call** */}
                       <IconCircle sx={{ background: b.gradient }}>
                         {b.renderIcon({ color: styles.colors.text })}
                       </IconCircle>

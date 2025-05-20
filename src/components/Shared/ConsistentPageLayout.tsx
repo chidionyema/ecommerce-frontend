@@ -4,8 +4,13 @@ import { motion } from 'framer-motion';
 import PageHeader from './PageHeader';
 import SEO from '../SEO';
 import NextLink from 'next/link';
-import { Send } from 'react-feather';
+import { Send } from 'react-feather'; // Assuming this is 'react-feather', ensure it's correctly imported if it's from Feather Icons
 import UltimateScrollNavigation from './UltimateScrollNavigation';
+
+// --- Import AuthProvider ---
+// Adjust the path according to your project structure.
+// This path assumes AuthContext.tsx is two levels up in a 'contexts' folder.
+
 
 const GradientBackground = styled('div')(({ theme }) => ({
   background: `
@@ -14,12 +19,12 @@ const GradientBackground = styled('div')(({ theme }) => ({
     0.85
   )} 100%)
   `,
-  minHeight: '3vh',
+  minHeight: '3vh', // Note: This is quite small for a background that contains content. You might mean 100vh or similar for a full page.
   padding: theme.spacing(1, 0),
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
+  justifyContent: 'center', // This will center the direct child (Container) if GradientBackground takes up more space.
 }));
 
 const PanelWrapper = styled('div')(({ theme }) => ({
@@ -84,51 +89,54 @@ const ConsistentPageLayout: React.FC<ConsistentPageLayoutProps> = ({
   scrollOptions = {},
 }) => {
   return (
-    <>
-      {seoTitle && (
-        <SEO title={seoTitle} description={seoDescription} keywords={seoKeywords} />
-      )}
-      <GradientBackground>
-        <Container maxWidth="xl">
-          <PanelWrapper>
-            <PageHeader
-              title={title}
-              subtitle={subtitle}
-              sx={{
-                '&.MuiTypography-root': {
-                  fontSize: { xs: '0.875rem', sm: '1rem' },
-                  marginBottom: '0',
-                  marginTop: '20',
-                  lineHeight: 1.2,
-                },
-                padding: '2px',
-              }}
-            />
-            <NextLink href="/contact" passHref>
-              <MotionCTAButton
-                animate={{ scale: [1, 1.02, 1] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                aria-label="Launch Your Startup with Us" // Accessibility improvement
-              >
-                <Send style={{ marginRight: '0.25rem', width: 14, height: 14 }} />
-                Launch Your Startup with Us
-              </MotionCTAButton>
-            </NextLink>
-          </PanelWrapper>
-          {children}
-        </Container>
-      </GradientBackground>
-      
-      {/* Integrated Scroll Panel */}
-      <UltimateScrollNavigation 
-        showProgressIndicator={true}
-        showSectionMenu={true}
-        showLabels={true}
-        enableSmartPositioning={true}
-        hideDelay={2500}
-        {...scrollOptions} // Allow page-specific overrides
-      />
-    </>
+    
+    
+      <>
+        {seoTitle && (
+          <SEO title={seoTitle} description={seoDescription} keywords={seoKeywords} />
+        )}
+        <GradientBackground>
+          <Container maxWidth="xl">
+            <PanelWrapper>
+              <PageHeader
+                title={title}
+                subtitle={subtitle}
+                sx={{
+                  '&.MuiTypography-root': {
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    marginBottom: '0',
+                    marginTop: '0', // Changed from '20' (string) to 0 (number) for consistency. Adjust if '20px' was intended.
+                    lineHeight: 1.2,
+                  },
+                  padding: '2px', // This padding seems very small. Verify if it's intended.
+                }}
+              />
+              <NextLink href="/contact" passHref>
+                <MotionCTAButton
+                  animate={{ scale: [1, 1.02, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                  aria-label="Launch Your Startup with Us"
+                >
+                  <Send style={{ marginRight: '0.25rem', width: 14, height: 14 }} />
+                  Launch Your Startup with Us
+                </MotionCTAButton>
+              </NextLink>
+            </PanelWrapper>
+            {/* The {children} prop will render the actual page content, like ResourcesPage */}
+            {children}
+          </Container>
+        </GradientBackground>
+        
+        <UltimateScrollNavigation 
+          showProgressIndicator={true}
+          showSectionMenu={true}
+          showLabels={true}
+          enableSmartPositioning={true}
+          hideDelay={2500}
+          {...scrollOptions}
+        />
+      </>
+   
   );
 };
 

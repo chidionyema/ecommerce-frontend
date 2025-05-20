@@ -8,14 +8,21 @@ import 'react-toastify/dist/ReactToastify.css';
 import dynamic from 'next/dynamic';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
-import { ThemeContextProvider } from '../theme/ThemeContext';
-import { AppThemeProvider } from '../theme/ThemeProvider';
-import GlobalLayout from '../layouts/GlobalLayout';
-import { NavigationProvider } from '../contexts/NavigationContext';
-import ErrorBoundary from '../components/ErrorBoundary';
+
+// --- Context Providers ---
+import { ThemeContextProvider } from '../theme/ThemeContext'; // Ensure path is correct
+import { AppThemeProvider } from '../theme/ThemeProvider';   // Ensure path is correct
+import { NavigationProvider } from '../contexts/NavigationContext'; // Ensure path is correct
+import { AuthProvider } from '../contexts/AuthContext'; // *** ADDED: Import AuthProvider *** (Adjust path if needed)
+
+// --- Layouts & Components ---
+import GlobalLayout from '../layouts/GlobalLayout'; // Ensure path is correct
+import ErrorBoundary from '../components/ErrorBoundary'; // Ensure path is correct
+
+// --- Hooks ---
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
-const AnalyticsProvider = dynamic(() => import('../components/AnalyticsProvider'), { ssr: false });
+const AnalyticsProvider = dynamic(() => import('../components/AnalyticsProvider'), { ssr: false }); // Ensure path is correct
 
 // Global styles that were previously in _app.tsx
 const GlobalStyles = () => (
@@ -29,6 +36,7 @@ const GlobalStyles = () => (
   </Head>
 );
 
+// This component seems to manage client-side navigation effects
 const ProvidersWrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -36,16 +44,12 @@ const ProvidersWrapper = ({ children }: { children: React.ReactNode }) => {
   const navigationLock = useRef(false);
   const [isPending, startTransition] = useTransition();
 
-  // Reset navigation lock when pathname or search params change
   useEffect(() => {
     navigationLock.current = false;
     delete document.documentElement.dataset.navigating;
   }, [pathname, searchParams]);
 
   useEffect(() => {
-    // For App Router, we need to use a different approach since router.events doesn't exist
-    
-    // Track page visibility for navigation state
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         navigationLock.current = true;
@@ -54,15 +58,13 @@ const ProvidersWrapper = ({ children }: { children: React.ReactNode }) => {
         setTimeout(() => {
           navigationLock.current = false;
           delete document.documentElement.dataset.navigating;
-        }, 300); // Small delay to ensure navigation is complete
+        }, 300);
       }
     };
 
-    // Create an observer to watch for DOM changes that might indicate navigation
     const observer = new MutationObserver((mutations) => {
       startTransition(() => {
         if (mutations.some(m => m.addedNodes.length || m.removedNodes.length)) {
-          // Check if we're in a navigation state and it's been long enough
           setTimeout(() => {
             navigationLock.current = false;
             delete document.documentElement.dataset.navigating;
@@ -71,13 +73,9 @@ const ProvidersWrapper = ({ children }: { children: React.ReactNode }) => {
       });
     });
 
-    // Start observing the document body for changes
     observer.observe(document.body, { childList: true, subtree: true });
-    
-    // Listen for visibility changes
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Create a click handler for links to set navigation state
     const handleLinkClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest('a');
@@ -87,7 +85,6 @@ const ProvidersWrapper = ({ children }: { children: React.ReactNode }) => {
         document.documentElement.dataset.navigating = 'true';
       }
     };
-
     document.addEventListener('click', handleLinkClick);
 
     return () => {
@@ -105,25 +102,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <GlobalStyles />
+        {/* Other global head elements like favicons, meta tags can go here */}
       </head>
       <body>
+      <p style={{ color: 'darkgreen', fontWeight: 'bold', fontSize: '1.2em' }}>
+            --- THIS IS FROM RootLayout.tsx (OUTSIDE AuthProvider) ---
+          </p>
         <GoogleReCaptchaProvider reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}>
           <AnalyticsProvider>
             <ThemeContextProvider>
               <AppThemeProvider>
                 <NavigationProvider>
-                  <CssBaseline />
-                  <LazyMotion features={domAnimation}>
-                    <ErrorBoundary>
-                      {/* Wrap your application with any client-specific providers */}
-                      <ProvidersWrapper>
-                        <GlobalLayout>
-                          {children}
-                        </GlobalLayout>
-                        <ToastContainer />
-                      </ProvidersWrapper>
-                    </ErrorBoundary>
-                  </LazyMotion>
+                  {/* *** AuthProvider wraps the core application structure *** */}
+                  <AuthProvider>
+                    <CssBaseline /> {/* Apply baseline after theme, within AuthProvider if AuthProvider has UI */}
+                    <LazyMotion features={domAnimation}>
+                      <ErrorBoundary>
+                        <ProvidersWrapper> {/* This manages navigation UI state */}
+                          <GlobalLayout> {/* Main site structure like navbars, footers */}
+                            {children} {/* Page content */}
+                          </GlobalLayout>
+                          <ToastContainer /> {/* For notifications */}
+                        </ProvidersWrapper>
+                      </ErrorBoundary>
+                    </LazyMotion>
+                  </AuthProvider>
                 </NavigationProvider>
               </AppThemeProvider>
             </ThemeContextProvider>
