@@ -15,10 +15,11 @@ import {
   SiDotnet,
   SiGo,        // New
   SiPython,    // New
-  SiJava,      // New
+        // New
   SiAngular,   // New
   SiVuedotjs   // New
 } from "react-icons/si";
+import { FaJava } from "react-icons/fa"
 import { ChevronRight, FileText, Download } from "lucide-react";
 import { ANIMATIONS, getSharedStyles } from "../../utils/designSystem";
 
@@ -134,7 +135,7 @@ const TECH_ITEMS = [
     category: "Backend",
   },
   {
-    icon: <SiJava size={42} />, // New Backend
+    icon: <FaJava size={42} />, // New Backend
     title: "Java & Spring",
     description: "Robust, scalable enterprise applications with Spring Boot. Battle-tested for large-scale systems and microservices.",
     color: "#f89820",
