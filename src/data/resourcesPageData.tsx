@@ -1,4 +1,3 @@
-// resourcesPageData.ts
 import {
   Article,
   Book,
@@ -8,7 +7,6 @@ import {
   DataObject,
   School,
   Dashboard,
-  
 } from '@mui/icons-material';
 
 // Type definitions
@@ -21,6 +19,7 @@ export interface ResourceData {
   downloadable?: boolean;
   featured?: boolean;
   premium?: boolean;
+  price?: string;
   readTime?: string;
   date?: string;
   authorName?: string;
@@ -72,129 +71,139 @@ export const getTypeIcon = (type: string, iconProps?: React.ComponentProps<typeo
       return <DataObject {...iconProps} />;
     case 'course':
       return <School {...iconProps} />;
-    case 'tool':
+    case 'tool': // Represents guides for tools or actual tool links
       return <Dashboard {...iconProps} />;
     default:
       return <Article {...iconProps} />;
   }
 };
 
-
 // Page section texts
 export const resourcesPageSections: ResourcesPageSections = {
   hero: {
-    title: 'GLUStack Knowledge Resources',
-    subtitle: 'Discover guides, tutorials, and tools to supercharge your development workflow',
-    searchPlaceholder: 'Search for resources by title, description, or tag...'
+    title: 'Explore .NET, Next.js & AI/ML Resources',
+    subtitle: 'Dive into .NET security, AI innovations, Next.js development, and cloud vault solutions.',
+    searchPlaceholder: 'Search resources by title, topic, or tag (e.g., .NET, Next.js, AI)...',
   },
   filter: {
-    label: 'Filter by:'
+    label: 'Filter by:',
   },
   tabs: [
     { label: 'All Resources', value: 0 },
-    { label: 'Premium Content', value: 1 }
+    { label: 'Premium Content', value: 1 },
   ],
   noResults: {
     title: 'No resources found',
     subtitle: 'Try adjusting your search or filter criteria',
-    buttonText: 'Clear all filters'
+    buttonText: 'Clear all filters',
   },
   cta: {
-    overline: 'PREMIUM CONTENT CREATORS',
-    title: 'Share Your Expertise & Earn',
-    description: 'Create high-quality premium resources to help others master GLUStack while generating income. Our community values expert knowledge and practical solutions.',
-    buttonText: 'Become a Premium Creator'
-  }
+    overline: 'CONTRIBUTE YOUR KNOWLEDGE',
+    title: 'Become a Tech Resource Creator',
+    description: 'Share your expertise in .NET, AI/ML, Next.js, or cloud security. Help our community grow with your valuable insights and practical solutions.',
+    buttonText: 'Start Creating',
+  },
 };
 
 // Sample resources data
 export const resourcesData: ResourceData[] = [
   {
     id: '1',
-    title: 'Getting Started with GLUStack',
-    description: 'Learn the basics of GLUStack and how to set up your first project with our comprehensive guide.',
+    title: 'Securing .NET APIs with JWT Authentication',
+    description: 'A comprehensive guide to implementing JWT for robust API security in .NET Core applications.',
     type: 'guide',
-    tags: ['beginners', 'setup', 'basics'],
-    readTime: '10 min read',
-    featured: true
+    tags: ['.net', 'security', 'jwt', 'api', 'authentication'],
+    readTime: '18 min read',
+    featured: true,
+    authorName: 'Alex Secure',
+    date: '2025-05-10',
   },
   {
     id: '2',
-    title: 'Advanced Performance Optimization',
-    description: 'Take your GLUStack applications to the next level with these advanced performance optimization techniques.',
-    type: 'article',
-    tags: ['performance', 'optimization', 'advanced'],
-    readTime: '15 min read'
+    title: 'Integrating Azure Key Vault with .NET Applications',
+    description: 'Learn how to securely manage secrets, keys, and certificates for your .NET apps using Azure Key Vault.',
+    type: 'tutorial',
+    tags: ['.net', 'azure', 'key vault', 'security', 'cloud', 'secrets management'],
+    readTime: '22 min read',
+    imageUrl: '/images/resources/azure-key-vault-dotnet.png', // Placeholder image path
   },
   {
     id: '3',
-    title: 'Building Scalable APIs with GLUStack',
-    description: 'Learn how to design and implement scalable API architectures using GLUStack components.',
-    type: 'tutorial',
-    tags: ['api', 'backend', 'architecture'],
-    readTime: '20 min read'
+    title: 'Building Full-Stack Apps with Next.js and .NET Web API',
+    description: 'Explore how to create a powerful full-stack application combining Next.js for the frontend and .NET Web API for the backend.',
+    type: 'article',
+    tags: ['next.js', '.net', 'full-stack', 'web api', 'react'],
+    readTime: '15 min read',
   },
   {
     id: '4',
-    title: 'GLUStack Deployment Strategies',
-    description: 'Explore different deployment strategies for your GLUStack applications in various environments.',
+    title: 'Introduction to Machine Learning with ML.NET',
+    description: 'Get started with machine learning in the .NET ecosystem using ML.NET. Build your first predictive model.',
     type: 'video',
-    tags: ['deployment', 'devops', 'cloud'],
-    readTime: '25 min watch',
-    featured: true
+    tags: ['machine learning', 'ml.net', '.net', 'ai', 'beginners'],
+    readTime: '30 min watch',
+    featured: true,
+    link: 'https://www.youtube.com/watch?v=exampleMLNET', // Placeholder link
   },
   {
     id: '5',
-    title: 'State Management Deep Dive',
-    description: 'A comprehensive look at state management patterns and best practices in GLUStack applications.',
+    title: '.NET Security Best Practices Handbook',
+    description: 'An in-depth eBook covering essential security best practices for developing resilient .NET applications, including secure coding and threat modeling.',
     type: 'ebook',
-    tags: ['state', 'patterns', 'architecture'],
-    readTime: '45 min read',
+    tags: ['.net', 'security', 'best practices', 'devsecops', 'ebook'],
+    readTime: '120 min read',
     premium: true,
-    downloadable: true
+    price: '$29.99',
+    downloadable: true,
+    authorName: 'Dr. Secure Coder',
+    date: '2025-04-20',
   },
   {
     id: '6',
-    title: 'GLUStack Component Library',
-    description: 'Explore our extensive library of pre-built components to accelerate your GLUStack development.',
+    title: 'Next.js Authentication (NextAuth.js) Starter Template',
+    description: 'A ready-to-use Next.js template with built-in authentication flows using NextAuth.js to kickstart your secure project.',
     type: 'template',
-    tags: ['components', 'ui', 'library'],
-    premium: true
+    tags: ['next.js', 'auth', 'template', 'starter kit', 'nextauth'],
+    premium: true,
+    price: '$19.99',
+    imageUrl: '/images/resources/nextjs-auth-template.png', // Placeholder image path
   },
   {
     id: '7',
-    title: 'Mastering GLUStack: Complete Course',
-    description: 'A comprehensive course covering all aspects of GLUStack development from basics to advanced techniques.',
+    title: 'Advanced .NET Security & Cryptography Masterclass',
+    description: 'A complete course on advanced .NET security topics including threat modeling, modern cryptography, and secure development lifecycle.',
     type: 'course',
-    tags: ['comprehensive', 'basics', 'advanced'],
-    readTime: '10 hour course',
-    premium: true
+    tags: ['.net', 'security', 'advanced', 'cryptography', 'course'],
+    readTime: '12 hour course',
+    premium: true,
+    price: '$149.99',
   },
   {
     id: '8',
-    title: 'GLUStack CLI Tool Guide',
-    description: 'Learn how to use the GLUStack CLI tool to streamline your development workflow.',
-    type: 'tool',
-    tags: ['cli', 'workflow', 'productivity'],
-    readTime: '12 min read'
+    title: 'Using HashiCorp Vault for .NET Secrets Management',
+    description: 'A practical guide on leveraging HashiCorp Vault to manage secrets effectively in .NET Core and microservices architectures.',
+    type: 'tool', // Guide for a tool
+    tags: ['hashicorp vault', '.net', 'microservices', 'secrets management', 'devops'],
+    readTime: '25 min read',
+    authorName: 'DevOps Dani',
+    date: '2025-03-01',
   },
   {
     id: '9',
-    title: 'Authentication & Authorization in GLUStack',
-    description: 'Implement secure authentication and authorization in your GLUStack applications.',
-    type: 'tutorial',
-    tags: ['security', 'auth', 'implementation'],
-    readTime: '18 min read',
-    authorName: 'Jane Developer',
-    date: '2025-01-15'
+    title: 'Next.js Performance: SSR, SSG, and ISR Explained',
+    description: 'Understand Server-Side Rendering, Static Site Generation, and Incremental Static Regeneration in Next.js for optimal web performance.',
+    type: 'article',
+    tags: ['next.js', 'ssr', 'ssg', 'isr', 'performance', 'webdev'],
+    readTime: '16 min read',
+    featured: true,
   },
   {
     id: '10',
-    title: 'Real-time Data with GLUStack',
-    description: 'Build real-time applications using GLUStack\'s powerful data synchronization features.',
-    type: 'article',
-    tags: ['real-time', 'data', 'sync'],
-    readTime: '14 min read',
-    featured: true
-  }
+    title: 'Practical AI: Anomaly Detection in Financial .NET Systems',
+    description: 'Implement an anomaly detection system using machine learning techniques (e.g., ML.NET or Python interop) within a .NET financial application.',
+    type: 'tutorial',
+    tags: ['ai', 'machine learning', '.net', 'anomaly detection', 'finance', 'tutorial'],
+    readTime: '28 min read',
+    imageUrl: '/images/resources/ai-anomaly-dotnet.png', // Placeholder image path
+  },
 ];
