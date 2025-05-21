@@ -2,54 +2,53 @@
 import React, { useState, useMemo } from "react";
 import {
   Box, Typography, Container, Grid, TextField, InputAdornment,
-  Button, Chip, Card, alpha, useTheme, Skeleton
+  Button, Chip, Card, alpha, useTheme, Skeleton // Skeleton is imported but not used in the provided code, can be removed if not needed
 } from "@mui/material";
-import { Search, ArrowForward, Stars, CheckCircle, InfoOutlined } from "@mui/icons-material"; // Added InfoOutlined for empty state
-import ConsistentPageLayout from "../../components/Shared/ConsistentPageLayout";
-import { resourcesData, getTypeIcon } from "../../data/resourcesPageData"; // Assume getTypeIcon returns accessible SVGs or has aria attributes
+import { Search, ArrowForward, Stars, CheckCircle, InfoOutlined } from "@mui/icons-material";
+import ConsistentPageLayout from "../../components/Shared/ConsistentPageLayout"; // Adjust path if needed
+// Assuming ResourceData is exported from this file
+import { resourcesData, getTypeIcon, ResourceData } from "../../data/resourcesPageData"; // Added ResourceData import
 import NextLink from "next/link";
 
 // Helper for accessibility attributes on filter chips
 const getChipAriaAttributes = (isActive: boolean) => ({
-  role: "button", // Makes it clear it's interactive
+  role: "button",
   "aria-pressed": isActive,
-  tabIndex: 0, // Make it focusable
+  tabIndex: 0,
 });
 
-const ResourceCard = ({ resource }: { resource: any }) => {
+const ResourceCard = ({ resource }: { resource: ResourceData }) => { // Typed resource prop
   const theme = useTheme();
   const isPremium = resource.premium;
-  // Use a more specific primary color from the theme, or ensure `main` and `dark` are well-contrasted
-  const cardAccentColor = isPremium ? theme.palette.secondary.main : theme.palette.primary.main; // Example: using secondary for premium distinction
+  const cardAccentColor = isPremium ? theme.palette.secondary.main : theme.palette.primary.main;
 
   return (
     <Card sx={{
-      height: '100%', // Ensure cards in a row are same height
+      height: '100%',
       display: 'flex',
       flexDirection: 'column',
       border: `1px solid ${theme.palette.divider}`,
-      borderRadius: '16px', // Slightly larger, more modern radius
+      borderRadius: '16px',
       transition: 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
       '&:hover': {
         transform: 'translateY(-6px)',
-        boxShadow: theme.shadows[6] // More pronounced shadow on hover
+        boxShadow: theme.shadows[6]
       }
     }}>
       {isPremium && (
         <Chip
-          icon={<Stars sx={{ fontSize: '1.1rem', color: 'inherit' }} />} // Ensure icon scales with chip and inherits color
+          icon={<Stars sx={{ fontSize: '1.1rem', color: 'inherit' }} />}
           label="Premium"
-          size="small" // Keep it unobtrusive
+          size="small"
           sx={{
             position: 'absolute',
             top: 16,
             right: 16,
-            // Using a vibrant, distinct color for premium indication
-            bgcolor: theme.palette.secondary.main, // Or a specific gold/premium color
+            bgcolor: theme.palette.secondary.main,
             color: theme.palette.secondary.contrastText,
             backdropFilter: 'blur(3px)',
-            borderRadius: '8px', // Softer radius for the chip
-            zIndex: 1, // Ensure it's above other elements if overlap occurs
+            borderRadius: '8px',
+            zIndex: 1,
             '.MuiChip-icon': { color: 'inherit' }
           }}
         />
@@ -57,25 +56,23 @@ const ResourceCard = ({ resource }: { resource: any }) => {
 
       <Box sx={{ p: { xs: 2, sm: 2.5 }, borderBottom: `1px solid ${theme.palette.divider}` }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-          {/* Assuming getTypeIcon returns an accessible SVG icon with appropriate aria-label if needed */}
           {getTypeIcon(resource.type, { sx: { color: 'text.secondary', fontSize: '1.25rem' } })}
           <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 500, letterSpacing: '0.5px' }}>
             {resource.type}
           </Typography>
         </Box>
 
-        {/* Using component="h2" for semantic heading structure within the card context */}
         <Typography
           variant="h6"
-          component="h2" // Important for accessibility and SEO
+          component="h2"
           sx={{
             fontWeight: 600,
             mb: 1,
-            minHeight: { xs: 'auto', sm: '3.6em' }, // Approx 2 lines for h6, adjust based on font
+            minHeight: { xs: 'auto', sm: '3.6em' },
             display: '-webkit-box',
             overflow: 'hidden',
             WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2, // Keep to 2 lines to avoid excessive truncation
+            WebkitLineClamp: 2,
             textOverflow: 'ellipsis',
             color: 'text.primary'
           }}>
@@ -86,50 +83,85 @@ const ResourceCard = ({ resource }: { resource: any }) => {
       <Box sx={{ p: { xs: 2, sm: 2.5 }, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <Typography variant="body2" color="text.secondary" sx={{
           mb: 2.5,
-          minHeight: { xs: 'auto', sm: '4.5em' }, // Approx 3 lines for body2, adjust based on font
+          minHeight: { xs: 'auto', sm: '4.5em' },
           display: '-webkit-box',
           overflow: 'hidden',
           WebkitBoxOrient: 'vertical',
-          WebkitLineClamp: 3, // Keep to 3 lines
+          WebkitLineClamp: 3,
           textOverflow: 'ellipsis',
-          flexGrow: 1 // Allows description to take up available space before feature list
+          flexGrow: 1
         }}>
           {resource.description}
         </Typography>
 
-        <Box sx={{ mb: 3 }}>
-          {/* Ensure these points are truly unique selling points per card, or part of a generic list */}
+        <Box sx={{ mb: 2 }}>
           {["Performance optimized", "Production ready", "Long-term support"].map((point, i) => (
             <Box key={i} sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
               <CheckCircle fontSize="small" sx={{ color: cardAccentColor, opacity: 0.85 }} />
-              <Typography variant="caption" component="span" color="text.secondary"> {/* Using caption for finer text */}
+              <Typography variant="caption" component="span" color="text.secondary">
                 {point}
               </Typography>
             </Box>
           ))}
         </Box>
 
+        {/* START: Added Price Display for Premium Resources */}
+        {isPremium && resource.price && (
+          <Typography
+            variant="h6"
+            component="p"
+            sx={{
+              fontWeight: 'bold',
+              color: 'text.primary',
+              textAlign: 'center',
+              my: 1.5,
+            }}
+          >
+            {resource.price}
+          </Typography>
+        )}
+        {/* END: Added Price Display */}
+
         <Button
           fullWidth
           variant="contained"
           endIcon={<ArrowForward />}
-          aria-label={isPremium ? `Access premium resource: ${resource.title}` : `View details for ${resource.title}`}
+          aria-label={
+            isPremium
+              ? resource.price
+                ? `Get premium resource ${resource.title} for ${resource.price}`
+                : `Access premium resource: ${resource.title}`
+              : `View details for ${resource.title}`
+          }
           sx={{
-            mt: 'auto', // Push button to the bottom
+            mt: 'auto',
             bgcolor: cardAccentColor,
             color: theme.palette.getContrastText(cardAccentColor),
             fontWeight: 600,
             py: 1.25,
             borderRadius: '8px',
-            textTransform: 'none', // More modern feel
+            textTransform: 'none',
             '&:hover': {
               bgcolor: alpha(cardAccentColor, 0.85),
-              transform: 'scale(1.02)', // Subtle hover effect
+              transform: 'scale(1.02)',
             },
             transition: 'background-color 0.2s ease-in-out, transform 0.2s ease-in-out'
           }}
+          // Example of how you might link it:
+          // component={NextLink}
+          // href={
+          //   isPremium
+          //     ? resource.price
+          //       ? `/checkout/${resource.id}` // Or your purchase/unlock path
+          //       : resource.link || `/resources/${resource.id}` // Fallback link for premium without price
+          //     : resource.link || `/resources/${resource.id}` // Link for free resources
+          // }
         >
-          {isPremium ? "Premium Access" : "View Details"}
+          {isPremium
+            ? resource.price
+              ? `Unlock for ${resource.price}`
+              : "Premium Access"
+            : "View Details"}
         </Button>
       </Box>
     </Card>
@@ -141,7 +173,7 @@ const ResourcesPage = () => {
   const theme = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
-  const [isPremiumFilterActive, setIsPremiumFilterActive] = useState(false); // Renamed for clarity
+  const [isPremiumFilterActive, setIsPremiumFilterActive] = useState(false);
 
   const allCategories = useMemo(() => ["all", ...new Set(resourcesData.flatMap(r => r.tags))], []);
 
@@ -168,42 +200,42 @@ const ResourcesPage = () => {
 
   return (
     <ConsistentPageLayout>
-      <Box sx={{ overflowX: 'hidden' }}> {/* Prevent horizontal scroll on overall page */}
+      <Box sx={{ overflowX: 'hidden' }}>
         <Container maxWidth="lg" sx={{ py: { xs: 3, sm: 4, md: 5 } }}>
           {/* Hero Section */}
           <Box sx={{
-            bgcolor: 'primary.main', // Or a gradient, or image background for more flair
+            bgcolor: 'primary.main',
             color: 'primary.contrastText',
             py: { xs: 5, sm: 6, md: 8 },
             mb: { xs: 3, sm: 4, md: 5 },
-            borderRadius: { xs: '12px', sm: '16px', md: '20px' }, // Responsive border radius
+            borderRadius: { xs: '12px', sm: '16px', md: '20px' },
             textAlign: 'center',
             px: { xs: 2, sm: 3 }
           }}>
             <Typography
-              variant="h2" // Upgraded for impact, will scale down
-              component="h1" // Main heading of the page
+              variant="h2"
+              component="h1"
               sx={{
-                fontWeight: 700, // Bolder for hero
+                fontWeight: 700,
                 mb: { xs: 1.5, sm: 2 },
-                fontSize: { // Responsive font size
+                fontSize: {
                   xs: '2.2rem',
                   sm: '2.8rem',
                   md: '3.5rem'
                 },
-                letterSpacing: '-0.5px' // Subtle refinement
+                letterSpacing: '-0.5px'
               }}>
               Build with Precision
             </Typography>
             <Typography
-              variant="h6" // Adjusted for better hierarchy
+              variant="h6"
               component="p"
               sx={{
                 mb: { xs: 3, sm: 4 },
                 opacity: 0.85,
-                maxWidth: '720px', // Constrain line length for readability
+                maxWidth: '720px',
                 mx: 'auto',
-                fontSize: { // Responsive font size
+                fontSize: {
                   xs: '1rem',
                   sm: '1.1rem',
                   md: '1.25rem'
@@ -214,9 +246,9 @@ const ResourcesPage = () => {
 
             <TextField
               fullWidth
-              variant="outlined" // Standard variant is usually better for accessibility unless heavily customized
+              variant="outlined"
               placeholder="Discover components, patterns, or guides..."
-              aria-label="Search for resources" // Crucial for accessibility
+              aria-label="Search for resources"
               value={searchQuery}
               onChange={handleSearchChange}
               InputProps={{
@@ -226,12 +258,12 @@ const ResourcesPage = () => {
                   </InputAdornment>
                 ),
                 sx: {
-                  bgcolor: alpha(theme.palette.background.paper, 0.95), // Slightly transparent for depth
-                  borderRadius: '12px', // Softer radius
-                  maxWidth: { xs: '100%', sm: '600px', md: '680px' }, // Responsive max width
+                  bgcolor: alpha(theme.palette.background.paper, 0.95),
+                  borderRadius: '12px',
+                  maxWidth: { xs: '100%', sm: '600px', md: '680px' },
                   mx: 'auto',
                   '&.Mui-focused': {
-                    boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.light, 0.5)}`, // Custom focus ring
+                    boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.light, 0.5)}`,
                   },
                   '& input::placeholder': {
                     color: theme.palette.text.secondary,
@@ -239,25 +271,25 @@ const ResourcesPage = () => {
                   }
                 }
               }}
-              sx={{ mb: { xs: 2, sm: 3 } }} // Responsive margin bottom
+              sx={{ mb: { xs: 2, sm: 3 } }}
             />
           </Box>
 
           {/* Filters */}
           <Box sx={{
             display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' }, // Stack on mobile, row on larger
+            flexDirection: { xs: 'column', sm: 'row' },
             gap: { xs: 1.5, sm: 2 },
             mb: { xs: 3, sm: 4, md: 5 },
-            alignItems: { xs: 'stretch', sm: 'center' }, // Stretch chips full width on mobile if desired, or 'flex-start'
-            p: { xs: 1, sm: 0 } // Padding for mobile filter container
+            alignItems: { xs: 'stretch', sm: 'center' },
+            p: { xs: 1, sm: 0 }
           }}>
             <Chip
               label="Premium Resources"
               variant={isPremiumFilterActive ? "filled" : "outlined"}
               onClick={togglePremiumFilter}
               icon={<Stars fontSize="small" />}
-              clickable // Makes it behave more like a button
+              clickable
               sx={{
                 borderColor: isPremiumFilterActive ? theme.palette.secondary.main : theme.palette.divider,
                 bgcolor: isPremiumFilterActive ? theme.palette.secondary.main : 'transparent',
@@ -265,24 +297,24 @@ const ResourcesPage = () => {
                 '&:hover': {
                   bgcolor: isPremiumFilterActive ? alpha(theme.palette.secondary.main, 0.85) : alpha(theme.palette.text.primary, 0.05)
                 },
-                height: { xs: 40, sm: 'auto' } // Consistent height for mobile
+                height: { xs: 40, sm: 'auto' }
               }}
-              {...getChipAriaAttributes(isPremiumFilterActive)} // Accessibility
+              {...getChipAriaAttributes(isPremiumFilterActive)}
             />
 
             <Box
-              role="group" // Group related filter buttons
+              role="group"
               aria-label="Filter by category"
               sx={{
                 display: 'flex',
                 gap: { xs: 1, sm: 1.5 },
-                flexWrap: 'wrap', // Allow tags to wrap
-                justifyContent: { xs: 'flex-start' } // Align tags on mobile
+                flexWrap: 'wrap',
+                justifyContent: { xs: 'flex-start' }
               }}>
               {allCategories.map(tag => (
                 <Chip
                   key={tag}
-                  label={tag.charAt(0).toUpperCase() + tag.slice(1)} // Capitalize
+                  label={tag.charAt(0).toUpperCase() + tag.slice(1)}
                   variant={activeCategory === tag ? "filled" : "outlined"}
                   onClick={() => handleCategoryChange(tag)}
                   clickable
@@ -293,9 +325,9 @@ const ResourcesPage = () => {
                     '&:hover': {
                        bgcolor: activeCategory === tag ? alpha(theme.palette.primary.main, 0.85) : alpha(theme.palette.text.primary, 0.05)
                     },
-                    height: { xs: 40, sm: 'auto' } // Consistent height for mobile
+                    height: { xs: 40, sm: 'auto' }
                   }}
-                  {...getChipAriaAttributes(activeCategory === tag)} // Accessibility
+                  {...getChipAriaAttributes(activeCategory === tag)}
                 />
               ))}
             </Box>
@@ -331,45 +363,43 @@ const ResourcesPage = () => {
             </Box>
           )}
 
-
           {/* CTA - "Share Your Expertise" */}
           <Box sx={{
             mt: { xs: 6, sm: 8, md: 10 },
             py: { xs: 5, sm: 6, md: 8 },
             textAlign: 'center',
             borderTop: `1px solid ${theme.palette.divider}`,
-            bgcolor: alpha(theme.palette.primary.light, 0.05), // Subtle background tint
-            borderRadius: { xs: '12px', sm: '16px' }, // Consistent rounding
-            mx: { xs: -2, sm: 0 }, // Extend to edges on mobile if container has padding
+            bgcolor: alpha(theme.palette.primary.light, 0.05),
+            borderRadius: { xs: '12px', sm: '16px' },
+            mx: { xs: -2, sm: 0 },
             px: { xs: 2, sm: 3 }
           }}>
             <Stars sx={{ fontSize: '2.5rem', color: 'primary.main', mb: 2 }} />
-            <Typography variant="h4" component="h2" sx={{ // Adjusted heading level
-              fontWeight: 600, // Semi-bold
+            <Typography variant="h4" component="h2" sx={{
+              fontWeight: 600,
               mb: 1.5,
-              fontSize: { xs: '1.8rem', sm: '2.2rem' } // Responsive font size
+              fontSize: { xs: '1.8rem', sm: '2.2rem' }
             }}>
               Share Your Expertise
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{
               mb: 3,
-              maxWidth: '600px', // Readability
+              maxWidth: '600px',
               mx: 'auto',
-              fontSize: { xs: '0.95rem', sm: '1rem' } // Responsive font size
+              fontSize: { xs: '0.95rem', sm: '1rem' }
             }}>
               Become a valued contributor to our growing ecosystem. Showcase your components and reach thousands of developers.
             </Typography>
-            <NextLink href="/creator" passHref legacyBehavior>
+            <NextLink href="/creator" passHref>
               <Button
-                variant="contained" // More prominent CTA
+                variant="contained"
                 color="primary"
                 size="large"
-                // startIcon={<Stars />} // Icon can be redundant if there's one above
                 sx={{
                   py: 1.5,
                   px: 4,
                   fontWeight: 600,
-                  textTransform: 'none', // Modern feel
+                  textTransform: 'none',
                   borderRadius: '10px',
                   '&:hover': {
                     transform: 'scale(1.03)',
@@ -390,4 +420,3 @@ const ResourcesPage = () => {
 };
 
 export default ResourcesPage;
-
