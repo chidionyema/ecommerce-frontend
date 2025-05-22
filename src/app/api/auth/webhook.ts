@@ -1,168 +1,126 @@
-// File: pages/api/webhook.ts
+// src/app/api/webhooks/stripe/route.ts
+export const dynamic = 'force-dynamic';
 
-
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { buffer } from 'micro';
+import { headers } from 'next/headers';
 
-
+// Initialize Stripe with correct beta version
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-02-24.acacia', // Updated to the required API version
+  apiVersion: '2025-04-30.basil'
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).end('Method Not Allowed');
+// --- Database functions ---
+const grantAccessToResource = async (
+  userId: string, 
+  resourceId: string,
+  paymentIntentId: string
+) => {
+  console.log(`Granting access to ${resourceId} for user ${userId}`);
+  return { success: true };
+};
+
+const revokeAccessToResource = async (
+  userId: string,
+  resourceId: string,
+  reason: string,
+  stripeObjectId: string
+) => {
+  console.log(`Revoking access from ${resourceId} for user ${userId}`);
+  return { success: true };
+};
+
+const findUserByCustomerId = async (
+  customerId: string
+) => {
+  return { id: 'user_123', email: 'user@example.com' };
+};
+
+const handleSubscriptionUpdate = async (subscription: Stripe.Subscription) => {
+  const customerId = typeof subscription.customer === 'string' 
+    ? subscription.customer 
+    : subscription.customer.id;
+  const user = await findUserByCustomerId(customerId);
+  if (user) {
+    console.log(`Updated subscription ${subscription.id} for ${user.email}`);
+  }
+};
+// --- End database functions ---
+
+export async function POST(request: Request) {
+  const body = await request.text();
+  
+  // CORRECT HEADER ACCESS PATTERN
+  const headersList = await headers();
+  const signature = headersList.get('stripe-signature');
+
+  if (!webhookSecret) {
+    console.error('WEBHOOK_ERROR: Stripe webhook secret not configured.');
+    return NextResponse.json(
+      { message: 'Webhook secret not configured.' }, 
+      { status: 500 }
+    );
   }
 
-  const buf = await buffer(req);
-  const signature = req.headers['stripe-signature'] as string;
+  if (!signature) {
+    console.error('WEBHOOK_ERROR: Missing Stripe signature.');
+    return NextResponse.json(
+      { message: 'Missing Stripe signature.' }, 
+      { status: 400 }
+    );
+  }
 
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(buf.toString(), signature, webhookSecret);
-  } catch (err) {
-    console.error(`Webhook signature verification failed: ${err instanceof Error ? err.message : 'Unknown Error'}`);
-    return res.status(400).send(`Webhook Error: ${err instanceof Error ? err.message : 'Unknown Error'}`);
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  } catch (err: any) {
+    console.error(`WEBHOOK_ERROR: Signature verification failed: ${err.message}`);
+    return NextResponse.json(
+      { message: `Webhook Error: ${err.message}` }, 
+      { status: 400 }
+    );
   }
 
-  // Handle the event
+  console.log(`WEBHOOK: Received event ${event.id} (${event.type})`);
+
   try {
+    const eventData = event.data.object as any;
+
     switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
-        
-        // Extract user ID from metadata
-        const userId = session.metadata?.userId;
-        if (!userId) {
-          throw new Error('No user ID found in session metadata');
-        }
-        
-        // Update user's subscription status in your database
-        await updateUserSubscription(userId, session);
-        
+      case 'payment_intent.succeeded':
+        const paymentIntent = eventData as Stripe.PaymentIntent;
+        // Handle payment success
         break;
-      }
-      
-      case 'invoice.payment_succeeded': {
-        const invoice = event.data.object as Stripe.Invoice;
-        
-        // Handle successful payment for subscription renewal
-        if (invoice.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-          const userId = subscription.metadata?.userId;
-          
-          if (userId) {
-            await updateSubscriptionStatus(userId, subscription);
-          }
-        }
-        
+
+      case 'checkout.session.completed':
+        const session = eventData as Stripe.Checkout.Session;
+        // Handle checkout completion
         break;
-      }
-      
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
-        const userId = subscription.metadata?.userId;
-        
-        if (userId) {
-          await updateSubscriptionStatus(userId, subscription);
-        }
-        
+
+      case 'customer.subscription.updated':
+      case 'customer.subscription.created':
+        const subscription = eventData as Stripe.Subscription;
+        await handleSubscriptionUpdate(subscription);
         break;
-      }
-      
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription;
-        const userId = subscription.metadata?.userId;
-        
-        if (userId) {
-          await cancelUserSubscription(userId);
-        }
-        
-        break;
-      }
-      
+
+      // Add other event handlers as needed
+
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        console.warn(`Unhandled event type: ${event.type}`);
     }
-    
-    res.status(200).json({ received: true });
-  } catch (err) {
-    console.error(`Error processing webhook: ${err instanceof Error ? err.message : 'Unknown Error'}`);
-    res.status(500).json({ error: 'Webhook handler failed' });
+  } catch (err: any) {
+    console.error(`WEBHOOK_ERROR: Event handling failed: ${err.message}`);
+    return NextResponse.json(
+      { message: 'Internal server error' },
+      { status: 500 }
+    );
   }
-}
 
-// Helper functions that would connect to your database
-async function updateUserSubscription(userId: string, session: Stripe.Checkout.Session) {
-  // In a real implementation, this would update your database
-  console.log(`Updating subscription for user ${userId} from session ${session.id}`);
-  
-  // Call your backend API to update the subscription
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/Subscription/webhook-update`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.API_WEBHOOK_KEY || '',
-    },
-    body: JSON.stringify({
-      userId,
-      sessionId: session.id,
-      status: 'active',
-    }),
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Failed to update subscription: ${response.statusText}`);
-  }
-}
-
-async function updateSubscriptionStatus(userId: string, subscription: Stripe.Subscription) {
-  // In a real implementation, this would update your database
-  console.log(`Updating subscription status for user ${userId}: ${subscription.status}`);
-  
-  // Call your backend API to update the subscription status
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/Subscription/webhook-update`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.API_WEBHOOK_KEY || '',
-    },
-    body: JSON.stringify({
-      userId,
-      subscriptionId: subscription.id,
-      status: subscription.status,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
-    }),
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Failed to update subscription status: ${response.statusText}`);
-  }
-}
-
-async function cancelUserSubscription(userId: string) {
-  // In a real implementation, this would update your database
-  console.log(`Canceling subscription for user ${userId}`);
-  
-  // Call your backend API to cancel the subscription
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/Subscription/webhook-cancel`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.API_WEBHOOK_KEY || '',
-    },
-    body: JSON.stringify({
-      userId,
-    }),
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Failed to cancel subscription: ${response.statusText}`);
-  }
+  return NextResponse.json(
+    { received: true }, 
+    { status: 200 }
+  );
 }

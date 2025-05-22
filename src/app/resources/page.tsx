@@ -2,12 +2,11 @@
 import React, { useState, useMemo } from "react";
 import {
   Box, Typography, Container, Grid, TextField, InputAdornment,
-  Button, Chip, Card, alpha, useTheme, Skeleton // Skeleton is imported but not used in the provided code, can be removed if not needed
+  Button, Chip, Card, alpha, useTheme, Skeleton
 } from "@mui/material";
 import { Search, ArrowForward, Stars, CheckCircle, InfoOutlined } from "@mui/icons-material";
 import ConsistentPageLayout from "../../components/Shared/ConsistentPageLayout"; // Adjust path if needed
-// Assuming ResourceData is exported from this file
-import { resourcesData, getTypeIcon, ResourceData } from "../../data/resourcesPageData"; // Added ResourceData import
+import { resourcesData, getTypeIcon, ResourceData } from "../../data/resourcesPageData";
 import NextLink from "next/link";
 
 // Helper for accessibility attributes on filter chips
@@ -17,10 +16,24 @@ const getChipAriaAttributes = (isActive: boolean) => ({
   tabIndex: 0,
 });
 
-const ResourceCard = ({ resource }: { resource: ResourceData }) => { // Typed resource prop
+const ResourceCard = ({ resource }: { resource: ResourceData }) => {
   const theme = useTheme();
   const isPremium = resource.premium;
   const cardAccentColor = isPremium ? theme.palette.secondary.main : theme.palette.primary.main;
+
+  // Determine the link for the button
+  let buttonHref = resource.link || `/resources/${resource.id}`; // Default for free or details page
+  if (isPremium && resource.price) {
+    // For premium items with a price, link to a checkout page
+    // You can structure this URL as needed, e.g., passing product ID
+    buttonHref = `/checkout/${resource.id}`;
+    // Alternatively, if you want to pass more info (be careful with price in URL, backend should verify):
+    // buttonHref = `/checkout?itemId=${resource.id}&title=${encodeURIComponent(resource.title)}&price=${encodeURIComponent(resource.price)}`;
+  } else if (isPremium && resource.link) {
+    // If it's premium but has a specific link (e.g., to an external platform or more info before purchase)
+    buttonHref = resource.link;
+  }
+
 
   return (
     <Card sx={{
@@ -105,7 +118,6 @@ const ResourceCard = ({ resource }: { resource: ResourceData }) => { // Typed re
           ))}
         </Box>
 
-        {/* START: Added Price Display for Premium Resources */}
         {isPremium && resource.price && (
           <Typography
             variant="h6"
@@ -120,9 +132,11 @@ const ResourceCard = ({ resource }: { resource: ResourceData }) => { // Typed re
             {resource.price}
           </Typography>
         )}
-        {/* END: Added Price Display */}
 
+        {/* Updated Button to use NextLink for navigation */}
         <Button
+          component={NextLink} // Integrate NextLink with MUI Button
+          href={buttonHref}    // Use the determined href
           fullWidth
           variant="contained"
           endIcon={<ArrowForward />}
@@ -147,15 +161,6 @@ const ResourceCard = ({ resource }: { resource: ResourceData }) => { // Typed re
             },
             transition: 'background-color 0.2s ease-in-out, transform 0.2s ease-in-out'
           }}
-          // Example of how you might link it:
-          // component={NextLink}
-          // href={
-          //   isPremium
-          //     ? resource.price
-          //       ? `/checkout/${resource.id}` // Or your purchase/unlock path
-          //       : resource.link || `/resources/${resource.id}` // Fallback link for premium without price
-          //     : resource.link || `/resources/${resource.id}` // Link for free resources
-          // }
         >
           {isPremium
             ? resource.price
@@ -391,6 +396,10 @@ const ResourcesPage = () => {
               Become a valued contributor to our growing ecosystem. Showcase your components and reach thousands of developers.
             </Typography>
             <NextLink href="/creator" passHref>
+              {/* Ensure the Button is a direct child that can accept the ref from NextLink if needed,
+                  or use the legacyBehavior prop for NextLink if wrapping a component that doesn't forward refs correctly.
+                  MUI Button generally works well with NextLink's `component` prop or direct wrapping.
+              */}
               <Button
                 variant="contained"
                 color="primary"
