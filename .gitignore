@@ -38,3 +38,4 @@ node_modules/
 .tmp/
 .vercel
 src/.env.local
+.env.local
