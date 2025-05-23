@@ -37,3 +37,4 @@ node_modules/
 # Ignore webpack cache
 .tmp/
 .vercel
+src/.env.local
