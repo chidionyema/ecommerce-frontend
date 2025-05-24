@@ -1,70 +1,27 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from 'react';
-import Head from 'next/head';
-import { Box, CircularProgress, Container } from '@mui/material';
-import dynamic from 'next/dynamic';
-import { SPACING } from '../utils/sharedStyles';
-import UltimateScrollNavigation from '../components/Shared/UltimateScrollNavigation';
+import React from "react"
+import Head from "next/head"
+import { Container, Box } from "@mui/material"
+import { motion } from "framer-motion"
+import UltimateScrollNavigation from "../components/Shared/UltimateScrollNavigation"
+import { SPACING } from "../utils/sharedStyles"
 
-// Import components with dynamic loading
-const Hero = dynamic(() => import('../components/Home/Hero'), { 
-  ssr: false,
-  loading: () => (
-    <Box sx={{ height: '94vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <CircularProgress color="secondary" />
-    </Box>
-  )
-});
+// Static imports
+import Hero from "../components/Home/Hero"
+import TechnologyShowcase from "../components/Home/TechnologyShowcase"
+import WhyChooseUs from "../components/Common/WhyChooseUs"
+import ServicesGrid from "../components/Common/ServicesGrid"
+import TestimonialsSection from "../components/Common/TestimonialsSection"
+import CTASection from "../components/Home/CTASection"
 
-const TechnologyShowcase = dynamic(() => import('../components/Home/TechnologyShowcase'), { 
-  ssr: false,
-  loading: () => <Box sx={{ height: '200px' }} />
-});
-
-const ServicesGrid = dynamic(() => import('../components/Common/ServicesGrid'), { 
-  ssr: false,
-  loading: () => <Box sx={{ height: '200px' }} />
-});
-
-const TestimonialsSection = dynamic(() => import('../components/Common/TestimonialsSection'), { 
-  ssr: false,
-  loading: () => <Box sx={{ height: '200px' }} />
-});
-
-const WhyChooseUs = dynamic(() => import('../components/Common/WhyChooseUs'), { 
-  ssr: false,
-  loading: () => <Box sx={{ height: '200px' }} />
-});
-
-const CTASection = dynamic(() => import('../components/Home/CTASection'), { 
-  ssr: false,
-  loading: () => <Box sx={{ height: '100px' }} />
-});
+// simple fade-in variants
+const variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+}
 
 export default function HomePage() {
-  const [componentsLoaded, setComponentsLoaded] = useState({
-    hero: false,
-    tech: false,
-    why: false,
-    services: false,
-    testimonials: false,
-    cta: false
-  });
-  
-  const [showSections, setShowSections] = useState(false);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setComponentsLoaded(prev => ({...prev, hero: true}));
-      setTimeout(() => {
-        setShowSections(true);
-      }, 300);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <>
       <Head>
@@ -74,40 +31,60 @@ export default function HomePage() {
           content="Enterprise-grade technology solutions with precision engineering and proven results"
         />
       </Head>
-      
-      <Container maxWidth="xl">
-        {/* Hero section with top margin */}
-        <Box sx={{ mt: SPACING.large * 2, mb: SPACING.large * 2 }}>
+
+      <Container
+        maxWidth="xl"
+        sx={{
+          px: { xs: 2, sm: 4 },
+          py: 0,
+        }}
+      >
+        {/* Hero */}
+        <Box
+          sx={{
+            mt: 0,
+            mb: { xs: 0, md: SPACING.large },
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
           <Hero />
         </Box>
 
-        {showSections && (
+        {/* All sections loaded statically */}
+        {[
+          <TechnologyShowcase key="tech" />,
+          <WhyChooseUs key="why" />,
+          <ServicesGrid key="services" />,
+          <TestimonialsSection key="testimonials" />,
+          <CTASection key="cta" />,
+        ].map((SectionComponent, idx) => (
           <Box
+            key={idx}
+            component={motion.div}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}  // Reduced trigger threshold
+            variants={variants}
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: SPACING.large * 2,
-              opacity: componentsLoaded.hero ? 1 : 0,
-              transition: 'opacity 0.5s ease-in',
+              display: "flex",
+              flexDirection: "column",
+              gap: { xs: 3, md: SPACING.large * 2 },
+              mb: idx < 4 ? { xs: 3, md: SPACING.large * 2 } : 0,
             }}
           >
-            <TechnologyShowcase />
-            <WhyChooseUs />
-            <ServicesGrid />
-            <TestimonialsSection />
-            <CTASection /> 
+            {SectionComponent}
           </Box>
-        )}
+        ))}
       </Container>
-      
-      {/* Add UltimateScrollNavigation for consistency with other pages */}
-      <UltimateScrollNavigation 
-        showProgressIndicator={true}
-        showSectionMenu={true}
-        showLabels={true}
-        enableSmartPositioning={true}
+
+      <UltimateScrollNavigation
+        showProgressIndicator
+        showSectionMenu
+        showLabels
+        enableSmartPositioning
         hideDelay={2500}
       />
     </>
-  );
+  )
 }

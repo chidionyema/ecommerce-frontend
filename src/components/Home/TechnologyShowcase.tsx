@@ -13,18 +13,17 @@ import {
   SiReact,
   SiNextdotjs,
   SiDotnet,
-  SiGo,        // New
-  SiPython,    // New
-        // New
-  SiAngular,   // New
-  SiVuedotjs   // New
+  SiGo,         // New
+  SiPython,     // New
+  SiAngular,    // New
+  SiVuedotjs    // New
 } from "react-icons/si";
 import { FaJava } from "react-icons/fa"
 import { ChevronRight, FileText, Download } from "lucide-react";
-import { ANIMATIONS, getSharedStyles } from "../../utils/designSystem";
+import { ANIMATIONS, getSharedStyles } from "../../utils/designSystem"; // Assuming designSystem.ts is in utils
 
 // Dynamic import with reduced SSR concerns and better loading experience
-const TechCard = dynamic(() => import("../Common/TechCard"), {
+const TechCard = dynamic(() => import("../Common/TechCard"), { // Assuming TechCard is in Common
   ssr: false,
   loading: () => (
     <Box sx={{
@@ -173,9 +172,8 @@ const CategoryButton: React.FC<CategoryButtonProps> = memo(
           fontSize: "0.85rem",
           fontWeight: 500,
           background: isActive ? alpha(theme.palette.primary.main, 0.1) : "transparent",
-          border: `1px solid ${
-            isActive ? theme.palette.primary.main : alpha("#fff", 0.15)
-          }`,
+          border: `1px solid ${isActive ? theme.palette.primary.main : alpha("#fff", 0.15)
+            }`,
           color: isActive ? theme.palette.primary.main : alpha("#fff", 0.85),
           "&:hover": {
             background: isActive ? alpha(theme.palette.primary.main, 0.15) : alpha("#fff", 0.04),
@@ -217,7 +215,7 @@ const ElegantCheckmarkItem = memo(
           {Icon ? <Icon size={8} /> : "✓"}
         </Box>
         <Typography
-          color={theme.palette.text.primary}
+          color={theme.palette.text.primary} // Ensure this uses theme's text color for the background
           sx={{ fontSize: "0.9rem", letterSpacing: "0.015em" }}
         >
           {text}
@@ -243,13 +241,13 @@ const TechCardItem = memo(
         xs={12}
         sm={6}
         md={4}
-        lg={3}
+        lg={3} // Adjusted lg for potentially 4 items per row on larger screens
         sx={{ display: "flex" }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
         <motion.div
-          variants={ANIMATIONS.item}
+          variants={ANIMATIONS.item} // Ensure ANIMATIONS.item is defined in your designSystem
           style={{ width: "100%", height: "100%" }}
           whileHover={{
             y: -5,
@@ -269,7 +267,7 @@ const TechCardItem = memo(
                 textAlign: "center",
                 mt: 2,
                 fontWeight: 400,
-                color: alpha(theme.palette.text.primary, 0.95),
+                color: alpha(theme.palette.text.primary, 0.95), // Use themed text color
                 flexGrow: 1,
                 lineHeight: 1.6,
                 fontSize: "0.85rem",
@@ -308,7 +306,7 @@ const ResourceItem = memo(({ text }: { text: string }) => {
         <FileText size={7} />
       </Box>
       <Typography
-        color={theme.palette.text.primary}
+        color={theme.palette.text.primary} // Use themed text color
         sx={{
           fontSize: "0.85rem",
           letterSpacing: "0.01em",
@@ -326,9 +324,14 @@ ResourceItem.displayName = "ResourceItem";
 // Main component with refined aesthetics and performance optimizations
 const TechnologyShowcase = () => {
   const theme = useTheme();
-  const styles = getSharedStyles(theme);
+  const styles = getSharedStyles(theme); // Ensure getSharedStyles is correctly defined
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+
+  // MODIFICATION: Adjusted the 'amount' threshold for useInView
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
+  // For debugging on mobile, you can uncomment the line below:
+  // console.log(`TechnologyShowcase isInView: ${isInView}`);
+
   const [hoveredIndex, setHoveredIndex] = useState(-1);
   const [filter, setFilter] = useState("All");
 
@@ -340,12 +343,11 @@ const TechnologyShowcase = () => {
 
   const categories = useMemo(
     () => ["All", ...Array.from(new Set(TECH_ITEMS.map((tech) => tech.category)))],
-    [] // TECH_ITEMS is stable, so empty dependency array is fine if TECH_ITEMS itself doesn't change reference.
-       // If TECH_ITEMS could change reference, add [TECH_ITEMS] here. For a const, it's okay.
+    [] // TECH_ITEMS is stable, so empty dependency array is fine.
   );
 
   // Custom purple accent color
-  const purpleColor = "#673AB7";
+  const purpleColor = "#673AB7"; // Consider adding to theme or styles object if used elsewhere
 
   // Animation variants with subtle spring physics
   const refinedAnimations = useMemo(() => ({
@@ -354,9 +356,9 @@ const TechnologyShowcase = () => {
       visible: {
         opacity: 1,
         transition: {
-          staggerChildren: 0.1,
+          staggerChildren: 0.07, // Slightly faster stagger
           delayChildren: 0.1,
-          duration: 0.5,
+          duration: 0.5, // Ensure this is a reasonable duration
           ease: [0.22, 1, 0.36, 1]
         }
       }
@@ -367,7 +369,7 @@ const TechnologyShowcase = () => {
         opacity: 1,
         y: 0,
         transition: {
-          duration: 0.5,
+          duration: 0.5, // Consistent duration
           ease: [0.22, 1, 0.36, 1]
         }
       }
@@ -381,7 +383,7 @@ const TechnologyShowcase = () => {
       sx={{
         position: "relative",
         py: { xs: 8, md: 10 },
-        background: "linear-gradient(180deg, #18407F 0%, #1A438A 100%)",
+        background: "linear-gradient(180deg, #18407F 0%, #1A438A 100%)", // Consider theme colors
         overflow: "hidden",
       }}
     >
@@ -393,14 +395,14 @@ const TechnologyShowcase = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          opacity: 0.035,
-          backgroundImage: "url('/images/grid-pattern.svg')",
-          backgroundSize: "cover",
+          opacity: 0.035, // Very subtle
+          backgroundImage: "url('/images/grid-pattern.svg')", // Ensure this path is correct
+          backgroundSize: "cover", // Or 'contain', 'auto' depending on SVG
           zIndex: 0,
         }}
       />
 
-      <Container sx={styles.contentContainer}>
+      <Container sx={styles.contentContainer}> {/* Ensure styles.contentContainer is defined */}
         <motion.div
           variants={refinedAnimations.container}
           initial="hidden"
@@ -411,20 +413,21 @@ const TechnologyShowcase = () => {
             <Typography
               variant="h2"
               sx={{
-                ...styles.sectionTitle,
+                ...styles.sectionTitle, // Ensure styles.sectionTitle is defined
                 letterSpacing: "-0.02em",
                 fontWeight: 700,
                 fontSize: { xs: "2rem", sm: "2.25rem", md: "2.5rem" },
                 mb: 1.5,
-                textAlign: "center"
+                textAlign: "center",
+                color: theme.palette.common.white // Explicitly set for contrast on dark bg
               }}
             >
               Enterprise-Grade{" "}
               <Box component="span" sx={{
-                background: "linear-gradient(135deg, #673AB7, #3F51B5)",
+                background: "linear-gradient(135deg, #673AB7, #3F51B5)", // Example gradient
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
-                color: "#673AB7",
+                color: "#673AB7", // Fallback color
               }}>
                 Technology Stack
               </Box>
@@ -432,14 +435,15 @@ const TechnologyShowcase = () => {
             <Typography
               variant="subtitle1"
               sx={{
-                ...styles.sectionSubtitle,
+                ...styles.sectionSubtitle, // Ensure styles.sectionSubtitle is defined
                 letterSpacing: "0.01em",
                 fontWeight: 400,
                 fontSize: { xs: "0.95rem", sm: "1rem", md: "1.1rem" },
                 mb: 4,
                 textAlign: "center",
                 maxWidth: "800px",
-                mx: "auto"
+                mx: "auto",
+                color: alpha(theme.palette.common.white, 0.85) // Lighter text for subtitle
               }}
             >
               Leverage our experience from ASOS, Tesco, and Philip Morris to build
@@ -453,10 +457,10 @@ const TechnologyShowcase = () => {
               sx={{
                 display: "flex",
                 justifyContent: "center",
-                gap: 1,
+                gap: { xs: 0.5, sm: 1 }, // Adjusted gap for mobile
                 flexWrap: "wrap",
                 mb: 4,
-                px: 2
+                px: { xs: 1, sm: 2 } // Add some horizontal padding on mobile
               }}
             >
               {categories.map((category) => (
@@ -473,7 +477,7 @@ const TechnologyShowcase = () => {
           {/* Tech cards grid with improved spacing */}
           <Grid
             container
-            spacing={3}
+            spacing={{ xs: 2, sm: 3 }} // Adjusted spacing for mobile
             justifyContent="center"
             sx={{ mb: 5 }}
           >
@@ -491,31 +495,34 @@ const TechnologyShowcase = () => {
           {/* Refined CTA card with elegantly separated sections */}
           <motion.div variants={refinedAnimations.item}>
             <Paper
-              elevation={0}
+              elevation={0} // Use 0 for flatter design if backdropFilter is primary
               sx={{
-                ...styles.ctaCard,
+                ...styles.ctaCard, // Ensure styles.ctaCard is defined
                 mt: 6,
                 mb: 2,
-                borderRadius: "16px",
-                background: `linear-gradient(145deg, ${alpha(
+                borderRadius: "16px", // Standardized border radius
+                background: `linear-gradient(145deg, ${alpha( // Using theme's paper or a custom dark shade
+                  theme.palette.background.paper, // Assuming dark theme, paper is dark
+                  0.97 // Adjust opacity as needed
+                )}, ${alpha(
                   theme.palette.background.paper,
-                  0.97
-                )}, ${alpha(theme.palette.background.paper, 0.87)})`,
-                backdropFilter: "blur(10px)",
-                boxShadow: `0 10px 30px ${alpha("#000", 0.08)}`,
+                  0.87
+                )})`,
+                backdropFilter: "blur(10px)", // Ensure this is visually effective
+                boxShadow: `0 10px 30px ${alpha("#000", 0.08)}`, // Softer shadow
                 maxWidth: "900px",
                 mx: "auto",
-                p: 0,
-                overflow: "hidden",
-                border: `1px solid ${alpha(theme.palette.divider, 0.05)}`
+                p: 0, // Padding will be applied to inner Boxes
+                overflow: "hidden", // Important for rounded corners with inner content
+                border: `1px solid ${alpha(theme.palette.divider, 0.15)}` // Slightly more visible border
               }}
             >
               {/* Header with subtle gradient background */}
               <Box
                 sx={{
-                  p: 3,
+                  p: {xs: 2, sm: 3}, // Responsive padding
                   background: `linear-gradient(to right, ${alpha(theme.palette.primary.main, 0.05)}, ${alpha(purpleColor, 0.05)})`,
-                  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.05)}`
+                  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}` // Subtler divider
                 }}
               >
                 <Typography
@@ -524,17 +531,17 @@ const TechnologyShowcase = () => {
                   fontWeight={600}
                   align="center"
                   color={theme.palette.primary.main}
-                  sx={{ letterSpacing: "-0.01em", fontSize: "1.1rem", mb: 1 }}
+                  sx={{ letterSpacing: "-0.01em", fontSize: {xs: "1rem", sm: "1.1rem"}, mb: 1 }}
                 >
                   Explore Our Technology Resources
                 </Typography>
                 <Typography
                   variant="body2"
-                  color={theme.palette.text.secondary}
+                  color={theme.palette.text.secondary} // Use theme's secondary text color
                   align="center"
                   sx={{
                     letterSpacing: "0.01em",
-                    maxWidth: "75%",
+                    maxWidth: {xs: "90%", sm: "75%"},
                     mx: "auto",
                     fontSize: "0.85rem",
                     lineHeight: 1.6
@@ -552,8 +559,8 @@ const TechnologyShowcase = () => {
                   xs={12}
                   md={7}
                   sx={{
-                    borderRight: { xs: "none", md: `1px solid ${alpha(theme.palette.divider, 0.08)}` },
-                    p: 3,
+                    borderRight: { xs: "none", md: `1px solid ${alpha(theme.palette.divider, 0.1)}` },
+                    p: {xs: 2, sm: 3},
                   }}
                 >
                   <Typography
@@ -569,7 +576,7 @@ const TechnologyShowcase = () => {
                     Free Enterprise Resources
                   </Typography>
 
-                  <Grid container spacing={2}>
+                  <Grid container spacing={{xs: 1, sm: 2}}>
                     {RESOURCE_ITEMS.map((item, i) => (
                       <Grid item xs={12} sm={6} key={i}>
                         <ResourceItem text={item} />
@@ -581,7 +588,7 @@ const TechnologyShowcase = () => {
                     variant="contained"
                     color="primary"
                     startIcon={<Download size={14} />}
-                    href="/resources"
+                    href="/resources" // Ensure this link is correct
                     sx={{
                       mt: 2.5,
                       px: 2.5,
@@ -589,7 +596,7 @@ const TechnologyShowcase = () => {
                       textTransform: "none",
                       fontWeight: 500,
                       fontSize: "0.85rem",
-                      borderRadius: 8,
+                      borderRadius: 8, // Consistent border radius
                       letterSpacing: "0.01em",
                       boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}`,
                       "&:hover": {
@@ -609,15 +616,15 @@ const TechnologyShowcase = () => {
                   xs={12}
                   md={5}
                   sx={{
-                    borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.08)}`, md: "none" },
-                    p: 3,
+                    borderTop: { xs: `1px solid ${alpha(theme.palette.divider, 0.1)}`, md: "none" },
+                    p: {xs: 2, sm: 3},
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
-                    background: { xs: "transparent", md: alpha(purpleColor, 0.03) }
+                    background: { xs: "transparent", md: alpha(purpleColor, 0.03) } // Subtle bg on md+
                   }}
                 >
-                  <Box sx={{ maxWidth: "90%" }}>
+                  <Box sx={{ maxWidth: {xs: "100%", sm:"90%"} }}> {/* Allow full width on xs */}
                     <Typography
                       variant="subtitle2"
                       sx={{
@@ -648,7 +655,7 @@ const TechnologyShowcase = () => {
                     <Button
                       variant="contained"
                       endIcon={<ChevronRight size={14} />}
-                      href="/stack"
+                      href="/stack" // Ensure this link is correct
                       sx={{
                         px: 2.5,
                         py: 0.75,
@@ -657,7 +664,8 @@ const TechnologyShowcase = () => {
                         fontSize: "0.85rem",
                         borderRadius: 8,
                         letterSpacing: "0.01em",
-                        bgcolor: purpleColor,
+                        bgcolor: purpleColor, // Use the defined purple color
+                        color: theme.palette.common.white, // Ensure text is white for contrast
                         "&:hover": {
                           bgcolor: alpha(purpleColor, 0.9),
                           boxShadow: `0 6px 16px ${alpha(purpleColor, 0.35)}`,
