@@ -1,52 +1,59 @@
+/* src/app/layout.tsx */
 'use client';
 
 import { useEffect, useRef, useTransition } from 'react';
-import Head from 'next/head';
 import { CssBaseline } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import dynamic from 'next/dynamic';
+
+import dynamic        from 'next/dynamic';
 import { LazyMotion, domAnimation } from 'framer-motion';
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
-import { ThemeContextProvider } from '../theme/ThemeContext';
-import { AppThemeProvider } from '../theme/ThemeProvider';
-import GlobalLayout from '../layouts/GlobalLayout';
-import { NavigationProvider } from '../contexts/NavigationContext';
-import ErrorBoundary from '../components/ErrorBoundary';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { GoogleReCaptchaProvider }  from 'react-google-recaptcha-v3';
 
-const AnalyticsProvider = dynamic(() => import('../components/AnalyticsProvider'), { ssr: false });
+import { ThemeContextProvider } from '@/theme/ThemeContext';
+import { AppThemeProvider }     from '@/theme/ThemeProvider';
+import GlobalLayout            from '@/layouts/GlobalLayout';
+import { NavigationProvider }   from '@/contexts/NavigationContext';
+import ErrorBoundary           from '@/components/ErrorBoundary';
+import CookieConsentBanner     from '@/components/Legal/CookieConsentBanner.client';
 
-// Global styles that were previously in _app.tsx
-const GlobalStyles = () => (
-  <Head>
-    <style>{`
-      :root {
-        font-synthesis: none;
-        text-rendering: optimizeLegibility;
-      }
-    `}</style>
-  </Head>
+import { usePathname, useSearchParams } from 'next/navigation';
+
+const AnalyticsProvider = dynamic(
+  () => import('@/components/AnalyticsProvider'),
+  { ssr: false },
 );
 
-const ProvidersWrapper = ({ children }: { children: React.ReactNode }) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const navigationLock = useRef(false);
-  const [isPending, startTransition] = useTransition();
+/* ─────────────────────────
+   Inline global style block
+─────────────────────────── */
+const GlobalStyles = () => (
+  <style>{`
+    :root {
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+  `}</style>
+);
 
-  // Reset navigation lock when pathname or search params change
+/* ─────────────────────────
+   Navigation lock helper
+─────────────────────────── */
+const ProvidersWrapper = ({ children }: { children: React.ReactNode }) => {
+  const pathname       = usePathname();
+  const searchParams   = useSearchParams();
+  const navigationLock = useRef(false);
+  const [, startTransition] = useTransition();
+
+  /* reset lock on route change */
   useEffect(() => {
     navigationLock.current = false;
     delete document.documentElement.dataset.navigating;
   }, [pathname, searchParams]);
 
+  /* mutation + visibility observers */
   useEffect(() => {
-    // For App Router, we need to use a different approach since router.events doesn't exist
-    
-    // Track page visibility for navigation state
-    const handleVisibilityChange = () => {
+    const handleVisibility = () => {
       if (document.visibilityState === 'hidden') {
         navigationLock.current = true;
         document.documentElement.dataset.navigating = 'true';
@@ -54,52 +61,46 @@ const ProvidersWrapper = ({ children }: { children: React.ReactNode }) => {
         setTimeout(() => {
           navigationLock.current = false;
           delete document.documentElement.dataset.navigating;
-        }, 300); // Small delay to ensure navigation is complete
+        }, 300);
       }
     };
 
-    // Create an observer to watch for DOM changes that might indicate navigation
-    const observer = new MutationObserver((mutations) => {
+    const observer = new MutationObserver((muts) =>
       startTransition(() => {
-        if (mutations.some(m => m.addedNodes.length || m.removedNodes.length)) {
-          // Check if we're in a navigation state and it's been long enough
+        if (muts.some(m => m.addedNodes.length || m.removedNodes.length)) {
           setTimeout(() => {
             navigationLock.current = false;
             delete document.documentElement.dataset.navigating;
           }, 200);
         }
-      });
-    });
+      }),
+    );
 
-    // Start observing the document body for changes
     observer.observe(document.body, { childList: true, subtree: true });
-    
-    // Listen for visibility changes
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener('visibilitychange', handleVisibility);
 
-    // Create a click handler for links to set navigation state
-    const handleLinkClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const link = target.closest('a');
-      
-      if (link && link.href && !link.target && link.href.startsWith(window.location.origin)) {
+    const linkHandler = (e: MouseEvent) => {
+      const link = (e.target as HTMLElement).closest('a');
+      if (link && link.href.startsWith(window.location.origin) && !link.target) {
         navigationLock.current = true;
         document.documentElement.dataset.navigating = 'true';
       }
     };
-
-    document.addEventListener('click', handleLinkClick);
+    document.addEventListener('click', linkHandler);
 
     return () => {
       observer.disconnect();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      document.removeEventListener('click', handleLinkClick);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      document.removeEventListener('click', linkHandler);
     };
   }, []);
 
   return <>{children}</>;
 };
 
+/* ─────────────────────────
+   Root layout component
+─────────────────────────── */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -107,7 +108,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GlobalStyles />
       </head>
       <body>
-        <GoogleReCaptchaProvider reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}>
+        <GoogleReCaptchaProvider
+          reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ''}
+        >
           <AnalyticsProvider>
             <ThemeContextProvider>
               <AppThemeProvider>
@@ -115,12 +118,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <CssBaseline />
                   <LazyMotion features={domAnimation}>
                     <ErrorBoundary>
-                      {/* Wrap your application with any client-specific providers */}
                       <ProvidersWrapper>
-                        <GlobalLayout>
-                          {children}
-                        </GlobalLayout>
-                        <ToastContainer />
+                        <GlobalLayout>{children}</GlobalLayout>
+
+                        {/* ── UX overlays ─ */}
+                        <CookieConsentBanner />
+                        <ToastContainer newestOnTop />
                       </ProvidersWrapper>
                     </ErrorBoundary>
                   </LazyMotion>

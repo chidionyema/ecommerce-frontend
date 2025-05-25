@@ -1,208 +1,162 @@
-# Next.js + Cloudflare Pages Deployment Guide
+# Enterprise Front-End – Next.js 15
 
-This document outlines the development workflow, build process, and deployment configuration for a Next.js application to Cloudflare Pages.
+> Production-ready starter with App Router, MUI, Stripe subscriptions and
+> social authentication.
 
-## Prerequisites
-- Node.js v20+
-- npm v9+
-- Cloudflare account
-- Wrangler CLI installed globally (`npm install -g wrangler`)
+---
 
-## Installation
+## 1 · Prerequisites
+
+| Tool | Minimum Version | Why |
+|------|-----------------|-----|
+| **Node.js** | 20.x LTS | Required by Next 15 |
+| **npm / pnpm / yarn** | npm 9+, pnpm 9+, yarn 4+ | Package manager |
+| **Stripe account** | — | Payments & webhooks |
+| **GitHub / Vercel / Docker** | — | (pick one) deployment |
+
+---
+
+## 2 · Getting Started
+
 ```bash
-# Install project dependencies
-npm install
+git clone https://github.com/your-org/your-repo.git
+cd your-repo
 
-# Install development tools
-npm install --save-dev serve cross-env concurrently
+# Install dependencies
+npm install          # or: pnpm i  /  yarn
 
-Environment Setup
-1. Local Development Environment
-Create .env.local file:
+# Start the dev server (http://localhost:3000)
+npm run dev
 
-NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_ID=local_dev
-# Add other environment variables here
-
-2. Cloudflare Production Environment
-Go to Cloudflare Dashboard → Pages → Settings → Environment Variables
-https://dash.cloudflare.com/4912457480997df81450b3ea614ccf3c/workers-and-pages/create/pages
-Add production values matching your local environment variables
-
-Development Workflow
-Local Development Server
-npm run dev or
-npx ts-node server.ts for https
+HTTPS in development (optional)
+# Generates a local certificate (macOS/linux)
+npm run dev:https     # wrapper around `ts-node server.ts`
 
 
-# Authentication and Subscription Integration
+3 · Environment Variables
 
-This guide explains how to set up the authentication and subscription system in your Next.js application.
+Create .env.local in the project root.
+Only the Stripe secrets are mandatory to run the build; everything else
+falls back to stubs or dev defaults.
+# ─────────── Core ───────────
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-## Features
+# ─────────── Stripe ───────────
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_…
+STRIPE_SECRET_KEY=sk_test_…          # used by server-only code
+STRIPE_WEBHOOK_SECRET=whsec_…        # signature verification
 
-- **Secure Authentication**
-  - JWT-based authentication with automatic token refresh
-  - Social login (Google, Facebook, Microsoft)
-  - Protected routes and middleware
-  - Session management
-
-- **Subscription Management**
-  - Stripe integration for payments
-  - Subscription status tracking
-  - Premium content access control
-  - Subscription management UI
-
-## Setup Instructions
-
-### 1. Prerequisites
-
-- Node.js 14+ and npm/yarn
-- Next.js 13+ project
-- Stripe account
-- Social login providers (optional)
-
-### 2. Environment Variables
-
-Create a `.env.local` file with the following variables:
-
-```env
-# Next Auth
+# ─────────── NextAuth (optional) ───────────
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-nextauth-secret
+NEXTAUTH_SECRET=replace-with-256-bit-hex
 
-# API URL
-NEXT_PUBLIC_API_URL=https://api.your-backend.com
-
-# Stripe
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-API_WEBHOOK_KEY=your-webhook-key
-
-# Social Login
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-FACEBOOK_CLIENT_ID=your-facebook-app-id
-FACEBOOK_CLIENT_SECRET=your-facebook-app-secret
-MICROSOFT_CLIENT_ID=your-microsoft-client-id
-MICROSOFT_CLIENT_SECRET=your-microsoft-client-secret
+# ─────────── Social Login (optional) ───────────
+GOOGLE_CLIENT_ID=…
+GOOGLE_CLIENT_SECRET=…
+FACEBOOK_CLIENT_ID=…
+FACEBOOK_CLIENT_SECRET=…
+MICROSOFT_CLIENT_ID=…
+MICROSOFT_CLIENT_SECRET=…
 MICROSOFT_TENANT_ID=common
-```
 
-### 3. Installation
 
-Install the required packages:
+4 · Scripts
+| Script              | What it does                             |
+| ------------------- | ---------------------------------------- |
+| `npm run dev`       | Hot-reload dev server (HTTP)             |
+| `npm run dev:https` | Same, but with local TLS via `server.ts` |
+| `npm run build`     | Production compile (`next build`)        |
+| `npm start`         | Starts compiled output (`next start`)    |
+| `npm run lint`      | ESLint + TypeScript                      |
+| `npm run test`      | Jest / React-Testing-Library unit tests  |
 
-```bash
-npm install next-auth @stripe/stripe-js stripe micro
-npm install -D @types/stripe
-```
 
-### 4. Backend Setup
+5 · Authentication & Subscription Flow
+5 · Authentication & Subscription Flow
 
-Ensure your backend API has the following endpoints:
+User signs up / signs in via credentials or social provider
+→ /api/auth/[...nextauth]
+Visits pricing page
+→ /pricing renders PricingTable with Stripe Prices.
+Clicks Subscribe
+→ /api/Subscription/create-checkout-session
+returns a Stripe Checkout URL.
+Stripe sends checkout.session.completed webhook
+→ /api/webhooks/stripe verifies signature with
+STRIPE_WEBHOOK_SECRET and grants access.
+Subsequent invoice.payment_* or customer.subscription.* events keep the
+user’s entitlement in sync.
+Webhook URL in dashboard:
+https://<your-domain>/api/webhooks/stripe
 
-- Authentication
-  - `/api/Authentication/login`
-  - `/api/Authentication/register`
-  - `/api/Authentication/logout`
-  - `/api/Authentication/verify-token`
-  - `/api/Authentication/refresh-token`
-  - `/api/external-authentication/callback`
+6 · Deployment Options
 
-- Subscription
-  - `/api/Subscription/status`
-  - `/api/Subscription/create-checkout-session`
-  - `/api/Subscription/webhook-update`
-  - `/api/Subscription/webhook-cancel`
+Vercel (1 click)
+Import the repo → Vercel dashboard.
+Add env vars under Settings ▸ Environment Variables.
+Click Deploy – Vercel runs npm run build automatically.
 
-### 5. Stripe Configuration
 
-1. Set up products and prices in your Stripe dashboard
-2. Configure a webhook endpoint in Stripe pointing to `/api/webhook` with these events:
-   - `checkout.session.completed`
-   - `invoice.payment_succeeded`
-   - `customer.subscription.updated`
-   - `customer.subscription.deleted`
+Docker
+docker build -t my-next-app .
+docker run -p 3000:3000 \
+  -e STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
+  -e STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
+  my-next-app
 
-### 6. Integration with Your App
+Generic CI (GitHub Actions)
 
-1. Place the provided files in their respective directories
-2. Update `_app.tsx` to include the `AuthProvider` and `SessionProvider`
-3. Use the `ProtectedRoute` component for pages that require authentication
-4. Implement the pricing page using the `PricingTable` component
+name: Build & Test
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 
-## Deployment Checklist
+7 · Important Files
 
-Before deploying to production:
+| Path                                       | Purpose                                |
+| ------------------------------------------ | -------------------------------------- |
+| `src/app/page.tsx`                         | Streaming landing page (App Router)    |
+| `src/app/api/webhooks/stripe/route.ts`     | Stripe webhook handler                 |
+| `src/components/home/*`                    | Hero, tech showcase, testimonials, CTA |
+| `src/components/Shared/LoadingSection.tsx` | Skeleton for lazy imports              |
+| `middleware.ts`                            | Route protection & token refresh       |
+| `theme/`                                   | MUI & Emotion theme providers          |
 
-1. **Security**
-   - Ensure HTTPS is enabled
-   - Set proper CORS headers
-   - Use strong NEXTAUTH_SECRET
-   - Configure secure cookies
+8 · Security Checklist
 
-2. **Stripe**
-   - Switch to production Stripe API keys
-   - Update webhook endpoints and secrets
-   - Test the complete subscription flow
+✅ NEXTAUTH_SECRET is 256-bit and stored in secrets manager.
+✅ STRIPE_WEBHOOK_SECRET matches dashboard value.
+✅ HTTPS enforced in prod (Vercel auto-TLS or reverse-proxy).
+✅ CSP & Referrer-Policy headers set in next.config.js.
+✅ GitHub Dependabot alerts monitored weekly.
 
-3. **Social Login**
-   - Update redirect URIs in provider dashboards
-   - Set up proper callback URLs
 
-4. **Performance**
-   - Implement proper error handling
-   - Add loading states for async operations
+9 · FAQ & Troubleshooting
 
-## Important Files
+| Problem                                                             | Fix                                                                                          |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **“Neither apiKey nor config.authenticator provided” during build** | Confirm `STRIPE_SECRET_KEY` present for the build or use lazy Stripe init (already in code). |
+| **Webhook signature failed**                                        | Ensure dashboard secret matches `.env` and your tunnelling tool (if any) forwards raw body.  |
+| **Social login 400 redirect\_uri\_mismatch**                        | Update OAuth console to point to the correct domain (including protocol and trailing slash). |
+| **Auth token expired mid-session**                                  | Inspect `middleware.ts` – refresh token if `exp < now + 30 s`.                               |
 
-- `pages/api/auth/[...nextauth].ts` - NextAuth configuration
-- `contexts/AuthContext.tsx` - Authentication context provider
-- `middleware.ts` - Route protection and token handling
-- `pages/api/webhook.ts` - Stripe webhook handler
-- `components/subscription/PricingTable.tsx` - Subscription UI
 
-## Customization
+Contributing
+Fork → Branch → PR.
+Conventional commits (feat:, fix:, etc.).
+CI must pass lint, tests, and build.
 
-### Styling
 
-The components use Tailwind CSS classes. You can customize the appearance by:
-
-1. Modifying the Tailwind classes directly in the components
-2. Creating a custom theme in your Tailwind config
-3. Adding additional CSS in your global stylesheet
-
-### Functionality
-
-To customize the behavior:
-
-1. Update the `AuthContext` to add or modify authentication functions
-2. Modify the `SubscriptionDetails` component to show different information
-3. Add or remove protected routes in the middleware configuration
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Authentication fails**
-   - Check API URL and endpoints
-   - Verify JWT secret consistency
-   - Check browser console for CORS errors
-
-2. **Stripe webhook not working**
-   - Verify webhook signature secret
-   - Check webhook endpoint is accessible
-   - Look at Stripe Dashboard for failed webhook attempts
-
-3. **Social login fails**
-   - Verify redirect URIs in provider dashboards
-   - Check console for OAuth errors
-   - Ensure provider credentials are correct
-
-### Logs and Debugging
-
-- Enable debug mode in NextAuth by setting `debug: true`
-- Check browser console for client-side errors
-- Review server logs for backend issues
-- Use Stripe CLI to test webhooks locally
+Happy shipping!
