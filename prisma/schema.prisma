@@ -1,15 +1,89 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// schema.prisma  – Last updated: 2025-05-25
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")   // Vercel (or fly.io, Render …)
+  directUrl = env("DATABASE_URL")   // Used by `prisma migrate`
+}
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+/* ------------------------------------------------------------------------- */
+/*  CORE MODELS                                                              */
+/* ------------------------------------------------------------------------- */
+
+model User {
+  id               String           @id @default(cuid())
+  email            String           @unique
+  username         String?          @unique
+  hashedPassword   String?          // Credential-based auth
+  stripeCustomerId String?          @unique
+  tempNotes        String?
+  roseWasHere      String?
+
+  /* Relations */
+  subscriptions    Subscription[]
+  resourceAccess   ResourceAccess[]
+
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id])
+
+  stripeSubscriptionId String   @unique                        // FROM Stripe
+  stripePriceId        String
+  status               String                                  // active | …
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean  @default(false)
+  canceledAt           DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  /// Helps detect near-simultaneous updates from different webhook types
+  @@index([stripeSubscriptionId, updatedAt])
+}
+
+/* ------------------------------------------------------------------------- */
+/*  FINE-GRAINED RESOURCE ACCESS (one-off purchases, entitlement model)      */
+/* ------------------------------------------------------------------------- */
+model ResourceAccess {
+  id                       String    @id @default(cuid())
+  userId                   String
+  user                     User      @relation(fields: [userId], references: [id])
+
+  resourceId               String
+  grantedByPaymentIntentId String
+  revokedAt                DateTime?
+  revokeReason             String?   // refund | chargeback | manual | …
+  revokedByStripeObjectId  String?   // could be a Charge, Dispute, etc.
+
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+
+  /// Exactly one active row per (user, resource) pair
+  @@unique([userId, resourceId])
+  @@index([grantedByPaymentIntentId])
+}
+
+/* ------------------------------------------------------------------------- */
+/*  STRIPE EVENT AUDIT / IDEMPOTENCY LOG                                     */
+/* ------------------------------------------------------------------------- */
+model StripeEventLog {
+  id         String   @id @default(cuid())
+  eventId    String   @unique          // Stripe’s canonical event.id
+  type       String
+  receivedAt DateTime @default(now())
+  payload    Json                     // Trim or move to S3 if payloads get big
+
+  @@index([type])
 }
