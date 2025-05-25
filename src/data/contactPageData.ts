@@ -156,7 +156,7 @@ export const contactInfoItems: ContactInfoItem[] = [
   {
     icon: LocationOn,
     primaryText: "Our Location",
-    secondaryText: "1234 Tech Plaza, Suite 500, San Francisco, CA 94107",
+    secondaryText: "3rd floor, 86-90 Paul Street LONDON EC2A 4NE",
   },
   {
     icon: AccessTime,
