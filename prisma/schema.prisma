@@ -1,9 +1,11 @@
-// schema.prisma  – Last updated: 2025-05-25
+// ===============================
+// File: prisma/schema.prisma
+// ===============================
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")   // Vercel (or fly.io, Render …)
-  directUrl = env("DATABASE_URL")   // Used by `prisma migrate`
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL")
 }
 
 generator client {
@@ -11,19 +13,16 @@ generator client {
 }
 
 /* ------------------------------------------------------------------------- */
-/*  CORE MODELS                                                              */
+/*  USERS & SUBSCRIPTIONS                                                    */
 /* ------------------------------------------------------------------------- */
 
 model User {
   id               String           @id @default(cuid())
   email            String           @unique
   username         String?          @unique
-  hashedPassword   String?          // Credential-based auth
+  hashedPassword   String?
   stripeCustomerId String?          @unique
-  tempNotes        String?
-  roseWasHere      String?
 
-  /* Relations */
   subscriptions    Subscription[]
   resourceAccess   ResourceAccess[]
 
@@ -36,9 +35,9 @@ model Subscription {
   userId               String
   user                 User     @relation(fields: [userId], references: [id])
 
-  stripeSubscriptionId String   @unique                        // FROM Stripe
+  stripeSubscriptionId String   @unique
   stripePriceId        String
-  status               String                                  // active | …
+  status               String
   currentPeriodStart   DateTime
   currentPeriodEnd     DateTime
   cancelAtPeriodEnd    Boolean  @default(false)
@@ -49,41 +48,37 @@ model Subscription {
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  /// Helps detect near-simultaneous updates from different webhook types
   @@index([stripeSubscriptionId, updatedAt])
 }
 
 /* ------------------------------------------------------------------------- */
-/*  FINE-GRAINED RESOURCE ACCESS (one-off purchases, entitlement model)      */
+/*  ONE‑OFF ENTITLEMENTS & STRIPE EVENT LOG                                  */
 /* ------------------------------------------------------------------------- */
+
 model ResourceAccess {
-  id                       String    @id @default(cuid())
+  id                       String   @id @default(cuid())
   userId                   String
-  user                     User      @relation(fields: [userId], references: [id])
+  user                     User     @relation(fields: [userId], references: [id])
 
   resourceId               String
-  grantedByPaymentIntentId String
+  grantedByPaymentIntentId String   @unique
   revokedAt                DateTime?
-  revokeReason             String?   // refund | chargeback | manual | …
-  revokedByStripeObjectId  String?   // could be a Charge, Dispute, etc.
+  revokeReason             String?
+  revokedByStripeObjectId  String?
 
-  createdAt                DateTime  @default(now())
-  updatedAt                DateTime  @updatedAt
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
 
-  /// Exactly one active row per (user, resource) pair
   @@unique([userId, resourceId])
-  @@index([grantedByPaymentIntentId])
+  @@index([resourceId])
 }
 
-/* ------------------------------------------------------------------------- */
-/*  STRIPE EVENT AUDIT / IDEMPOTENCY LOG                                     */
-/* ------------------------------------------------------------------------- */
 model StripeEventLog {
   id         String   @id @default(cuid())
-  eventId    String   @unique          // Stripe’s canonical event.id
+  eventId    String   @unique              // Stripe event.id (idempotency)
   type       String
   receivedAt DateTime @default(now())
-  payload    Json                     // Trim or move to S3 if payloads get big
+  payload    Json
 
-  @@index([type])
+  @@index([type, receivedAt])
 }

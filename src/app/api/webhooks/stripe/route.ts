@@ -2,7 +2,7 @@
 // -----------------------------------------------------------------------------
 // Typed, idempotent Stripe webhook handler backed by Prisma
 // -----------------------------------------------------------------------------
-// Last updated: 2025‑05‑25
+// Last updated: 2025-05-25
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +11,10 @@ import { headers } from 'next/headers';
 import Stripe from 'stripe';
 
 import { prisma } from '@/lib/prisma';
-import { getCustomerId } from '@/utils/stripe'; // NEW: safe customer‑ID extractor
+import { getCustomerId } from '@/utils/stripe';          // NEW: safe customer-ID extractor
+import type { Prisma } from '@prisma/client';            // NEW: Prisma types for strict-mode
+
+type Tx = Prisma.TransactionClient;                      // Optional alias for brevity
 
 /* -------------------------------------------------------------------------- */
 /* Stripe initialisation – basil schema                                       */
@@ -23,7 +26,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 /* -------------------------------------------------------------------------- */
-/* Type‑helpers to support both snake_case (classic) and camelCase (basil)    */
+/* Type-helpers to support both snake_case (classic) and camelCase (basil)    */
 /* -------------------------------------------------------------------------- */
 // Simple helper: safely read either snake_case or camelCase field names without busting TS types
 const pickField = (obj: any, snake: string, camel: string) => obj?.[snake] ?? obj?.[camel];
@@ -39,7 +42,7 @@ const grantAccessToResource = async (
   resourceId: string,
   paymentIntentId: string,
 ) =>
-  prisma.$transaction(async (tx) => {
+  prisma.$transaction(async (tx: Tx) => {
     await tx.resourceAccess.upsert({
       where: { userId_resourceId: { userId, resourceId } },
       update: {
