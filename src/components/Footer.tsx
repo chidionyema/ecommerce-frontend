@@ -59,13 +59,13 @@ const Footer: React.FC = () => {
               Contact
             </Typography>
             <Typography variant="body2">
-              123 Tech Street, Innovation City
+            3rd floor, 86-90 Paul Street LONDON EC2A 4NE
             </Typography>
             <Typography variant="body2">
               Email: info@glustack.com
             </Typography>
             <Typography variant="body2">
-              Phone: +1 (555) 123-4567
+              Phone: +44 7904026978
             </Typography>
           </Grid>
           <Grid item xs={12} sm={12} md={3} textAlign="center">
