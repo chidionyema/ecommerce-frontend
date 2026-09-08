@@ -1,0 +1,14 @@
+id: auto-ecommerce-frontend
+name: ecommerce-frontend
+repo: ecommerce-frontend
+path: ecommerce-frontend
+state: NO_CLUSTER_HOME
+git_branch: no-git
+last_commit: never
+code_files: 140
+test_files: 0
+indicators:
+- Dockerfile
+- docker-compose.yml
+- package.json
+requires_deep_review: true

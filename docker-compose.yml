@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  setup_https:
+    build:
+      context: .
+      dockerfile: Dockerfile.certbot
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    entrypoint: >
+      /bin/sh -c "certbot certonly \
+      --authenticator dns-cloudflare \
+      --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini \
+      --dns-cloudflare-propagation-seconds 60 \
+      --agree-tos \
+      --email chidi@gmail.com \
+      --no-eff-email \
+      --non-interactive \
+      -d local.glustack.com && \
+      mkdir -p /etc/letsencrypt && \
+      cp /etc/letsencrypt/live/local.glustack.com/privkey.pem /etc/letsencrypt/key.pem && \
+      cp /etc/letsencrypt/live/local.glustack.com/fullchain.pem /etc/letsencrypt/cert.pem"
+    volumes:
+      - ./certs:/etc/letsencrypt
+      - ./cloudflare.ini:/etc/letsencrypt/cloudflare.ini
+    restart: "no"
+    container_name: ecommerce-frontend-setup_https
+
+  gluestack:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://api.local.ritualworks.com
+      - PORT=3001
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./certs:/app/certs:ro
+    depends_on:
+      - setup_https
+    container_name: ecommerce-frontend-gluestack
